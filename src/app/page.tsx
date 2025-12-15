@@ -91,8 +91,27 @@ export default function Home() {
           </div>
         </div>
 
+        {/* Coupang Partners Banner */}
+        <div className="mt-8">
+          <p className="text-center text-xs text-gray-400 mb-2">추천 상품</p>
+          <div className="flex justify-center">
+            <iframe
+              src="https://ads-partners.coupang.com/widgets.html?id=950676&template=carousel&trackingCode=AF6497036&subId=&width=450&height=130&tsource="
+              width="450"
+              height="130"
+              frameBorder="0"
+              scrolling="no"
+              referrerPolicy="unsafe-url"
+              className="rounded-lg max-w-full"
+            />
+          </div>
+          <p className="text-center text-gray-600 text-[10px] mt-2">
+            쿠팡 파트너스 활동의 일환으로 일정액의 수수료를 제공받습니다
+          </p>
+        </div>
+
         {/* Footer */}
-        <p className="text-center text-gray-500 text-xs mt-8">
+        <p className="text-center text-gray-500 text-xs mt-6">
           ⚠️ 재미로만 봐주세요! 과학적 근거는 없습니다.
         </p>
       </main>
