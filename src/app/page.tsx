@@ -1,253 +1,95 @@
 "use client";
 
-import { useState, useRef } from "react";
-
-interface AnalysisResult {
-  type: string;
-  title: string;
-  traits: string[];
-  career: string;
-  love: string;
-  luckyNumber: number;
-  description: string;
-}
+import Link from "next/link";
 
 export default function Home() {
-  const [image, setImage] = useState<string | null>(null);
-  const [loading, setLoading] = useState(false);
-  const [result, setResult] = useState<AnalysisResult | null>(null);
-  const fileInputRef = useRef<HTMLInputElement>(null);
-
-  const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (file) {
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        setImage(reader.result as string);
-        setResult(null);
-      };
-      reader.readAsDataURL(file);
-    }
-  };
-
-  const analyzeImage = async () => {
-    if (!image) return;
-
-    setLoading(true);
-    try {
-      const response = await fetch("/api/analyze", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ image }),
-      });
-
-      const data = await response.json();
-      if (data.error) {
-        alert(data.error);
-      } else {
-        setResult(data);
-      }
-    } catch (error) {
-      alert("분석 중 오류가 발생했습니다.");
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const resetAll = () => {
-    setImage(null);
-    setResult(null);
-    if (fileInputRef.current) {
-      fileInputRef.current.value = "";
-    }
-  };
-
-  const shareResult = async () => {
-    if (!result || !image) return;
-
-    const shareText = `🔮 AI 관상 테스트 결과\n\n나는 "${result.title}" 타입!\n\n✨ 성격: ${result.traits.join(", ")}\n💼 직업: ${result.career}\n💕 연애: ${result.love}\n🍀 행운의 숫자: ${result.luckyNumber}\n\n당신도 테스트 해보세요!`;
-    const shareUrl = window.location.origin;
-
-    // 이미지를 Blob으로 변환
-    try {
-      const response = await fetch(image);
-      const blob = await response.blob();
-      const file = new File([blob], "face-reading-result.png", { type: blob.type });
-
-      if (navigator.share && navigator.canShare({ files: [file] })) {
-        await navigator.share({
-          title: "AI 관상 테스트 결과",
-          text: shareText,
-          url: shareUrl,
-          files: [file],
-        });
-      } else if (navigator.share) {
-        await navigator.share({
-          title: "AI 관상 테스트 결과",
-          text: shareText,
-          url: shareUrl,
-        });
-      } else {
-        await navigator.clipboard.writeText(`${shareText}\n\n${shareUrl}`);
-        alert("결과가 클립보드에 복사되었습니다!");
-      }
-    } catch (error) {
-      // 공유 취소 등의 에러는 무시
-      if ((error as Error).name !== "AbortError") {
-        try {
-          await navigator.clipboard.writeText(`${shareText}\n\n${shareUrl}`);
-          alert("결과가 클립보드에 복사되었습니다!");
-        } catch {
-          alert("공유하기를 사용할 수 없습니다.");
-        }
-      }
-    }
-  };
-
   return (
     <div className="min-h-screen bg-gradient-to-br from-purple-900 via-indigo-900 to-black text-white">
-      <main className="container mx-auto px-4 py-8 max-w-md">
+      <main className="container mx-auto px-4 py-12 max-w-lg">
         {/* Header */}
-        <div className="text-center mb-8">
-          <h1 className="text-3xl font-bold mb-2 bg-gradient-to-r from-pink-400 to-purple-400 bg-clip-text text-transparent">
-            AI 관상 테스트
+        <div className="text-center mb-12">
+          <h1 className="text-4xl font-bold mb-3 bg-gradient-to-r from-pink-400 via-purple-400 to-yellow-400 bg-clip-text text-transparent">
+            운명을 읽다
           </h1>
-          <p className="text-gray-300 text-sm">
-            AI가 당신의 얼굴에서 숨겨진 성격을 찾아드립니다
+          <p className="text-gray-300">
+            AI와 전통 명리학이 만나다
           </p>
         </div>
 
-        {/* Upload Section */}
-        {!result && (
-          <div className="bg-white/10 backdrop-blur-lg rounded-2xl p-6 mb-6">
-            <div
-              className="border-2 border-dashed border-purple-400 rounded-xl p-8 text-center cursor-pointer hover:bg-white/5 transition"
-              onClick={() => fileInputRef.current?.click()}
-            >
-              {image ? (
-                <div className="relative">
-                  <img
-                    src={image}
-                    alt="업로드된 이미지"
-                    className="mx-auto rounded-lg object-cover max-h-[250px] w-auto"
-                  />
-                  <p className="text-sm text-gray-400 mt-3">
-                    다른 사진을 선택하려면 클릭하세요
+        {/* Menu Cards */}
+        <div className="space-y-4">
+          {/* 관상 테스트 */}
+          <Link href="/face" className="block">
+            <div className="bg-white/10 backdrop-blur-lg rounded-2xl p-6 hover:bg-white/15 transition group">
+              <div className="flex items-center gap-4">
+                <div className="text-5xl">👤</div>
+                <div className="flex-1">
+                  <h2 className="text-xl font-bold mb-1 group-hover:text-pink-400 transition">
+                    AI 관상 분석
+                  </h2>
+                  <p className="text-gray-400 text-sm">
+                    얼굴 사진으로 보는 초년·중년·말년운
                   </p>
                 </div>
-              ) : (
-                <div>
-                  <div className="text-5xl mb-3">📷</div>
-                  <p className="text-lg font-medium">사진을 업로드하세요</p>
-                  <p className="text-sm text-gray-400 mt-1">
-                    얼굴이 잘 보이는 정면 사진이 좋아요
+                <div className="text-gray-500 group-hover:text-white transition">→</div>
+              </div>
+              <div className="flex gap-2 mt-4">
+                <span className="text-xs px-2 py-1 bg-pink-500/20 text-pink-300 rounded-full">전통 관상학</span>
+                <span className="text-xs px-2 py-1 bg-purple-500/20 text-purple-300 rounded-full">AI 분석</span>
+                <span className="text-xs px-2 py-1 bg-blue-500/20 text-blue-300 rounded-full">재물운</span>
+              </div>
+            </div>
+          </Link>
+
+          {/* 신년 운세 */}
+          <Link href="/fortune" className="block">
+            <div className="bg-white/10 backdrop-blur-lg rounded-2xl p-6 hover:bg-white/15 transition group relative overflow-hidden">
+              <div className="absolute top-2 right-2 bg-yellow-500 text-black text-xs font-bold px-2 py-1 rounded-full">
+                2025 🐍
+              </div>
+              <div className="flex items-center gap-4">
+                <div className="text-5xl">🔮</div>
+                <div className="flex-1">
+                  <h2 className="text-xl font-bold mb-1 group-hover:text-yellow-400 transition">
+                    2025 신년 운세
+                  </h2>
+                  <p className="text-gray-400 text-sm">
+                    사주팔자로 보는 을사년 운세
                   </p>
                 </div>
-              )}
-              <input
-                ref={fileInputRef}
-                type="file"
-                accept="image/*"
-                onChange={handleImageUpload}
-                className="hidden"
-              />
-            </div>
-
-            {image && (
-              <button
-                onClick={analyzeImage}
-                disabled={loading}
-                className="w-full mt-4 py-3 bg-gradient-to-r from-pink-500 to-purple-500 rounded-xl font-bold text-lg hover:opacity-90 transition disabled:opacity-50"
-              >
-                {loading ? (
-                  <span className="flex items-center justify-center gap-2">
-                    <span className="animate-spin">🔮</span> 관상 분석 중...
-                  </span>
-                ) : (
-                  "🔮 관상 보기"
-                )}
-              </button>
-            )}
-          </div>
-        )}
-
-        {/* Result Section */}
-        {result && (
-          <div className="bg-white/10 backdrop-blur-lg rounded-2xl p-6 animate-fade-in">
-            {/* Type Badge */}
-            <div className="text-center mb-6">
-              <div className="inline-block px-4 py-1 bg-gradient-to-r from-pink-500 to-purple-500 rounded-full text-sm font-medium mb-3">
-                {result.type}
+                <div className="text-gray-500 group-hover:text-white transition">→</div>
               </div>
-              <h2 className="text-2xl font-bold">{result.title}</h2>
-            </div>
-
-            {/* Uploaded Image */}
-            {image && (
-              <div className="flex justify-center mb-6">
-                <img
-                  src={image}
-                  alt="분석된 이미지"
-                  className="rounded-full object-cover border-4 border-purple-400 w-[120px] h-[120px]"
-                />
-              </div>
-            )}
-
-            {/* Description */}
-            <p className="text-gray-300 text-center mb-6 leading-relaxed">
-              {result.description}
-            </p>
-
-            {/* Traits */}
-            <div className="mb-6">
-              <h3 className="font-bold text-pink-400 mb-2">✨ 성격 특징</h3>
-              <div className="flex flex-wrap gap-2">
-                {result.traits.map((trait, i) => (
-                  <span
-                    key={i}
-                    className="px-3 py-1 bg-white/10 rounded-full text-sm"
-                  >
-                    {trait}
-                  </span>
-                ))}
+              <div className="flex gap-2 mt-4">
+                <span className="text-xs px-2 py-1 bg-yellow-500/20 text-yellow-300 rounded-full">사주팔자</span>
+                <span className="text-xs px-2 py-1 bg-orange-500/20 text-orange-300 rounded-full">천간지지</span>
+                <span className="text-xs px-2 py-1 bg-red-500/20 text-red-300 rounded-full">오행분석</span>
               </div>
             </div>
+          </Link>
+        </div>
 
-            {/* Career & Love */}
-            <div className="grid grid-cols-2 gap-4 mb-6">
-              <div className="bg-white/5 rounded-xl p-4">
-                <h3 className="font-bold text-purple-400 mb-1">💼 어울리는 직업</h3>
-                <p className="text-sm">{result.career}</p>
-              </div>
-              <div className="bg-white/5 rounded-xl p-4">
-                <h3 className="font-bold text-pink-400 mb-1">💕 연애 스타일</h3>
-                <p className="text-sm">{result.love}</p>
-              </div>
+        {/* Info Section */}
+        <div className="mt-12 bg-white/5 rounded-2xl p-6">
+          <h3 className="font-bold mb-3 text-center">✨ 특징</h3>
+          <div className="grid grid-cols-2 gap-4 text-sm">
+            <div className="text-center">
+              <div className="text-2xl mb-1">📚</div>
+              <p className="text-gray-400">전통 명리학 기반</p>
             </div>
-
-            {/* Lucky Number */}
-            <div className="text-center mb-6 p-4 bg-gradient-to-r from-pink-500/20 to-purple-500/20 rounded-xl">
-              <p className="text-sm text-gray-400">행운의 숫자</p>
-              <p className="text-4xl font-bold">{result.luckyNumber}</p>
+            <div className="text-center">
+              <div className="text-2xl mb-1">🤖</div>
+              <p className="text-gray-400">AI 정밀 분석</p>
             </div>
-
-            {/* Buttons */}
-            <div className="flex gap-3">
-              <button
-                onClick={shareResult}
-                className="flex-1 py-3 bg-gradient-to-r from-pink-500 to-purple-500 rounded-xl font-bold hover:opacity-90 transition"
-              >
-                공유하기 📤
-              </button>
-              <button
-                onClick={resetAll}
-                className="flex-1 py-3 bg-white/10 rounded-xl font-bold hover:bg-white/20 transition"
-              >
-                다시하기 🔄
-              </button>
+            <div className="text-center">
+              <div className="text-2xl mb-1">🎯</div>
+              <p className="text-gray-400">체계적인 운세</p>
+            </div>
+            <div className="text-center">
+              <div className="text-2xl mb-1">📱</div>
+              <p className="text-gray-400">공유하기 쉬움</p>
             </div>
           </div>
-        )}
+        </div>
 
         {/* Footer */}
         <p className="text-center text-gray-500 text-xs mt-8">
