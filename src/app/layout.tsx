@@ -13,12 +13,12 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "AI 관상 테스트 | 얼굴로 보는 내 성격",
-  description: "AI가 당신의 얼굴을 분석해 숨겨진 성격과 운명을 알려드립니다. 무료 관상 테스트!",
-  keywords: "관상, AI 관상, 얼굴 분석, 성격 테스트, 무료 관상",
+  title: "운명을 읽다 | AI 관상 & 2026 신년운세",
+  description: "AI 관상 분석과 사주팔자 기반 2026년 병오년 신년운세! 얼굴로 보는 초년·중년·말년운, 음력 생년월일로 보는 무료 운세.",
+  keywords: "관상, AI 관상, 신년운세, 2026운세, 사주, 사주팔자, 병오년, 무료운세, 토정비결, 얼굴분석",
   openGraph: {
-    title: "AI 관상 테스트 | 얼굴로 보는 내 성격",
-    description: "AI가 당신의 얼굴을 분석해 숨겨진 성격과 운명을 알려드립니다.",
+    title: "운명을 읽다 | AI 관상 & 2026 신년운세",
+    description: "AI 관상 분석과 사주팔자 기반 2026년 신년운세를 무료로 확인하세요!",
     type: "website",
   },
 };
