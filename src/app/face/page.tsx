@@ -175,16 +175,28 @@ export default function FacePage() {
         {/* Result Section */}
         {result && (
           <div className="space-y-4 animate-fade-in">
-            {/* 기본 정보 */}
+            {/* 기본 정보 + 사진 */}
             <div className="bg-gradient-to-r from-pink-500/20 to-purple-500/20 backdrop-blur-lg rounded-2xl p-6">
-              <div className="text-center">
-                <span className="inline-block px-4 py-1 bg-pink-500 text-white rounded-full text-sm font-bold mb-3">
-                  {result.type}
-                </span>
-                <h2 className="text-2xl font-bold mb-2">{result.title}</h2>
-                <p className="text-gray-300 text-sm leading-relaxed">
-                  {result.summary}
-                </p>
+              <div className="flex gap-4 items-start">
+                {/* 업로드한 사진 */}
+                {image && (
+                  <div className="flex-shrink-0">
+                    <img
+                      src={image}
+                      alt="분석된 얼굴"
+                      className="w-24 h-24 object-cover rounded-xl border-2 border-pink-400/50"
+                    />
+                  </div>
+                )}
+                <div className="flex-1 text-center">
+                  <span className="inline-block px-4 py-1 bg-pink-500 text-white rounded-full text-sm font-bold mb-2">
+                    {result.type}
+                  </span>
+                  <h2 className="text-xl font-bold mb-2">{result.title}</h2>
+                  <p className="text-gray-300 text-sm leading-relaxed">
+                    {result.summary}
+                  </p>
+                </div>
               </div>
             </div>
 

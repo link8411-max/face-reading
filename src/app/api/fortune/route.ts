@@ -30,7 +30,7 @@ async function tryGenerateContent(prompt: string, maxRetries = 2) {
 
 export async function POST(request: NextRequest) {
   try {
-    const { year, month, day, isLunar } = await request.json();
+    const { year, month, day, hour, isLunar } = await request.json();
 
     if (!year || !month || !day) {
       return NextResponse.json({ error: "생년월일이 필요합니다." }, { status: 400 });
@@ -38,18 +38,20 @@ export async function POST(request: NextRequest) {
 
     const 사주결과 = 사주분석(year, month, day);
     const 역법 = isLunar ? "음력" : "양력";
+    const 시간정보 = hour && hour !== "모름" ? hour : null;
 
     const prompt = `당신은 전통 사주명리학 전문가입니다.
 아래 사주 정보를 바탕으로 2026년 병오년(丙午年) 신년 운세를 분석해주세요.
 
 [사주 정보]
-- 생년월일: ${year}년 ${month}월 ${day}일 (${역법})
+- 생년월일시: ${year}년 ${month}월 ${day}일 ${시간정보 ? 시간정보 : "(시간 미상)"}
 - 역법: ${역법} ${isLunar ? "(전통 사주명리학 기준)" : "(양력 입력 - 참고용 분석)"}
 - 띠: ${사주결과.띠} (${사주결과.띠이모지})
 - 사주팔자:
   - 년주: ${사주결과.사주.년주}
   - 월주: ${사주결과.사주.월주}
-  - 일주: ${사주결과.사주.일주}
+  - 일주: ${사주결과.사주.일주}${시간정보 ? `
+  - 시주: ${시간정보} (태어난 시간)` : ""}
 - 일간(본인 오행): ${사주결과.일간} (${사주결과.일간오행})
 - 음양: ${사주결과.음양}
 - 오행 분포: 목(${사주결과.오행분포.목}) 화(${사주결과.오행분포.화}) 토(${사주결과.오행분포.토}) 금(${사주결과.오행분포.금}) 수(${사주결과.오행분포.수})
@@ -128,7 +130,7 @@ export async function POST(request: NextRequest) {
     const aiResult = JSON.parse(jsonMatch[0]);
 
     const finalResult = {
-      사주정보: { ...사주결과, 역법 },
+      사주정보: { ...사주결과, 역법, 시주: 시간정보 },
       운세: aiResult,
     };
 
