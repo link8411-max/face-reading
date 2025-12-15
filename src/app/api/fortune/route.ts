@@ -4,6 +4,30 @@ import { 사주분석, 년도2026 } from "@/lib/saju";
 
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY || "");
 
+// 재시도 함수
+async function tryGenerateContent(prompt: string, maxRetries = 2) {
+  const models = ["gemini-2.5-flash", "gemini-2.0-flash"];
+
+  for (const modelName of models) {
+    for (let i = 0; i < maxRetries; i++) {
+      try {
+        const model = genAI.getGenerativeModel({ model: modelName });
+        const result = await model.generateContent(prompt);
+        return result.response.text();
+      } catch (error: unknown) {
+        const err = error as { status?: number };
+        console.log(`${modelName} 시도 ${i + 1} 실패:`, err.status);
+        if (err.status === 503 || err.status === 429) {
+          await new Promise(r => setTimeout(r, 1000 * (i + 1)));
+          continue;
+        }
+        break;
+      }
+    }
+  }
+  throw new Error("모든 모델 시도 실패");
+}
+
 export async function POST(request: NextRequest) {
   try {
     const { year, month, day, isLunar } = await request.json();
@@ -12,11 +36,8 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: "생년월일이 필요합니다." }, { status: 400 });
     }
 
-    // 사주 계산 (음력이든 양력이든 입력된 날짜로 계산 - 전통 사주는 음력 기준)
     const 사주결과 = 사주분석(year, month, day);
     const 역법 = isLunar ? "음력" : "양력";
-
-    const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash" });
 
     const prompt = `당신은 전통 사주명리학 전문가입니다.
 아래 사주 정보를 바탕으로 2026년 병오년(丙午年) 신년 운세를 분석해주세요.
@@ -97,11 +118,8 @@ export async function POST(request: NextRequest) {
 - 오행의 상생상극을 고려해주세요
 - 긍정적이면서도 실질적인 조언을 해주세요`;
 
-    const result = await model.generateContent(prompt);
-    const response = await result.response;
-    const text = response.text();
+    const text = await tryGenerateContent(prompt);
 
-    // Parse JSON from response
     const jsonMatch = text.match(/\{[\s\S]*\}/);
     if (!jsonMatch) {
       return NextResponse.json({ error: "분석 결과를 파싱할 수 없습니다." }, { status: 500 });
@@ -109,7 +127,6 @@ export async function POST(request: NextRequest) {
 
     const aiResult = JSON.parse(jsonMatch[0]);
 
-    // 사주 정보와 AI 분석 결과 합치기
     const finalResult = {
       사주정보: { ...사주결과, 역법 },
       운세: aiResult,
