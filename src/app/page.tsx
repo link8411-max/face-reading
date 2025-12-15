@@ -41,6 +41,32 @@ export default function Home() {
             </div>
           </Link>
 
+          {/* 오늘의 운세 */}
+          <Link href="/fortune/daily" className="block">
+            <div className="bg-white/10 backdrop-blur-lg rounded-2xl p-6 hover:bg-white/15 transition group relative overflow-hidden">
+              <div className="absolute top-2 right-2 bg-orange-500 text-white text-xs font-bold px-2 py-1 rounded-full">
+                NEW ✨
+              </div>
+              <div className="flex items-center gap-4">
+                <div className="text-5xl">☀️</div>
+                <div className="flex-1">
+                  <h2 className="text-xl font-bold mb-1 group-hover:text-orange-400 transition">
+                    오늘의 운세
+                  </h2>
+                  <p className="text-gray-400 text-sm">
+                    띠별로 보는 오늘 하루 운세
+                  </p>
+                </div>
+                <div className="text-gray-500 group-hover:text-white transition">→</div>
+              </div>
+              <div className="flex gap-2 mt-4">
+                <span className="text-xs px-2 py-1 bg-orange-500/20 text-orange-300 rounded-full">매일 업데이트</span>
+                <span className="text-xs px-2 py-1 bg-pink-500/20 text-pink-300 rounded-full">행운시간</span>
+                <span className="text-xs px-2 py-1 bg-yellow-500/20 text-yellow-300 rounded-full">행운색</span>
+              </div>
+            </div>
+          </Link>
+
           {/* 신년 운세 */}
           <Link href="/fortune" className="block">
             <div className="bg-white/10 backdrop-blur-lg rounded-2xl p-6 hover:bg-white/15 transition group relative overflow-hidden">
