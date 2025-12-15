@@ -4,15 +4,16 @@
 - **서비스명**: 운명을 읽다
 - **URL**: https://face-reading.vercel.app
 - **GitHub**: https://github.com/link8411-max/face-reading
-- **개발일**: 2025년 12월 15일
+- **개발 시작일**: 2025년 12월 15일
 
 ## 기술 스택
 - **프레임워크**: Next.js 16 (App Router)
 - **언어**: TypeScript
 - **스타일링**: Tailwind CSS
-- **AI API**: Google Gemini API (gemini-2.5-flash)
+- **AI API**: Google Gemini API (관상 분석만 사용)
 - **배포**: Vercel
 - **분석**: Vercel Analytics
+- **광고**: 쿠팡 파트너스
 
 ## 주요 기능
 
@@ -36,91 +37,93 @@
   - 월별 운세 (상반기/하반기, 최고의달/주의할달)
   - 세부 운세 (재물운, 애정운, 직장운, 건강운, 학업운)
   - 오행 분석, 행운 요소, 조언
+- **DB 기반** (AI 호출 없음 → 즉시 응답!)
+
+### 3. 오늘의 운세 (`/fortune/daily`) ⭐ NEW
+- 출생년도 입력 → 띠 계산 → 오늘 운세 표시
+- **요일별 × 12띠 = 84개 조합** 미리 생성
+- **표시 항목**:
+  - 오늘의 운세 점수 (★★★★★)
+  - 오늘의 한마디
+  - 행운의 시간
+  - 행운의 색
+- **DB 기반** (AI 호출 없음 → 즉시 응답!)
 
 ## 프로젝트 구조
 ```
 src/
 ├── app/
-│   ├── page.tsx              # 메인 (관상/운세 선택)
+│   ├── page.tsx              # 메인 (메뉴 선택)
 │   ├── layout.tsx            # 레이아웃 + Analytics
+│   ├── globals.css           # 전역 스타일 + 애니메이션
 │   ├── face/
 │   │   └── page.tsx          # 관상 분석 페이지
 │   ├── fortune/
-│   │   └── page.tsx          # 신년 운세 페이지
+│   │   ├── page.tsx          # 신년 운세 페이지
+│   │   └── daily/
+│   │       └── page.tsx      # 오늘의 운세 페이지
 │   └── api/
 │       ├── analyze/
-│       │   └── route.ts      # 관상 분석 API
+│       │   └── route.ts      # 관상 분석 API (Gemini)
 │       └── fortune/
-│           └── route.ts      # 운세 분석 API
+│           └── route.ts      # 운세 분석 API (DB 조회)
 ├── lib/
-│   └── saju.ts               # 사주팔자 계산 유틸리티
+│   ├── saju.ts               # 사주팔자 계산 유틸리티
+│   └── fortuneDB.ts          # 운세 데이터베이스 ⭐
 └── globals.css
 ```
 
-## API 상세
+## 운세 데이터베이스 (`fortuneDB.ts`)
 
-### POST /api/analyze (관상)
+### 구조
 ```typescript
-// Request
-{ image: string }  // base64 이미지
-
-// Response
-{
-  type: string,           // 관상 유형
-  title: string,          // 대표 관상명
-  faceFeatures: {...},    // 부위별 분석
-  lifeFortune: {...},     // 시기별 운세
-  categories: {...},      // 운세 지수
-  personality: string[],  // 성격 특성
-  career: string,         // 어울리는 직업
-  advice: string,         // 조언
-  luckyNumber: number,
-  luckyColor: string,
-  summary: string
+fortuneDB = {
+  띠: { ... },           // 12띠별 기본 성격
+  "2026_띠별": { ... },  // 2026년 띠별 신년운세
+  오행: { ... },         // 오행별 특성
+  세부운세: { ... },     // 재물/애정/직장/건강/학업운 템플릿
+  행운요소: { ... },     // 오행별 행운 요소
+  일간운세: { ... },     // 요일 × 띠별 일간 운세 (84개)
+  조언: { ... },         // 해야할것/피해야할것/명심할말
 }
 ```
 
-### POST /api/fortune (운세)
-```typescript
-// Request
-{
-  year: number,
-  month: number,
-  day: number,
-  hour: string,      // "자시"~"해시" 또는 "모름"
-  isLunar: boolean   // 음력 여부
-}
+### 장점
+- **AI 호출 없음** → API 비용 0원
+- **즉시 응답** → 3-10초 → 0.01초
+- **안정적** → 외부 API 의존 없음
 
-// Response
-{
-  사주정보: {
-    띠, 띠이모지, 사주, 일간, 일간오행,
-    음양, 오행분포, 강한오행, 약한오행,
-    역법, 시주
-  },
-  운세: {
-    총운, 월별운세, 세부운세, 사주분석,
-    행운요소, 조언
-  }
-}
+### 연간 업데이트
+```
+매년 12월: fortuneDB.ts 업데이트
+- "2026_띠별" → "2027_띠별"로 변경
+- 새해 운세 내용 수정
 ```
 
-## 사주 계산 (`/src/lib/saju.ts`)
-- **천간**: 갑을병정무기경신임계 (10개)
-- **지지**: 자축인묘진사오미신유술해 (12개)
-- **오행**: 목화토금수
-- **계산**: 년주, 월주, 일주 (시주는 AI가 처리)
-- **2026년 정보**: 병오년 (丙午年) - 화(火) + 말띠
+## 애니메이션 효과
+- `animate-shake-slow` - 방울 흔들림
+- `animate-twinkle` - 별 반짝임
+- `animate-pulse-heart` - 두근두근
+- `animate-float` - 떠다니기
+- `animate-bounce-in` - 튀어오르기
+- `animate-fade-in` - 페이드인
+
+## 수익화
+
+### 쿠팡 파트너스
+- **ID**: AF6497036
+- **배너 위치**: 메인, 관상 결과, 운세 결과, 오늘의 운세
+- **배너 타입**: 다이나믹 캐러셀 (450x130)
+- **수익 구조**: 클릭 후 24시간 내 구매 시 약 3-5% 수수료
+
+### 향후 계획
+- 카카오 애드핏 / Google AdSense
+- 리워드 광고
 
 ## 환경 변수
 ```
-GEMINI_API_KEY=AIzaSy...  # Google AI Studio에서 발급
+GEMINI_API_KEY=AIzaSy...  # Google AI Studio에서 발급 (관상 분석용)
 ```
-
-## Gemini API 설정
-- **모델**: gemini-2.5-flash (기본), gemini-2.0-flash (백업)
-- **재시도 로직**: 503/429 에러 시 자동 재시도 + 백업 모델 전환
-- **유료 전환됨**: 일일 제한 해제
 
 ## 배포 정보
 - **플랫폼**: Vercel
@@ -129,15 +132,10 @@ GEMINI_API_KEY=AIzaSy...  # Google AI Studio에서 발급
 
 ## 구현 예정 / 아이디어
 - [ ] 공유 기능 강화 (카카오톡, 이미지 저장)
-- [ ] 광고 (카카오 AdFit 또는 Google AdSense)
-- [ ] 결과 이미지 생성 (공유용)
-- [ ] UI 개선
-- [ ] 더 많은 운세 옵션 (오늘의 운세, 궁합 등)
-
-## 참고 사항
-- 메타데이터: `layout.tsx`에서 설정 (SEO)
-- Vercel Analytics 활성화됨 (월 2,500 이벤트 무료)
-- Gemini API 유료 전환 완료 (사용량 과금)
+- [ ] 결과 이미지 생성 (공유용 카드)
+- [ ] 주간 운세 추가
+- [ ] 궁합 보기 기능
+- [ ] 카카오 애드핏 / AdSense 연동
 
 ## 로컬 개발
 ```bash
@@ -147,12 +145,22 @@ npm run dev
 ```
 
 ## 최근 커밋 히스토리
-1. feat: 태어난 시간(시주) 입력 + 관상 결과에 사진 표시
-2. feat: Vercel Analytics 추가 + gemini-2.5-flash 기본 모델
-3. feat: 재시도 로직 + 백업 모델 추가
-4. feat: 2026년 병오년으로 운세 업데이트
-5. feat: 음력/양력 선택 기능 추가
-6. feat: 사주팔자 기반 신년 운세 기능 추가
+1. feat: 애니메이션 효과 추가
+2. feat: 오늘의 운세 기능 추가
+3. perf: 운세 API를 DB 조회 방식으로 변경 (AI 호출 제거)
+4. feat: 쿠팡 파트너스 배너 추가
+5. feat: 태어난 시간(시주) 입력 + 관상 결과에 사진 표시
+6. feat: Vercel Analytics 추가 + gemini-2.5-flash 기본 모델
+7. feat: 재시도 로직 + 백업 모델 추가
+8. feat: 2026년 병오년으로 운세 업데이트
+9. feat: 음력/양력 선택 기능 추가
+10. feat: 사주팔자 기반 신년 운세 기능 추가
+
+## 참고 사항
+- 메타데이터: `layout.tsx`에서 설정 (SEO)
+- Vercel Analytics 활성화됨 (월 2,500 이벤트 무료)
+- Gemini API는 관상 분석에만 사용 (운세는 DB 조회)
+- 운세 데이터는 재미용 (과학적 근거 없음)
 
 ---
-마지막 업데이트: 2025-12-15
+마지막 업데이트: 2025-12-16
