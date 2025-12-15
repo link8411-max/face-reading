@@ -14,7 +14,14 @@ export async function POST(request: NextRequest) {
     // Remove data URL prefix to get base64
     const base64Image = image.replace(/^data:image\/\w+;base64,/, "");
 
-    const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
+    // 모델 로테이션으로 무료 할당량 최대화
+    const models = [
+      "gemini-2.0-flash",
+      "gemini-2.5-flash",
+      "gemini-2.0-flash-lite",
+    ];
+    const selectedModel = models[Math.floor(Math.random() * models.length)];
+    const model = genAI.getGenerativeModel({ model: selectedModel });
 
     const prompt = `당신은 전통 관상학에 기반한 전문 관상 분석가입니다.
 이 얼굴 사진을 보고 체계적으로 관상을 분석해주세요.

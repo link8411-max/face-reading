@@ -16,7 +16,14 @@ export async function POST(request: NextRequest) {
     const 사주결과 = 사주분석(year, month, day);
     const 역법 = isLunar ? "음력" : "양력";
 
-    const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
+    // 모델 로테이션으로 무료 할당량 최대화
+  const models = [
+    "gemini-2.0-flash",
+    "gemini-2.5-flash",
+    "gemini-2.0-flash-lite",
+  ];
+  const selectedModel = models[Math.floor(Math.random() * models.length)];
+  const model = genAI.getGenerativeModel({ model: selectedModel });
 
     const prompt = `당신은 전통 사주명리학 전문가입니다.
 아래 사주 정보를 바탕으로 2026년 병오년(丙午年) 신년 운세를 분석해주세요.
