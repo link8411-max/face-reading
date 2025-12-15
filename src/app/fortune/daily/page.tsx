@@ -66,6 +66,7 @@ export default function DailyFortunePage() {
         </div>
 
         <div className="text-center mb-8">
+          <div className="text-4xl mb-3 animate-shake-slow inline-block">🔔</div>
           <h1 className="text-3xl font-bold mb-2 bg-gradient-to-r from-yellow-400 to-orange-400 bg-clip-text text-transparent">
             오늘의 운세
           </h1>
@@ -99,9 +100,14 @@ export default function DailyFortunePage() {
           <div className="space-y-4 animate-fade-in">
             {/* 기본 정보 */}
             <div className="bg-gradient-to-r from-orange-500/20 to-pink-500/20 backdrop-blur-lg rounded-2xl p-6 text-center">
-              <span className="text-6xl block mb-3">{띠이모지(result.띠)}</span>
+              <span className="text-6xl block mb-3 animate-bounce-in">{띠이모지(result.띠)}</span>
               <h2 className="text-2xl font-bold mb-1">{result.띠}띠</h2>
               <p className="text-gray-400 text-sm">{birthYear}년생</p>
+              <div className="flex justify-center gap-2 mt-3">
+                <span className="animate-twinkle inline-block">✨</span>
+                <span className="animate-twinkle inline-block" style={{ animationDelay: "0.2s" }}>⭐</span>
+                <span className="animate-twinkle inline-block" style={{ animationDelay: "0.4s" }}>✨</span>
+              </div>
             </div>
 
             {/* 오늘의 운세 */}

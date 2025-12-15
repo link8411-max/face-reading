@@ -8,6 +8,11 @@ export default function Home() {
       <main className="container mx-auto px-4 py-12 max-w-lg">
         {/* Header */}
         <div className="text-center mb-12">
+          <div className="flex justify-center gap-3 mb-4">
+            <span className="text-3xl animate-float" style={{ animationDelay: "0s" }}>🔮</span>
+            <span className="text-3xl animate-float" style={{ animationDelay: "0.3s" }}>✨</span>
+            <span className="text-3xl animate-float" style={{ animationDelay: "0.6s" }}>🌙</span>
+          </div>
           <h1 className="text-4xl font-bold mb-3 bg-gradient-to-r from-pink-400 via-purple-400 to-yellow-400 bg-clip-text text-transparent">
             운명을 읽다
           </h1>
@@ -44,7 +49,7 @@ export default function Home() {
           {/* 오늘의 운세 */}
           <Link href="/fortune/daily" className="block">
             <div className="bg-white/10 backdrop-blur-lg rounded-2xl p-6 hover:bg-white/15 transition group relative overflow-hidden">
-              <div className="absolute top-2 right-2 bg-orange-500 text-white text-xs font-bold px-2 py-1 rounded-full">
+              <div className="absolute top-2 right-2 bg-orange-500 text-white text-xs font-bold px-2 py-1 rounded-full animate-pulse-heart">
                 NEW ✨
               </div>
               <div className="flex items-center gap-4">
