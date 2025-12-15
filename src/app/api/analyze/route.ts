@@ -14,7 +14,7 @@ export async function POST(request: NextRequest) {
     // Remove data URL prefix to get base64
     const base64Image = image.replace(/^data:image\/\w+;base64,/, "");
 
-    const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
+    const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash" });
 
     const prompt = `당신은 전통 관상학에 기반한 전문 관상 분석가입니다.
 이 얼굴 사진을 보고 체계적으로 관상을 분석해주세요.
