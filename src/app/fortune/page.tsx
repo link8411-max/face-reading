@@ -20,7 +20,7 @@ interface FortuneResult {
     총운: { rating: number; keyword: string; summary: string };
     월별운세: { 상반기: string; 하반기: string; 최고의달: string; 주의할달: string };
     세부운세: Record<string, { rating: number; description: string }>;
-    사주분석: { 오행조화: string; "2025년궁합": string };
+    사주분석: { 오행조화: string; "2026년궁합": string };
     행운요소: { 행운의숫자: number[]; 행운의색상: string; 행운의방위: string; 행운의계절: string };
     조언: { 해야할것: string; 피해야할것: string; 명심할말: string };
   };
@@ -90,15 +90,15 @@ export default function FortunePage() {
           <Link href="/" className="text-gray-400 hover:text-white">
             ← 돌아가기
           </Link>
-          <span className="text-2xl">🐍</span>
+          <span className="text-2xl">🐎</span>
         </div>
 
         <div className="text-center mb-8">
           <h1 className="text-3xl font-bold mb-2 bg-gradient-to-r from-yellow-400 to-orange-400 bg-clip-text text-transparent">
-            2025 신년 운세
+            2026 신년 운세
           </h1>
           <p className="text-gray-300 text-sm">
-            사주팔자로 보는 을사년 운세
+            사주팔자로 보는 병오년 운세
           </p>
         </div>
 
@@ -183,7 +183,7 @@ export default function FortunePage() {
                   <span className="animate-spin">🔮</span> 운세 분석 중...
                 </span>
               ) : (
-                "🔮 2025 운세 보기"
+                "🔮 2026 운세 보기"
               )}
             </button>
           </div>
@@ -239,7 +239,7 @@ export default function FortunePage() {
             {/* 총운 */}
             <div className="bg-gradient-to-r from-yellow-500/20 to-orange-500/20 backdrop-blur-lg rounded-2xl p-6">
               <div className="flex justify-between items-center mb-3">
-                <h3 className="text-xl font-bold">2025년 총운</h3>
+                <h3 className="text-xl font-bold">2026년 총운</h3>
                 <span className="text-yellow-400 text-xl">
                   {renderStars(result.운세.총운.rating)}
                 </span>
@@ -325,7 +325,7 @@ export default function FortunePage() {
 
             {/* 조언 */}
             <div className="bg-gradient-to-r from-purple-500/20 to-pink-500/20 backdrop-blur-lg rounded-2xl p-6">
-              <h3 className="text-lg font-bold mb-4">💡 2025년 조언</h3>
+              <h3 className="text-lg font-bold mb-4">💡 2026년 조언</h3>
               <div className="space-y-3">
                 <div className="flex gap-3">
                   <span className="text-green-400">✓</span>

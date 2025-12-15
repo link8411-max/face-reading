@@ -1,6 +1,6 @@
 import { GoogleGenerativeAI } from "@google/generative-ai";
 import { NextRequest, NextResponse } from "next/server";
-import { 사주분석, 년도2025, 오행 } from "@/lib/saju";
+import { 사주분석, 년도2026 } from "@/lib/saju";
 
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY || "");
 
@@ -19,7 +19,7 @@ export async function POST(request: NextRequest) {
     const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash" });
 
     const prompt = `당신은 전통 사주명리학 전문가입니다.
-아래 사주 정보를 바탕으로 2025년 을사년(乙巳年) 신년 운세를 분석해주세요.
+아래 사주 정보를 바탕으로 2026년 병오년(丙午年) 신년 운세를 분석해주세요.
 
 [사주 정보]
 - 생년월일: ${year}년 ${month}월 ${day}일 (${역법})
@@ -35,9 +35,9 @@ export async function POST(request: NextRequest) {
 - 강한 오행: ${사주결과.강한오행}
 - 약한 오행: ${사주결과.약한오행}
 
-[2025년 정보]
-- 을사년(乙巳年): 목(木) + 뱀띠
-- 특징: ${년도2025.특징}
+[2026년 정보]
+- 병오년(丙午年): 화(火) + 말띠
+- 특징: ${년도2026.특징}
 
 반드시 아래 JSON 형식으로만 응답하세요:
 
@@ -45,7 +45,7 @@ export async function POST(request: NextRequest) {
   "총운": {
     "rating": 1-5 사이 숫자,
     "keyword": "올해의 키워드 (한 단어)",
-    "summary": "2025년 전체 운세 요약 (3-4문장)"
+    "summary": "2026년 전체 운세 요약 (3-4문장)"
   },
   "월별운세": {
     "상반기": "1-6월 운세 (2문장)",
@@ -77,7 +77,7 @@ export async function POST(request: NextRequest) {
   },
   "사주분석": {
     "오행조화": "오행 분포에 따른 분석 (2문장)",
-    "2025년궁합": "을사년과 본인 사주의 궁합 분석 (2문장)"
+    "2026년궁합": "병오년과 본인 사주의 궁합 분석 (2문장)"
   },
   "행운요소": {
     "행운의숫자": [3개의 숫자],
@@ -86,8 +86,8 @@ export async function POST(request: NextRequest) {
     "행운의계절": "계절"
   },
   "조언": {
-    "해야할것": "2025년에 해야 할 것 (한 문장)",
-    "피해야할것": "2025년에 피해야 할 것 (한 문장)",
+    "해야할것": "2026년에 해야 할 것 (한 문장)",
+    "피해야할것": "2026년에 피해야 할 것 (한 문장)",
     "명심할말": "명심해야 할 한마디"
   }
 }

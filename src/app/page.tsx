@@ -45,16 +45,16 @@ export default function Home() {
           <Link href="/fortune" className="block">
             <div className="bg-white/10 backdrop-blur-lg rounded-2xl p-6 hover:bg-white/15 transition group relative overflow-hidden">
               <div className="absolute top-2 right-2 bg-yellow-500 text-black text-xs font-bold px-2 py-1 rounded-full">
-                2025 🐍
+                2026 🐎
               </div>
               <div className="flex items-center gap-4">
                 <div className="text-5xl">🔮</div>
                 <div className="flex-1">
                   <h2 className="text-xl font-bold mb-1 group-hover:text-yellow-400 transition">
-                    2025 신년 운세
+                    2026 신년 운세
                   </h2>
                   <p className="text-gray-400 text-sm">
-                    사주팔자로 보는 을사년 운세
+                    사주팔자로 보는 병오년 운세
                   </p>
                 </div>
                 <div className="text-gray-500 group-hover:text-white transition">→</div>
