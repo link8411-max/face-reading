@@ -14,6 +14,7 @@ interface FortuneResult {
     오행분포: Record<string, number>;
     강한오행: string;
     약한오행: string;
+    역법: string;
   };
   운세: {
     총운: { rating: number; keyword: string; summary: string };
@@ -27,6 +28,7 @@ interface FortuneResult {
 
 export default function FortunePage() {
   const [birthDate, setBirthDate] = useState({ year: "", month: "", day: "" });
+  const [isLunar, setIsLunar] = useState(false);
   const [loading, setLoading] = useState(false);
   const [result, setResult] = useState<FortuneResult | null>(null);
 
@@ -45,6 +47,7 @@ export default function FortunePage() {
           year: parseInt(birthDate.year),
           month: parseInt(birthDate.month),
           day: parseInt(birthDate.day),
+          isLunar,
         }),
       });
 
@@ -63,6 +66,7 @@ export default function FortunePage() {
 
   const resetAll = () => {
     setBirthDate({ year: "", month: "", day: "" });
+    setIsLunar(false);
     setResult(null);
   };
 
@@ -102,6 +106,35 @@ export default function FortunePage() {
         {!result && (
           <div className="bg-white/10 backdrop-blur-lg rounded-2xl p-6 mb-6">
             <h2 className="text-lg font-bold mb-4 text-center">생년월일 입력</h2>
+
+            {/* 음력/양력 선택 */}
+            <div className="flex justify-center gap-2 mb-4">
+              <button
+                onClick={() => setIsLunar(false)}
+                className={`px-4 py-2 rounded-full text-sm font-medium transition ${
+                  !isLunar
+                    ? "bg-yellow-500 text-black"
+                    : "bg-white/10 text-gray-400 hover:bg-white/20"
+                }`}
+              >
+                ☀️ 양력
+              </button>
+              <button
+                onClick={() => setIsLunar(true)}
+                className={`px-4 py-2 rounded-full text-sm font-medium transition ${
+                  isLunar
+                    ? "bg-purple-500 text-white"
+                    : "bg-white/10 text-gray-400 hover:bg-white/20"
+                }`}
+              >
+                🌙 음력
+              </button>
+            </div>
+            {isLunar && (
+              <p className="text-xs text-center text-purple-300 mb-4">
+                ✓ 전통 사주명리학은 음력 기준입니다
+              </p>
+            )}
 
             <div className="grid grid-cols-3 gap-3 mb-6">
               <div>
@@ -166,6 +199,13 @@ export default function FortunePage() {
                 <h2 className="text-2xl font-bold mt-2">{result.사주정보.띠}띠</h2>
                 <p className="text-gray-400 text-sm">
                   {birthDate.year}년 {birthDate.month}월 {birthDate.day}일생
+                  <span className={`ml-2 px-2 py-0.5 rounded-full text-xs ${
+                    result.사주정보.역법 === "음력"
+                      ? "bg-purple-500/30 text-purple-300"
+                      : "bg-yellow-500/30 text-yellow-300"
+                  }`}>
+                    {result.사주정보.역법 === "음력" ? "🌙 음력" : "☀️ 양력"}
+                  </span>
                 </p>
               </div>
 

@@ -6,14 +6,15 @@ const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY || "");
 
 export async function POST(request: NextRequest) {
   try {
-    const { year, month, day } = await request.json();
+    const { year, month, day, isLunar } = await request.json();
 
     if (!year || !month || !day) {
       return NextResponse.json({ error: "생년월일이 필요합니다." }, { status: 400 });
     }
 
-    // 사주 계산
+    // 사주 계산 (음력이든 양력이든 입력된 날짜로 계산 - 전통 사주는 음력 기준)
     const 사주결과 = 사주분석(year, month, day);
+    const 역법 = isLunar ? "음력" : "양력";
 
     const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash" });
 
@@ -21,7 +22,8 @@ export async function POST(request: NextRequest) {
 아래 사주 정보를 바탕으로 2025년 을사년(乙巳年) 신년 운세를 분석해주세요.
 
 [사주 정보]
-- 생년월일: ${year}년 ${month}월 ${day}일
+- 생년월일: ${year}년 ${month}월 ${day}일 (${역법})
+- 역법: ${역법} ${isLunar ? "(전통 사주명리학 기준)" : "(양력 입력 - 참고용 분석)"}
 - 띠: ${사주결과.띠} (${사주결과.띠이모지})
 - 사주팔자:
   - 년주: ${사주결과.사주.년주}
@@ -109,7 +111,7 @@ export async function POST(request: NextRequest) {
 
     // 사주 정보와 AI 분석 결과 합치기
     const finalResult = {
-      사주정보: 사주결과,
+      사주정보: { ...사주결과, 역법 },
       운세: aiResult,
     };
 
