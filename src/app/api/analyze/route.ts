@@ -3,6 +3,38 @@ import { NextRequest, NextResponse } from "next/server";
 
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY || "");
 
+// 재시도 함수 (이미지 포함)
+async function tryGenerateWithImage(base64Image: string, prompt: string, maxRetries = 2) {
+  const models = ["gemini-2.0-flash-lite", "gemini-2.5-flash", "gemini-2.0-flash"];
+
+  for (const modelName of models) {
+    for (let i = 0; i < maxRetries; i++) {
+      try {
+        const model = genAI.getGenerativeModel({ model: modelName });
+        const result = await model.generateContent([
+          {
+            inlineData: {
+              mimeType: "image/jpeg",
+              data: base64Image,
+            },
+          },
+          prompt,
+        ]);
+        return result.response.text();
+      } catch (error: unknown) {
+        const err = error as { status?: number };
+        console.log(`${modelName} 시도 ${i + 1} 실패:`, err.status);
+        if (err.status === 503 || err.status === 429) {
+          await new Promise(r => setTimeout(r, 1000 * (i + 1)));
+          continue;
+        }
+        break;
+      }
+    }
+  }
+  throw new Error("모든 모델 시도 실패");
+}
+
 export async function POST(request: NextRequest) {
   try {
     const { image } = await request.json();
@@ -11,10 +43,7 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: "이미지가 필요합니다." }, { status: 400 });
     }
 
-    // Remove data URL prefix to get base64
     const base64Image = image.replace(/^data:image\/\w+;base64,/, "");
-
-    const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash" });
 
     const prompt = `당신은 전통 관상학에 기반한 전문 관상 분석가입니다.
 이 얼굴 사진을 보고 체계적으로 관상을 분석해주세요.
@@ -78,20 +107,8 @@ export async function POST(request: NextRequest) {
 - 긍정적이고 희망적인 내용으로 작성해주세요
 - 각 수치는 반드시 숫자로만 응답하세요`;
 
-    const result = await model.generateContent([
-      {
-        inlineData: {
-          mimeType: "image/jpeg",
-          data: base64Image,
-        },
-      },
-      prompt,
-    ]);
+    const text = await tryGenerateWithImage(base64Image, prompt);
 
-    const response = await result.response;
-    const text = response.text();
-
-    // Parse JSON from response
     const jsonMatch = text.match(/\{[\s\S]*\}/);
     if (!jsonMatch) {
       return NextResponse.json({ error: "분석 결과를 파싱할 수 없습니다." }, { status: 500 });
