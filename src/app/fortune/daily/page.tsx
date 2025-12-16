@@ -22,6 +22,7 @@ function 띠이모지(띠: string): string {
 
 export default function DailyFortunePage() {
   const [birthYear, setBirthYear] = useState("");
+  const [isEarlyYear, setIsEarlyYear] = useState(false); // 1-2월생 (음력 설 전)
   const [result, setResult] = useState<{
     띠: string;
     운세: { rating: number; 한마디: string; 행운시간: string; 행운색: string };
@@ -33,12 +34,14 @@ export default function DailyFortunePage() {
 
   const handleSubmit = () => {
     const year = parseInt(birthYear);
-    if (year < 1920 || year > 2024) {
+    if (!birthYear || isNaN(year) || year < 1920 || year > 2024) {
       alert("올바른 출생년도를 입력해주세요 (1920-2024)");
       return;
     }
 
-    const 띠 = 띠계산(year);
+    // 1-2월생이고 음력 설 전이면 전년도 띠 사용
+    const 계산년도 = isEarlyYear ? year - 1 : year;
+    const 띠 = 띠계산(계산년도);
     const 요일데이터 = fortuneDB.일간운세[오늘요일 as keyof typeof fortuneDB.일간운세];
     const 운세 = 요일데이터[띠 as keyof typeof 요일데이터];
 
@@ -51,6 +54,7 @@ export default function DailyFortunePage() {
 
   const resetAll = () => {
     setBirthYear("");
+    setIsEarlyYear(false);
     setResult(null);
   };
 
@@ -86,6 +90,22 @@ export default function DailyFortunePage() {
               className="w-full px-4 py-4 bg-white/10 rounded-xl text-center text-2xl focus:outline-none focus:ring-2 focus:ring-orange-500 mb-4"
             />
 
+            {/* 음력 설 전 체크박스 */}
+            <label className="flex items-center justify-center gap-2 mb-4 cursor-pointer">
+              <input
+                type="checkbox"
+                checked={isEarlyYear}
+                onChange={(e) => setIsEarlyYear(e.target.checked)}
+                className="w-5 h-5 rounded accent-orange-500"
+              />
+              <span className="text-sm text-gray-300">
+                1~2월생이에요 (음력 설 전 출생)
+              </span>
+            </label>
+            <p className="text-xs text-gray-500 text-center mb-4">
+              * 음력 설(1월 말~2월 초) 전에 태어났다면 체크하세요
+            </p>
+
             <button
               onClick={handleSubmit}
               className="w-full py-4 bg-gradient-to-r from-orange-500 to-pink-500 rounded-xl font-bold text-lg hover:opacity-90 transition"
@@ -102,7 +122,9 @@ export default function DailyFortunePage() {
             <div className="bg-gradient-to-r from-orange-500/20 to-pink-500/20 backdrop-blur-lg rounded-2xl p-6 text-center">
               <span className="text-6xl block mb-3 animate-bounce-in">{띠이모지(result.띠)}</span>
               <h2 className="text-2xl font-bold mb-1">{result.띠}띠</h2>
-              <p className="text-gray-400 text-sm">{birthYear}년생</p>
+              <p className="text-gray-400 text-sm">
+                {birthYear}년생 {isEarlyYear && "(음력 설 전)"}
+              </p>
               <div className="flex justify-center gap-2 mt-3">
                 <span className="animate-twinkle inline-block">✨</span>
                 <span className="animate-twinkle inline-block" style={{ animationDelay: "0.2s" }}>⭐</span>
