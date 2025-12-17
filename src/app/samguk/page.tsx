@@ -2,6 +2,7 @@
 
 import { useState, useRef } from "react";
 import Link from "next/link";
+import html2canvas from "html2canvas";
 import { SamgukCharacter } from "@/lib/samgukDB";
 
 interface AnalysisResult {
@@ -196,7 +197,81 @@ export default function SamgukPage() {
   const [image, setImage] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const [result, setResult] = useState<AnalysisResult | null>(null);
+  const [isCapturing, setIsCapturing] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const resultRef = useRef<HTMLDivElement>(null);
+
+  // 결과 이미지 캡쳐
+  const captureResult = async (): Promise<Blob | null> => {
+    if (!resultRef.current) return null;
+
+    try {
+      const canvas = await html2canvas(resultRef.current, {
+        backgroundColor: "#1c1917", // stone-900
+        scale: 2, // 고해상도
+        useCORS: true,
+        logging: false,
+      });
+
+      return new Promise((resolve) => {
+        canvas.toBlob((blob) => resolve(blob), "image/png", 1.0);
+      });
+    } catch (error) {
+      console.error("캡쳐 실패:", error);
+      return null;
+    }
+  };
+
+  // 이미지 다운로드
+  const handleDownload = async () => {
+    setIsCapturing(true);
+    const blob = await captureResult();
+    setIsCapturing(false);
+
+    if (blob) {
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = `삼국지닮은꼴_${result?.character.name || "결과"}.png`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+    }
+  };
+
+  // 공유하기
+  const handleShare = async () => {
+    setIsCapturing(true);
+    const blob = await captureResult();
+    setIsCapturing(false);
+
+    if (!blob) return;
+
+    // Web Share API 지원 확인
+    if (navigator.share && navigator.canShare) {
+      const file = new File([blob], `삼국지닮은꼴_${result?.character.name || "결과"}.png`, { type: "image/png" });
+
+      if (navigator.canShare({ files: [file] })) {
+        try {
+          await navigator.share({
+            title: `나의 삼국지 닮은꼴: ${result?.character.name}`,
+            text: `나는 ${result?.character.name}(${result?.character.hanja})와 ${result?.similarity}% 닮았대요! 🎭`,
+            files: [file],
+          });
+          return;
+        } catch (error) {
+          if ((error as Error).name !== "AbortError") {
+            console.error("공유 실패:", error);
+          }
+          return;
+        }
+      }
+    }
+
+    // Web Share API 미지원시 다운로드로 대체
+    handleDownload();
+  };
 
   const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -359,6 +434,8 @@ export default function SamgukPage() {
         {/* Result Section */}
         {result && (
           <div className="space-y-4 animate-fade-in">
+            {/* 캡쳐 영역 시작 */}
+            <div ref={resultRef} className="space-y-4 bg-stone-900 p-4 -m-4">
             {/* 메인 결과 카드 - 코에이 스타일 */}
             <div className="relative">
               {/* 외곽 금테 프레임 */}
@@ -797,6 +874,38 @@ export default function SamgukPage() {
               <p className="text-center text-stone-700 text-[10px] mt-2">
                 쿠팡 파트너스 활동의 일환으로 일정액의 수수료를 제공받습니다
               </p>
+            </div>
+            </div>
+            {/* 캡쳐 영역 끝 */}
+
+            {/* 공유 버튼 */}
+            <div className="flex gap-3">
+              <button
+                onClick={handleDownload}
+                disabled={isCapturing}
+                className="flex-1 py-3 bg-gradient-to-r from-emerald-700 to-emerald-600 rounded-xl font-bold text-center hover:from-emerald-600 hover:to-emerald-500 transition text-white disabled:opacity-50 flex items-center justify-center gap-2"
+              >
+                {isCapturing ? (
+                  <>
+                    <span className="animate-spin">⏳</span> 캡쳐중...
+                  </>
+                ) : (
+                  <>📥 이미지 저장</>
+                )}
+              </button>
+              <button
+                onClick={handleShare}
+                disabled={isCapturing}
+                className="flex-1 py-3 bg-gradient-to-r from-blue-700 to-blue-600 rounded-xl font-bold text-center hover:from-blue-600 hover:to-blue-500 transition text-white disabled:opacity-50 flex items-center justify-center gap-2"
+              >
+                {isCapturing ? (
+                  <>
+                    <span className="animate-spin">⏳</span> 캡쳐중...
+                  </>
+                ) : (
+                  <>📤 공유하기</>
+                )}
+              </button>
             </div>
 
             {/* 버튼 */}

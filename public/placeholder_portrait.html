@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <style>
+    body {
+      margin: 0;
+      padding: 20px;
+      background: #1c1917;
+      display: flex;
+      gap: 40px;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      font-family: sans-serif;
+    }
+    .comparison {
+      text-align: center;
+      color: #fbbf24;
+    }
+    .label {
+      margin-bottom: 10px;
+      font-size: 14px;
+    }
+
+    /* 플레이스홀더 스타일 초상화 */
+    .placeholder-portrait {
+      width: 200px;
+      height: 200px;
+      background: linear-gradient(135deg, #1e3a5f, #0f172a);
+      border: 4px solid;
+      border-image: linear-gradient(135deg, #fbbf24, #92400e, #fbbf24) 1;
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      box-shadow:
+        0 0 30px rgba(251, 191, 36, 0.3),
+        inset 0 0 40px rgba(0, 0, 0, 0.8);
+    }
+
+    /* 세력 표시 */
+    .faction-banner {
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      background: linear-gradient(90deg, #1e3a5f, #2563eb, #1e3a5f);
+      padding: 5px;
+      text-align: center;
+      color: white;
+      font-weight: bold;
+      letter-spacing: 0.3em;
+      border-bottom: 2px solid rgba(251, 191, 36, 0.5);
+    }
+
+    /* 한자 이름 */
+    .hanja-name {
+      font-size: 48px;
+      color: #fbbf24;
+      text-shadow: 0 0 20px rgba(251, 191, 36, 0.5);
+      font-weight: bold;
+      margin-top: 20px;
+    }
+
+    /* 한글 이름 */
+    .korean-name {
+      font-size: 18px;
+      color: #e5e7eb;
+      margin-top: 10px;
+    }
+
+    /* 역할 */
+    .role {
+      position: absolute;
+      bottom: 10px;
+      font-size: 12px;
+      color: #9ca3af;
+      background: rgba(0, 0, 0, 0.5);
+      padding: 3px 10px;
+      border-radius: 10px;
+    }
+
+    /* 장식 코너 */
+    .corner {
+      position: absolute;
+      width: 15px;
+      height: 15px;
+      border: 2px solid #fbbf24;
+    }
+    .corner.tl { top: 5px; left: 5px; border-right: none; border-bottom: none; }
+    .corner.tr { top: 5px; right: 5px; border-left: none; border-bottom: none; }
+    .corner.bl { bottom: 5px; left: 5px; border-right: none; border-top: none; }
+    .corner.br { bottom: 5px; right: 5px; border-left: none; border-top: none; }
+  </style>
+</head>
+<body>
+  <div class="comparison">
+    <div class="label">플레이스홀더 스타일 (무료, 즉시)</div>
+    <div class="placeholder-portrait">
+      <div class="faction-banner">━ 蜀 ━</div>
+      <div class="corner tl"></div>
+      <div class="corner tr"></div>
+      <div class="corner bl"></div>
+      <div class="corner br"></div>
+      <div class="hanja-name">亮</div>
+      <div class="korean-name">제갈량</div>
+      <div class="role">촉한의 승상</div>
+    </div>
+  </div>
+</body>
+</html>
