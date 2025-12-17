@@ -59,35 +59,52 @@ export default function DailyFortunePage() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-orange-900 via-pink-900 to-purple-900 text-white">
-      <main className="container mx-auto px-4 py-8 max-w-lg">
+    <div className="min-h-screen bg-gradient-to-b from-slate-950 via-purple-950 to-slate-950 text-white relative overflow-hidden">
+      {/* 별 배경 효과 */}
+      <div className="absolute inset-0 overflow-hidden pointer-events-none">
+        <div className="absolute top-20 left-10 w-1 h-1 bg-white rounded-full animate-twinkle" />
+        <div className="absolute top-40 right-20 w-1.5 h-1.5 bg-yellow-200 rounded-full animate-twinkle" style={{ animationDelay: "0.5s" }} />
+        <div className="absolute top-60 left-1/4 w-1 h-1 bg-white rounded-full animate-twinkle" style={{ animationDelay: "1s" }} />
+        <div className="absolute top-32 right-1/3 w-0.5 h-0.5 bg-purple-200 rounded-full animate-twinkle" style={{ animationDelay: "0.3s" }} />
+        <div className="absolute top-80 left-1/2 w-1 h-1 bg-yellow-100 rounded-full animate-twinkle" style={{ animationDelay: "0.7s" }} />
+        <div className="absolute top-96 right-10 w-1.5 h-1.5 bg-white rounded-full animate-twinkle" style={{ animationDelay: "1.2s" }} />
+        <div className="absolute top-[500px] left-20 w-1 h-1 bg-purple-100 rounded-full animate-twinkle" style={{ animationDelay: "0.9s" }} />
+        <div className="absolute top-[600px] right-1/4 w-0.5 h-0.5 bg-white rounded-full animate-twinkle" style={{ animationDelay: "0.4s" }} />
+      </div>
+
+      <main className="container mx-auto px-4 py-8 max-w-lg relative z-10">
         {/* Header */}
         <div className="flex items-center justify-between mb-6">
-          <Link href="/" className="text-gray-400 hover:text-white">
+          <Link href="/" className="text-yellow-600/70 hover:text-yellow-500 transition">
             ← 돌아가기
           </Link>
-          <span className="text-2xl">☀️</span>
+          <span className="text-2xl">🌙</span>
         </div>
 
         <div className="text-center mb-8">
-          <div className="text-4xl mb-3 animate-shake-slow inline-block">🔔</div>
-          <h1 className="text-3xl font-bold mb-2 bg-gradient-to-r from-yellow-400 to-orange-400 bg-clip-text text-transparent">
+          <div className="text-5xl mb-4 animate-float inline-block">✨</div>
+          <h1 className="text-3xl font-bold mb-2 text-transparent bg-clip-text bg-gradient-to-r from-yellow-200 via-yellow-400 to-amber-500" style={{ textShadow: "0 0 30px rgba(251, 191, 36, 0.3)" }}>
             오늘의 운세
           </h1>
-          <p className="text-gray-300 text-sm">{오늘날짜}</p>
+          <p className="text-yellow-100/60 text-sm tracking-wider">{오늘날짜}</p>
+          <div className="flex justify-center gap-1 mt-2">
+            <span className="text-yellow-500/40">─</span>
+            <span className="text-yellow-400">☆</span>
+            <span className="text-yellow-500/40">─</span>
+          </div>
         </div>
 
         {/* Input Section */}
         {!result && (
-          <div className="bg-white/10 backdrop-blur-lg rounded-2xl p-6 mb-6">
-            <h2 className="text-lg font-bold mb-4 text-center">태어난 해를 알려주세요</h2>
+          <div className="bg-gradient-to-b from-slate-900/80 to-purple-900/50 backdrop-blur-lg rounded-2xl p-6 mb-6 border border-yellow-500/20 shadow-lg shadow-purple-900/30">
+            <h2 className="text-lg font-bold mb-4 text-center text-yellow-100">태어난 해를 알려주세요</h2>
 
             <input
               type="number"
               placeholder="예: 1990"
               value={birthYear}
               onChange={(e) => setBirthYear(e.target.value)}
-              className="w-full px-4 py-4 bg-white/10 rounded-xl text-center text-2xl focus:outline-none focus:ring-2 focus:ring-orange-500 mb-4"
+              className="w-full px-4 py-4 bg-slate-800/50 border border-yellow-600/30 rounded-xl text-center text-2xl focus:outline-none focus:ring-2 focus:ring-yellow-500/50 focus:border-yellow-500/50 mb-4 placeholder-slate-500"
             />
 
             {/* 음력 설 전 체크박스 */}
@@ -96,21 +113,21 @@ export default function DailyFortunePage() {
                 type="checkbox"
                 checked={isEarlyYear}
                 onChange={(e) => setIsEarlyYear(e.target.checked)}
-                className="w-5 h-5 rounded accent-orange-500"
+                className="w-5 h-5 rounded accent-yellow-500"
               />
-              <span className="text-sm text-gray-300">
+              <span className="text-sm text-yellow-100/70">
                 1~2월생이에요 (음력 설 전 출생)
               </span>
             </label>
-            <p className="text-xs text-gray-500 text-center mb-4">
+            <p className="text-xs text-slate-500 text-center mb-4">
               * 음력 설(1월 말~2월 초) 전에 태어났다면 체크하세요
             </p>
 
             <button
               onClick={handleSubmit}
-              className="w-full py-4 bg-gradient-to-r from-orange-500 to-pink-500 rounded-xl font-bold text-lg hover:opacity-90 transition"
+              className="w-full py-4 bg-gradient-to-r from-yellow-600 to-amber-500 rounded-xl font-bold text-lg hover:from-yellow-500 hover:to-amber-400 transition text-slate-900 shadow-lg shadow-yellow-600/20"
             >
-              오늘의 운세 보기 ✨
+              운세 보기 ✨
             </button>
           </div>
         )}
@@ -119,55 +136,55 @@ export default function DailyFortunePage() {
         {result && (
           <div className="space-y-4 animate-fade-in">
             {/* 기본 정보 */}
-            <div className="bg-gradient-to-r from-orange-500/20 to-pink-500/20 backdrop-blur-lg rounded-2xl p-6 text-center">
+            <div className="bg-gradient-to-b from-slate-900/80 to-purple-900/50 backdrop-blur-lg rounded-2xl p-6 text-center border border-yellow-500/20">
               <span className="text-6xl block mb-3 animate-bounce-in">{띠이모지(result.띠)}</span>
-              <h2 className="text-2xl font-bold mb-1">{result.띠}띠</h2>
-              <p className="text-gray-400 text-sm">
+              <h2 className="text-2xl font-bold mb-1 text-yellow-100">{result.띠}띠</h2>
+              <p className="text-slate-400 text-sm">
                 {birthYear}년생 {isEarlyYear && "(음력 설 전)"}
               </p>
-              <div className="flex justify-center gap-2 mt-3">
-                <span className="animate-twinkle inline-block">✨</span>
-                <span className="animate-twinkle inline-block" style={{ animationDelay: "0.2s" }}>⭐</span>
-                <span className="animate-twinkle inline-block" style={{ animationDelay: "0.4s" }}>✨</span>
+              <div className="flex justify-center gap-1 mt-3">
+                <span className="text-yellow-500/40">─</span>
+                <span className="text-yellow-400 animate-twinkle">☆</span>
+                <span className="text-yellow-500/40">─</span>
               </div>
             </div>
 
             {/* 오늘의 운세 */}
-            <div className="bg-white/10 backdrop-blur-lg rounded-2xl p-6">
+            <div className="bg-gradient-to-b from-slate-900/80 to-purple-900/50 backdrop-blur-lg rounded-2xl p-6 border border-yellow-500/20">
               <div className="flex justify-between items-center mb-4">
-                <h3 className="text-xl font-bold">오늘의 운세</h3>
-                <span className="text-yellow-400 text-xl">
+                <h3 className="text-xl font-bold text-yellow-100">오늘의 운세</h3>
+                <span className="text-yellow-400 text-xl tracking-wider">
                   {renderStars(result.운세.rating)}
                 </span>
               </div>
 
-              <div className="bg-white/5 rounded-xl p-4 mb-4">
-                <p className="text-xl text-center font-medium text-yellow-300">
+              <div className="bg-slate-800/50 rounded-xl p-4 mb-4 border border-yellow-600/20">
+                <p className="text-xl text-center font-medium text-yellow-200">
                   "{result.운세.한마디}"
                 </p>
               </div>
 
               <div className="grid grid-cols-2 gap-3">
-                <div className="bg-white/5 rounded-xl p-3 text-center">
-                  <p className="text-xs text-gray-400 mb-1">행운의 시간</p>
-                  <p className="text-lg font-bold text-orange-400">{result.운세.행운시간}</p>
+                <div className="bg-slate-800/50 rounded-xl p-3 text-center border border-purple-500/20">
+                  <p className="text-xs text-slate-400 mb-1">행운의 시간</p>
+                  <p className="text-lg font-bold text-yellow-400">{result.운세.행운시간}</p>
                 </div>
-                <div className="bg-white/5 rounded-xl p-3 text-center">
-                  <p className="text-xs text-gray-400 mb-1">행운의 색</p>
-                  <p className="text-lg font-bold text-pink-400">{result.운세.행운색}</p>
+                <div className="bg-slate-800/50 rounded-xl p-3 text-center border border-purple-500/20">
+                  <p className="text-xs text-slate-400 mb-1">행운의 색</p>
+                  <p className="text-lg font-bold text-purple-300">{result.운세.행운색}</p>
                 </div>
               </div>
             </div>
 
             {/* 띠별 특성 */}
-            <div className="bg-white/10 backdrop-blur-lg rounded-2xl p-6">
-              <h3 className="text-lg font-bold mb-3">💫 {result.띠}띠 특성</h3>
-              <p className="text-gray-300 text-sm leading-relaxed">
+            <div className="bg-gradient-to-b from-slate-900/80 to-purple-900/50 backdrop-blur-lg rounded-2xl p-6 border border-yellow-500/20">
+              <h3 className="text-lg font-bold mb-3 text-yellow-100">✧ {result.띠}띠 특성</h3>
+              <p className="text-slate-300 text-sm leading-relaxed">
                 {fortuneDB.띠[result.띠 as keyof typeof fortuneDB.띠].성격}
               </p>
               <div className="flex flex-wrap gap-2 mt-3">
                 {fortuneDB.띠[result.띠 as keyof typeof fortuneDB.띠].장점.map((장점, i) => (
-                  <span key={i} className="px-3 py-1 bg-orange-500/20 text-orange-300 rounded-full text-xs">
+                  <span key={i} className="px-3 py-1 bg-yellow-500/10 text-yellow-300/80 rounded-full text-xs border border-yellow-500/20">
                     {장점}
                   </span>
                 ))}
@@ -197,13 +214,13 @@ export default function DailyFortunePage() {
             <div className="flex gap-3">
               <button
                 onClick={resetAll}
-                className="flex-1 py-3 bg-white/10 rounded-xl font-bold hover:bg-white/20 transition"
+                className="flex-1 py-3 bg-slate-800/50 border border-yellow-500/20 rounded-xl font-bold hover:bg-slate-700/50 transition text-yellow-100/80"
               >
-                다시하기 🔄
+                다시하기
               </button>
               <Link
                 href="/fortune"
-                className="flex-1 py-3 bg-gradient-to-r from-purple-500 to-indigo-500 rounded-xl font-bold text-center hover:opacity-90 transition"
+                className="flex-1 py-3 bg-gradient-to-r from-yellow-600 to-amber-500 rounded-xl font-bold text-center hover:from-yellow-500 hover:to-amber-400 transition text-slate-900"
               >
                 신년운세 🔮
               </Link>
@@ -212,7 +229,7 @@ export default function DailyFortunePage() {
         )}
 
         {/* Footer */}
-        <p className="text-center text-gray-500 text-xs mt-8">
+        <p className="text-center text-slate-600 text-xs mt-8">
           ⚠️ 재미로만 봐주세요! 과학적 근거는 없습니다.
         </p>
       </main>
