@@ -2,6 +2,7 @@
 
 import { useState, useRef } from "react";
 import Link from "next/link";
+import html2canvas from "html2canvas";
 
 interface AnalysisResult {
   type: string;
@@ -37,7 +38,68 @@ export default function FacePage() {
   const [image, setImage] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const [result, setResult] = useState<AnalysisResult | null>(null);
+  const [isCapturing, setIsCapturing] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const resultRef = useRef<HTMLDivElement>(null);
+
+  // 결과 이미지 캡쳐
+  const captureResult = async (): Promise<Blob | null> => {
+    if (!resultRef.current) return null;
+    try {
+      const canvas = await html2canvas(resultRef.current, {
+        backgroundColor: "#1c1917",
+        scale: 2,
+        useCORS: true,
+        logging: false,
+      });
+      return new Promise((resolve) => {
+        canvas.toBlob((blob) => resolve(blob), "image/png", 1.0);
+      });
+    } catch (error) {
+      console.error("캡쳐 실패:", error);
+      return null;
+    }
+  };
+
+  const handleDownload = async () => {
+    setIsCapturing(true);
+    const blob = await captureResult();
+    setIsCapturing(false);
+    if (blob) {
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = `관상분석_${result?.type || "결과"}.png`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+    }
+  };
+
+  const handleShare = async () => {
+    setIsCapturing(true);
+    const blob = await captureResult();
+    setIsCapturing(false);
+    if (!blob) return;
+    if (navigator.share && navigator.canShare) {
+      const file = new File([blob], `관상분석_${result?.type || "결과"}.png`, { type: "image/png" });
+      if (navigator.canShare({ files: [file] })) {
+        try {
+          await navigator.share({
+            title: `나의 관상: ${result?.type}`,
+            text: `${result?.title} - ${result?.summary}`,
+            files: [file],
+          });
+          return;
+        } catch (error) {
+          if ((error as Error).name !== "AbortError") console.error("공유 실패:", error);
+          return;
+        }
+      }
+    }
+    handleDownload();
+  };
 
   const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -194,6 +256,8 @@ export default function FacePage() {
         {/* Result Section */}
         {result && (
           <div className="space-y-4 animate-fade-in">
+            {/* 캡쳐 영역 시작 */}
+            <div ref={resultRef} className="space-y-4 bg-stone-900 p-4 -m-4">
             {/* 기본 정보 + 사진 */}
             <div className="bg-gradient-to-r from-red-900/40 to-amber-900/40 backdrop-blur-lg rounded-2xl p-6 border border-amber-600/20">
               <div className="flex gap-4 items-start">
@@ -351,6 +415,26 @@ export default function FacePage() {
               <p className="text-center text-stone-700 text-[10px] mt-2">
                 쿠팡 파트너스 활동의 일환으로 일정액의 수수료를 제공받습니다
               </p>
+            </div>
+            </div>
+            {/* 캡쳐 영역 끝 */}
+
+            {/* 공유 버튼 */}
+            <div className="flex gap-3">
+              <button
+                onClick={handleDownload}
+                disabled={isCapturing}
+                className="flex-1 py-3 bg-gradient-to-r from-emerald-700 to-emerald-600 rounded-xl font-bold text-center hover:from-emerald-600 hover:to-emerald-500 transition text-white disabled:opacity-50 flex items-center justify-center gap-2"
+              >
+                {isCapturing ? "⏳ 캡쳐중..." : "📥 이미지 저장"}
+              </button>
+              <button
+                onClick={handleShare}
+                disabled={isCapturing}
+                className="flex-1 py-3 bg-gradient-to-r from-blue-700 to-blue-600 rounded-xl font-bold text-center hover:from-blue-600 hover:to-blue-500 transition text-white disabled:opacity-50 flex items-center justify-center gap-2"
+              >
+                {isCapturing ? "⏳ 캡쳐중..." : "📤 공유하기"}
+              </button>
             </div>
 
             {/* 버튼 */}

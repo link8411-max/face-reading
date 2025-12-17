@@ -1,7 +1,8 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useRef } from "react";
 import Link from "next/link";
+import html2canvas from "html2canvas";
 import { fortuneDB } from "@/lib/fortuneDB";
 
 const 띠목록 = ["쥐", "소", "호랑이", "토끼", "용", "뱀", "말", "양", "원숭이", "닭", "개", "돼지"];
@@ -27,10 +28,71 @@ export default function DailyFortunePage() {
     띠: string;
     운세: { rating: number; 한마디: string; 행운시간: string; 행운색: string };
   } | null>(null);
+  const [isCapturing, setIsCapturing] = useState(false);
+  const resultRef = useRef<HTMLDivElement>(null);
 
   const today = new Date();
   const 오늘요일 = 요일목록[today.getDay()];
   const 오늘날짜 = `${today.getMonth() + 1}월 ${today.getDate()}일 ${오늘요일}`;
+
+  // 결과 이미지 캡쳐
+  const captureResult = async (): Promise<Blob | null> => {
+    if (!resultRef.current) return null;
+    try {
+      const canvas = await html2canvas(resultRef.current, {
+        backgroundColor: "#1c1917",
+        scale: 2,
+        useCORS: true,
+        logging: false,
+      });
+      return new Promise((resolve) => {
+        canvas.toBlob((blob) => resolve(blob), "image/png", 1.0);
+      });
+    } catch (error) {
+      console.error("캡쳐 실패:", error);
+      return null;
+    }
+  };
+
+  const handleDownload = async () => {
+    setIsCapturing(true);
+    const blob = await captureResult();
+    setIsCapturing(false);
+    if (blob) {
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = `오늘의운세_${result?.띠}띠.png`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+    }
+  };
+
+  const handleShare = async () => {
+    setIsCapturing(true);
+    const blob = await captureResult();
+    setIsCapturing(false);
+    if (!blob) return;
+    if (navigator.share && navigator.canShare) {
+      const file = new File([blob], `오늘의운세_${result?.띠}띠.png`, { type: "image/png" });
+      if (navigator.canShare({ files: [file] })) {
+        try {
+          await navigator.share({
+            title: `오늘의 ${result?.띠}띠 운세`,
+            text: `${오늘날짜} - ${result?.운세.한마디}`,
+            files: [file],
+          });
+          return;
+        } catch (error) {
+          if ((error as Error).name !== "AbortError") console.error("공유 실패:", error);
+          return;
+        }
+      }
+    }
+    handleDownload();
+  };
 
   const handleSubmit = () => {
     const year = parseInt(birthYear);
@@ -136,6 +198,8 @@ export default function DailyFortunePage() {
         {/* Result Section */}
         {result && (
           <div className="space-y-4 animate-fade-in">
+            {/* 캡쳐 영역 시작 */}
+            <div ref={resultRef} className="space-y-4 bg-stone-900 p-4 -m-4">
             {/* 기본 정보 */}
             <div className="bg-gradient-to-b from-stone-900/80 to-red-950/50 backdrop-blur-lg rounded-2xl p-6 text-center border border-amber-600/20">
               <span className="text-6xl block mb-3 animate-bounce-in">{띠이모지(result.띠)}</span>
@@ -209,6 +273,26 @@ export default function DailyFortunePage() {
               <p className="text-center text-stone-700 text-[10px] mt-2">
                 쿠팡 파트너스 활동의 일환으로 일정액의 수수료를 제공받습니다
               </p>
+            </div>
+            </div>
+            {/* 캡쳐 영역 끝 */}
+
+            {/* 공유 버튼 */}
+            <div className="flex gap-3">
+              <button
+                onClick={handleDownload}
+                disabled={isCapturing}
+                className="flex-1 py-3 bg-gradient-to-r from-emerald-700 to-emerald-600 rounded-xl font-bold text-center hover:from-emerald-600 hover:to-emerald-500 transition text-white disabled:opacity-50 flex items-center justify-center gap-2"
+              >
+                {isCapturing ? "⏳ 캡쳐중..." : "📥 이미지 저장"}
+              </button>
+              <button
+                onClick={handleShare}
+                disabled={isCapturing}
+                className="flex-1 py-3 bg-gradient-to-r from-blue-700 to-blue-600 rounded-xl font-bold text-center hover:from-blue-600 hover:to-blue-500 transition text-white disabled:opacity-50 flex items-center justify-center gap-2"
+              >
+                {isCapturing ? "⏳ 캡쳐중..." : "📤 공유하기"}
+              </button>
             </div>
 
             {/* 버튼 */}
