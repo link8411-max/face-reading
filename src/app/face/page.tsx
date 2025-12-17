@@ -88,38 +88,57 @@ export default function FacePage() {
   };
 
   const 운아이콘: Record<string, string> = {
-    재물운: "💰",
-    애정운: "💕",
-    직장운: "💼",
-    건강운: "💪",
-    대인운: "🤝",
+    재물운: "財",
+    애정운: "愛",
+    직장운: "職",
+    건강운: "健",
+    대인운: "人",
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-purple-900 via-indigo-900 to-black text-white">
-      <main className="container mx-auto px-4 py-8 max-w-lg">
+    <div className="min-h-screen bg-gradient-to-b from-stone-950 via-red-950 to-stone-950 text-white relative overflow-hidden">
+      {/* 전통 문양 배경 */}
+      <div className="absolute inset-0 opacity-5 pointer-events-none">
+        <div className="absolute top-10 left-5 text-6xl">卍</div>
+        <div className="absolute top-32 right-10 text-5xl">福</div>
+        <div className="absolute top-60 left-8 text-4xl">壽</div>
+        <div className="absolute bottom-60 right-5 text-6xl">吉</div>
+        <div className="absolute bottom-32 left-1/4 text-5xl">相</div>
+      </div>
+
+      <main className="container mx-auto px-4 py-8 max-w-lg relative z-10">
         {/* Header */}
         <div className="flex items-center justify-between mb-6">
-          <Link href="/" className="text-gray-400 hover:text-white">
+          <Link href="/" className="text-amber-700/70 hover:text-amber-600 transition">
             ← 돌아가기
           </Link>
           <span className="text-2xl">👤</span>
         </div>
 
         <div className="text-center mb-8">
-          <h1 className="text-3xl font-bold mb-2 bg-gradient-to-r from-pink-400 to-purple-400 bg-clip-text text-transparent">
-            AI 관상 분석
+          <div className="flex justify-center items-center gap-2 mb-3">
+            <span className="text-amber-600/60">━━</span>
+            <span className="text-2xl">☯</span>
+            <span className="text-amber-600/60">━━</span>
+          </div>
+          <h1 className="text-3xl font-bold mb-2 text-transparent bg-clip-text bg-gradient-to-r from-amber-200 via-yellow-400 to-amber-200" style={{ textShadow: "0 0 30px rgba(251, 191, 36, 0.3)" }}>
+            AI 觀相 분석
           </h1>
-          <p className="text-gray-300 text-sm">
+          <p className="text-amber-100/60 text-sm tracking-widest">
             전통 관상학 기반 얼굴 분석
           </p>
+          <div className="flex justify-center items-center gap-2 mt-3">
+            <span className="text-red-800/60 text-xs">◆</span>
+            <span className="text-amber-600/40 text-xs">━━━━━</span>
+            <span className="text-red-800/60 text-xs">◆</span>
+          </div>
         </div>
 
         {/* Upload Section */}
         {!result && (
-          <div className="bg-white/10 backdrop-blur-lg rounded-2xl p-6 mb-6">
+          <div className="bg-gradient-to-b from-stone-900/80 to-red-950/50 backdrop-blur-lg rounded-2xl p-6 mb-6 border border-amber-600/20">
             <div
-              className="border-2 border-dashed border-white/30 rounded-xl p-8 text-center cursor-pointer hover:border-pink-400 transition"
+              className="border-2 border-dashed border-amber-600/30 rounded-xl p-8 text-center cursor-pointer hover:border-amber-500/50 transition"
               onClick={() => fileInputRef.current?.click()}
             >
               {image ? (
@@ -131,8 +150,8 @@ export default function FacePage() {
               ) : (
                 <div>
                   <span className="text-5xl mb-4 block">📷</span>
-                  <p className="text-gray-300">얼굴 사진을 업로드하세요</p>
-                  <p className="text-gray-500 text-sm mt-2">
+                  <p className="text-amber-100/80">얼굴 사진을 업로드하세요</p>
+                  <p className="text-stone-500 text-sm mt-2">
                     정면 얼굴이 잘 보이는 사진이 좋아요
                   </p>
                 </div>
@@ -150,18 +169,18 @@ export default function FacePage() {
               <div className="flex gap-3 mt-4">
                 <button
                   onClick={resetAll}
-                  className="flex-1 py-3 bg-white/10 rounded-xl font-bold hover:bg-white/20 transition"
+                  className="flex-1 py-3 bg-stone-800/50 border border-amber-600/20 rounded-xl font-bold hover:bg-stone-700/50 transition text-amber-100/80"
                 >
                   다시 선택
                 </button>
                 <button
                   onClick={analyzeImage}
                   disabled={loading}
-                  className="flex-1 py-3 bg-gradient-to-r from-pink-500 to-purple-500 rounded-xl font-bold hover:opacity-90 transition disabled:opacity-50"
+                  className="flex-1 py-3 bg-gradient-to-r from-red-700 to-amber-600 rounded-xl font-bold hover:from-red-600 hover:to-amber-500 transition disabled:opacity-50 text-amber-100"
                 >
                   {loading ? (
                     <span className="flex items-center justify-center gap-2">
-                      <span className="animate-spin">🔮</span> 분석 중...
+                      <span className="animate-spin">☯</span> 분석 중...
                     </span>
                   ) : (
                     "관상 분석하기"
@@ -176,7 +195,7 @@ export default function FacePage() {
         {result && (
           <div className="space-y-4 animate-fade-in">
             {/* 기본 정보 + 사진 */}
-            <div className="bg-gradient-to-r from-pink-500/20 to-purple-500/20 backdrop-blur-lg rounded-2xl p-6">
+            <div className="bg-gradient-to-r from-red-900/40 to-amber-900/40 backdrop-blur-lg rounded-2xl p-6 border border-amber-600/20">
               <div className="flex gap-4 items-start">
                 {/* 업로드한 사진 */}
                 {image && (
@@ -184,16 +203,16 @@ export default function FacePage() {
                     <img
                       src={image}
                       alt="분석된 얼굴"
-                      className="w-24 h-24 object-cover rounded-xl border-2 border-pink-400/50"
+                      className="w-24 h-24 object-cover rounded-xl border-2 border-amber-500/50"
                     />
                   </div>
                 )}
                 <div className="flex-1 text-center">
-                  <span className="inline-block px-4 py-1 bg-pink-500 text-white rounded-full text-sm font-bold mb-2">
+                  <span className="inline-block px-4 py-1 bg-gradient-to-r from-red-700 to-amber-600 text-amber-100 rounded-full text-sm font-bold mb-2">
                     {result.type}
                   </span>
-                  <h2 className="text-xl font-bold mb-2">{result.title}</h2>
-                  <p className="text-gray-300 text-sm leading-relaxed">
+                  <h2 className="text-xl font-bold mb-2 text-amber-100">{result.title}</h2>
+                  <p className="text-stone-300 text-sm leading-relaxed">
                     {result.summary}
                   </p>
                 </div>
@@ -201,71 +220,71 @@ export default function FacePage() {
             </div>
 
             {/* 얼굴 부위별 분석 */}
-            <div className="bg-white/10 backdrop-blur-lg rounded-2xl p-6">
-              <h3 className="text-lg font-bold mb-4">🔍 부위별 관상</h3>
+            <div className="bg-gradient-to-b from-stone-900/80 to-red-950/50 backdrop-blur-lg rounded-2xl p-6 border border-amber-600/20">
+              <h3 className="text-lg font-bold mb-4 text-amber-100">面相 부위별 관상</h3>
               <div className="space-y-3">
                 {Object.entries(result.faceFeatures).map(([부위, 설명]) => (
-                  <div key={부위} className="bg-white/5 rounded-xl p-3">
-                    <span className="text-pink-400 font-medium">{부위}</span>
-                    <p className="text-sm text-gray-300 mt-1">{설명}</p>
+                  <div key={부위} className="bg-stone-900/50 rounded-xl p-3 border border-amber-600/10">
+                    <span className="text-amber-400 font-medium">{부위}</span>
+                    <p className="text-sm text-stone-300 mt-1">{설명}</p>
                   </div>
                 ))}
               </div>
             </div>
 
             {/* 시기별 운세 */}
-            <div className="bg-white/10 backdrop-blur-lg rounded-2xl p-6">
-              <h3 className="text-lg font-bold mb-4">📅 시기별 운세</h3>
+            <div className="bg-gradient-to-b from-stone-900/80 to-red-950/50 backdrop-blur-lg rounded-2xl p-6 border border-amber-600/20">
+              <h3 className="text-lg font-bold mb-4 text-amber-100">時期別 운세</h3>
               <div className="space-y-4">
                 {Object.entries(result.lifeFortune).map(([시기, 데이터]) => (
                   <div
                     key={시기}
-                    className={`rounded-xl p-4 ${
+                    className={`rounded-xl p-4 border ${
                       시기 === "초년운"
-                        ? "bg-blue-500/20"
+                        ? "bg-emerald-900/20 border-emerald-600/20"
                         : 시기 === "중년운"
-                        ? "bg-yellow-500/20"
-                        : "bg-green-500/20"
+                        ? "bg-amber-900/20 border-amber-600/20"
+                        : "bg-red-900/20 border-red-600/20"
                     }`}
                   >
                     <div className="flex justify-between items-center mb-2">
                       <div>
-                        <span className="font-bold">
-                          {시기 === "초년운" && "🌱 "}
-                          {시기 === "중년운" && "🌳 "}
-                          {시기 === "말년운" && "🍂 "}
+                        <span className="font-bold text-amber-100">
+                          {시기 === "초년운" && "初 "}
+                          {시기 === "중년운" && "中 "}
+                          {시기 === "말년운" && "末 "}
                           {시기}
                         </span>
-                        <span className="text-xs text-gray-400 ml-2">
+                        <span className="text-xs text-stone-400 ml-2">
                           ({데이터.period})
                         </span>
                       </div>
-                      <span className="text-yellow-400">
+                      <span className="text-amber-400">
                         {renderStars(데이터.rating)}
                       </span>
                     </div>
-                    <p className="text-sm text-gray-300">{데이터.description}</p>
+                    <p className="text-sm text-stone-300">{데이터.description}</p>
                   </div>
                 ))}
               </div>
             </div>
 
             {/* 세부 운세 */}
-            <div className="bg-white/10 backdrop-blur-lg rounded-2xl p-6">
-              <h3 className="text-lg font-bold mb-4">📊 운세 지수</h3>
+            <div className="bg-gradient-to-b from-stone-900/80 to-red-950/50 backdrop-blur-lg rounded-2xl p-6 border border-amber-600/20">
+              <h3 className="text-lg font-bold mb-4 text-amber-100">運勢 지수</h3>
               <div className="space-y-3">
                 {Object.entries(result.categories).map(([항목, 점수]) => (
                   <div key={항목} className="flex items-center gap-3">
-                    <span className="w-20 text-sm">
-                      {운아이콘[항목]} {항목}
+                    <span className="w-20 text-sm text-amber-100">
+                      <span className="text-amber-400">{운아이콘[항목]}</span> {항목}
                     </span>
-                    <div className="flex-1 bg-white/10 rounded-full h-3 overflow-hidden">
+                    <div className="flex-1 bg-stone-800/50 rounded-full h-3 overflow-hidden">
                       <div
-                        className="h-full bg-gradient-to-r from-pink-500 to-purple-500 rounded-full transition-all duration-500"
+                        className="h-full bg-gradient-to-r from-red-600 to-amber-500 rounded-full transition-all duration-500"
                         style={{ width: `${점수 * 20}%` }}
                       />
                     </div>
-                    <span className="text-yellow-400 text-sm w-16 text-right">
+                    <span className="text-amber-400 text-sm w-16 text-right">
                       {renderStars(점수)}
                     </span>
                   </div>
@@ -274,13 +293,13 @@ export default function FacePage() {
             </div>
 
             {/* 성격 특성 */}
-            <div className="bg-white/10 backdrop-blur-lg rounded-2xl p-6">
-              <h3 className="text-lg font-bold mb-4">✨ 성격 특성</h3>
+            <div className="bg-gradient-to-b from-stone-900/80 to-red-950/50 backdrop-blur-lg rounded-2xl p-6 border border-amber-600/20">
+              <h3 className="text-lg font-bold mb-4 text-amber-100">性格 특성</h3>
               <div className="flex flex-wrap gap-2">
                 {result.personality.map((특성, index) => (
                   <span
                     key={index}
-                    className="px-3 py-1 bg-purple-500/30 text-purple-200 rounded-full text-sm"
+                    className="px-3 py-1 bg-amber-900/30 text-amber-300/80 rounded-full text-sm border border-amber-600/20"
                   >
                     {특성}
                   </span>
@@ -289,35 +308,35 @@ export default function FacePage() {
             </div>
 
             {/* 어울리는 직업 */}
-            <div className="bg-white/10 backdrop-blur-lg rounded-2xl p-6">
-              <h3 className="text-lg font-bold mb-3">💼 어울리는 직업</h3>
-              <p className="text-gray-300">{result.career}</p>
+            <div className="bg-gradient-to-b from-stone-900/80 to-red-950/50 backdrop-blur-lg rounded-2xl p-6 border border-amber-600/20">
+              <h3 className="text-lg font-bold mb-3 text-amber-100">適職 어울리는 직업</h3>
+              <p className="text-stone-300">{result.career}</p>
             </div>
 
             {/* 행운 요소 & 조언 */}
-            <div className="bg-gradient-to-r from-yellow-500/20 to-orange-500/20 backdrop-blur-lg rounded-2xl p-6">
-              <h3 className="text-lg font-bold mb-4">🍀 행운의 요소</h3>
+            <div className="bg-gradient-to-r from-red-900/40 to-amber-900/40 backdrop-blur-lg rounded-2xl p-6 border border-amber-600/20">
+              <h3 className="text-lg font-bold mb-4 text-amber-100">幸運 요소</h3>
               <div className="grid grid-cols-2 gap-3 mb-4">
-                <div className="bg-white/10 rounded-xl p-3 text-center">
-                  <p className="text-xs text-gray-400">행운의 숫자</p>
-                  <p className="text-2xl font-bold text-yellow-400">
+                <div className="bg-stone-900/50 rounded-xl p-3 text-center border border-amber-600/10">
+                  <p className="text-xs text-stone-400">행운의 숫자</p>
+                  <p className="text-2xl font-bold text-amber-400">
                     {result.luckyNumber}
                   </p>
                 </div>
-                <div className="bg-white/10 rounded-xl p-3 text-center">
-                  <p className="text-xs text-gray-400">행운의 색상</p>
-                  <p className="text-xl font-bold">{result.luckyColor}</p>
+                <div className="bg-stone-900/50 rounded-xl p-3 text-center border border-amber-600/10">
+                  <p className="text-xs text-stone-400">행운의 색상</p>
+                  <p className="text-xl font-bold text-amber-100">{result.luckyColor}</p>
                 </div>
               </div>
-              <div className="bg-white/10 rounded-xl p-4 text-center">
-                <p className="text-xs text-gray-400 mb-1">관상학적 조언</p>
-                <p className="text-yellow-300 font-medium">"{result.advice}"</p>
+              <div className="bg-stone-900/50 rounded-xl p-4 text-center border border-amber-600/20">
+                <p className="text-xs text-stone-500 mb-1">觀相 조언</p>
+                <p className="text-amber-300 font-medium">"{result.advice}"</p>
               </div>
             </div>
 
             {/* Coupang Partners Banner */}
             <div className="mt-2">
-              <p className="text-center text-xs text-gray-400 mb-2">추천 상품</p>
+              <p className="text-center text-xs text-stone-500 mb-2">추천 상품</p>
               <div className="flex justify-center">
                 <iframe
                   src="https://ads-partners.coupang.com/widgets.html?id=950676&template=carousel&trackingCode=AF6497036&subId=&width=450&height=130&tsource="
@@ -329,7 +348,7 @@ export default function FacePage() {
                   className="rounded-lg max-w-full"
                 />
               </div>
-              <p className="text-center text-gray-600 text-[10px] mt-2">
+              <p className="text-center text-stone-700 text-[10px] mt-2">
                 쿠팡 파트너스 활동의 일환으로 일정액의 수수료를 제공받습니다
               </p>
             </div>
@@ -338,13 +357,13 @@ export default function FacePage() {
             <div className="flex gap-3">
               <button
                 onClick={resetAll}
-                className="flex-1 py-3 bg-white/10 rounded-xl font-bold hover:bg-white/20 transition"
+                className="flex-1 py-3 bg-stone-800/50 border border-amber-600/20 rounded-xl font-bold hover:bg-stone-700/50 transition text-amber-100/80"
               >
-                다시하기 🔄
+                다시하기
               </button>
               <Link
                 href="/fortune"
-                className="flex-1 py-3 bg-gradient-to-r from-yellow-500 to-orange-500 rounded-xl font-bold text-center hover:opacity-90 transition"
+                className="flex-1 py-3 bg-gradient-to-r from-red-700 to-amber-600 rounded-xl font-bold text-center hover:from-red-600 hover:to-amber-500 transition text-amber-100"
               >
                 운세 보기 🔮
               </Link>
@@ -353,7 +372,7 @@ export default function FacePage() {
         )}
 
         {/* Footer */}
-        <p className="text-center text-gray-500 text-xs mt-8">
+        <p className="text-center text-stone-600 text-xs mt-8">
           ⚠️ 재미로만 봐주세요! 전통 관상학을 참고했습니다.
         </p>
       </main>
