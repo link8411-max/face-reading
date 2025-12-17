@@ -104,29 +104,49 @@ export default function FortunePage() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-indigo-900 via-purple-900 to-black text-white">
-      <main className="container mx-auto px-4 py-8 max-w-lg">
+    <div className="min-h-screen bg-gradient-to-b from-stone-950 via-red-950 to-stone-950 text-white relative overflow-hidden">
+      {/* 전통 문양 배경 */}
+      <div className="absolute inset-0 opacity-5">
+        <div className="absolute top-10 left-5 text-6xl">卍</div>
+        <div className="absolute top-40 right-10 text-4xl">福</div>
+        <div className="absolute top-72 left-10 text-5xl">壽</div>
+        <div className="absolute bottom-40 right-5 text-6xl">吉</div>
+        <div className="absolute bottom-20 left-1/4 text-4xl">運</div>
+      </div>
+
+      <main className="container mx-auto px-4 py-8 max-w-lg relative z-10">
         {/* Header */}
         <div className="flex items-center justify-between mb-6">
-          <Link href="/" className="text-gray-400 hover:text-white">
+          <Link href="/" className="text-amber-700/70 hover:text-amber-600 transition">
             ← 돌아가기
           </Link>
           <span className="text-2xl">🐎</span>
         </div>
 
         <div className="text-center mb-8">
-          <h1 className="text-3xl font-bold mb-2 bg-gradient-to-r from-yellow-400 to-orange-400 bg-clip-text text-transparent">
+          {/* 전통 장식 */}
+          <div className="flex justify-center items-center gap-2 mb-3">
+            <span className="text-amber-600/60">━━</span>
+            <span className="text-2xl">☯</span>
+            <span className="text-amber-600/60">━━</span>
+          </div>
+          <h1 className="text-3xl font-bold mb-2 text-transparent bg-clip-text bg-gradient-to-r from-amber-200 via-yellow-400 to-amber-200" style={{ textShadow: "0 0 30px rgba(251, 191, 36, 0.3)" }}>
             2026 신년 운세
           </h1>
-          <p className="text-gray-300 text-sm">
-            사주팔자로 보는 병오년 운세
+          <p className="text-amber-100/60 text-sm tracking-widest">
+            丙午年 · 사주팔자로 보는 새해 운세
           </p>
+          <div className="flex justify-center items-center gap-2 mt-3">
+            <span className="text-red-800/60 text-xs">◆</span>
+            <span className="text-amber-600/60 text-xs">━━━━━</span>
+            <span className="text-red-800/60 text-xs">◆</span>
+          </div>
         </div>
 
         {/* Input Section */}
         {!result && (
-          <div className="bg-white/10 backdrop-blur-lg rounded-2xl p-6 mb-6">
-            <h2 className="text-lg font-bold mb-4 text-center">생년월일 입력</h2>
+          <div className="bg-gradient-to-b from-stone-900/80 to-red-950/50 backdrop-blur-lg rounded-2xl p-6 mb-6 border border-amber-600/20 shadow-lg shadow-red-950/30">
+            <h2 className="text-lg font-bold mb-4 text-center text-amber-100">生年月日 입력</h2>
 
             {/* 음력/양력 선택 */}
             <div className="flex justify-center gap-2 mb-4">
@@ -134,8 +154,8 @@ export default function FortunePage() {
                 onClick={() => setIsLunar(false)}
                 className={`px-4 py-2 rounded-full text-sm font-medium transition ${
                   !isLunar
-                    ? "bg-yellow-500 text-black"
-                    : "bg-white/10 text-gray-400 hover:bg-white/20"
+                    ? "bg-amber-600 text-stone-900"
+                    : "bg-stone-800/50 text-amber-100/50 hover:bg-stone-700/50 border border-amber-600/20"
                 }`}
               >
                 ☀️ 양력
@@ -144,32 +164,32 @@ export default function FortunePage() {
                 onClick={() => setIsLunar(true)}
                 className={`px-4 py-2 rounded-full text-sm font-medium transition ${
                   isLunar
-                    ? "bg-purple-500 text-white"
-                    : "bg-white/10 text-gray-400 hover:bg-white/20"
+                    ? "bg-red-700 text-amber-100"
+                    : "bg-stone-800/50 text-amber-100/50 hover:bg-stone-700/50 border border-amber-600/20"
                 }`}
               >
                 🌙 음력
               </button>
             </div>
             {isLunar && (
-              <p className="text-xs text-center text-purple-300 mb-4">
+              <p className="text-xs text-center text-red-300 mb-4">
                 ✓ 전통 사주명리학은 음력 기준입니다
               </p>
             )}
 
             <div className="grid grid-cols-3 gap-3 mb-4">
               <div>
-                <label className="block text-sm text-gray-400 mb-1">년도</label>
+                <label className="block text-sm text-amber-100/60 mb-1">년도</label>
                 <input
                   type="number"
                   placeholder="1990"
                   value={birthDate.year}
                   onChange={(e) => setBirthDate({ ...birthDate, year: e.target.value })}
-                  className="w-full px-4 py-3 bg-white/10 rounded-xl text-center text-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
+                  className="w-full px-4 py-3 bg-stone-800/50 border border-amber-600/30 rounded-xl text-center text-lg focus:outline-none focus:ring-2 focus:ring-amber-500/50 placeholder-stone-500"
                 />
               </div>
               <div>
-                <label className="block text-sm text-gray-400 mb-1">월</label>
+                <label className="block text-sm text-amber-100/60 mb-1">월</label>
                 <input
                   type="number"
                   placeholder="5"
@@ -177,11 +197,11 @@ export default function FortunePage() {
                   max="12"
                   value={birthDate.month}
                   onChange={(e) => setBirthDate({ ...birthDate, month: e.target.value })}
-                  className="w-full px-4 py-3 bg-white/10 rounded-xl text-center text-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
+                  className="w-full px-4 py-3 bg-stone-800/50 border border-amber-600/30 rounded-xl text-center text-lg focus:outline-none focus:ring-2 focus:ring-amber-500/50 placeholder-stone-500"
                 />
               </div>
               <div>
-                <label className="block text-sm text-gray-400 mb-1">일</label>
+                <label className="block text-sm text-amber-100/60 mb-1">일</label>
                 <input
                   type="number"
                   placeholder="15"
@@ -189,26 +209,26 @@ export default function FortunePage() {
                   max="31"
                   value={birthDate.day}
                   onChange={(e) => setBirthDate({ ...birthDate, day: e.target.value })}
-                  className="w-full px-4 py-3 bg-white/10 rounded-xl text-center text-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
+                  className="w-full px-4 py-3 bg-stone-800/50 border border-amber-600/30 rounded-xl text-center text-lg focus:outline-none focus:ring-2 focus:ring-amber-500/50 placeholder-stone-500"
                 />
               </div>
             </div>
 
             {/* 태어난 시간 */}
             <div className="mb-6">
-              <label className="block text-sm text-gray-400 mb-1">태어난 시간</label>
+              <label className="block text-sm text-amber-100/60 mb-1">태어난 시간 (時柱)</label>
               <select
                 value={birthHour}
                 onChange={(e) => setBirthHour(e.target.value)}
-                className="w-full px-4 py-3 bg-white/10 rounded-xl text-center text-lg focus:outline-none focus:ring-2 focus:ring-purple-500 appearance-none cursor-pointer"
+                className="w-full px-4 py-3 bg-stone-800/50 border border-amber-600/30 rounded-xl text-center text-lg focus:outline-none focus:ring-2 focus:ring-amber-500/50 appearance-none cursor-pointer"
               >
                 {hourOptions.map((option) => (
-                  <option key={option.value} value={option.value} className="bg-gray-800">
+                  <option key={option.value} value={option.value} className="bg-stone-800">
                     {option.label}
                   </option>
                 ))}
               </select>
-              <p className="text-xs text-gray-500 mt-1 text-center">
+              <p className="text-xs text-stone-500 mt-1 text-center">
                 모르면 &apos;모름&apos; 선택 (시주 제외하고 분석)
               </p>
             </div>
@@ -216,14 +236,14 @@ export default function FortunePage() {
             <button
               onClick={handleSubmit}
               disabled={loading}
-              className="w-full py-3 bg-gradient-to-r from-yellow-500 to-orange-500 rounded-xl font-bold text-lg hover:opacity-90 transition disabled:opacity-50"
+              className="w-full py-3 bg-gradient-to-r from-red-700 to-amber-600 rounded-xl font-bold text-lg hover:from-red-600 hover:to-amber-500 transition disabled:opacity-50 text-amber-100 shadow-lg shadow-red-900/30"
             >
               {loading ? (
                 <span className="flex items-center justify-center gap-2">
-                  <span className="animate-spin">🔮</span> 운세 분석 중...
+                  <span className="animate-spin">☯</span> 사주 분석 중...
                 </span>
               ) : (
-                "🔮 2026 운세 보기"
+                "운세 보기 ☯"
               )}
             </button>
           </div>
@@ -233,16 +253,16 @@ export default function FortunePage() {
         {result && (
           <div className="space-y-4 animate-fade-in">
             {/* 기본 정보 */}
-            <div className="bg-white/10 backdrop-blur-lg rounded-2xl p-6">
+            <div className="bg-gradient-to-b from-stone-900/80 to-red-950/50 backdrop-blur-lg rounded-2xl p-6 border border-amber-600/20">
               <div className="text-center mb-4">
                 <span className="text-6xl">{result.사주정보.띠이모지}</span>
-                <h2 className="text-2xl font-bold mt-2">{result.사주정보.띠}띠</h2>
-                <p className="text-gray-400 text-sm">
+                <h2 className="text-2xl font-bold mt-2 text-amber-100">{result.사주정보.띠}띠</h2>
+                <p className="text-stone-400 text-sm">
                   {birthDate.year}년 {birthDate.month}월 {birthDate.day}일생
                   <span className={`ml-2 px-2 py-0.5 rounded-full text-xs ${
                     result.사주정보.역법 === "음력"
-                      ? "bg-purple-500/30 text-purple-300"
-                      : "bg-yellow-500/30 text-yellow-300"
+                      ? "bg-red-700/30 text-red-300"
+                      : "bg-amber-600/30 text-amber-300"
                   }`}>
                     {result.사주정보.역법 === "음력" ? "🌙 음력" : "☀️ 양력"}
                   </span>
@@ -250,71 +270,71 @@ export default function FortunePage() {
               </div>
 
               {/* 사주 정보 */}
-              <div className={`grid ${result.사주정보.시주 ? "grid-cols-4" : "grid-cols-3"} gap-2 text-center text-sm bg-black/20 rounded-xl p-3 mb-4`}>
+              <div className={`grid ${result.사주정보.시주 ? "grid-cols-4" : "grid-cols-3"} gap-2 text-center text-sm bg-stone-900/50 rounded-xl p-3 mb-4 border border-amber-600/10`}>
                 <div>
-                  <p className="text-gray-400">년주</p>
-                  <p className="font-bold">{result.사주정보.사주.년주}</p>
+                  <p className="text-stone-500 text-xs">年柱</p>
+                  <p className="font-bold text-amber-100">{result.사주정보.사주.년주}</p>
                 </div>
                 <div>
-                  <p className="text-gray-400">월주</p>
-                  <p className="font-bold">{result.사주정보.사주.월주}</p>
+                  <p className="text-stone-500 text-xs">月柱</p>
+                  <p className="font-bold text-amber-100">{result.사주정보.사주.월주}</p>
                 </div>
                 <div>
-                  <p className="text-gray-400">일주</p>
-                  <p className="font-bold">{result.사주정보.사주.일주}</p>
+                  <p className="text-stone-500 text-xs">日柱</p>
+                  <p className="font-bold text-amber-100">{result.사주정보.사주.일주}</p>
                 </div>
                 {result.사주정보.시주 && (
                   <div>
-                    <p className="text-gray-400">시주</p>
-                    <p className="font-bold text-yellow-400">{result.사주정보.시주}</p>
+                    <p className="text-stone-500 text-xs">時柱</p>
+                    <p className="font-bold text-amber-400">{result.사주정보.시주}</p>
                   </div>
                 )}
               </div>
 
               {/* 오행 분포 */}
-              <div className="flex justify-between text-sm">
+              <div className="flex justify-between text-sm bg-stone-900/30 rounded-xl p-3">
                 {Object.entries(result.사주정보.오행분포).map(([오행, 값]) => (
                   <div key={오행} className="text-center">
                     <p className={`text-lg font-bold ${오행색상[오행]}`}>{오행}</p>
-                    <p>{값}</p>
+                    <p className="text-stone-400">{값}</p>
                   </div>
                 ))}
               </div>
             </div>
 
             {/* 총운 */}
-            <div className="bg-gradient-to-r from-yellow-500/20 to-orange-500/20 backdrop-blur-lg rounded-2xl p-6">
+            <div className="bg-gradient-to-r from-red-900/40 to-amber-900/40 backdrop-blur-lg rounded-2xl p-6 border border-amber-600/20">
               <div className="flex justify-between items-center mb-3">
-                <h3 className="text-xl font-bold">2026년 총운</h3>
-                <span className="text-yellow-400 text-xl">
+                <h3 className="text-xl font-bold text-amber-100">丙午年 총운</h3>
+                <span className="text-amber-400 text-xl tracking-wider">
                   {renderStars(result.운세.총운.rating)}
                 </span>
               </div>
-              <div className="inline-block px-3 py-1 bg-yellow-500 text-black rounded-full text-sm font-bold mb-3">
+              <div className="inline-block px-3 py-1 bg-gradient-to-r from-red-700 to-amber-600 text-amber-100 rounded-full text-sm font-bold mb-3">
                 {result.운세.총운.keyword}
               </div>
-              <p className="text-gray-200 leading-relaxed">{result.운세.총운.summary}</p>
+              <p className="text-stone-300 leading-relaxed">{result.운세.총운.summary}</p>
             </div>
 
             {/* 월별 운세 */}
-            <div className="bg-white/10 backdrop-blur-lg rounded-2xl p-6">
-              <h3 className="text-lg font-bold mb-4">📅 월별 운세</h3>
+            <div className="bg-gradient-to-b from-stone-900/80 to-red-950/50 backdrop-blur-lg rounded-2xl p-6 border border-amber-600/20">
+              <h3 className="text-lg font-bold mb-4 text-amber-100">月別 운세</h3>
               <div className="space-y-3">
-                <div className="bg-white/5 rounded-xl p-3">
-                  <p className="text-sm text-blue-400 font-medium">상반기 (1-6월)</p>
-                  <p className="text-sm">{result.운세.월별운세.상반기}</p>
+                <div className="bg-stone-900/50 rounded-xl p-3 border border-amber-600/10">
+                  <p className="text-sm text-amber-400 font-medium">상반기 (1-6월)</p>
+                  <p className="text-sm text-stone-300">{result.운세.월별운세.상반기}</p>
                 </div>
-                <div className="bg-white/5 rounded-xl p-3">
-                  <p className="text-sm text-orange-400 font-medium">하반기 (7-12월)</p>
-                  <p className="text-sm">{result.운세.월별운세.하반기}</p>
+                <div className="bg-stone-900/50 rounded-xl p-3 border border-amber-600/10">
+                  <p className="text-sm text-red-400 font-medium">하반기 (7-12월)</p>
+                  <p className="text-sm text-stone-300">{result.운세.월별운세.하반기}</p>
                 </div>
                 <div className="flex gap-3">
-                  <div className="flex-1 bg-green-500/20 rounded-xl p-3 text-center">
-                    <p className="text-xs text-gray-400">최고의 달</p>
-                    <p className="text-lg font-bold text-green-400">{result.운세.월별운세.최고의달}</p>
+                  <div className="flex-1 bg-emerald-900/30 rounded-xl p-3 text-center border border-emerald-600/20">
+                    <p className="text-xs text-stone-400">吉 최고의 달</p>
+                    <p className="text-lg font-bold text-emerald-400">{result.운세.월별운세.최고의달}</p>
                   </div>
-                  <div className="flex-1 bg-red-500/20 rounded-xl p-3 text-center">
-                    <p className="text-xs text-gray-400">주의할 달</p>
+                  <div className="flex-1 bg-red-900/30 rounded-xl p-3 text-center border border-red-600/20">
+                    <p className="text-xs text-stone-400">凶 주의할 달</p>
                     <p className="text-lg font-bold text-red-400">{result.운세.월별운세.주의할달}</p>
                   </div>
                 </div>
@@ -322,68 +342,68 @@ export default function FortunePage() {
             </div>
 
             {/* 세부 운세 */}
-            <div className="bg-white/10 backdrop-blur-lg rounded-2xl p-6">
-              <h3 className="text-lg font-bold mb-4">📊 세부 운세</h3>
+            <div className="bg-gradient-to-b from-stone-900/80 to-red-950/50 backdrop-blur-lg rounded-2xl p-6 border border-amber-600/20">
+              <h3 className="text-lg font-bold mb-4 text-amber-100">細部 운세</h3>
               <div className="space-y-4">
                 {Object.entries(result.운세.세부운세).map(([항목, 데이터]) => (
-                  <div key={항목} className="bg-white/5 rounded-xl p-4">
+                  <div key={항목} className="bg-stone-900/50 rounded-xl p-4 border border-amber-600/10">
                     <div className="flex justify-between items-center mb-2">
-                      <span className="font-medium">
-                        {항목 === "재물운" && "💰"}
-                        {항목 === "애정운" && "💕"}
-                        {항목 === "직장운" && "💼"}
-                        {항목 === "건강운" && "💪"}
-                        {항목 === "학업운" && "📚"}
-                        {" "}{항목}
+                      <span className="font-medium text-amber-100">
+                        {항목 === "재물운" && "財 "}
+                        {항목 === "애정운" && "愛 "}
+                        {항목 === "직장운" && "職 "}
+                        {항목 === "건강운" && "健 "}
+                        {항목 === "학업운" && "學 "}
+                        {항목}
                       </span>
-                      <span className="text-yellow-400">{renderStars(데이터.rating)}</span>
+                      <span className="text-amber-400">{renderStars(데이터.rating)}</span>
                     </div>
-                    <p className="text-sm text-gray-300">{데이터.description}</p>
+                    <p className="text-sm text-stone-300">{데이터.description}</p>
                   </div>
                 ))}
               </div>
             </div>
 
             {/* 행운 요소 */}
-            <div className="bg-white/10 backdrop-blur-lg rounded-2xl p-6">
-              <h3 className="text-lg font-bold mb-4">🍀 행운의 요소</h3>
+            <div className="bg-gradient-to-b from-stone-900/80 to-red-950/50 backdrop-blur-lg rounded-2xl p-6 border border-amber-600/20">
+              <h3 className="text-lg font-bold mb-4 text-amber-100">幸運 요소</h3>
               <div className="grid grid-cols-2 gap-3">
-                <div className="bg-white/5 rounded-xl p-3 text-center">
-                  <p className="text-xs text-gray-400">행운의 숫자</p>
-                  <p className="text-xl font-bold text-yellow-400">
+                <div className="bg-stone-900/50 rounded-xl p-3 text-center border border-amber-600/10">
+                  <p className="text-xs text-stone-400">행운의 숫자</p>
+                  <p className="text-xl font-bold text-amber-400">
                     {result.운세.행운요소.행운의숫자.join(", ")}
                   </p>
                 </div>
-                <div className="bg-white/5 rounded-xl p-3 text-center">
-                  <p className="text-xs text-gray-400">행운의 색상</p>
-                  <p className="text-xl font-bold">{result.운세.행운요소.행운의색상}</p>
+                <div className="bg-stone-900/50 rounded-xl p-3 text-center border border-amber-600/10">
+                  <p className="text-xs text-stone-400">행운의 색상</p>
+                  <p className="text-xl font-bold text-amber-100">{result.운세.행운요소.행운의색상}</p>
                 </div>
-                <div className="bg-white/5 rounded-xl p-3 text-center">
-                  <p className="text-xs text-gray-400">행운의 방위</p>
-                  <p className="text-xl font-bold">{result.운세.행운요소.행운의방위}</p>
+                <div className="bg-stone-900/50 rounded-xl p-3 text-center border border-amber-600/10">
+                  <p className="text-xs text-stone-400">행운의 방위</p>
+                  <p className="text-xl font-bold text-amber-100">{result.운세.행운요소.행운의방위}</p>
                 </div>
-                <div className="bg-white/5 rounded-xl p-3 text-center">
-                  <p className="text-xs text-gray-400">행운의 계절</p>
-                  <p className="text-xl font-bold">{result.운세.행운요소.행운의계절}</p>
+                <div className="bg-stone-900/50 rounded-xl p-3 text-center border border-amber-600/10">
+                  <p className="text-xs text-stone-400">행운의 계절</p>
+                  <p className="text-xl font-bold text-amber-100">{result.운세.행운요소.행운의계절}</p>
                 </div>
               </div>
             </div>
 
             {/* 조언 */}
-            <div className="bg-gradient-to-r from-purple-500/20 to-pink-500/20 backdrop-blur-lg rounded-2xl p-6">
-              <h3 className="text-lg font-bold mb-4">💡 2026년 조언</h3>
+            <div className="bg-gradient-to-r from-red-900/40 to-amber-900/40 backdrop-blur-lg rounded-2xl p-6 border border-amber-600/20">
+              <h3 className="text-lg font-bold mb-4 text-amber-100">丙午年 조언</h3>
               <div className="space-y-3">
                 <div className="flex gap-3">
-                  <span className="text-green-400">✓</span>
-                  <p className="text-sm">{result.운세.조언.해야할것}</p>
+                  <span className="text-emerald-400">吉</span>
+                  <p className="text-sm text-stone-300">{result.운세.조언.해야할것}</p>
                 </div>
                 <div className="flex gap-3">
-                  <span className="text-red-400">✗</span>
-                  <p className="text-sm">{result.운세.조언.피해야할것}</p>
+                  <span className="text-red-400">凶</span>
+                  <p className="text-sm text-stone-300">{result.운세.조언.피해야할것}</p>
                 </div>
-                <div className="bg-white/10 rounded-xl p-4 text-center">
-                  <p className="text-xs text-gray-400 mb-1">명심할 말</p>
-                  <p className="font-medium text-yellow-300">"{result.운세.조언.명심할말}"</p>
+                <div className="bg-stone-900/50 rounded-xl p-4 text-center border border-amber-600/20">
+                  <p className="text-xs text-stone-500 mb-1">銘心</p>
+                  <p className="font-medium text-amber-300">"{result.운세.조언.명심할말}"</p>
                 </div>
               </div>
             </div>
@@ -411,13 +431,13 @@ export default function FortunePage() {
             <div className="flex gap-3">
               <button
                 onClick={resetAll}
-                className="flex-1 py-3 bg-white/10 rounded-xl font-bold hover:bg-white/20 transition"
+                className="flex-1 py-3 bg-stone-800/50 border border-amber-600/20 rounded-xl font-bold hover:bg-stone-700/50 transition text-amber-100/80"
               >
-                다시하기 🔄
+                다시하기
               </button>
               <Link
-                href="/"
-                className="flex-1 py-3 bg-gradient-to-r from-pink-500 to-purple-500 rounded-xl font-bold text-center hover:opacity-90 transition"
+                href="/face"
+                className="flex-1 py-3 bg-gradient-to-r from-red-700 to-amber-600 rounded-xl font-bold text-center hover:from-red-600 hover:to-amber-500 transition text-amber-100"
               >
                 관상 보기 👤
               </Link>
@@ -426,7 +446,7 @@ export default function FortunePage() {
         )}
 
         {/* Footer */}
-        <p className="text-center text-gray-500 text-xs mt-8">
+        <p className="text-center text-stone-600 text-xs mt-8">
           ⚠️ 재미로만 봐주세요! 전통 사주명리학을 참고했습니다.
         </p>
       </main>
