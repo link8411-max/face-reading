@@ -396,69 +396,73 @@ export default function SamgukPage() {
                   mixBlendMode: 'overlay'
                 }}></div>
 
-                <div className="p-6 relative z-10">
-                  <div className="flex gap-4 items-start">
-                    {/* 업로드한 사진 - 정사각형 프레임 */}
-                    {image && (
+                <div className="p-4 sm:p-6 relative z-10">
+                  {/* 모바일: 세로 배치, 데스크톱: 가로 배치 */}
+                  <div className="flex flex-col sm:flex-row gap-4 items-center sm:items-start">
+                    {/* 사진 비교 영역 */}
+                    <div className="flex items-center gap-2 sm:gap-4">
+                      {/* 업로드한 사진 - 정사각형 프레임 */}
+                      {image && (
+                        <div className="flex-shrink-0">
+                          <div className="relative">
+                            {/* 금테 장식 프레임 */}
+                            <div className="absolute -inset-1 bg-gradient-to-br from-amber-400 via-yellow-600 to-amber-700 rounded opacity-60"></div>
+                            <div className="relative bg-gradient-to-br from-amber-900 to-amber-950 p-1 rounded">
+                              <img
+                                src={image}
+                                alt="내 얼굴"
+                                className="w-20 h-20 sm:w-28 sm:h-28 object-cover rounded border-2 border-amber-500/70"
+                                style={{ boxShadow: 'inset 0 0 10px rgba(0, 0, 0, 0.5)' }}
+                              />
+                            </div>
+                            <div className="absolute -bottom-3 left-1/2 -translate-x-1/2 bg-gradient-to-r from-amber-900 via-amber-700 to-amber-900 px-2 sm:px-3 py-1 rounded-full text-xs text-amber-100 border-2 border-amber-500/50 font-bold shadow-lg">
+                              나
+                            </div>
+                          </div>
+                        </div>
+                      )}
+
+                      {/* 화살표 장식 */}
+                      <div className="flex items-center justify-center">
+                        <div className="text-xl sm:text-2xl text-amber-400" style={{ textShadow: '0 0 10px rgba(251, 191, 36, 0.5)' }}>→</div>
+                      </div>
+
+                      {/* 인물 초상화 영역 - 정사각형 프레임 (코에이 스타일) */}
                       <div className="flex-shrink-0">
                         <div className="relative">
                           {/* 금테 장식 프레임 */}
-                          <div className="absolute -inset-1 bg-gradient-to-br from-amber-400 via-yellow-600 to-amber-700 rounded opacity-60"></div>
-                          <div className="relative bg-gradient-to-br from-amber-900 to-amber-950 p-1 rounded">
-                            <img
-                              src={image}
-                              alt="내 얼굴"
-                              className="w-28 h-28 object-cover rounded border-2 border-amber-500/70"
-                              style={{ boxShadow: 'inset 0 0 10px rgba(0, 0, 0, 0.5)' }}
-                            />
+                          <div className="absolute -inset-1 bg-gradient-to-br from-yellow-400 via-amber-600 to-yellow-700 rounded opacity-80"></div>
+                          <div className={`relative p-1 rounded ${
+                            result.character.faction === "위" ? "bg-gradient-to-br from-blue-800 to-blue-950" :
+                            result.character.faction === "촉" ? "bg-gradient-to-br from-green-800 to-green-950" :
+                            result.character.faction === "오" ? "bg-gradient-to-br from-red-800 to-red-950" :
+                            "bg-gradient-to-br from-purple-800 to-purple-950"
+                          }`}>
+                            <div className={`w-20 h-20 sm:w-28 sm:h-28 rounded border-2 flex items-center justify-center text-4xl sm:text-5xl ${
+                              result.character.faction === "위" ? "bg-gradient-to-br from-blue-900/80 to-blue-950/90 border-blue-400/70" :
+                              result.character.faction === "촉" ? "bg-gradient-to-br from-green-900/80 to-green-950/90 border-green-400/70" :
+                              result.character.faction === "오" ? "bg-gradient-to-br from-red-900/80 to-red-950/90 border-red-400/70" :
+                              "bg-gradient-to-br from-purple-900/80 to-purple-950/90 border-purple-400/70"
+                            }`} style={{ boxShadow: 'inset 0 0 20px rgba(0, 0, 0, 0.5)' }}>
+                              {/* 세력별 대표 이모지 */}
+                              <span style={{ textShadow: '0 0 20px rgba(0, 0, 0, 0.8)' }}>
+                                {result.character.stats.무력 >= 90 ? "⚔️" :
+                                 result.character.stats.지력 >= 90 ? "📜" :
+                                 result.character.stats.매력 >= 90 ? "👑" :
+                                 result.character.stats.통솔 >= 90 ? "🏴" : "🎭"}
+                              </span>
+                            </div>
                           </div>
-                          <div className="absolute -bottom-3 left-1/2 -translate-x-1/2 bg-gradient-to-r from-amber-900 via-amber-700 to-amber-900 px-3 py-1 rounded-full text-xs text-amber-100 border-2 border-amber-500/50 font-bold shadow-lg">
-                            나
+                          <div className="absolute -bottom-3 left-1/2 -translate-x-1/2 bg-gradient-to-r from-amber-900 via-amber-700 to-amber-900 px-2 sm:px-3 py-1 rounded-full text-xs text-amber-100 border-2 border-amber-500/50 font-bold shadow-lg whitespace-nowrap">
+                            {result.character.name}
                           </div>
-                        </div>
-                      </div>
-                    )}
-
-                    {/* 화살표 장식 */}
-                    <div className="flex items-center justify-center pt-8">
-                      <div className="text-2xl text-amber-400" style={{ textShadow: '0 0 10px rgba(251, 191, 36, 0.5)' }}>→</div>
-                    </div>
-
-                    {/* 인물 초상화 영역 - 정사각형 프레임 (코에이 스타일) */}
-                    <div className="flex-shrink-0">
-                      <div className="relative">
-                        {/* 금테 장식 프레임 */}
-                        <div className="absolute -inset-1 bg-gradient-to-br from-yellow-400 via-amber-600 to-yellow-700 rounded opacity-80"></div>
-                        <div className={`relative p-1 rounded ${
-                          result.character.faction === "위" ? "bg-gradient-to-br from-blue-800 to-blue-950" :
-                          result.character.faction === "촉" ? "bg-gradient-to-br from-green-800 to-green-950" :
-                          result.character.faction === "오" ? "bg-gradient-to-br from-red-800 to-red-950" :
-                          "bg-gradient-to-br from-purple-800 to-purple-950"
-                        }`}>
-                          <div className={`w-28 h-28 rounded border-2 flex items-center justify-center text-5xl ${
-                            result.character.faction === "위" ? "bg-gradient-to-br from-blue-900/80 to-blue-950/90 border-blue-400/70" :
-                            result.character.faction === "촉" ? "bg-gradient-to-br from-green-900/80 to-green-950/90 border-green-400/70" :
-                            result.character.faction === "오" ? "bg-gradient-to-br from-red-900/80 to-red-950/90 border-red-400/70" :
-                            "bg-gradient-to-br from-purple-900/80 to-purple-950/90 border-purple-400/70"
-                          }`} style={{ boxShadow: 'inset 0 0 20px rgba(0, 0, 0, 0.5)' }}>
-                            {/* 세력별 대표 이모지 */}
-                            <span style={{ textShadow: '0 0 20px rgba(0, 0, 0, 0.8)' }}>
-                              {result.character.stats.무력 >= 90 ? "⚔️" :
-                               result.character.stats.지력 >= 90 ? "📜" :
-                               result.character.stats.매력 >= 90 ? "👑" :
-                               result.character.stats.통솔 >= 90 ? "🏴" : "🎭"}
-                            </span>
-                          </div>
-                        </div>
-                        <div className="absolute -bottom-3 left-1/2 -translate-x-1/2 bg-gradient-to-r from-amber-900 via-amber-700 to-amber-900 px-3 py-1 rounded-full text-xs text-amber-100 border-2 border-amber-500/50 font-bold shadow-lg whitespace-nowrap">
-                          {result.character.name}
                         </div>
                       </div>
                     </div>
 
                     {/* 인물 정보 */}
-                    <div className="flex-1 pt-2">
-                      <div className="flex items-center gap-2 mb-2">
+                    <div className="flex-1 text-center sm:text-left pt-4 sm:pt-2">
+                      <div className="flex items-center justify-center sm:justify-start gap-2 mb-2">
                         <span className={`px-3 py-1 rounded-full text-sm font-bold shadow-lg ${
                           result.character.faction === "위" ? "bg-gradient-to-r from-blue-600 to-blue-700 text-blue-100" :
                           result.character.faction === "촉" ? "bg-gradient-to-r from-green-600 to-green-700 text-green-100" :
@@ -468,7 +472,7 @@ export default function SamgukPage() {
                           일치도 {result.similarity}%
                         </span>
                       </div>
-                      <h2 className="text-3xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-amber-200 via-yellow-400 to-amber-200 mb-1" style={{
+                      <h2 className="text-2xl sm:text-3xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-amber-200 via-yellow-400 to-amber-200 mb-1" style={{
                         textShadow: '0 0 20px rgba(251, 191, 36, 0.3)'
                       }}>
                         {result.character.name}
