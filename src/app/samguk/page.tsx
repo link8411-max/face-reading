@@ -307,6 +307,25 @@ export default function SamgukPage() {
               </div>
             </div>
 
+            {/* Coupang Partners Banner 1 */}
+            <div className="mt-2">
+              <p className="text-center text-xs text-stone-500 mb-2">추천 상품</p>
+              <div className="flex justify-center">
+                <iframe
+                  src="https://ads-partners.coupang.com/widgets.html?id=950676&template=carousel&trackingCode=AF6497036&subId=&width=450&height=130&tsource="
+                  width="450"
+                  height="130"
+                  frameBorder="0"
+                  scrolling="no"
+                  referrerPolicy="unsafe-url"
+                  className="rounded-lg max-w-full"
+                />
+              </div>
+              <p className="text-center text-stone-700 text-[10px] mt-2">
+                쿠팡 파트너스 활동의 일환으로 일정액의 수수료를 제공받습니다
+              </p>
+            </div>
+
             {/* 내 얼굴 분석 상세 */}
             <div className="bg-gradient-to-b from-stone-900/80 to-amber-950/50 backdrop-blur-lg rounded-2xl p-6 border border-amber-600/30">
               <h3 className="text-lg font-bold mb-3 text-amber-100 flex items-center gap-2">
