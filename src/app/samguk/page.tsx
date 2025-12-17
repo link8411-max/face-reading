@@ -18,6 +18,124 @@ interface AnalysisResult {
   character: SamgukCharacter;
 }
 
+// 오각형 레이더 차트 컴포넌트
+function RadarChart({ stats }: { stats: { 통솔: number; 무력: number; 지력: number; 정치: number; 매력: number } }) {
+  const size = 200;
+  const center = size / 2;
+  const radius = 70;
+
+  const statKeys = ["통솔", "무력", "지력", "정치", "매력"] as const;
+  const angles = statKeys.map((_, i) => (Math.PI * 2 * i) / 5 - Math.PI / 2);
+
+  // 배경 오각형 (격자)
+  const createPentagon = (r: number) => {
+    return angles.map((angle, i) => {
+      const x = center + r * Math.cos(angle);
+      const y = center + r * Math.sin(angle);
+      return `${i === 0 ? 'M' : 'L'} ${x} ${y}`;
+    }).join(' ') + ' Z';
+  };
+
+  // 스탯 오각형
+  const statPoints = angles.map((angle, i) => {
+    const value = stats[statKeys[i]] / 100;
+    const x = center + radius * value * Math.cos(angle);
+    const y = center + radius * value * Math.sin(angle);
+    return `${x},${y}`;
+  }).join(' ');
+
+  // 레이블 위치
+  const labelPositions = angles.map((angle) => ({
+    x: center + (radius + 25) * Math.cos(angle),
+    y: center + (radius + 25) * Math.sin(angle),
+  }));
+
+  return (
+    <svg width={size} height={size} className="mx-auto">
+      {/* 배경 격자 */}
+      {[0.2, 0.4, 0.6, 0.8, 1].map((scale, i) => (
+        <path
+          key={i}
+          d={createPentagon(radius * scale)}
+          fill="none"
+          stroke="rgba(217, 119, 6, 0.2)"
+          strokeWidth="1"
+        />
+      ))}
+
+      {/* 중심에서 꼭짓점으로 선 */}
+      {angles.map((angle, i) => (
+        <line
+          key={i}
+          x1={center}
+          y1={center}
+          x2={center + radius * Math.cos(angle)}
+          y2={center + radius * Math.sin(angle)}
+          stroke="rgba(217, 119, 6, 0.2)"
+          strokeWidth="1"
+        />
+      ))}
+
+      {/* 스탯 영역 */}
+      <polygon
+        points={statPoints}
+        fill="rgba(234, 179, 8, 0.3)"
+        stroke="rgb(234, 179, 8)"
+        strokeWidth="2"
+      />
+
+      {/* 꼭짓점 포인트 */}
+      {angles.map((angle, i) => {
+        const value = stats[statKeys[i]] / 100;
+        const x = center + radius * value * Math.cos(angle);
+        const y = center + radius * value * Math.sin(angle);
+        return (
+          <circle
+            key={i}
+            cx={x}
+            cy={y}
+            r="4"
+            fill="rgb(234, 179, 8)"
+          />
+        );
+      })}
+
+      {/* 레이블 */}
+      {statKeys.map((stat, i) => (
+        <text
+          key={stat}
+          x={labelPositions[i].x}
+          y={labelPositions[i].y}
+          textAnchor="middle"
+          dominantBaseline="middle"
+          className="fill-amber-200 text-xs font-bold"
+        >
+          {stat}
+        </text>
+      ))}
+
+      {/* 수치 */}
+      {statKeys.map((stat, i) => {
+        const value = stats[stat] / 100;
+        const x = center + (radius * value + 12) * Math.cos(angles[i]);
+        const y = center + (radius * value + 12) * Math.sin(angles[i]);
+        return (
+          <text
+            key={`val-${stat}`}
+            x={x}
+            y={y}
+            textAnchor="middle"
+            dominantBaseline="middle"
+            className={`text-[10px] font-bold ${stats[stat] >= 90 ? 'fill-yellow-400' : 'fill-amber-400'}`}
+          >
+            {stats[stat]}
+          </text>
+        );
+      })}
+    </svg>
+  );
+}
+
 export default function SamgukPage() {
   const [image, setImage] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
@@ -185,77 +303,120 @@ export default function SamgukPage() {
         {/* Result Section */}
         {result && (
           <div className="space-y-4 animate-fade-in">
-            {/* 메인 결과 카드 */}
-            <div className={`bg-gradient-to-b ${getFactionBgClass(result.character.faction)} backdrop-blur-lg rounded-2xl p-6 border-2 ${getFactionBorderClass(result.character.faction)} shadow-xl`}>
-              <div className="flex gap-4 items-start">
-                {/* 업로드한 사진 */}
-                {image && (
-                  <div className="flex-shrink-0">
-                    <img
-                      src={image}
-                      alt="내 얼굴"
-                      className="w-20 h-20 object-cover rounded-lg border-2 border-amber-500/50"
-                    />
-                    <p className="text-xs text-center mt-1 text-stone-400">나</p>
-                  </div>
-                )}
-                <div className="flex-1 text-center">
-                  <div className="flex items-center justify-center gap-2 mb-2">
-                    <span className={`px-3 py-1 rounded-full text-xs font-bold ${
-                      result.character.faction === "위" ? "bg-blue-600 text-blue-100" :
-                      result.character.faction === "촉" ? "bg-green-600 text-green-100" :
-                      result.character.faction === "오" ? "bg-red-600 text-red-100" :
-                      "bg-purple-600 text-purple-100"
-                    }`}>
-                      {result.character.faction}
-                    </span>
-                    <span className="text-amber-400 text-sm">{result.similarity}% 일치</span>
-                  </div>
-                  <h2 className="text-3xl font-bold mb-1 text-amber-100">
-                    {result.character.name}
-                  </h2>
-                  <p className="text-lg text-stone-400 mb-2">{result.character.hanja}</p>
-                  <p className="text-sm text-amber-200/80">{result.character.role}</p>
-                </div>
+            {/* 메인 결과 카드 - 코에이 스타일 */}
+            <div className={`bg-gradient-to-b ${getFactionBgClass(result.character.faction)} backdrop-blur-lg rounded-2xl border-2 ${getFactionBorderClass(result.character.faction)} shadow-xl overflow-hidden`}>
+              {/* 상단 세력 배너 */}
+              <div className={`py-2 text-center ${
+                result.character.faction === "위" ? "bg-blue-800" :
+                result.character.faction === "촉" ? "bg-green-800" :
+                result.character.faction === "오" ? "bg-red-800" :
+                "bg-purple-800"
+              }`}>
+                <span className="text-white font-bold tracking-widest">
+                  {result.character.faction === "위" ? "━ 魏 ━" :
+                   result.character.faction === "촉" ? "━ 蜀 ━" :
+                   result.character.faction === "오" ? "━ 吳 ━" :
+                   "━ 群雄 ━"}
+                </span>
               </div>
 
-              {/* 닮은 이유 */}
-              <div className="mt-4 p-4 bg-stone-900/50 rounded-xl border border-amber-600/20">
-                <p className="text-sm text-stone-300 leading-relaxed">
-                  "{result.matchReason}"
-                </p>
+              <div className="p-6">
+                <div className="flex gap-4 items-center">
+                  {/* 업로드한 사진 */}
+                  {image && (
+                    <div className="flex-shrink-0">
+                      <div className="relative">
+                        <img
+                          src={image}
+                          alt="내 얼굴"
+                          className="w-24 h-24 object-cover rounded-lg border-2 border-amber-500/50"
+                        />
+                        <div className="absolute -bottom-2 left-1/2 -translate-x-1/2 bg-stone-900 px-2 py-0.5 rounded text-xs text-amber-300 border border-amber-600/30">
+                          나
+                        </div>
+                      </div>
+                    </div>
+                  )}
+
+                  {/* 화살표 */}
+                  <div className="text-2xl text-amber-500">→</div>
+
+                  {/* 인물 초상화 영역 */}
+                  <div className="flex-shrink-0">
+                    <div className="relative">
+                      <div className={`w-24 h-24 rounded-lg border-2 flex items-center justify-center text-4xl ${
+                        result.character.faction === "위" ? "bg-blue-900/50 border-blue-500/50" :
+                        result.character.faction === "촉" ? "bg-green-900/50 border-green-500/50" :
+                        result.character.faction === "오" ? "bg-red-900/50 border-red-500/50" :
+                        "bg-purple-900/50 border-purple-500/50"
+                      }`}>
+                        {/* 세력별 대표 이모지 */}
+                        {result.character.stats.무력 >= 90 ? "⚔️" :
+                         result.character.stats.지력 >= 90 ? "📜" :
+                         result.character.stats.매력 >= 90 ? "👑" :
+                         result.character.stats.통솔 >= 90 ? "🏴" : "🎭"}
+                      </div>
+                      <div className="absolute -bottom-2 left-1/2 -translate-x-1/2 bg-stone-900 px-2 py-0.5 rounded text-xs text-amber-300 border border-amber-600/30 whitespace-nowrap">
+                        {result.character.name}
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* 인물 정보 */}
+                  <div className="flex-1">
+                    <div className="flex items-center gap-2 mb-1">
+                      <span className={`px-2 py-0.5 rounded text-xs font-bold ${
+                        result.character.faction === "위" ? "bg-blue-600 text-blue-100" :
+                        result.character.faction === "촉" ? "bg-green-600 text-green-100" :
+                        result.character.faction === "오" ? "bg-red-600 text-red-100" :
+                        "bg-purple-600 text-purple-100"
+                      }`}>
+                        {result.similarity}%
+                      </span>
+                    </div>
+                    <h2 className="text-2xl font-bold text-amber-100">
+                      {result.character.name}
+                    </h2>
+                    <p className="text-sm text-stone-400">{result.character.hanja}</p>
+                    <p className="text-xs text-amber-200/80 mt-1">{result.character.role}</p>
+                  </div>
+                </div>
+
+                {/* 닮은 이유 */}
+                <div className="mt-4 p-4 bg-stone-900/70 rounded-xl border border-amber-600/30">
+                  <p className="text-xs text-amber-400 mb-1">📜 분석 결과</p>
+                  <p className="text-sm text-stone-300 leading-relaxed">
+                    {result.matchReason}
+                  </p>
+                </div>
               </div>
             </div>
 
-            {/* 능력치 (코에이 스타일) */}
-            <div className="bg-gradient-to-b from-stone-900/80 to-amber-950/50 backdrop-blur-lg rounded-2xl p-6 border border-amber-600/30">
-              <h3 className="text-lg font-bold mb-4 text-amber-100 flex items-center gap-2">
-                <span>📊</span> 능력치
+            {/* 능력치 (코에이 스타일 오각형) */}
+            <div className="bg-gradient-to-b from-stone-900/90 to-amber-950/60 backdrop-blur-lg rounded-2xl p-6 border-2 border-amber-700/50 relative overflow-hidden">
+              {/* 두루마리 배경 효과 */}
+              <div className="absolute inset-0 opacity-5">
+                <div className="absolute top-2 left-2 text-4xl text-amber-200">武</div>
+                <div className="absolute top-2 right-2 text-4xl text-amber-200">智</div>
+                <div className="absolute bottom-2 left-2 text-4xl text-amber-200">德</div>
+                <div className="absolute bottom-2 right-2 text-4xl text-amber-200">統</div>
+              </div>
+
+              <h3 className="text-lg font-bold mb-2 text-amber-100 text-center relative z-10">
+                ⚔️ 능력치 ⚔️
               </h3>
-              <div className="space-y-3">
-                {Object.entries(result.character.stats).map(([stat, value]) => (
-                  <div key={stat} className="flex items-center gap-3">
-                    <span className="w-12 text-sm text-amber-200 font-medium">{stat}</span>
-                    <div className="flex-1 bg-stone-800/50 rounded-full h-4 overflow-hidden">
-                      <div
-                        className={`h-full rounded-full transition-all duration-1000 ${
-                          value >= 90 ? "bg-gradient-to-r from-red-500 to-yellow-500" :
-                          value >= 80 ? "bg-gradient-to-r from-amber-500 to-yellow-500" :
-                          value >= 70 ? "bg-gradient-to-r from-green-500 to-emerald-500" :
-                          value >= 60 ? "bg-gradient-to-r from-blue-500 to-cyan-500" :
-                          "bg-gradient-to-r from-stone-500 to-stone-400"
-                        }`}
-                        style={{ width: `${value}%` }}
-                      />
-                    </div>
-                    <span className={`w-8 text-right font-bold ${
-                      value >= 90 ? "text-yellow-400" :
-                      value >= 80 ? "text-amber-400" :
-                      value >= 70 ? "text-green-400" :
-                      "text-stone-400"
-                    }`}>{value}</span>
-                  </div>
-                ))}
+
+              {/* 오각형 레이더 차트 */}
+              <div className="relative z-10">
+                <RadarChart stats={result.character.stats} />
+              </div>
+
+              {/* 총합 */}
+              <div className="text-center mt-2 relative z-10">
+                <span className="text-stone-400 text-sm">총합: </span>
+                <span className="text-xl font-bold text-yellow-400">
+                  {Object.values(result.character.stats).reduce((a, b) => a + b, 0)}
+                </span>
               </div>
             </div>
 
