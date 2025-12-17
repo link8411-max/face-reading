@@ -26,7 +26,10 @@ export default function Home() {
           <h1 className="text-4xl font-bold mb-3 text-transparent bg-clip-text bg-gradient-to-r from-amber-200 via-yellow-400 to-amber-200" style={{ textShadow: "0 0 30px rgba(251, 191, 36, 0.3)" }}>
             운명을 읽다
           </h1>
-          <p className="text-amber-100/60 tracking-widest">
+          <p className="text-lg text-amber-200/80 mb-1">
+            무료 AI 관상 분석 & 2026 신년운세
+          </p>
+          <p className="text-amber-100/60 tracking-widest text-sm">
             AI와 전통 명리학이 만나다
           </p>
           <div className="flex justify-center items-center gap-2 mt-3">
@@ -181,6 +184,52 @@ export default function Home() {
           <p className="text-center text-stone-700 text-[10px] mt-2">
             쿠팡 파트너스 활동의 일환으로 일정액의 수수료를 제공받습니다
           </p>
+        </div>
+
+        {/* FAQ Section */}
+        <div className="mt-12 bg-gradient-to-b from-stone-900/50 to-red-950/30 rounded-2xl p-6 border border-amber-600/20">
+          <h2 className="font-bold mb-4 text-center text-amber-100 text-lg">자주 묻는 질문</h2>
+          <div className="space-y-4 text-sm">
+            <details className="group">
+              <summary className="cursor-pointer text-amber-200 hover:text-amber-300 transition list-none flex items-center gap-2">
+                <span className="text-amber-600 group-open:rotate-90 transition-transform">▶</span>
+                관상이란 무엇인가요?
+              </summary>
+              <p className="mt-2 text-stone-400 pl-5 leading-relaxed">
+                관상(觀相)은 사람의 얼굴 생김새를 보고 성격, 운명, 건강 등을 판단하는 동양의 전통 학문입니다.
+                눈, 코, 입, 이마, 턱 등 각 부위의 특징을 분석하여 초년운, 중년운, 말년운을 예측합니다.
+              </p>
+            </details>
+            <details className="group">
+              <summary className="cursor-pointer text-amber-200 hover:text-amber-300 transition list-none flex items-center gap-2">
+                <span className="text-amber-600 group-open:rotate-90 transition-transform">▶</span>
+                AI가 어떻게 얼굴을 분석하나요?
+              </summary>
+              <p className="mt-2 text-stone-400 pl-5 leading-relaxed">
+                최신 AI 기술(Google Gemini)을 활용하여 업로드된 얼굴 사진의 이목구비를 분석합니다.
+                전통 관상학의 기준을 바탕으로 각 부위의 특징을 파악하고, 종합적인 관상 해석을 제공합니다.
+              </p>
+            </details>
+            <details className="group">
+              <summary className="cursor-pointer text-amber-200 hover:text-amber-300 transition list-none flex items-center gap-2">
+                <span className="text-amber-600 group-open:rotate-90 transition-transform">▶</span>
+                2026년 병오년 운세는 어떻게 보나요?
+              </summary>
+              <p className="mt-2 text-stone-400 pl-5 leading-relaxed">
+                음력 생년월일시를 입력하면 사주팔자와 천간지지를 분석하여 2026년 병오년(丙午年) 운세를 확인할 수 있습니다.
+                총운, 재물운, 직장운, 건강운, 애정운을 상세하게 알려드립니다.
+              </p>
+            </details>
+            <details className="group">
+              <summary className="cursor-pointer text-amber-200 hover:text-amber-300 transition list-none flex items-center gap-2">
+                <span className="text-amber-600 group-open:rotate-90 transition-transform">▶</span>
+                무료인가요?
+              </summary>
+              <p className="mt-2 text-stone-400 pl-5 leading-relaxed">
+                네, 모든 서비스는 완전 무료입니다. AI 관상 분석, 오늘의 운세, 신년운세 모두 무료로 이용하실 수 있습니다.
+              </p>
+            </details>
+          </div>
         </div>
 
         {/* Footer */}
