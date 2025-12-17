@@ -87,6 +87,33 @@ export default function Home() {
             </div>
           </Link>
 
+          {/* 삼국지 닮은꼴 */}
+          <Link href="/samguk" className="block">
+            <div className="bg-gradient-to-b from-stone-900/80 to-red-950/50 backdrop-blur-lg rounded-2xl p-6 hover:from-stone-800/80 hover:to-red-900/50 transition group relative overflow-hidden border border-amber-600/20">
+              <div className="absolute top-2 right-2 bg-gradient-to-r from-amber-600 to-yellow-500 text-stone-900 text-xs font-bold px-2 py-1 rounded-full animate-pulse-heart">
+                NEW
+              </div>
+              <div className="flex items-center gap-4">
+                <div className="text-5xl">⚔️</div>
+                <div className="flex-1">
+                  <h2 className="text-xl font-bold mb-1 text-amber-100 group-hover:text-amber-300 transition">
+                    삼국지 닮은꼴
+                  </h2>
+                  <p className="text-stone-400 text-sm">
+                    나는 어떤 삼국지 영웅일까?
+                  </p>
+                </div>
+                <div className="text-amber-600/50 group-hover:text-amber-400 transition">→</div>
+              </div>
+              <div className="flex gap-2 mt-4">
+                <span className="text-xs px-2 py-1 bg-blue-900/30 text-blue-300 rounded-full border border-blue-600/20">위</span>
+                <span className="text-xs px-2 py-1 bg-green-900/30 text-green-300 rounded-full border border-green-600/20">촉</span>
+                <span className="text-xs px-2 py-1 bg-red-900/30 text-red-300 rounded-full border border-red-600/20">오</span>
+                <span className="text-xs px-2 py-1 bg-amber-900/30 text-amber-300 rounded-full border border-amber-600/20">50명</span>
+              </div>
+            </div>
+          </Link>
+
           {/* 신년 운세 */}
           <Link href="/fortune" className="block">
             <div className="bg-gradient-to-b from-stone-900/80 to-red-950/50 backdrop-blur-lg rounded-2xl p-6 hover:from-stone-800/80 hover:to-red-900/50 transition group relative overflow-hidden border border-amber-600/20">
