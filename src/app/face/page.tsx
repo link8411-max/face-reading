@@ -88,22 +88,22 @@ export default function FacePage() {
   };
 
   const 운아이콘: Record<string, string> = {
-    재물운: "財",
-    애정운: "愛",
-    직장운: "職",
-    건강운: "健",
-    대인운: "人",
+    재물운: "💰",
+    애정운: "💕",
+    직장운: "💼",
+    건강운: "💪",
+    대인운: "🤝",
   };
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-stone-950 via-red-950 to-stone-950 text-white relative overflow-hidden">
-      {/* 전통 문양 배경 */}
-      <div className="absolute inset-0 opacity-5 pointer-events-none">
-        <div className="absolute top-10 left-5 text-6xl">卍</div>
-        <div className="absolute top-32 right-10 text-5xl">福</div>
-        <div className="absolute top-60 left-8 text-4xl">壽</div>
-        <div className="absolute bottom-60 right-5 text-6xl">吉</div>
-        <div className="absolute bottom-32 left-1/4 text-5xl">相</div>
+      {/* 배경 장식 */}
+      <div className="absolute inset-0 opacity-10 pointer-events-none">
+        <div className="absolute top-20 left-10 w-2 h-2 bg-amber-400 rounded-full" />
+        <div className="absolute top-40 right-16 w-1.5 h-1.5 bg-red-400 rounded-full" />
+        <div className="absolute top-72 left-1/4 w-1 h-1 bg-amber-300 rounded-full" />
+        <div className="absolute bottom-60 right-1/3 w-2 h-2 bg-red-300 rounded-full" />
+        <div className="absolute bottom-32 left-1/3 w-1.5 h-1.5 bg-amber-500 rounded-full" />
       </div>
 
       <main className="container mx-auto px-4 py-8 max-w-lg relative z-10">
@@ -122,7 +122,7 @@ export default function FacePage() {
             <span className="text-amber-600/60">━━</span>
           </div>
           <h1 className="text-3xl font-bold mb-2 text-transparent bg-clip-text bg-gradient-to-r from-amber-200 via-yellow-400 to-amber-200" style={{ textShadow: "0 0 30px rgba(251, 191, 36, 0.3)" }}>
-            AI 觀相 분석
+            AI 관상 분석
           </h1>
           <p className="text-amber-100/60 text-sm tracking-widest">
             전통 관상학 기반 얼굴 분석
@@ -221,7 +221,7 @@ export default function FacePage() {
 
             {/* 얼굴 부위별 분석 */}
             <div className="bg-gradient-to-b from-stone-900/80 to-red-950/50 backdrop-blur-lg rounded-2xl p-6 border border-amber-600/20">
-              <h3 className="text-lg font-bold mb-4 text-amber-100">面相 부위별 관상</h3>
+              <h3 className="text-lg font-bold mb-4 text-amber-100">부위별 관상</h3>
               <div className="space-y-3">
                 {Object.entries(result.faceFeatures).map(([부위, 설명]) => (
                   <div key={부위} className="bg-stone-900/50 rounded-xl p-3 border border-amber-600/10">
@@ -234,7 +234,7 @@ export default function FacePage() {
 
             {/* 시기별 운세 */}
             <div className="bg-gradient-to-b from-stone-900/80 to-red-950/50 backdrop-blur-lg rounded-2xl p-6 border border-amber-600/20">
-              <h3 className="text-lg font-bold mb-4 text-amber-100">時期別 운세</h3>
+              <h3 className="text-lg font-bold mb-4 text-amber-100">시기별 운세</h3>
               <div className="space-y-4">
                 {Object.entries(result.lifeFortune).map(([시기, 데이터]) => (
                   <div
@@ -250,9 +250,9 @@ export default function FacePage() {
                     <div className="flex justify-between items-center mb-2">
                       <div>
                         <span className="font-bold text-amber-100">
-                          {시기 === "초년운" && "初 "}
-                          {시기 === "중년운" && "中 "}
-                          {시기 === "말년운" && "末 "}
+                          {시기 === "초년운" && "🌱 "}
+                          {시기 === "중년운" && "🌳 "}
+                          {시기 === "말년운" && "🍂 "}
                           {시기}
                         </span>
                         <span className="text-xs text-stone-400 ml-2">
@@ -271,7 +271,7 @@ export default function FacePage() {
 
             {/* 세부 운세 */}
             <div className="bg-gradient-to-b from-stone-900/80 to-red-950/50 backdrop-blur-lg rounded-2xl p-6 border border-amber-600/20">
-              <h3 className="text-lg font-bold mb-4 text-amber-100">運勢 지수</h3>
+              <h3 className="text-lg font-bold mb-4 text-amber-100">운세 지수</h3>
               <div className="space-y-3">
                 {Object.entries(result.categories).map(([항목, 점수]) => (
                   <div key={항목} className="flex items-center gap-3">
@@ -294,7 +294,7 @@ export default function FacePage() {
 
             {/* 성격 특성 */}
             <div className="bg-gradient-to-b from-stone-900/80 to-red-950/50 backdrop-blur-lg rounded-2xl p-6 border border-amber-600/20">
-              <h3 className="text-lg font-bold mb-4 text-amber-100">性格 특성</h3>
+              <h3 className="text-lg font-bold mb-4 text-amber-100">성격 특성</h3>
               <div className="flex flex-wrap gap-2">
                 {result.personality.map((특성, index) => (
                   <span
@@ -309,13 +309,13 @@ export default function FacePage() {
 
             {/* 어울리는 직업 */}
             <div className="bg-gradient-to-b from-stone-900/80 to-red-950/50 backdrop-blur-lg rounded-2xl p-6 border border-amber-600/20">
-              <h3 className="text-lg font-bold mb-3 text-amber-100">適職 어울리는 직업</h3>
+              <h3 className="text-lg font-bold mb-3 text-amber-100">어울리는 직업</h3>
               <p className="text-stone-300">{result.career}</p>
             </div>
 
             {/* 행운 요소 & 조언 */}
             <div className="bg-gradient-to-r from-red-900/40 to-amber-900/40 backdrop-blur-lg rounded-2xl p-6 border border-amber-600/20">
-              <h3 className="text-lg font-bold mb-4 text-amber-100">幸運 요소</h3>
+              <h3 className="text-lg font-bold mb-4 text-amber-100">행운 요소</h3>
               <div className="grid grid-cols-2 gap-3 mb-4">
                 <div className="bg-stone-900/50 rounded-xl p-3 text-center border border-amber-600/10">
                   <p className="text-xs text-stone-400">행운의 숫자</p>
@@ -329,7 +329,7 @@ export default function FacePage() {
                 </div>
               </div>
               <div className="bg-stone-900/50 rounded-xl p-4 text-center border border-amber-600/20">
-                <p className="text-xs text-stone-500 mb-1">觀相 조언</p>
+                <p className="text-xs text-stone-500 mb-1">관상 조언</p>
                 <p className="text-amber-300 font-medium">"{result.advice}"</p>
               </div>
             </div>

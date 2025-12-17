@@ -60,13 +60,13 @@ export default function DailyFortunePage() {
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-stone-950 via-red-950 to-stone-950 text-white relative overflow-hidden">
-      {/* 전통 문양 배경 */}
-      <div className="absolute inset-0 opacity-5 pointer-events-none">
-        <div className="absolute top-10 left-5 text-6xl">卍</div>
-        <div className="absolute top-40 right-10 text-4xl">福</div>
-        <div className="absolute top-72 left-10 text-5xl">壽</div>
-        <div className="absolute bottom-40 right-5 text-6xl">吉</div>
-        <div className="absolute bottom-20 left-1/4 text-4xl">運</div>
+      {/* 배경 장식 */}
+      <div className="absolute inset-0 opacity-10 pointer-events-none">
+        <div className="absolute top-20 left-10 w-2 h-2 bg-amber-400 rounded-full" />
+        <div className="absolute top-40 right-16 w-1.5 h-1.5 bg-red-400 rounded-full" />
+        <div className="absolute top-72 left-1/4 w-1 h-1 bg-amber-300 rounded-full" />
+        <div className="absolute bottom-60 right-1/3 w-2 h-2 bg-red-300 rounded-full" />
+        <div className="absolute bottom-32 left-1/3 w-1.5 h-1.5 bg-amber-500 rounded-full" />
       </div>
 
       <main className="container mx-auto px-4 py-8 max-w-lg relative z-10">
@@ -85,7 +85,7 @@ export default function DailyFortunePage() {
             <span className="text-amber-600/60">━━</span>
           </div>
           <h1 className="text-3xl font-bold mb-2 text-transparent bg-clip-text bg-gradient-to-r from-amber-200 via-yellow-400 to-amber-200" style={{ textShadow: "0 0 30px rgba(251, 191, 36, 0.3)" }}>
-            오늘의 運勢
+            오늘의 운세
           </h1>
           <p className="text-amber-100/60 text-sm tracking-widest">{오늘날짜}</p>
           <div className="flex justify-center items-center gap-2 mt-3">
@@ -153,7 +153,7 @@ export default function DailyFortunePage() {
             {/* 오늘의 운세 */}
             <div className="bg-gradient-to-b from-stone-900/80 to-red-950/50 backdrop-blur-lg rounded-2xl p-6 border border-amber-600/20">
               <div className="flex justify-between items-center mb-4">
-                <h3 className="text-xl font-bold text-amber-100">오늘의 運勢</h3>
+                <h3 className="text-xl font-bold text-amber-100">오늘의 운세</h3>
                 <span className="text-amber-400 text-xl tracking-wider">
                   {renderStars(result.운세.rating)}
                 </span>
