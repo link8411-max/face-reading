@@ -22,6 +22,22 @@ export interface SamgukCharacter {
   quote: string;
   modernJob: string;
   description: string;
+  // 현대판 능력치
+  modernStats: {
+    리더십: number;     // 팀장/리더 능력
+    체력: number;       // 헬스/운동
+    두뇌: number;       // 머리/공부
+    눈치: number;       // 처세술/정치력
+    연애력: number;     // 소개팅/연애
+  };
+  funStats: {
+    술자리생존: number;
+    재테크: number;
+    칼퇴력: number;
+    꼰대력: number;
+    워라밸: number;
+  };
+  modernComment: string;  // 재미있는 현대 해석 한줄평
 }
 
 export const samgukCharacters: SamgukCharacter[] = [
@@ -40,7 +56,10 @@ export const samgukCharacters: SamgukCharacter[] = [
     personality: "대담하고 결단력 있으며, 인재를 아끼지만 냉철한 판단을 내림",
     quote: "나는 차라리 천하를 저버릴지언정, 천하가 나를 저버리게 하지 않겠다",
     modernJob: "대기업 CEO, 정치인",
-    description: "난세의 간웅으로 불리는 위나라의 창업주. 뛰어난 군사적 재능과 정치력으로 화북을 통일했다."
+    description: "난세의 간웅으로 불리는 위나라의 창업주. 뛰어난 군사적 재능과 정치력으로 화북을 통일했다.",
+    modernStats: { 리더십: 99, 체력: 75, 두뇌: 92, 눈치: 95, 연애력: 88 },
+    funStats: { 술자리생존: 90, 재테크: 95, 칼퇴력: 10, 꼰대력: 85, 워라밸: 20 },
+    modernComment: "회사 차리면 10년 안에 코스피 상장. 근데 부하 칼퇴는 꿈도 꾸지 마세요."
   },
   {
     id: "simayi",
@@ -56,7 +75,10 @@ export const samgukCharacters: SamgukCharacter[] = [
     personality: "인내심이 강하고 기회를 노리며, 겉으로는 순종적이나 속으로는 야망이 큼",
     quote: "참을 수 있으면 참고, 견딜 수 있으면 견뎌라",
     modernJob: "전략 컨설턴트, 투자가",
-    description: "제갈량의 라이벌로 유명한 위나라의 명장. 끝없는 인내로 결국 천하를 손에 넣었다."
+    description: "제갈량의 라이벌로 유명한 위나라의 명장. 끝없는 인내로 결국 천하를 손에 넣었다.",
+    modernStats: { 리더십: 88, 체력: 60, 두뇌: 99, 눈치: 100, 연애력: 65 },
+    funStats: { 술자리생존: 95, 재테크: 100, 칼퇴력: 80, 꼰대력: 70, 워라밸: 75 },
+    modernComment: "30년 참고 기다려서 회장 자리 꿰찬 타입. 주식도 존버로 대박."
   },
   {
     id: "zhangliao",
@@ -72,7 +94,10 @@ export const samgukCharacters: SamgukCharacter[] = [
     personality: "용맹하면서도 지략이 있고, 적에게도 존경받는 무장",
     quote: "800명으로 10만 대군을 막겠다!",
     modernJob: "군인, 소방관, 경호원",
-    description: "합비 전투에서 800명으로 손권의 10만 대군을 막아낸 전설적인 무장."
+    description: "합비 전투에서 800명으로 손권의 10만 대군을 막아낸 전설적인 무장.",
+    modernStats: { 리더십: 90, 체력: 95, 두뇌: 72, 눈치: 60, 연애력: 78 },
+    funStats: { 술자리생존: 85, 재테크: 50, 칼퇴력: 30, 꼰대력: 40, 워라밸: 35 },
+    modernComment: "PT 면접에서 '저 혼자 다 하겠습니다' 하고 진짜 해버리는 타입."
   },
   {
     id: "xiaohoudun",
@@ -88,7 +113,10 @@ export const samgukCharacters: SamgukCharacter[] = [
     personality: "불같은 성격에 충성심이 강하고, 두려움을 모르는 용맹함",
     quote: "부모에게 받은 몸, 버릴 수 없다!",
     modernJob: "격투기 선수, 경찰 특공대",
-    description: "전투 중 눈에 화살을 맞고도 싸운 조조의 가장 충직한 무장."
+    description: "전투 중 눈에 화살을 맞고도 싸운 조조의 가장 충직한 무장.",
+    modernStats: { 리더십: 85, 체력: 92, 두뇌: 55, 눈치: 50, 연애력: 70 },
+    funStats: { 술자리생존: 95, 재테크: 40, 칼퇴력: 20, 꼰대력: 75, 워라밸: 30 },
+    modernComment: "눈 다쳐도 출근하는 타입. 인사팀이 '병가 좀 쓰세요' 해도 안 들음."
   },
   {
     id: "xuchu",
@@ -104,7 +132,10 @@ export const samgukCharacters: SamgukCharacter[] = [
     personality: "말은 적지만 충성심이 깊고, 전투에서는 미친 듯이 싸움",
     quote: "...(말없이 적을 베어버림)",
     modernJob: "보디빌더, 경호원",
-    description: "호치(虎痴)라 불린 조조의 친위대장. 맨몸으로 마초와 대등하게 싸웠다."
+    description: "호치(虎痴)라 불린 조조의 친위대장. 맨몸으로 마초와 대등하게 싸웠다.",
+    modernStats: { 리더십: 65, 체력: 100, 두뇌: 35, 눈치: 30, 연애력: 45 },
+    funStats: { 술자리생존: 100, 재테크: 20, 칼퇴력: 5, 꼰대력: 60, 워라밸: 10 },
+    modernComment: "헬스장 살고 말 거의 안 하는데 아령 400개씩 드는 형님. 인싸는 아님."
   },
   {
     id: "dianwei",
@@ -120,7 +151,10 @@ export const samgukCharacters: SamgukCharacter[] = [
     personality: "과묵하지만 주군을 위해 목숨을 바치는 충성심",
     quote: "주공을 지키는 것이 내 임무다!",
     modernJob: "경호원, 군인",
-    description: "조조를 위해 목숨을 바친 최강의 호위무장. 80근 쌍철극을 휘둘렀다."
+    description: "조조를 위해 목숨을 바친 최강의 호위무장. 80근 쌍철극을 휘둘렀다.",
+    modernStats: { 리더십: 60, 체력: 98, 두뇌: 32, 눈치: 35, 연애력: 40 },
+    funStats: { 술자리생존: 95, 재테크: 15, 칼퇴력: 0, 꼰대력: 55, 워라밸: 5 },
+    modernComment: "회사 비상 상황 발생하면 새벽 3시에도 바로 출근. 본인 목숨보다 CEO 목숨."
   },
   {
     id: "xunyu",
@@ -136,7 +170,10 @@ export const samgukCharacters: SamgukCharacter[] = [
     personality: "온화하면서도 원칙을 지키며, 한나라에 대한 충성심이 깊음",
     quote: "천하를 위한 것이지, 개인을 위한 것이 아닙니다",
     modernJob: "국무총리, 대학교수",
-    description: "왕좌의 향기로 불린 조조의 수석 책사. 뛰어난 인재 추천 능력."
+    description: "왕좌의 향기로 불린 조조의 수석 책사. 뛰어난 인재 추천 능력.",
+    modernStats: { 리더십: 95, 체력: 30, 두뇌: 98, 눈치: 97, 연애력: 85 },
+    funStats: { 술자리생존: 75, 재테크: 90, 칼퇴력: 60, 꼰대력: 30, 워라밸: 55 },
+    modernComment: "명문대 출신 인사담당 임원. 이력서만 봐도 사람 파악 끝. 향수 취향 고급."
   },
   {
     id: "guojia",
@@ -152,7 +189,10 @@ export const samgukCharacters: SamgukCharacter[] = [
     personality: "천재적 두뇌에 자유분방한 성격, 술을 즐기고 예의에 얽매이지 않음",
     quote: "봉효가 있었다면 내가 이 지경이 되었겠는가!",
     modernJob: "스타트업 창업자, 천재 해커",
-    description: "조조가 가장 아꼈던 천재 책사. 38세에 요절하여 조조를 통곡하게 했다."
+    description: "조조가 가장 아꼈던 천재 책사. 38세에 요절하여 조조를 통곡하게 했다.",
+    modernStats: { 리더십: 70, 체력: 25, 두뇌: 99, 눈치: 65, 연애력: 80 },
+    funStats: { 술자리생존: 30, 재테크: 85, 칼퇴력: 90, 꼰대력: 10, 워라밸: 95 },
+    modernComment: "천재 개발자인데 술 너무 많이 마심. 코드는 신급인데 건강검진 D등급."
   },
   {
     id: "jiaxu",
@@ -168,7 +208,10 @@ export const samgukCharacters: SamgukCharacter[] = [
     personality: "극도로 조심성이 많고, 자신의 안위를 최우선시하며 냉철함",
     quote: "밝은 곳에 서지 말고, 어두운 곳에서 살아남아라",
     modernJob: "로비스트, 위기관리 전문가",
-    description: "독사라 불린 난세의 생존 전문가. 여러 주군을 섬기며 끝까지 살아남았다."
+    description: "독사라 불린 난세의 생존 전문가. 여러 주군을 섬기며 끝까지 살아남았다.",
+    modernStats: { 리더십: 65, 체력: 35, 두뇌: 97, 눈치: 100, 연애력: 50 },
+    funStats: { 술자리생존: 100, 재테크: 95, 칼퇴력: 100, 꼰대력: 20, 워라밸: 100 },
+    modernComment: "회사 망해도 혼자 살아남음. 줌 회의에서 절대 카메라 안 켬. 처세술 교과서."
   },
   {
     id: "zhanghe",
@@ -184,7 +227,10 @@ export const samgukCharacters: SamgukCharacter[] = [
     personality: "지략과 무력을 겸비하고 상황 판단이 빠름",
     quote: "병법은 물과 같아 변화무쌍해야 한다",
     modernJob: "특수부대 지휘관, 전술가",
-    description: "오호대장군 중 가장 지략이 뛰어난 무장. 제갈량도 경계했다."
+    description: "오호대장군 중 가장 지략이 뛰어난 무장. 제갈량도 경계했다.",
+    modernStats: { 리더십: 88, 체력: 85, 두뇌: 75, 눈치: 80, 연애력: 70 },
+    funStats: { 술자리생존: 80, 재테크: 70, 칼퇴력: 40, 꼰대력: 50, 워라밸: 45 },
+    modernComment: "전략 전술 둘 다 잘하는 올라운더. 플랜 A부터 Z까지 다 준비하는 타입."
   },
 
   // ========== 위(魏) 여성 ==========
@@ -202,7 +248,10 @@ export const samgukCharacters: SamgukCharacter[] = [
     personality: "검소하고 지혜로우며, 조조의 내조자로서 후궁들을 잘 다스림",
     quote: "후궁의 사치는 나라를 병들게 합니다",
     modernJob: "재단 이사장, 교육자",
-    description: "조조의 정실부인. 기녀 출신이지만 지혜와 덕으로 위나라 황후가 되었다."
+    description: "조조의 정실부인. 기녀 출신이지만 지혜와 덕으로 위나라 황후가 되었다.",
+    modernStats: { 리더십: 85, 체력: 40, 두뇌: 82, 눈치: 90, 연애력: 88 },
+    funStats: { 술자리생존: 70, 재테크: 95, 칼퇴력: 50, 꼰대력: 20, 워라밸: 65 },
+    modernComment: "백화점 VIP 회원인데 절대 사치 안 함. 알뜰살뜰 재테크로 부자 만드는 현명한 아내."
   },
   {
     id: "zhangchunhua",
@@ -218,7 +267,10 @@ export const samgukCharacters: SamgukCharacter[] = [
     personality: "냉철하고 결단력 있으며, 필요하면 과감한 결정을 내림",
     quote: "비밀을 지키려면 증인을 없애야 합니다",
     modernJob: "검사, 기업 법무팀장",
-    description: "사마의의 아내. 사마의의 꾀병을 들킨 하녀를 직접 처리한 냉철한 여인."
+    description: "사마의의 아내. 사마의의 꾀병을 들킨 하녀를 직접 처리한 냉철한 여인.",
+    modernStats: { 리더십: 80, 체력: 45, 두뇌: 85, 눈치: 95, 연애력: 70 },
+    funStats: { 술자리생존: 90, 재테크: 92, 칼퇴력: 70, 꼰대력: 65, 워라밸: 60 },
+    modernComment: "남편 비리 완벽하게 커버. 회사 내부고발자 나오면 바로 처리하는 법무팀 실세."
   },
   {
     id: "zhenji",
@@ -234,7 +286,10 @@ export const samgukCharacters: SamgukCharacter[] = [
     personality: "아름답고 시적 감수성이 뛰어나지만, 비운의 삶을 살았음",
     quote: "낙수의 신녀처럼 아름다운...",
     modernJob: "시인, 예술가",
-    description: "조비의 황후. 절세미인으로 낙신부의 모델이 되었으나 비운의 죽음을 맞았다."
+    description: "조비의 황후. 절세미인으로 낙신부의 모델이 되었으나 비운의 죽음을 맞았다.",
+    modernStats: { 리더십: 45, 체력: 30, 두뇌: 75, 눈치: 50, 연애력: 95 },
+    funStats: { 술자리생존: 40, 재테크: 30, 칼퇴력: 85, 꼰대력: 5, 워라밸: 70 },
+    modernComment: "인스타 감성 장인. 시 쓰고 사진 찍는데 남편은 다른 여자한테 꽂혀서 비극."
   },
 
   // ========== 촉(蜀) 남성 ==========
@@ -252,7 +307,10 @@ export const samgukCharacters: SamgukCharacter[] = [
     personality: "백성을 사랑하고 의리를 중시하며, 인재를 모으는 능력이 탁월",
     quote: "형제는 수족과 같고, 아내는 의복과 같다",
     modernJob: "NGO 대표, 사회운동가",
-    description: "삼고초려로 제갈량을 얻고 촉한을 세운 인덕의 군주."
+    description: "삼고초려로 제갈량을 얻고 촉한을 세운 인덕의 군주.",
+    modernStats: { 리더십: 90, 체력: 65, 두뇌: 78, 눈치: 85, 연애력: 92 },
+    funStats: { 술자리생존: 85, 재테크: 60, 칼퇴력: 50, 꼰대력: 15, 워라밸: 60 },
+    modernComment: "눈물로 직원 감동시켜서 야근 시킴. 근데 진심이라 다들 따름. 인맥 끝판왕."
   },
   {
     id: "guanyu",
@@ -268,7 +326,10 @@ export const samgukCharacters: SamgukCharacter[] = [
     personality: "의리를 목숨보다 중시하고, 오만하지만 진정한 영웅",
     quote: "여기서 죽을지언정 항복은 없다!",
     modernJob: "무술 사범, 경찰청장",
-    description: "무신으로 추앙받는 의리의 화신. 청룡언월도와 적토마의 주인."
+    description: "무신으로 추앙받는 의리의 화신. 청룡언월도와 적토마의 주인.",
+    modernStats: { 리더십: 90, 체력: 95, 두뇌: 70, 눈치: 40, 연애력: 85 },
+    funStats: { 술자리생존: 75, 재테크: 55, 칼퇴력: 25, 꼰대력: 90, 워라밸: 30 },
+    modernComment: "의리파 조직 보스. 자존심 세서 조언 안 들음. 근데 형님 대접은 확실히 해줌."
   },
   {
     id: "zhangfei",
@@ -284,7 +345,10 @@ export const samgukCharacters: SamgukCharacter[] = [
     personality: "불같은 성격에 술을 좋아하지만, 지략가를 존경함",
     quote: "나는 장비다! 누가 와서 죽음을 겨뤄볼 테냐!",
     modernJob: "프로레슬러, 술집 사장",
-    description: "장판교에서 혼자 조조 대군을 막은 만인지적의 용장."
+    description: "장판교에서 혼자 조조 대군을 막은 만인지적의 용장.",
+    modernStats: { 리더십: 80, 체력: 98, 두뇌: 42, 눈치: 30, 연애력: 65 },
+    funStats: { 술자리생존: 95, 재테크: 45, 칼퇴력: 15, 꼰대력: 80, 워라밸: 20 },
+    modernComment: "회식 때 소주 10병 마시고 다음날 멀쩡히 출근. 소리 크고 무섭지만 속은 따뜻."
   },
   {
     id: "zhugeliang",
@@ -300,7 +364,10 @@ export const samgukCharacters: SamgukCharacter[] = [
     personality: "신중하고 충성스러우며, 모든 일을 완벽하게 처리하려 함",
     quote: "신은 다만 몸이 부서져도 은혜에 보답하고자 할 뿐입니다",
     modernJob: "국방장관, AI 연구원",
-    description: "삼국지 최고의 지략가. 천하삼분지계를 세우고 촉한을 이끌었다."
+    description: "삼국지 최고의 지략가. 천하삼분지계를 세우고 촉한을 이끌었다.",
+    modernStats: { 리더십: 99, 체력: 40, 두뇌: 100, 눈치: 92, 연애력: 75 },
+    funStats: { 술자리생존: 60, 재테크: 80, 칼퇴력: 5, 꼰대력: 40, 워라밸: 10 },
+    modernComment: "모든 업무 혼자 다 처리. 과로로 죽을 것 같은데도 일 안 놔줌. 완벽주의 끝판왕."
   },
   {
     id: "zhaoyun",
@@ -316,7 +383,10 @@ export const samgukCharacters: SamgukCharacter[] = [
     personality: "냉철하면서도 충성스럽고, 모든 면에서 균형 잡힌 무장",
     quote: "나는 상산 조자룡이다!",
     modernJob: "특수부대 대원, 모델",
-    description: "장판 전투에서 아두를 구한 상산의 백룡. 완벽한 무장의 대명사."
+    description: "장판 전투에서 아두를 구한 상산의 백룡. 완벽한 무장의 대명사.",
+    modernStats: { 리더십: 88, 체력: 95, 두뇌: 75, 눈치: 80, 연애력: 92 },
+    funStats: { 술자리생존: 85, 재테크: 70, 칼퇴력: 40, 꼰대력: 25, 워라밸: 50 },
+    modernComment: "외모, 실력, 인성 삼박자. 회사 내 여직원들이 다 좋아함. 스캔들 제로."
   },
   {
     id: "machao",
@@ -332,7 +402,10 @@ export const samgukCharacters: SamgukCharacter[] = [
     personality: "용맹하지만 충동적이고, 복수심에 불타는 비운의 영웅",
     quote: "조조! 내 아버지의 원수!",
     modernJob: "레이서, 익스트림 스포츠 선수",
-    description: "금마초라 불린 서량의 맹장. 조조를 벌벌 떨게 만든 돌격의 화신."
+    description: "금마초라 불린 서량의 맹장. 조조를 벌벌 떨게 만든 돌격의 화신.",
+    modernStats: { 리더십: 85, 체력: 98, 두뇌: 50, 눈치: 45, 연애력: 90 },
+    funStats: { 술자리생존: 70, 재테크: 40, 칼퇴력: 60, 꼰대력: 55, 워라밸: 55 },
+    modernComment: "스포츠카 몰고 다니는 잘생긴 부잣집 아들. 충동적이라 사고는 자주 침."
   },
   {
     id: "huangzhong",
@@ -348,7 +421,10 @@ export const samgukCharacters: SamgukCharacter[] = [
     personality: "나이에 굴하지 않는 불굴의 정신, 젊은이 못지않은 패기",
     quote: "늙었다고? 아직 멀었다!",
     modernJob: "양궁 코치, 은퇴 안 한 운동선수",
-    description: "60이 넘어 정군산에서 하후연을 베어 명성을 떨친 노장."
+    description: "60이 넘어 정군산에서 하후연을 베어 명성을 떨친 노장.",
+    modernStats: { 리더십: 75, 체력: 90, 두뇌: 60, 눈치: 65, 연애력: 60 },
+    funStats: { 술자리생존: 80, 재테크: 75, 칼퇴력: 30, 꼰대력: 70, 워라밸: 40 },
+    modernComment: "60대 임원인데 신입보다 열정 넘침. '요즘 젊은이들은~' 입버릇. 근데 인정."
   },
   {
     id: "weiyan",
@@ -364,7 +440,10 @@ export const samgukCharacters: SamgukCharacter[] = [
     personality: "능력은 뛰어나지만 오만하고, 자신의 재능이 인정받지 못함을 불만",
     quote: "내 계책이 채택되었다면 천하가 바뀌었을 것이다!",
     modernJob: "스타트업 CTO (퇴사 후 창업)",
-    description: "반골의 상이라 의심받은 비운의 맹장. 자오곡 기습을 건의했다."
+    description: "반골의 상이라 의심받은 비운의 맹장. 자오곡 기습을 건의했다.",
+    modernStats: { 리더십: 82, 체력: 88, 두뇌: 70, 눈치: 35, 연애력: 50 },
+    funStats: { 술자리생존: 65, 재테크: 80, 칼퇴력: 70, 꼰대력: 75, 워라밸: 60 },
+    modernComment: "능력은 있는데 삐딱해서 회의 때마다 반대 의견. 결국 퇴사 후 경쟁사 설립."
   },
   {
     id: "jiangwei",
@@ -380,7 +459,10 @@ export const samgukCharacters: SamgukCharacter[] = [
     personality: "스승 제갈량에 대한 충성심이 깊고, 끝까지 촉한 부흥을 꿈꿈",
     quote: "신의 계책이 이루어지지 않은 것은 하늘의 뜻입니다",
     modernJob: "사회운동가, 변호사",
-    description: "제갈량의 후계자로 9번의 북벌을 감행한 촉한 최후의 충신."
+    description: "제갈량의 후계자로 9번의 북벌을 감행한 촉한 최후의 충신.",
+    modernStats: { 리더십: 85, 체력: 82, 두뇌: 92, 눈치: 70, 연애력: 68 },
+    funStats: { 술자리생존: 70, 재테크: 60, 칼퇴력: 35, 꼰대력: 50, 워라밸: 40 },
+    modernComment: "스승 철학 지키려고 무리수 두다 회사 망함. 충성심은 100점, 현실감각 0점."
   },
   {
     id: "pangtong",
@@ -396,7 +478,10 @@ export const samgukCharacters: SamgukCharacter[] = [
     personality: "외모로 무시당하지만 천재적 두뇌, 성격이 급함",
     quote: "복룡(제갈량)과 봉추(방통) 중 하나만 얻어도 천하를 얻는다",
     modernJob: "괴짜 천재 개발자",
-    description: "제갈량과 쌍벽을 이루는 봉추. 낙봉파에서 36세에 요절했다."
+    description: "제갈량과 쌍벽을 이루는 봉추. 낙봉파에서 36세에 요절했다.",
+    modernStats: { 리더십: 70, 체력: 35, 두뇌: 99, 눈치: 60, 연애력: 40 },
+    funStats: { 술자리생존: 50, 재테크: 70, 칼퇴력: 80, 꼰대력: 30, 워라밸: 75 },
+    modernComment: "외모로 무시당하지만 코드 실력은 제갈량급. 성격 급해서 회의 중 자주 짜증."
   },
 
   // ========== 촉(蜀) 여성 ==========
@@ -414,7 +499,10 @@ export const samgukCharacters: SamgukCharacter[] = [
     personality: "외모보다 지혜를 중시하며, 발명과 기계에 천재적 재능",
     quote: "외모가 중요한 게 아니라 머리가 중요하지요",
     modernJob: "공학자, 발명가",
-    description: "제갈량의 아내. 못생겼다고 알려졌지만 천재적 두뇌로 남편을 도왔다."
+    description: "제갈량의 아내. 못생겼다고 알려졌지만 천재적 두뇌로 남편을 도왔다.",
+    modernStats: { 리더십: 60, 체력: 40, 두뇌: 95, 눈치: 75, 연애력: 50 },
+    funStats: { 술자리생존: 55, 재테크: 85, 칼퇴력: 70, 꼰대력: 20, 워라밸: 65 },
+    modernComment: "MIT 출신 공대 여신. 외모는 평범해도 특허 10개 보유. 남편 과로사 막는 중."
   },
   {
     id: "ganfuren",
@@ -430,7 +518,10 @@ export const samgukCharacters: SamgukCharacter[] = [
     personality: "인내심이 강하고 어려운 시절에도 유비를 내조함",
     quote: "어디로 가시든 함께 하겠습니다",
     modernJob: "상담사, 교육자",
-    description: "유비의 부인이자 유선(아두)의 어머니. 장판 전투에서 조운이 구해냈다."
+    description: "유비의 부인이자 유선(아두)의 어머니. 장판 전투에서 조운이 구해냈다.",
+    modernStats: { 리더십: 50, 체력: 40, 두뇌: 65, 눈치: 70, 연애력: 80 },
+    funStats: { 술자리생존: 60, 재테크: 65, 칼퇴력: 55, 꼰대력: 15, 워라밸: 70 },
+    modernComment: "남편 사업 망해도 묵묵히 따라감. 애 교육 잘 시키는 인내의 아이콘."
   },
   {
     id: "mifuren",
@@ -446,7 +537,10 @@ export const samgukCharacters: SamgukCharacter[] = [
     personality: "남편과 아들을 위해 자신을 희생하는 충절",
     quote: "저 때문에 지체하지 마세요...",
     modernJob: "봉사자, 간호사",
-    description: "유비의 부인. 장판 전투에서 아두를 조운에게 맡기고 우물에 투신했다."
+    description: "유비의 부인. 장판 전투에서 아두를 조운에게 맡기고 우물에 투신했다.",
+    modernStats: { 리더십: 40, 체력: 35, 두뇌: 60, 눈치: 55, 연애력: 75 },
+    funStats: { 술자리생존: 45, 재테크: 40, 칼퇴력: 50, 꼰대력: 10, 워라밸: 50 },
+    modernComment: "가족 위해 모든 걸 희생. 헬리콥터 육아 끝판왕인데 자기는 아무것도 안 함."
   },
   {
     id: "sunshangxiang",
@@ -462,7 +556,10 @@ export const samgukCharacters: SamgukCharacter[] = [
     personality: "무예를 좋아하고 활달하며, 일반적인 여성상과 다름",
     quote: "검을 쥐면 남자도 두렵지 않아요!",
     modernJob: "스포츠 선수, 무술가",
-    description: "손권의 여동생이자 유비의 아내. 무예를 좋아한 여장군 스타일의 공주."
+    description: "손권의 여동생이자 유비의 아내. 무예를 좋아한 여장군 스타일의 공주.",
+    modernStats: { 리더십: 75, 체력: 85, 두뇌: 70, 눈치: 65, 연애력: 82 },
+    funStats: { 술자리생존: 80, 재테크: 60, 칼퇴력: 65, 꼰대력: 35, 워라밸: 70 },
+    modernComment: "재벌집 딸인데 크로스핏 강사. 남자친구보다 싸움 더 잘함. 집안 반대로 이별."
   },
 
   // ========== 오(吳) 남성 ==========
@@ -480,7 +577,10 @@ export const samgukCharacters: SamgukCharacter[] = [
     personality: "인재를 잘 쓰고 참모의 말을 경청하며, 균형 감각이 뛰어남",
     quote: "아들을 낳으려면 손중모 같은 아들을 낳아야 한다",
     modernJob: "대기업 2세 경영인",
-    description: "형과 아버지의 유산을 지키고 발전시킨 오나라의 군주."
+    description: "형과 아버지의 유산을 지키고 발전시킨 오나라의 군주.",
+    modernStats: { 리더십: 92, 체력: 70, 두뇌: 85, 눈치: 88, 연애력: 80 },
+    funStats: { 술자리생존: 85, 재테크: 85, 칼퇴력: 45, 꼰대력: 55, 워라밸: 55 },
+    modernComment: "재벌 2세인데 아버지보다 잘함. 직원 말 잘 듣고 균형감각 최고. 조언 수용."
   },
   {
     id: "zhouyu",
@@ -496,7 +596,10 @@ export const samgukCharacters: SamgukCharacter[] = [
     personality: "재능이 뛰어나고 자존심이 강하며, 예술적 감각이 있음",
     quote: "하늘은 어찌하여 주유를 낳고 제갈량을 낳았는가!",
     modernJob: "오케스트라 지휘자, 연예기획사 대표",
-    description: "적벽대전의 영웅. 뛰어난 외모와 음악적 재능을 겸비한 오나라의 천재."
+    description: "적벽대전의 영웅. 뛰어난 외모와 음악적 재능을 겸비한 오나라의 천재.",
+    modernStats: { 리더십: 95, 체력: 70, 두뇌: 97, 눈치: 85, 연애력: 98 },
+    funStats: { 술자리생존: 80, 재테크: 75, 칼퇴력: 50, 꼰대력: 60, 워라밸: 50 },
+    modernComment: "외모 10점 능력 10점 재력 10점. 근데 라이벌 의식 때문에 혈압 오르다 조졌음."
   },
   {
     id: "luxun",
@@ -512,7 +615,10 @@ export const samgukCharacters: SamgukCharacter[] = [
     personality: "겸손하고 인내심이 강하며, 겉으로는 평범해 보이지만 뛰어난 지략",
     quote: "적이 교만해질 때까지 기다려라",
     modernJob: "전략 컨설턴트, 대학교수",
-    description: "이릉대전에서 유비를 대파한 오나라의 명장. 서생 같은 외모에 숨은 지략가."
+    description: "이릉대전에서 유비를 대파한 오나라의 명장. 서생 같은 외모에 숨은 지략가.",
+    modernStats: { 리더십: 90, 체력: 55, 두뇌: 96, 눈치: 93, 연애력: 75 },
+    funStats: { 술자리생존: 75, 재테크: 85, 칼퇴력: 60, 꼰대력: 30, 워라밸: 65 },
+    modernComment: "신입처럼 보이는데 전략은 임원급. 적이 자만할 때까지 기다렸다가 한방."
   },
   {
     id: "lvmeng",
@@ -528,7 +634,10 @@ export const samgukCharacters: SamgukCharacter[] = [
     personality: "처음엔 무식했으나 끊임없이 공부하여 지장으로 성장",
     quote: "선비가 3일을 떨어져 있으면 눈을 비비고 다시 봐야 한다",
     modernJob: "자수성가 CEO, 평생학습자",
-    description: "오하아몽에서 지장으로 성장한 입지전적 인물. 관우를 사로잡았다."
+    description: "오하아몽에서 지장으로 성장한 입지전적 인물. 관우를 사로잡았다.",
+    modernStats: { 리더십: 85, 체력: 80, 두뇌: 88, 눈치: 82, 연애력: 70 },
+    funStats: { 술자리생존: 80, 재테크: 90, 칼퇴력: 55, 꼰대력: 45, 워라밸: 60 },
+    modernComment: "고졸인데 독학으로 MBA 따고 CEO 됨. 평생교육원 단골. 자기계발 끝판왕."
   },
   {
     id: "ganning",
@@ -544,7 +653,10 @@ export const samgukCharacters: SamgukCharacter[] = [
     personality: "호탕하고 거침없으며, 과거 해적 출신의 거친 매력",
     quote: "100명의 기병으로 조조 진영을 휩쓸겠다!",
     modernJob: "오토바이 라이더, 익스트림 스포츠 선수",
-    description: "금범적이라 불린 전 해적. 100명으로 조조 진영을 기습한 맹장."
+    description: "금범적이라 불린 전 해적. 100명으로 조조 진영을 기습한 맹장.",
+    modernStats: { 리더십: 72, 체력: 92, 두뇌: 50, 눈치: 40, 연애력: 75 },
+    funStats: { 술자리생존: 95, 재테크: 35, 칼퇴력: 80, 꼰대력: 65, 워라밸: 75 },
+    modernComment: "전과자 출신인데 개과천선해서 특공대 됨. 바이크 타고 금목걸이 주렁주렁."
   },
   {
     id: "taishici",
@@ -560,7 +672,10 @@ export const samgukCharacters: SamgukCharacter[] = [
     personality: "효심이 깊고 의리를 중시하며, 약속을 목숨보다 중히 여김",
     quote: "대장부가 세상에 태어나 칠 척 검을 차고...",
     modernJob: "국궁 선수, 의리파 형사",
-    description: "손책과 일대일 결투를 벌인 명궁. 효자이자 의리의 무장."
+    description: "손책과 일대일 결투를 벌인 명궁. 효자이자 의리의 무장.",
+    modernStats: { 리더십: 75, 체력: 90, 두뇌: 65, 눈치: 60, 연애력: 78 },
+    funStats: { 술자리생존: 85, 재테크: 60, 칼퇴력: 45, 꼰대력: 50, 워라밸: 55 },
+    modernComment: "효자 인증. 월급 반은 부모님 드림. 약속은 칼 같이 지킴. 의리파 선배."
   },
   {
     id: "lusu",
@@ -576,7 +691,10 @@ export const samgukCharacters: SamgukCharacter[] = [
     personality: "대국적 관점에서 생각하고, 온화하며 중재를 잘함",
     quote: "유비와 손을 잡아야 조조에 맞설 수 있습니다",
     modernJob: "외교관, UN 직원",
-    description: "손유동맹을 이끈 오나라의 외교가. 대국적 안목의 소유자."
+    description: "손유동맹을 이끈 오나라의 외교가. 대국적 안목의 소유자.",
+    modernStats: { 리더십: 75, 체력: 50, 두뇌: 90, 눈치: 95, 연애력: 82 },
+    funStats: { 술자리생존: 90, 재테크: 80, 칼퇴력: 70, 꼰대력: 20, 워라밸: 75 },
+    modernComment: "회사 내 갈등 중재 전문가. 외교력 갑. 다들 노숙이 말하면 수긍함. 착한 사람."
   },
   {
     id: "sunce",
@@ -592,7 +710,10 @@ export const samgukCharacters: SamgukCharacter[] = [
     personality: "패기 넘치고 과감하며, 카리스마가 있지만 성급함",
     quote: "나는 강동의 땅을 평정하겠다!",
     modernJob: "스타트업 창업자, 모험가",
-    description: "소패왕이라 불린 오나라의 창업주. 26세에 요절한 비운의 영웅."
+    description: "소패왕이라 불린 오나라의 창업주. 26세에 요절한 비운의 영웅.",
+    modernStats: { 리더십: 92, 체력: 90, 두뇌: 75, 눈치: 65, 연애력: 95 },
+    funStats: { 술자리생존: 85, 재테크: 70, 칼퇴력: 40, 꼰대력: 40, 워라밸: 45 },
+    modernComment: "20대에 회사 차려서 대박. 잘생기고 능력 있는데 너무 무리해서 26살에 과로사."
   },
 
   // ========== 오(吳) 여성 ==========
@@ -610,7 +731,10 @@ export const samgukCharacters: SamgukCharacter[] = [
     personality: "아름답고 현숙하며, 남편의 요절로 비운의 삶",
     quote: "...(말없이 미소)",
     modernJob: "배우, 모델",
-    description: "손책의 아내이자 동오의 국모. 이교와 함께 이교자매로 유명."
+    description: "손책의 아내이자 동오의 국모. 이교와 함께 이교자매로 유명.",
+    modernStats: { 리더십: 45, 체력: 40, 두뇌: 70, 눈치: 65, 연애력: 98 },
+    funStats: { 술자리생존: 60, 재테크: 55, 칼퇴력: 70, 꼰대력: 10, 워라밸: 65 },
+    modernComment: "톱스타 배우. 남편 젊은 나이에 죽어서 평생 미망인. 청순가련 이미지."
   },
   {
     id: "xiaoqiao",
@@ -626,7 +750,10 @@ export const samgukCharacters: SamgukCharacter[] = [
     personality: "밝고 예술적 감각이 뛰어나며, 주유와 금슬이 좋음",
     quote: "주랑의 음악은 천하제일이에요",
     modernJob: "음악가, 예술가",
-    description: "주유의 아내. 적벽대전에서 조조가 탐냈다는 전설의 미녀."
+    description: "주유의 아내. 적벽대전에서 조조가 탐냈다는 전설의 미녀.",
+    modernStats: { 리더십: 40, 체력: 38, 두뇌: 75, 눈치: 70, 연애력: 100 },
+    funStats: { 술자리생존: 65, 재테크: 60, 칼퇴력: 75, 꼰대력: 5, 워라밸: 80 },
+    modernComment: "피아니스트. 잘생긴 지휘자 남편이랑 부부듀엣. 인스타 팔로워 100만. 완벽부부."
   },
   {
     id: "wuguotai",
@@ -642,7 +769,10 @@ export const samgukCharacters: SamgukCharacter[] = [
     personality: "현명하고 결단력 있으며, 손씨 가문을 뒤에서 이끔",
     quote: "내 눈으로 직접 보고 판단하겠다",
     modernJob: "기업 회장, 재단 이사장",
-    description: "손권의 어머니. 현명한 판단으로 손씨 가문을 뒤에서 이끈 여걸."
+    description: "손권의 어머니. 현명한 판단으로 손씨 가문을 뒤에서 이끈 여걸.",
+    modernStats: { 리더십: 88, 체력: 35, 두뇌: 80, 눈치: 90, 연애력: 70 },
+    funStats: { 술자리생존: 75, 재테크: 95, 칼퇴력: 60, 꼰대력: 80, 워라밸: 55 },
+    modernComment: "재벌 총수 며느리. 남편 죽어도 회사 경영 직접 관리. 며느리 고르는 눈 칼같음."
   },
   {
     id: "bujianying",
@@ -658,7 +788,10 @@ export const samgukCharacters: SamgukCharacter[] = [
     personality: "성격이 온화하고 질투하지 않아 손권의 사랑을 독차지함",
     quote: "다른 후궁들도 아껴주세요",
     modernJob: "상담사, 중재자",
-    description: "손권이 가장 사랑한 후궁. 온화한 성품으로 후궁들 사이를 화목하게 했다."
+    description: "손권이 가장 사랑한 후궁. 온화한 성품으로 후궁들 사이를 화목하게 했다.",
+    modernStats: { 리더십: 50, 체력: 35, 두뇌: 75, 눈치: 85, 연애력: 93 },
+    funStats: { 술자리생존: 70, 재테크: 65, 칼퇴력: 65, 꼰대력: 10, 워라밸: 75 },
+    modernComment: "사내연애 성공. 질투 안 하고 다른 여직원들도 챙겨줘서 사내 인기 최고."
   },
 
   // ========== 기타 남성 ==========
@@ -676,7 +809,10 @@ export const samgukCharacters: SamgukCharacter[] = [
     personality: "무예는 천하제일이나 의리가 없고 배신을 밥먹듯이 함",
     quote: "내가 여기 있는데 누가 나와 겨루겠는가!",
     modernJob: "UFC 챔피언, 용병",
-    description: "삼국지 최강의 무장. 방천화극과 적토마의 주인이지만 배신자."
+    description: "삼국지 최강의 무장. 방천화극과 적토마의 주인이지만 배신자.",
+    modernStats: { 리더십: 65, 체력: 100, 두뇌: 28, 눈치: 20, 연애력: 75 },
+    funStats: { 술자리생존: 70, 재테크: 30, 칼퇴력: 50, 꼰대력: 60, 워라밸: 60 },
+    modernComment: "싸움은 최강인데 이직 7번. 돈만 더 주면 바로 배신. 이력서에 전 직장 20개."
   },
   {
     id: "dongzhuo",
@@ -692,7 +828,10 @@ export const samgukCharacters: SamgukCharacter[] = [
     personality: "탐욕스럽고 잔인하며, 권력을 위해 무엇이든 함",
     quote: "천자를 내 손에 쥐었으니 천하가 내 것이다!",
     modernJob: "부패한 정치인, 마피아 보스",
-    description: "한나라를 멸망의 길로 이끈 폭군. 여포에게 살해당했다."
+    description: "한나라를 멸망의 길로 이끈 폭군. 여포에게 살해당했다.",
+    modernStats: { 리더십: 70, 체력: 80, 두뇌: 50, 눈치: 35, 연애력: 30 },
+    funStats: { 술자리생존: 85, 재테크: 50, 칼퇴력: 20, 꼰대력: 100, 워라밸: 15 },
+    modernComment: "횡령, 배임 다 함. 직원들 갈구고 성과 독식. 결국 내부고발로 감옥 직행."
   },
   {
     id: "yuanshao",
@@ -708,7 +847,10 @@ export const samgukCharacters: SamgukCharacter[] = [
     personality: "명문 출신의 자존심이 강하나 결단력이 부족",
     quote: "내가 4대 삼공의 후예인데!",
     modernJob: "재벌 3세 (실패한)",
-    description: "명문가 출신으로 최대 세력을 이끌었으나 관도대전에서 조조에게 패배."
+    description: "명문가 출신으로 최대 세력을 이끌었으나 관도대전에서 조조에게 패배.",
+    modernStats: { 리더십: 75, 체력: 60, 두뇌: 68, 눈치: 55, 연애력: 80 },
+    funStats: { 술자리생존: 75, 재테크: 65, 칼퇴력: 60, 꼰대력: 85, 워라밸: 65 },
+    modernComment: "재벌 3세. 스펙은 좋은데 결정 못 내림. 회의만 100번. 결국 회사 날림."
   },
   {
     id: "yuanshu",
@@ -724,7 +866,10 @@ export const samgukCharacters: SamgukCharacter[] = [
     personality: "명문가의 자존심만 강하고 실력이 없으며 사치스러움",
     quote: "내가 황제다!",
     modernJob: "파산한 재벌 2세",
-    description: "스스로 황제를 칭했다가 몰락한 원소의 동생. 꿀물을 찾으며 죽었다."
+    description: "스스로 황제를 칭했다가 몰락한 원소의 동생. 꿀물을 찾으며 죽었다.",
+    modernStats: { 리더십: 50, 체력: 45, 두뇌: 40, 눈치: 30, 연애력: 40 },
+    funStats: { 술자리생존: 60, 재테크: 20, 칼퇴력: 80, 꼰대력: 90, 워라밸: 85 },
+    modernComment: "금수저인데 능력 제로. 회사 돈 탕진하고 명품만 삼. 결국 파산하고 쫓겨남."
   },
   {
     id: "gongsunzan",
@@ -740,7 +885,10 @@ export const samgukCharacters: SamgukCharacter[] = [
     personality: "용맹하고 오랑캐와의 전투 경험이 풍부하나 고집이 셈",
     quote: "나의 백마의병이 오랑캐를 몰아내겠다!",
     modernJob: "국경수비대장",
-    description: "백마장군으로 북방 오랑캐를 토벌한 맹장. 원소와의 싸움에서 패배."
+    description: "백마장군으로 북방 오랑캐를 토벌한 맹장. 원소와의 싸움에서 패배.",
+    modernStats: { 리더십: 80, 체력: 85, 두뇌: 58, 눈치: 50, 연애력: 65 },
+    funStats: { 술자리생존: 80, 재테크: 55, 칼퇴력: 35, 꼰대력: 70, 워라밸: 40 },
+    modernComment: "국경 수비대장. 북쪽 방어는 잘하는데 고집 세서 남쪽 공격에 당함."
   },
   {
     id: "zhangjiao",
@@ -756,7 +904,10 @@ export const samgukCharacters: SamgukCharacter[] = [
     personality: "백성의 고통을 이용해 혁명을 일으킨 카리스마적 지도자",
     quote: "창천이 이미 죽었으니 황천이 마땅히 서리라!",
     modernJob: "종교 지도자, 혁명가",
-    description: "황건적의 난을 일으킨 태평도의 교주. 삼국시대의 시작점."
+    description: "황건적의 난을 일으킨 태평도의 교주. 삼국시대의 시작점.",
+    modernStats: { 리더십: 90, 체력: 45, 두뇌: 80, 눈치: 75, 연애력: 70 },
+    funStats: { 술자리생존: 65, 재테크: 70, 칼퇴력: 70, 꼰대력: 60, 워라밸: 60 },
+    modernComment: "신흥종교 교주. SNS로 신도 100만 모음. 사회 불만 이용해서 혁명 시도했다 실패."
   },
   {
     id: "huatuo",
@@ -772,7 +923,10 @@ export const samgukCharacters: SamgukCharacter[] = [
     personality: "인술을 베푸는 어진 의사, 환자를 차별하지 않음",
     quote: "병을 고치는 것이 나의 도리입니다",
     modernJob: "외과 전문의, 노벨 의학상 수상자",
-    description: "삼국시대 최고의 명의. 마취제를 발명하고 관우의 뼈를 긁었다."
+    description: "삼국시대 최고의 명의. 마취제를 발명하고 관우의 뼈를 긁었다.",
+    modernStats: { 리더십: 40, 체력: 35, 두뇌: 95, 눈치: 70, 연애력: 75 },
+    funStats: { 술자리생존: 50, 재테크: 40, 칼퇴력: 85, 꼰대력: 15, 워라밸: 80 },
+    modernComment: "노벨상 받을 뻔한 외과 신의. 마취제 개발. 환자는 차별 안 하지만 조조는 싫어함."
   },
   {
     id: "liubiao",
@@ -788,7 +942,10 @@ export const samgukCharacters: SamgukCharacter[] = [
     personality: "문화를 좋아하고 평화를 원하나 결단력이 부족",
     quote: "나는 싸우기보다 지키는 것을 원한다",
     modernJob: "대학 총장, 문화재단 이사장",
-    description: "형주를 평화롭게 다스린 문인 군주. 유비에게 형주를 맡겼다."
+    description: "형주를 평화롭게 다스린 문인 군주. 유비에게 형주를 맡겼다.",
+    modernStats: { 리더십: 68, 체력: 45, 두뇌: 75, 눈치: 60, 연애력: 78 },
+    funStats: { 술자리생존: 70, 재테크: 70, 칼퇴력: 80, 꼰대력: 50, 워라밸: 85 },
+    modernComment: "대학 총장. 평화주의자. 결정은 못 내리지만 분위기 좋음. 결국 남한테 뺏김."
   },
   {
     id: "menghuo",
@@ -804,7 +961,10 @@ export const samgukCharacters: SamgukCharacter[] = [
     personality: "고집이 세지만 은혜를 알고, 한번 마음 먹으면 충성함",
     quote: "일곱 번 잡혀도 항복하지 않겠다... 아 진짜 항복",
     modernJob: "소수민족 지도자",
-    description: "제갈량에게 7번 잡혔다 7번 풀려난 남만의 왕. 결국 진심으로 복종."
+    description: "제갈량에게 7번 잡혔다 7번 풀려난 남만의 왕. 결국 진심으로 복종.",
+    modernStats: { 리더십: 75, 체력: 85, 두뇌: 40, 눈치: 35, 연애력: 70 },
+    funStats: { 술자리생존: 90, 재테크: 45, 칼퇴력: 40, 꼰대력: 70, 워라밸: 50 },
+    modernComment: "소수민족 추장. 고집 세서 7번 지고도 안 인정. 8번째 되니 '형님' 함."
   },
 
   // ========== 기타 여성 ==========
@@ -822,7 +982,10 @@ export const samgukCharacters: SamgukCharacter[] = [
     personality: "나라를 위해 미인계를 펼친 애국녀, 지혜롭고 담대함",
     quote: "이 몸을 바쳐 나라를 구하겠습니다",
     modernJob: "첩보원, 배우",
-    description: "미인계로 동탁과 여포를 이간질시킨 중국 4대 미녀 중 하나."
+    description: "미인계로 동탁과 여포를 이간질시킨 중국 4대 미녀 중 하나.",
+    modernStats: { 리더십: 40, 체력: 40, 두뇌: 85, 눈치: 92, 연애력: 100 },
+    funStats: { 술자리생존: 85, 재테크: 60, 칼퇴력: 70, 꼰대력: 10, 워라밸: 65 },
+    modernComment: "국정원 요원. 미모로 적국 요인 꼬셔서 기밀 빼냄. 허니트랩 성공률 100%."
   },
   {
     id: "zhurong",
@@ -838,7 +1001,10 @@ export const samgukCharacters: SamgukCharacter[] = [
     personality: "용맹하고 불같은 성격, 남편을 뛰어넘는 무력",
     quote: "남만의 전사를 얕보지 마라!",
     modernJob: "여성 격투기 선수, 액션 배우",
-    description: "남만왕 맹획의 아내. 비도를 던지며 촉군과 맞서 싸운 여장군."
+    description: "남만왕 맹획의 아내. 비도를 던지며 촉군과 맞서 싸운 여장군.",
+    modernStats: { 리더십: 70, 체력: 90, 두뇌: 55, 눈치: 45, 연애력: 80 },
+    funStats: { 술자리생존: 95, 재테크: 50, 칼퇴력: 60, 꼰대력: 55, 워라밸: 65 },
+    modernComment: "여자 UFC 챔피언. 남편보다 싸움 잘함. 칼 던지기는 올림픽 금메달감."
   },
   {
     id: "caiwenji",
@@ -854,7 +1020,10 @@ export const samgukCharacters: SamgukCharacter[] = [
     personality: "뛰어난 문학적 재능, 파란만장한 삶을 살았음",
     quote: "고향을 그리는 마음을 어찌 글로 다 표현할까",
     modernJob: "작가, 음악가",
-    description: "채옹의 딸. 흉노에게 납치되었다가 조조가 몸값을 치르고 구해온 문학가."
+    description: "채옹의 딸. 흉노에게 납치되었다가 조조가 몸값을 치르고 구해온 문학가.",
+    modernStats: { 리더십: 40, 체력: 35, 두뇌: 90, 눈치: 65, 연애력: 75 },
+    funStats: { 술자리생존: 55, 재테크: 55, 칼퇴력: 75, 꼰대력: 15, 워라밸: 70 },
+    modernComment: "베스트셀러 작가. 납치당했다 풀려난 파란만장한 인생. 에세이로 대박."
   },
   {
     id: "dongbai",
@@ -870,7 +1039,10 @@ export const samgukCharacters: SamgukCharacter[] = [
     personality: "어린 나이에 권력을 얻었으나 그 무게를 모름",
     quote: "할아버지가 주신 거예요",
     modernJob: "재벌 3세",
-    description: "동탁의 손녀. 어린 나이에 제후에 봉해졌으나 동탁 멸망과 함께 몰락."
+    description: "동탁의 손녀. 어린 나이에 제후에 봉해졌으나 동탁 멸망과 함께 몰락.",
+    modernStats: { 리더십: 30, 체력: 35, 두뇌: 45, 눈치: 40, 연애력: 70 },
+    funStats: { 술자리생존: 50, 재테크: 25, 칼퇴력: 90, 꼰대력: 30, 워라밸: 95 },
+    modernComment: "재벌 3세 막내딸. 어려서 임원 됨. 할아버지 감옥 가니까 같이 몰락. 금수저 반납."
   }
 ];
 
