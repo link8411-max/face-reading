@@ -5,6 +5,7 @@ export interface SamgukCharacter {
   id: string;
   name: string;
   hanja: string;
+  gender: "남" | "여";
   faction: "위" | "촉" | "오" | "기타";
   factionColor: string;
   role: string;
@@ -16,7 +17,7 @@ export interface SamgukCharacter {
     매력: number;
   };
   traits: string[];
-  appearance: string; // Gemini 매칭용 외모 특징
+  appearance: string;
   personality: string;
   quote: string;
   modernJob: string;
@@ -24,11 +25,12 @@ export interface SamgukCharacter {
 }
 
 export const samgukCharacters: SamgukCharacter[] = [
-  // ========== 위(魏) ==========
+  // ========== 위(魏) 남성 ==========
   {
     id: "caocao",
     name: "조조",
     hanja: "曹操",
+    gender: "남",
     faction: "위",
     factionColor: "#3B82F6",
     role: "위나라 창업주",
@@ -44,6 +46,7 @@ export const samgukCharacters: SamgukCharacter[] = [
     id: "simayi",
     name: "사마의",
     hanja: "司馬懿",
+    gender: "남",
     faction: "위",
     factionColor: "#3B82F6",
     role: "위나라 대도독",
@@ -59,6 +62,7 @@ export const samgukCharacters: SamgukCharacter[] = [
     id: "zhangliao",
     name: "장료",
     hanja: "張遼",
+    gender: "남",
     faction: "위",
     factionColor: "#3B82F6",
     role: "위나라 명장",
@@ -74,6 +78,7 @@ export const samgukCharacters: SamgukCharacter[] = [
     id: "xiaohoudun",
     name: "하후돈",
     hanja: "夏侯惇",
+    gender: "남",
     faction: "위",
     factionColor: "#3B82F6",
     role: "위나라 맹장",
@@ -89,6 +94,7 @@ export const samgukCharacters: SamgukCharacter[] = [
     id: "xuchu",
     name: "허저",
     hanja: "許褚",
+    gender: "남",
     faction: "위",
     factionColor: "#3B82F6",
     role: "조조의 호위무장",
@@ -104,6 +110,7 @@ export const samgukCharacters: SamgukCharacter[] = [
     id: "dianwei",
     name: "전위",
     hanja: "典韋",
+    gender: "남",
     faction: "위",
     factionColor: "#3B82F6",
     role: "조조의 호위무장",
@@ -119,6 +126,7 @@ export const samgukCharacters: SamgukCharacter[] = [
     id: "xunyu",
     name: "순욱",
     hanja: "荀彧",
+    gender: "남",
     faction: "위",
     factionColor: "#3B82F6",
     role: "위나라 책사",
@@ -134,6 +142,7 @@ export const samgukCharacters: SamgukCharacter[] = [
     id: "guojia",
     name: "곽가",
     hanja: "郭嘉",
+    gender: "남",
     faction: "위",
     factionColor: "#3B82F6",
     role: "위나라 귀재",
@@ -149,6 +158,7 @@ export const samgukCharacters: SamgukCharacter[] = [
     id: "jiaxu",
     name: "가후",
     hanja: "賈詡",
+    gender: "남",
     faction: "위",
     factionColor: "#3B82F6",
     role: "위나라 책사",
@@ -164,6 +174,7 @@ export const samgukCharacters: SamgukCharacter[] = [
     id: "zhanghe",
     name: "장합",
     hanja: "張郃",
+    gender: "남",
     faction: "위",
     factionColor: "#3B82F6",
     role: "위나라 명장",
@@ -176,11 +187,62 @@ export const samgukCharacters: SamgukCharacter[] = [
     description: "오호대장군 중 가장 지략이 뛰어난 무장. 제갈량도 경계했다."
   },
 
-  // ========== 촉(蜀) ==========
+  // ========== 위(魏) 여성 ==========
+  {
+    id: "bianshi",
+    name: "변씨",
+    hanja: "卞氏",
+    gender: "여",
+    faction: "위",
+    factionColor: "#3B82F6",
+    role: "조조의 정실",
+    stats: { 통솔: 72, 무력: 18, 지력: 78, 정치: 85, 매력: 88 },
+    traits: ["현모양처", "검소", "지혜", "내조"],
+    appearance: "단아하고 우아한 외모, 현명한 눈빛, 검소한 차림",
+    personality: "검소하고 지혜로우며, 조조의 내조자로서 후궁들을 잘 다스림",
+    quote: "후궁의 사치는 나라를 병들게 합니다",
+    modernJob: "재단 이사장, 교육자",
+    description: "조조의 정실부인. 기녀 출신이지만 지혜와 덕으로 위나라 황후가 되었다."
+  },
+  {
+    id: "zhangchunhua",
+    name: "장춘화",
+    hanja: "張春華",
+    gender: "여",
+    faction: "위",
+    factionColor: "#3B82F6",
+    role: "사마의의 아내",
+    stats: { 통솔: 68, 무력: 22, 지력: 82, 정치: 78, 매력: 75 },
+    traits: ["냉철", "결단력", "독한 여자", "내조"],
+    appearance: "날카로운 눈매, 단호한 표정, 귀족적 분위기",
+    personality: "냉철하고 결단력 있으며, 필요하면 과감한 결정을 내림",
+    quote: "비밀을 지키려면 증인을 없애야 합니다",
+    modernJob: "검사, 기업 법무팀장",
+    description: "사마의의 아내. 사마의의 꾀병을 들킨 하녀를 직접 처리한 냉철한 여인."
+  },
+  {
+    id: "zhenji",
+    name: "견씨",
+    hanja: "甄氏",
+    gender: "여",
+    faction: "위",
+    factionColor: "#3B82F6",
+    role: "조비의 황후",
+    stats: { 통솔: 42, 무력: 15, 지력: 72, 정치: 58, 매력: 96 },
+    traits: ["절세미녀", "비운", "시인", "낙신부"],
+    appearance: "빼어난 미모, 슬픈 눈빛, 우아하고 청초한 분위기",
+    personality: "아름답고 시적 감수성이 뛰어나지만, 비운의 삶을 살았음",
+    quote: "낙수의 신녀처럼 아름다운...",
+    modernJob: "시인, 예술가",
+    description: "조비의 황후. 절세미인으로 낙신부의 모델이 되었으나 비운의 죽음을 맞았다."
+  },
+
+  // ========== 촉(蜀) 남성 ==========
   {
     id: "liubei",
     name: "유비",
     hanja: "劉備",
+    gender: "남",
     faction: "촉",
     factionColor: "#22C55E",
     role: "촉나라 황제",
@@ -196,6 +258,7 @@ export const samgukCharacters: SamgukCharacter[] = [
     id: "guanyu",
     name: "관우",
     hanja: "關羽",
+    gender: "남",
     faction: "촉",
     factionColor: "#22C55E",
     role: "촉나라 무신",
@@ -211,6 +274,7 @@ export const samgukCharacters: SamgukCharacter[] = [
     id: "zhangfei",
     name: "장비",
     hanja: "張飛",
+    gender: "남",
     faction: "촉",
     factionColor: "#22C55E",
     role: "촉나라 맹장",
@@ -226,6 +290,7 @@ export const samgukCharacters: SamgukCharacter[] = [
     id: "zhugeliang",
     name: "제갈량",
     hanja: "諸葛亮",
+    gender: "남",
     faction: "촉",
     factionColor: "#22C55E",
     role: "촉나라 승상",
@@ -241,6 +306,7 @@ export const samgukCharacters: SamgukCharacter[] = [
     id: "zhaoyun",
     name: "조운",
     hanja: "趙雲",
+    gender: "남",
     faction: "촉",
     factionColor: "#22C55E",
     role: "촉나라 명장",
@@ -256,6 +322,7 @@ export const samgukCharacters: SamgukCharacter[] = [
     id: "machao",
     name: "마초",
     hanja: "馬超",
+    gender: "남",
     faction: "촉",
     factionColor: "#22C55E",
     role: "촉나라 맹장",
@@ -271,6 +338,7 @@ export const samgukCharacters: SamgukCharacter[] = [
     id: "huangzhong",
     name: "황충",
     hanja: "黃忠",
+    gender: "남",
     faction: "촉",
     factionColor: "#22C55E",
     role: "촉나라 노장",
@@ -286,6 +354,7 @@ export const samgukCharacters: SamgukCharacter[] = [
     id: "weiyan",
     name: "위연",
     hanja: "魏延",
+    gender: "남",
     faction: "촉",
     factionColor: "#22C55E",
     role: "촉나라 장수",
@@ -301,6 +370,7 @@ export const samgukCharacters: SamgukCharacter[] = [
     id: "jiangwei",
     name: "강유",
     hanja: "姜維",
+    gender: "남",
     faction: "촉",
     factionColor: "#22C55E",
     role: "촉나라 대장군",
@@ -316,6 +386,7 @@ export const samgukCharacters: SamgukCharacter[] = [
     id: "pangtong",
     name: "방통",
     hanja: "龐統",
+    gender: "남",
     faction: "촉",
     factionColor: "#22C55E",
     role: "촉나라 책사",
@@ -328,11 +399,78 @@ export const samgukCharacters: SamgukCharacter[] = [
     description: "제갈량과 쌍벽을 이루는 봉추. 낙봉파에서 36세에 요절했다."
   },
 
-  // ========== 오(吳) ==========
+  // ========== 촉(蜀) 여성 ==========
+  {
+    id: "huangyueying",
+    name: "황월영",
+    hanja: "黃月英",
+    gender: "여",
+    faction: "촉",
+    factionColor: "#22C55E",
+    role: "제갈량의 아내",
+    stats: { 통솔: 58, 무력: 25, 지력: 92, 정치: 72, 매력: 55 },
+    traits: ["천재", "발명가", "못생김", "현명"],
+    appearance: "평범한 외모, 총명한 눈빛, 손재주가 좋아 보이는 손",
+    personality: "외모보다 지혜를 중시하며, 발명과 기계에 천재적 재능",
+    quote: "외모가 중요한 게 아니라 머리가 중요하지요",
+    modernJob: "공학자, 발명가",
+    description: "제갈량의 아내. 못생겼다고 알려졌지만 천재적 두뇌로 남편을 도왔다."
+  },
+  {
+    id: "ganfuren",
+    name: "감부인",
+    hanja: "甘夫人",
+    gender: "여",
+    faction: "촉",
+    factionColor: "#22C55E",
+    role: "유비의 부인",
+    stats: { 통솔: 45, 무력: 18, 지력: 62, 정치: 55, 매력: 85 },
+    traits: ["현모양처", "인내", "유선의 어머니", "피난"],
+    appearance: "온화하고 인자한 얼굴, 부드러운 눈매, 현숙한 분위기",
+    personality: "인내심이 강하고 어려운 시절에도 유비를 내조함",
+    quote: "어디로 가시든 함께 하겠습니다",
+    modernJob: "상담사, 교육자",
+    description: "유비의 부인이자 유선(아두)의 어머니. 장판 전투에서 조운이 구해냈다."
+  },
+  {
+    id: "mifuren",
+    name: "미부인",
+    hanja: "糜夫人",
+    gender: "여",
+    faction: "촉",
+    factionColor: "#22C55E",
+    role: "유비의 부인",
+    stats: { 통솔: 38, 무력: 15, 지력: 58, 정치: 48, 매력: 82 },
+    traits: ["희생", "충절", "우물", "비운"],
+    appearance: "아름다운 얼굴, 슬픈 눈빛, 연약한 분위기",
+    personality: "남편과 아들을 위해 자신을 희생하는 충절",
+    quote: "저 때문에 지체하지 마세요...",
+    modernJob: "봉사자, 간호사",
+    description: "유비의 부인. 장판 전투에서 아두를 조운에게 맡기고 우물에 투신했다."
+  },
+  {
+    id: "sunshangxiang",
+    name: "손상향",
+    hanja: "孫尚香",
+    gender: "여",
+    faction: "촉",
+    factionColor: "#22C55E",
+    role: "유비의 부인, 손권의 여동생",
+    stats: { 통솔: 72, 무력: 78, 지력: 68, 정치: 62, 매력: 88 },
+    traits: ["여장군", "활달", "궁술", "비운의 사랑"],
+    appearance: "늠름하고 활달한 외모, 강인한 눈빛, 여전사의 기품",
+    personality: "무예를 좋아하고 활달하며, 일반적인 여성상과 다름",
+    quote: "검을 쥐면 남자도 두렵지 않아요!",
+    modernJob: "스포츠 선수, 무술가",
+    description: "손권의 여동생이자 유비의 아내. 무예를 좋아한 여장군 스타일의 공주."
+  },
+
+  // ========== 오(吳) 남성 ==========
   {
     id: "sunquan",
     name: "손권",
     hanja: "孫權",
+    gender: "남",
     faction: "오",
     factionColor: "#EF4444",
     role: "오나라 황제",
@@ -348,6 +486,7 @@ export const samgukCharacters: SamgukCharacter[] = [
     id: "zhouyu",
     name: "주유",
     hanja: "周瑜",
+    gender: "남",
     faction: "오",
     factionColor: "#EF4444",
     role: "오나라 대도독",
@@ -363,6 +502,7 @@ export const samgukCharacters: SamgukCharacter[] = [
     id: "luxun",
     name: "육손",
     hanja: "陸遜",
+    gender: "남",
     faction: "오",
     factionColor: "#EF4444",
     role: "오나라 대도독",
@@ -378,6 +518,7 @@ export const samgukCharacters: SamgukCharacter[] = [
     id: "lvmeng",
     name: "여몽",
     hanja: "呂蒙",
+    gender: "남",
     faction: "오",
     factionColor: "#EF4444",
     role: "오나라 장수",
@@ -393,6 +534,7 @@ export const samgukCharacters: SamgukCharacter[] = [
     id: "ganning",
     name: "감녕",
     hanja: "甘寧",
+    gender: "남",
     faction: "오",
     factionColor: "#EF4444",
     role: "오나라 맹장",
@@ -408,6 +550,7 @@ export const samgukCharacters: SamgukCharacter[] = [
     id: "taishici",
     name: "태사자",
     hanja: "太史慈",
+    gender: "남",
     faction: "오",
     factionColor: "#EF4444",
     role: "오나라 장수",
@@ -423,6 +566,7 @@ export const samgukCharacters: SamgukCharacter[] = [
     id: "lusu",
     name: "노숙",
     hanja: "魯肅",
+    gender: "남",
     faction: "오",
     factionColor: "#EF4444",
     role: "오나라 책사",
@@ -438,6 +582,7 @@ export const samgukCharacters: SamgukCharacter[] = [
     id: "sunce",
     name: "손책",
     hanja: "孫策",
+    gender: "남",
     faction: "오",
     factionColor: "#EF4444",
     role: "오나라 창업주",
@@ -449,10 +594,13 @@ export const samgukCharacters: SamgukCharacter[] = [
     modernJob: "스타트업 창업자, 모험가",
     description: "소패왕이라 불린 오나라의 창업주. 26세에 요절한 비운의 영웅."
   },
+
+  // ========== 오(吳) 여성 ==========
   {
     id: "daqiao",
     name: "대교",
     hanja: "大喬",
+    gender: "여",
     faction: "오",
     factionColor: "#EF4444",
     role: "손책의 아내",
@@ -468,6 +616,7 @@ export const samgukCharacters: SamgukCharacter[] = [
     id: "xiaoqiao",
     name: "소교",
     hanja: "小喬",
+    gender: "여",
     faction: "오",
     factionColor: "#EF4444",
     role: "주유의 아내",
@@ -479,12 +628,45 @@ export const samgukCharacters: SamgukCharacter[] = [
     modernJob: "음악가, 예술가",
     description: "주유의 아내. 적벽대전에서 조조가 탐냈다는 전설의 미녀."
   },
+  {
+    id: "wuguotai",
+    name: "오국태",
+    hanja: "吳國太",
+    gender: "여",
+    faction: "오",
+    factionColor: "#EF4444",
+    role: "손권의 어머니",
+    stats: { 통솔: 75, 무력: 15, 지력: 78, 정치: 82, 매력: 80 },
+    traits: ["현명", "국모", "손견의 아내", "정치력"],
+    appearance: "위엄 있는 노부인, 날카로운 눈빛, 귀족적 품위",
+    personality: "현명하고 결단력 있으며, 손씨 가문을 뒤에서 이끔",
+    quote: "내 눈으로 직접 보고 판단하겠다",
+    modernJob: "기업 회장, 재단 이사장",
+    description: "손권의 어머니. 현명한 판단으로 손씨 가문을 뒤에서 이끈 여걸."
+  },
+  {
+    id: "bujianying",
+    name: "보련사",
+    hanja: "步練師",
+    gender: "여",
+    faction: "오",
+    factionColor: "#EF4444",
+    role: "손권의 총애를 받은 후궁",
+    stats: { 통솔: 48, 무력: 12, 지력: 72, 정치: 68, 매력: 92 },
+    traits: ["총애", "미모", "온화", "황후"],
+    appearance: "청초한 미모, 온화한 눈빛, 부드러운 분위기",
+    personality: "성격이 온화하고 질투하지 않아 손권의 사랑을 독차지함",
+    quote: "다른 후궁들도 아껴주세요",
+    modernJob: "상담사, 중재자",
+    description: "손권이 가장 사랑한 후궁. 온화한 성품으로 후궁들 사이를 화목하게 했다."
+  },
 
-  // ========== 기타 ==========
+  // ========== 기타 남성 ==========
   {
     id: "lvbu",
     name: "여포",
     hanja: "呂布",
+    gender: "남",
     faction: "기타",
     factionColor: "#A855F7",
     role: "비장의 무장",
@@ -500,6 +682,7 @@ export const samgukCharacters: SamgukCharacter[] = [
     id: "dongzhuo",
     name: "동탁",
     hanja: "董卓",
+    gender: "남",
     faction: "기타",
     factionColor: "#A855F7",
     role: "폭군",
@@ -515,6 +698,7 @@ export const samgukCharacters: SamgukCharacter[] = [
     id: "yuanshao",
     name: "원소",
     hanja: "袁紹",
+    gender: "남",
     faction: "기타",
     factionColor: "#A855F7",
     role: "하북의 맹주",
@@ -530,6 +714,7 @@ export const samgukCharacters: SamgukCharacter[] = [
     id: "yuanshu",
     name: "원술",
     hanja: "袁術",
+    gender: "남",
     faction: "기타",
     factionColor: "#A855F7",
     role: "참칭 황제",
@@ -545,6 +730,7 @@ export const samgukCharacters: SamgukCharacter[] = [
     id: "gongsunzan",
     name: "공손찬",
     hanja: "公孫瓚",
+    gender: "남",
     faction: "기타",
     factionColor: "#A855F7",
     role: "북방의 맹장",
@@ -560,6 +746,7 @@ export const samgukCharacters: SamgukCharacter[] = [
     id: "zhangjiao",
     name: "장각",
     hanja: "張角",
+    gender: "남",
     faction: "기타",
     factionColor: "#A855F7",
     role: "황건적 수괴",
@@ -575,6 +762,7 @@ export const samgukCharacters: SamgukCharacter[] = [
     id: "huatuo",
     name: "화타",
     hanja: "華佗",
+    gender: "남",
     faction: "기타",
     factionColor: "#A855F7",
     role: "신의",
@@ -587,24 +775,10 @@ export const samgukCharacters: SamgukCharacter[] = [
     description: "삼국시대 최고의 명의. 마취제를 발명하고 관우의 뼈를 긁었다."
   },
   {
-    id: "diaochan",
-    name: "초선",
-    hanja: "貂蟬",
-    faction: "기타",
-    factionColor: "#A855F7",
-    role: "절세미녀",
-    stats: { 통솔: 35, 무력: 18, 지력: 82, 정치: 68, 매력: 100 },
-    traits: ["미인계", "연환계", "여포", "동탁"],
-    appearance: "삼국지 제일의 미녀, 아름다운 자태, 달빛 같은 피부",
-    personality: "나라를 위해 미인계를 펼친 애국녀, 지혜롭고 담대함",
-    quote: "이 몸을 바쳐 나라를 구하겠습니다",
-    modernJob: "첩보원, 배우",
-    description: "미인계로 동탁과 여포를 이간질시킨 중국 4대 미녀 중 하나."
-  },
-  {
     id: "liubiao",
     name: "유표",
     hanja: "劉表",
+    gender: "남",
     faction: "기타",
     factionColor: "#A855F7",
     role: "형주목",
@@ -617,9 +791,44 @@ export const samgukCharacters: SamgukCharacter[] = [
     description: "형주를 평화롭게 다스린 문인 군주. 유비에게 형주를 맡겼다."
   },
   {
+    id: "menghuo",
+    name: "맹획",
+    hanja: "孟獲",
+    gender: "남",
+    faction: "기타",
+    factionColor: "#A855F7",
+    role: "남만왕",
+    stats: { 통솔: 78, 무력: 82, 지력: 38, 정치: 35, 매력: 72 },
+    traits: ["남만왕", "칠종칠금", "고집", "의리"],
+    appearance: "거친 외모, 이국적 복장, 우직한 인상",
+    personality: "고집이 세지만 은혜를 알고, 한번 마음 먹으면 충성함",
+    quote: "일곱 번 잡혀도 항복하지 않겠다... 아 진짜 항복",
+    modernJob: "소수민족 지도자",
+    description: "제갈량에게 7번 잡혔다 7번 풀려난 남만의 왕. 결국 진심으로 복종."
+  },
+
+  // ========== 기타 여성 ==========
+  {
+    id: "diaochan",
+    name: "초선",
+    hanja: "貂蟬",
+    gender: "여",
+    faction: "기타",
+    factionColor: "#A855F7",
+    role: "절세미녀",
+    stats: { 통솔: 35, 무력: 18, 지력: 82, 정치: 68, 매력: 100 },
+    traits: ["미인계", "연환계", "여포", "동탁"],
+    appearance: "삼국지 제일의 미녀, 아름다운 자태, 달빛 같은 피부",
+    personality: "나라를 위해 미인계를 펼친 애국녀, 지혜롭고 담대함",
+    quote: "이 몸을 바쳐 나라를 구하겠습니다",
+    modernJob: "첩보원, 배우",
+    description: "미인계로 동탁과 여포를 이간질시킨 중국 4대 미녀 중 하나."
+  },
+  {
     id: "zhurong",
     name: "축융",
     hanja: "祝融",
+    gender: "여",
     faction: "기타",
     factionColor: "#A855F7",
     role: "남만의 여장군",
@@ -632,19 +841,36 @@ export const samgukCharacters: SamgukCharacter[] = [
     description: "남만왕 맹획의 아내. 비도를 던지며 촉군과 맞서 싸운 여장군."
   },
   {
-    id: "menghuo",
-    name: "맹획",
-    hanja: "孟獲",
+    id: "caiwenji",
+    name: "채문희",
+    hanja: "蔡文姬",
+    gender: "여",
     faction: "기타",
     factionColor: "#A855F7",
-    role: "남만왕",
-    stats: { 통솔: 78, 무력: 82, 지력: 38, 정치: 35, 매력: 72 },
-    traits: ["남만왕", "칠종칠금", "고집", "의리"],
-    appearance: "거친 외모, 이국적 복장, 우직한 인상",
-    personality: "고집이 세지만 은혜를 알고, 한번 마음 먹으면 충성함",
-    quote: "일곱 번 잡혀도 항복하지 않겠다... 아 진짜 항복",
-    modernJob: "소수민족 지도자",
-    description: "제갈량에게 7번 잡혔다 7번 풀려난 남만의 왕. 결국 진심으로 복종."
+    role: "문학가",
+    stats: { 통솔: 35, 무력: 12, 지력: 88, 정치: 58, 매력: 85 },
+    traits: ["문학가", "음악가", "비운", "호가십팔박"],
+    appearance: "지적인 외모, 슬픈 눈빛, 문인의 우아함",
+    personality: "뛰어난 문학적 재능, 파란만장한 삶을 살았음",
+    quote: "고향을 그리는 마음을 어찌 글로 다 표현할까",
+    modernJob: "작가, 음악가",
+    description: "채옹의 딸. 흉노에게 납치되었다가 조조가 몸값을 치르고 구해온 문학가."
+  },
+  {
+    id: "dongbai",
+    name: "동백",
+    hanja: "董白",
+    gender: "여",
+    faction: "기타",
+    factionColor: "#A855F7",
+    role: "동탁의 손녀",
+    stats: { 통솔: 28, 무력: 15, 지력: 42, 정치: 35, 매력: 78 },
+    traits: ["동탁의 손녀", "어린 나이", "비운", "권력"],
+    appearance: "어린 소녀, 순수한 외모, 귀족적 차림",
+    personality: "어린 나이에 권력을 얻었으나 그 무게를 모름",
+    quote: "할아버지가 주신 거예요",
+    modernJob: "재벌 3세",
+    description: "동탁의 손녀. 어린 나이에 제후에 봉해졌으나 동탁 멸망과 함께 몰락."
   }
 ];
 
@@ -663,14 +889,21 @@ export function getCharactersByFaction(faction: string): SamgukCharacter[] {
   return samgukCharacters.filter(c => c.faction === faction);
 }
 
-// 프롬프트용 인물 목록 생성
-export function getCharacterListForPrompt(): string {
-  return samgukCharacters.map(c =>
+// 성별로 인물 목록
+export function getCharactersByGender(gender: "남" | "여"): SamgukCharacter[] {
+  return samgukCharacters.filter(c => c.gender === gender);
+}
+
+// 프롬프트용 인물 목록 생성 (성별 필터 포함)
+export function getCharacterListForPrompt(gender?: "남" | "여"): string {
+  const filtered = gender ? samgukCharacters.filter(c => c.gender === gender) : samgukCharacters;
+  return filtered.map(c =>
     `${c.name}(${c.hanja}): ${c.appearance}`
   ).join("\n");
 }
 
-// 인물 이름 목록만
-export function getCharacterNames(): string[] {
-  return samgukCharacters.map(c => c.name);
+// 인물 이름 목록만 (성별 필터 포함)
+export function getCharacterNames(gender?: "남" | "여"): string[] {
+  const filtered = gender ? samgukCharacters.filter(c => c.gender === gender) : samgukCharacters;
+  return filtered.map(c => c.name);
 }

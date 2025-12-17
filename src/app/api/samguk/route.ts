@@ -1,6 +1,6 @@
 import { GoogleGenerativeAI } from "@google/generative-ai";
 import { NextRequest, NextResponse } from "next/server";
-import { getCharacterByName, getCharacterListForPrompt, samgukCharacters } from "@/lib/samgukDB";
+import { getCharacterByName, getCharacterListForPrompt, getCharacterNames } from "@/lib/samgukDB";
 
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY || "");
 
@@ -46,14 +46,22 @@ export async function POST(request: NextRequest) {
 
     const base64Image = image.replace(/^data:image\/\w+;base64,/, "");
 
-    // 인물 목록 생성
-    const characterList = getCharacterListForPrompt();
-    const characterNames = samgukCharacters.map(c => c.name).join(", ");
+    // 1단계: 성별 판단
+    const genderPrompt = `이 사진 속 사람의 성별을 판단해주세요.
+반드시 "남" 또는 "여" 중 하나로만 응답하세요.
+다른 말은 하지 말고 한 글자만 응답하세요.`;
+
+    const genderResult = await tryGenerateWithImage(base64Image, genderPrompt);
+    const gender = genderResult.trim().includes("여") ? "여" : "남";
+
+    // 2단계: 해당 성별의 인물 목록으로 매칭
+    const characterList = getCharacterListForPrompt(gender as "남" | "여");
+    const characterNames = getCharacterNames(gender as "남" | "여").join(", ");
 
     const prompt = `당신은 삼국지 인물 전문가입니다.
-이 사람의 얼굴을 보고, 아래 삼국지 50명 인물 중에서 가장 닮은 인물을 찾아주세요.
+이 사람의 얼굴을 보고, 아래 삼국지 ${gender === "여" ? "여성" : "남성"} 인물 중에서 가장 닮은 인물을 찾아주세요.
 
-## 삼국지 인물 목록 (이름: 외모 특징)
+## 삼국지 ${gender === "여" ? "여성" : "남성"} 인물 목록 (이름: 외모 특징)
 ${characterList}
 
 ## 규칙
