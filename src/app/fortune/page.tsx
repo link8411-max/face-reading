@@ -1,8 +1,8 @@
 "use client";
 
-import { useState, useRef } from "react";
+import { useState } from "react";
 import Link from "next/link";
-import html2canvas from "html2canvas";
+import { useScreenshot } from "@/hooks/useScreenshot";
 
 interface FortuneResult {
   사주정보: {
@@ -34,67 +34,14 @@ export default function FortunePage() {
   const [isLunar, setIsLunar] = useState(false);
   const [loading, setLoading] = useState(false);
   const [result, setResult] = useState<FortuneResult | null>(null);
-  const [isCapturing, setIsCapturing] = useState(false);
-  const resultRef = useRef<HTMLDivElement>(null);
 
-  // 결과 이미지 캡쳐
-  const captureResult = async (): Promise<Blob | null> => {
-    if (!resultRef.current) return null;
-    try {
-      const canvas = await html2canvas(resultRef.current, {
-        backgroundColor: "#1c1917",
-        scale: 2,
-        useCORS: true,
-        logging: false,
-      });
-      return new Promise((resolve) => {
-        canvas.toBlob((blob) => resolve(blob), "image/png", 1.0);
-      });
-    } catch (error) {
-      console.error("캡쳐 실패:", error);
-      return null;
-    }
-  };
+  const { ref: resultRef, isCapturing, download, share } = useScreenshot();
 
-  const handleDownload = async () => {
-    setIsCapturing(true);
-    const blob = await captureResult();
-    setIsCapturing(false);
-    if (blob) {
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement("a");
-      a.href = url;
-      a.download = `2026년운세_${result?.사주정보.띠}띠.png`;
-      document.body.appendChild(a);
-      a.click();
-      document.body.removeChild(a);
-      URL.revokeObjectURL(url);
-    }
-  };
-
-  const handleShare = async () => {
-    setIsCapturing(true);
-    const blob = await captureResult();
-    setIsCapturing(false);
-    if (!blob) return;
-    if (navigator.share && navigator.canShare) {
-      const file = new File([blob], `2026년운세_${result?.사주정보.띠}띠.png`, { type: "image/png" });
-      if (navigator.canShare({ files: [file] })) {
-        try {
-          await navigator.share({
-            title: `2026년 ${result?.사주정보.띠}띠 운세`,
-            text: `${result?.운세.총운.keyword} - ${result?.운세.총운.summary}`,
-            files: [file],
-          });
-          return;
-        } catch (error) {
-          if ((error as Error).name !== "AbortError") console.error("공유 실패:", error);
-          return;
-        }
-      }
-    }
-    handleDownload();
-  };
+  const getShareOptions = () => ({
+    fileName: `2026년운세_${result?.사주정보.띠}띠`,
+    shareTitle: `2026년 ${result?.사주정보.띠}띠 운세`,
+    shareText: `${result?.운세.총운.keyword} - ${result?.운세.총운.summary}`,
+  });
 
   const handleSubmit = async () => {
     if (!birthDate.year || !birthDate.month || !birthDate.day) {
@@ -496,14 +443,14 @@ export default function FortunePage() {
             {/* 공유 버튼 */}
             <div className="flex gap-3">
               <button
-                onClick={handleDownload}
+                onClick={() => download(getShareOptions())}
                 disabled={isCapturing}
                 className="flex-1 py-3 bg-gradient-to-r from-emerald-700 to-emerald-600 rounded-xl font-bold text-center hover:from-emerald-600 hover:to-emerald-500 transition text-white disabled:opacity-50 flex items-center justify-center gap-2"
               >
                 {isCapturing ? "⏳ 캡쳐중..." : "📥 이미지 저장"}
               </button>
               <button
-                onClick={handleShare}
+                onClick={() => share(getShareOptions())}
                 disabled={isCapturing}
                 className="flex-1 py-3 bg-gradient-to-r from-blue-700 to-blue-600 rounded-xl font-bold text-center hover:from-blue-600 hover:to-blue-500 transition text-white disabled:opacity-50 flex items-center justify-center gap-2"
               >

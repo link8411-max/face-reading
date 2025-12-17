@@ -2,7 +2,7 @@
 
 import { useState, useRef } from "react";
 import Link from "next/link";
-import html2canvas from "html2canvas";
+import { useScreenshot } from "@/hooks/useScreenshot";
 
 interface AnalysisResult {
   type: string;
@@ -38,68 +38,15 @@ export default function FacePage() {
   const [image, setImage] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const [result, setResult] = useState<AnalysisResult | null>(null);
-  const [isCapturing, setIsCapturing] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
-  const resultRef = useRef<HTMLDivElement>(null);
 
-  // 결과 이미지 캡쳐
-  const captureResult = async (): Promise<Blob | null> => {
-    if (!resultRef.current) return null;
-    try {
-      const canvas = await html2canvas(resultRef.current, {
-        backgroundColor: "#1c1917",
-        scale: 2,
-        useCORS: true,
-        logging: false,
-      });
-      return new Promise((resolve) => {
-        canvas.toBlob((blob) => resolve(blob), "image/png", 1.0);
-      });
-    } catch (error) {
-      console.error("캡쳐 실패:", error);
-      return null;
-    }
-  };
+  const { ref: resultRef, isCapturing, download, share } = useScreenshot();
 
-  const handleDownload = async () => {
-    setIsCapturing(true);
-    const blob = await captureResult();
-    setIsCapturing(false);
-    if (blob) {
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement("a");
-      a.href = url;
-      a.download = `관상분석_${result?.type || "결과"}.png`;
-      document.body.appendChild(a);
-      a.click();
-      document.body.removeChild(a);
-      URL.revokeObjectURL(url);
-    }
-  };
-
-  const handleShare = async () => {
-    setIsCapturing(true);
-    const blob = await captureResult();
-    setIsCapturing(false);
-    if (!blob) return;
-    if (navigator.share && navigator.canShare) {
-      const file = new File([blob], `관상분석_${result?.type || "결과"}.png`, { type: "image/png" });
-      if (navigator.canShare({ files: [file] })) {
-        try {
-          await navigator.share({
-            title: `나의 관상: ${result?.type}`,
-            text: `${result?.title} - ${result?.summary}`,
-            files: [file],
-          });
-          return;
-        } catch (error) {
-          if ((error as Error).name !== "AbortError") console.error("공유 실패:", error);
-          return;
-        }
-      }
-    }
-    handleDownload();
-  };
+  const getShareOptions = () => ({
+    fileName: `관상분석_${result?.type || "결과"}`,
+    shareTitle: `나의 관상: ${result?.type}`,
+    shareText: `${result?.title} - ${result?.summary}`,
+  });
 
   const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -422,14 +369,14 @@ export default function FacePage() {
             {/* 공유 버튼 */}
             <div className="flex gap-3">
               <button
-                onClick={handleDownload}
+                onClick={() => download(getShareOptions())}
                 disabled={isCapturing}
                 className="flex-1 py-3 bg-gradient-to-r from-emerald-700 to-emerald-600 rounded-xl font-bold text-center hover:from-emerald-600 hover:to-emerald-500 transition text-white disabled:opacity-50 flex items-center justify-center gap-2"
               >
                 {isCapturing ? "⏳ 캡쳐중..." : "📥 이미지 저장"}
               </button>
               <button
-                onClick={handleShare}
+                onClick={() => share(getShareOptions())}
                 disabled={isCapturing}
                 className="flex-1 py-3 bg-gradient-to-r from-blue-700 to-blue-600 rounded-xl font-bold text-center hover:from-blue-600 hover:to-blue-500 transition text-white disabled:opacity-50 flex items-center justify-center gap-2"
               >
