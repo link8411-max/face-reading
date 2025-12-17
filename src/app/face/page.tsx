@@ -380,7 +380,7 @@ export default function FacePage() {
                 disabled={isCapturing}
                 className="flex-1 py-3 bg-gradient-to-r from-blue-700 to-blue-600 rounded-xl font-bold text-center hover:from-blue-600 hover:to-blue-500 transition text-white disabled:opacity-50 flex items-center justify-center gap-2"
               >
-                {isCapturing ? "⏳ 캡쳐중..." : "📤 공유하기"}
+                {isCapturing ? "⏳ 캡쳐중..." : "📤 내 관상 친구와 비교하기"}
               </button>
             </div>
 

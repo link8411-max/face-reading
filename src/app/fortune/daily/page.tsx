@@ -238,7 +238,7 @@ export default function DailyFortunePage() {
                 disabled={isCapturing}
                 className="flex-1 py-3 bg-gradient-to-r from-blue-700 to-blue-600 rounded-xl font-bold text-center hover:from-blue-600 hover:to-blue-500 transition text-white disabled:opacity-50 flex items-center justify-center gap-2"
               >
-                {isCapturing ? "⏳ 캡쳐중..." : "📤 공유하기"}
+                {isCapturing ? "⏳ 캡쳐중..." : "📤 오늘 운세 친구에게 공유"}
               </button>
             </div>
 

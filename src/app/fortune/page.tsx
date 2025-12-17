@@ -454,7 +454,7 @@ export default function FortunePage() {
                 disabled={isCapturing}
                 className="flex-1 py-3 bg-gradient-to-r from-blue-700 to-blue-600 rounded-xl font-bold text-center hover:from-blue-600 hover:to-blue-500 transition text-white disabled:opacity-50 flex items-center justify-center gap-2"
               >
-                {isCapturing ? "⏳ 캡쳐중..." : "📤 공유하기"}
+                {isCapturing ? "⏳ 캡쳐중..." : "📤 2026 운세 카톡으로 보내기"}
               </button>
             </div>
 

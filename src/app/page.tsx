@@ -23,12 +23,14 @@ export default function Home() {
             <span className="text-3xl animate-float">☯</span>
             <span className="text-amber-600/60">━━</span>
           </div>
-          <h1 className="text-4xl font-bold mb-3 text-transparent bg-clip-text bg-gradient-to-r from-amber-200 via-yellow-400 to-amber-200" style={{ textShadow: "0 0 30px rgba(251, 191, 36, 0.3)" }}>
-            운명을 읽다
+          <h1 className="mb-3">
+            <span className="block text-4xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-amber-200 via-yellow-400 to-amber-200" style={{ textShadow: "0 0 30px rgba(251, 191, 36, 0.3)" }}>
+              운명을 읽다
+            </span>
+            <span className="block text-lg text-amber-200/80 mt-2">
+              무료 AI 관상 & 2026 신년운세
+            </span>
           </h1>
-          <p className="text-lg text-amber-200/80 mb-1">
-            무료 AI 관상 분석 & 2026 신년운세
-          </p>
           <p className="text-amber-100/60 tracking-widest text-sm">
             AI와 전통 명리학이 만나다
           </p>
