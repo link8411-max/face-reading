@@ -6,7 +6,7 @@ const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY || "");
 
 // 재시도 함수 (이미지 포함)
 async function tryGenerateWithImage(base64Image: string, prompt: string, maxRetries = 2) {
-  const models = ["gemini-2.0-flash", "gemini-1.5-flash"];
+  const models = ["gemini-2.0-flash", "gemini-2.5-flash"];
 
   for (const modelName of models) {
     for (let i = 0; i < maxRetries; i++) {
