@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { SamgukCharacter } from "@/lib/samgukDB";
@@ -193,14 +193,59 @@ function KoeiStatBar({ label, value, icon }: { label: string; value: number; ico
   );
 }
 
+const compressImage = (base64Str: string, maxWidth = 1024): Promise<string> => {
+  return new Promise((resolve) => {
+    const img = new Image();
+    img.src = base64Str;
+    img.onload = () => {
+      const canvas = document.createElement("canvas");
+      let width = img.width;
+      let height = img.height;
+
+      if (width > maxWidth) {
+        height = (height * maxWidth) / width;
+        width = maxWidth;
+      }
+
+      canvas.width = width;
+      canvas.height = height;
+      const ctx = canvas.getContext("2d");
+      ctx?.drawImage(img, 0, 0, width, height);
+      resolve(canvas.toDataURL("image/jpeg", 0.7));
+    };
+  });
+};
+
 export default function SamgukPage() {
   const router = useRouter();
   const [image, setImage] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
+  const [loadingStep, setLoadingStep] = useState(0);
   const [result, setResult] = useState<AnalysisResult | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const { ref: resultRef, isCapturing, download, share } = useScreenshot();
+
+  const loadingMessages = [
+    "장수들의 명부를 훑어보는 중...",
+    "관상에서 영웅의 기개를 찾는 중...",
+    "눈매의 기운을 측정하여 지략을 읽는 중...",
+    "전장의 용맹함이 누구와 닮았는지 대조 중...",
+    "천하를 호령할 기운이 느껴집니다...",
+    "거의 다 되었습니다. 영웅의 탄생을 기다리세요..."
+  ];
+
+  useEffect(() => {
+    let timer: NodeJS.Timeout;
+    if (loading) {
+      timer = setInterval(() => {
+        setLoadingStep((prev) => (prev + 1) % loadingMessages.length);
+      }, 2500);
+    } else {
+      setLoadingStep(0);
+    }
+    return () => clearInterval(timer);
+  }, [loading, loadingMessages.length]);
 
   const getShareOptions = () => ({
     fileName: `삼국지닮은꼴_${result?.character.name || "결과"}`,
@@ -225,10 +270,12 @@ export default function SamgukPage() {
 
     setLoading(true);
     try {
+      // 이미지 압축 (최대 1024px, 0.7 퀄리티)
+      const compressedImage = await compressImage(image);
       const response = await fetch("/api/samguk", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ image }),
+        body: JSON.stringify({ image: compressedImage }),
       });
 
       const data = await response.json();
@@ -236,6 +283,8 @@ export default function SamgukPage() {
         alert(data.error);
       } else {
         setResult(data);
+        // 결과가 나오면 페이지 상단으로 스크롤하여 결과를 바로 볼 수 있게 함
+        window.scrollTo({ top: 0, behavior: "smooth" });
       }
     } catch {
       alert("분석 중 오류가 발생했습니다.");
@@ -354,9 +403,23 @@ export default function SamgukPage() {
                   className="flex-1 py-3 bg-gradient-to-r from-[#C41E3A] to-[#D4AF37] rounded-xl font-bold hover:opacity-90 transition disabled:opacity-50 text-white"
                 >
                   {loading ? (
-                    <span className="flex items-center justify-center gap-2">
-                      <span className="animate-spin">⚔️</span> 분석 중...
-                    </span>
+                    <div className="flex flex-col items-center gap-2">
+                      <span className="animate-spin text-2xl">⚔️</span>
+                      <div className="flex flex-col items-center">
+                        <span className="text-sm opacity-90 animate-pulse font-medium text-amber-200">
+                          {loadingMessages[loadingStep]}
+                        </span>
+                        <div className="flex gap-1 mt-1">
+                          {loadingMessages.map((_, i) => (
+                            <div
+                              key={i}
+                              className={`w-1.5 h-1.5 rounded-full transition-all duration-300 ${i === loadingStep ? "bg-amber-400 scale-125" : "bg-amber-900/50"
+                                }`}
+                            />
+                          ))}
+                        </div>
+                      </div>
+                    </div>
                   ) : (
                     "닮은꼴 찾기 ⚔️"
                   )}
@@ -366,7 +429,117 @@ export default function SamgukPage() {
           </div>
         )}
 
+        {/* Loading Overlay */}
+        {loading && (
+          <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/80 backdrop-blur-md transition-all duration-500">
+            <div className="max-w-xs w-full px-6 flex flex-col items-center">
+              {/* Scanning Hexagon Frame */}
+              <div className="relative w-48 h-48 mb-8">
+                <div className="absolute inset-0 border-2 border-amber-500/30 rounded-full animate-ping"></div>
+                <div className="absolute inset-2 border border-amber-400/50 rounded-full animate-pulse"></div>
+
+                {/* Image under Scan */}
+                <div className="absolute inset-4 overflow-hidden rounded-full border-2 border-amber-600 shadow-[0_0_20px_rgba(251,191,36,0.5)]">
+                  {image ? (
+                    <img src={image} alt="Scanning" className="w-full h-full object-cover opacity-50 contrast-125 grayscale" />
+                  ) : (
+                    <div className="w-full h-full bg-amber-950/50 flex items-center justify-center text-4xl">👤</div>
+                  )}
+                  {/* Scanning Line */}
+                  <div className="absolute left-0 right-0 h-1 bg-gradient-to-r from-transparent via-amber-400 to-transparent shadow-[0_0_10px_#fbbf24] animate-[scan_2s_ease-in-out_infinite]"></div>
+                </div>
+
+                {/* Rotating Gears/Runes */}
+                <div className="absolute inset-0 border-t-2 border-b-2 border-amber-400/20 rounded-full animate-[spin_10s_linear_infinite]"></div>
+                <div className="absolute inset-0 border-l-2 border-r-2 border-amber-400/10 rounded-full animate-[spin_15s_linear_infinite_reverse]"></div>
+              </div>
+
+              {/* Status Text Area */}
+              <div className="text-center space-y-4 w-full">
+                <div className="inline-block px-4 py-1 bg-amber-900/50 border border-amber-500/50 rounded-full text-xs text-amber-300 font-bold tracking-widest animate-bounce">
+                  SYSTEM: 영웅 탐색 중...
+                </div>
+
+                <h2 className="text-xl font-bold text-white tracking-widest drop-shadow-lg">
+                  {loadingMessages[loadingStep]}
+                </h2>
+
+                {/* Analysis Log Log */}
+                <div className="bg-stone-900/80 border border-amber-900/50 rounded-lg p-3 h-28 overflow-hidden text-left font-mono text-[10px] text-amber-400/80 relative">
+                  <div className="space-y-1 transition-all duration-500" style={{ transform: `translateY(-${Math.max(0, (loadingStep - 2) * 16)}px)` }}>
+                    <p className="flex items-center gap-2">
+                      <span className="text-amber-600">●</span>
+                      <span>&gt; 분석 알고리즘 초기화... [OK]</span>
+                    </p>
+                    <p className="flex items-center gap-2">
+                      <span className={loadingStep >= 1 ? "text-emerald-500" : "text-amber-900"}>●</span>
+                      <span>&gt; 안면 골격 랜드마크 추출 중...</span>
+                    </p>
+                    {loadingStep >= 1 && (
+                      <p className="flex items-center gap-2 animate-in fade-in slide-in-from-left-2">
+                        <span className="text-emerald-500">●</span>
+                        <span className="text-emerald-400">&gt; 눈매/미간/비강 데이터 수집 완료.</span>
+                      </p>
+                    )}
+                    {loadingStep >= 2 && (
+                      <p className="flex items-center gap-2 animate-in fade-in slide-in-from-left-2">
+                        <span className="text-amber-600">●</span>
+                        <span>&gt; 삼국지 52인 영웅 데이터베이스 대조 시작...</span>
+                      </p>
+                    )}
+                    {loadingStep >= 3 && (
+                      <p className="flex items-center gap-2 animate-in fade-in slide-in-from-left-2">
+                        <span className="text-amber-600">●</span>
+                        <span>&gt; 기개(氣槪) 및 인상 에너지 계산 중...</span>
+                      </p>
+                    )}
+                    {loadingStep >= 4 && (
+                      <p className="flex items-center gap-3 animate-in fade-in slide-in-from-left-2">
+                        <span className="text-blue-500">●</span>
+                        <span className="text-blue-300 font-bold font-mono animate-pulse">&gt; 매칭 캐릭터 식별됨 (ID: MATCH_FOUND)</span>
+                      </p>
+                    )}
+                    {loadingStep >= 5 && (
+                      <p className="flex items-center gap-2 animate-in fade-in slide-in-from-left-2 text-white">
+                        <span className="text-white animate-ping text-[6px]">●</span>
+                        <span className="font-bold">&gt; 천하를 호령할 영웅의 자태를 렌더링합니다...</span>
+                      </p>
+                    )}
+                  </div>
+                  {/* CRT Line Effect */}
+                  <div className="absolute inset-0 pointer-events-none bg-[linear-gradient(rgba(18,16,16,0)_50%,rgba(0,0,0,0.1)_50%),linear-gradient(90deg,rgba(255,0,0,0.03),rgba(0,255,0,0.01),rgba(0,0,255,0.03))] bg-[length:100%_2px,3px_100%]"></div>
+                </div>
+
+                <style jsx>{`
+                  @keyframes scan {
+                    0%, 100% { top: 0%; opacity: 0; }
+                    5% { opacity: 1; }
+                    95% { opacity: 1; }
+                    100% { top: 100%; opacity: 0; }
+                  }
+                  .animate-scan {
+                    animation: scan 2s ease-in-out infinite;
+                  }
+                `}</style>
+
+                {/* Progress Bar */}
+                <div className="w-full h-1 bg-stone-800 rounded-full overflow-hidden">
+                  <div
+                    className="h-full bg-gradient-to-r from-amber-700 via-amber-400 to-amber-700 transition-all duration-500 ease-out"
+                    style={{ width: `${((loadingStep + 1) / loadingMessages.length) * 100}%` }}
+                  ></div>
+                </div>
+              </div>
+
+              <div className="mt-8 text-amber-500/50 text-[10px] tracking-tighter italic">
+                ※ 고대의 비기(秘記)를 통해 당신과 가장 닮은 영웅을 찾고 있습니다.
+              </div>
+            </div>
+          </div>
+        )}
+
         {/* Result Section */}
+
         {result && (
           <div className="space-y-4 animate-fade-in">
             {/* 캡쳐 영역 시작 */}
@@ -383,9 +556,9 @@ export default function SamgukPage() {
                   }}>
                   {/* 상단 세력 배너 - 민화 스타일 */}
                   <div className={`py-3 text-center relative ${result.character.faction === "위" ? "bg-gradient-to-r from-[#1E3A5F] via-[#1E3A5F]/90 to-[#1E3A5F]" :
-                      result.character.faction === "촉" ? "bg-gradient-to-r from-green-700 via-green-600 to-green-700" :
-                        result.character.faction === "오" ? "bg-gradient-to-r from-[#C41E3A] via-[#C41E3A]/90 to-[#C41E3A]" :
-                          "bg-gradient-to-r from-purple-700 via-purple-600 to-purple-700"
+                    result.character.faction === "촉" ? "bg-gradient-to-r from-green-700 via-green-600 to-green-700" :
+                      result.character.faction === "오" ? "bg-gradient-to-r from-[#C41E3A] via-[#C41E3A]/90 to-[#C41E3A]" :
+                        "bg-gradient-to-r from-purple-700 via-purple-600 to-purple-700"
                     } border-b-2 border-[#FFD700]/50`}>
                     {/* 장식 무늬 */}
                     <div className="absolute left-4 top-1/2 -translate-y-1/2 text-[#FFD700]/40 text-xl">◆</div>
@@ -444,14 +617,14 @@ export default function SamgukPage() {
                             {/* 금테 장식 프레임 */}
                             <div className="absolute -inset-1 bg-gradient-to-br from-yellow-400 via-amber-600 to-yellow-700 rounded opacity-80"></div>
                             <div className={`relative p-1 rounded ${result.character.faction === "위" ? "bg-gradient-to-br from-blue-800 to-blue-950" :
-                                result.character.faction === "촉" ? "bg-gradient-to-br from-green-800 to-green-950" :
-                                  result.character.faction === "오" ? "bg-gradient-to-br from-red-800 to-red-950" :
-                                    "bg-gradient-to-br from-purple-800 to-purple-950"
+                              result.character.faction === "촉" ? "bg-gradient-to-br from-green-800 to-green-950" :
+                                result.character.faction === "오" ? "bg-gradient-to-br from-red-800 to-red-950" :
+                                  "bg-gradient-to-br from-purple-800 to-purple-950"
                               }`}>
                               <div className={`w-20 h-20 sm:w-28 sm:h-28 rounded border-2 overflow-hidden ${result.character.faction === "위" ? "bg-gradient-to-br from-blue-900/80 to-blue-950/90 border-blue-400/70" :
-                                  result.character.faction === "촉" ? "bg-gradient-to-br from-green-900/80 to-green-950/90 border-green-400/70" :
-                                    result.character.faction === "오" ? "bg-gradient-to-br from-red-900/80 to-red-950/90 border-red-400/70" :
-                                      "bg-gradient-to-br from-purple-900/80 to-purple-950/90 border-purple-400/70"
+                                result.character.faction === "촉" ? "bg-gradient-to-br from-green-900/80 to-green-950/90 border-green-400/70" :
+                                  result.character.faction === "오" ? "bg-gradient-to-br from-red-900/80 to-red-950/90 border-red-400/70" :
+                                    "bg-gradient-to-br from-purple-900/80 to-purple-950/90 border-purple-400/70"
                                 }`} style={{ boxShadow: 'inset 0 0 20px rgba(0, 0, 0, 0.5)' }}>
                                 <img
                                   src={`/images/samguk/${result.character.name}.jpg`}
@@ -483,9 +656,9 @@ export default function SamgukPage() {
                       <div className="flex-1 text-center sm:text-left pt-4 sm:pt-2">
                         <div className="flex items-center justify-center sm:justify-start gap-2 mb-2">
                           <span className={`px-3 py-1 rounded-full text-sm font-bold shadow-lg ${result.character.faction === "위" ? "bg-gradient-to-r from-blue-600 to-blue-700 text-blue-100" :
-                              result.character.faction === "촉" ? "bg-gradient-to-r from-green-600 to-green-700 text-green-100" :
-                                result.character.faction === "오" ? "bg-gradient-to-r from-red-600 to-red-700 text-red-100" :
-                                  "bg-gradient-to-r from-purple-600 to-purple-700 text-purple-100"
+                            result.character.faction === "촉" ? "bg-gradient-to-r from-green-600 to-green-700 text-green-100" :
+                              result.character.faction === "오" ? "bg-gradient-to-r from-red-600 to-red-700 text-red-100" :
+                                "bg-gradient-to-r from-purple-600 to-purple-700 text-purple-100"
                             } border border-amber-400/30`}>
                             일치도 {result.similarity}%
                           </span>

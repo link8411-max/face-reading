@@ -3,9 +3,47 @@ import { NextRequest, NextResponse } from "next/server";
 
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY || "");
 
+let cachedModels: string[] = [];
+
+/**
+ * 실시간으로 사용 가능한 모델 리스트를 가져와 최적의 순서로 정렬합나다.
+ */
+async function getOptimizedModels() {
+  if (cachedModels.length > 0) return cachedModels;
+
+  try {
+    const key = process.env.GEMINI_API_KEY;
+    const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models?key=${key}`);
+    const data = await res.json();
+
+    if (!data.models) return ["gemini-1.5-flash", "gemini-2.0-flash"];
+
+    const available = data.models
+      .filter((m: any) => m.supportedGenerationMethods.includes("generateContent"))
+      .map((m: any) => m.name.replace("models/", ""));
+
+    const priorityOrder = [
+      "gemini-1.5-flash",
+      "gemini-2.0-flash",
+      "gemini-2.5-flash",
+      "gemini-2.0-flash-exp",
+      "gemini-1.5-flash-latest"
+    ];
+
+    cachedModels = priorityOrder.filter(p => available.includes(p));
+    if (cachedModels.length === 0 && available.length > 0) {
+      cachedModels = [available[0]];
+    }
+    return cachedModels.length > 0 ? cachedModels : ["gemini-1.5-flash"];
+  } catch (error) {
+    console.error("Model discovery failed:", error);
+    return ["gemini-1.5-flash"];
+  }
+}
+
 // 재시도 함수 (이미지 포함)
 async function tryGenerateWithImage(base64Image: string, prompt: string, maxRetries = 2) {
-  const models = ["gemini-2.0-flash", "gemini-2.5-flash"];
+  const models = await getOptimizedModels();
 
   for (const modelName of models) {
     for (let i = 0; i < maxRetries; i++) {
