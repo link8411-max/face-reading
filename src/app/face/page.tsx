@@ -163,20 +163,20 @@ export default function FacePage() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-stone-950 via-red-950 to-stone-950 text-white relative overflow-hidden">
-      {/* 배경 장식 */}
-      <div className="absolute inset-0 opacity-10 pointer-events-none">
-        <div className="absolute top-20 left-10 w-2 h-2 bg-amber-400 rounded-full" />
-        <div className="absolute top-40 right-16 w-1.5 h-1.5 bg-red-400 rounded-full" />
-        <div className="absolute top-72 left-1/4 w-1 h-1 bg-amber-300 rounded-full" />
-        <div className="absolute bottom-60 right-1/3 w-2 h-2 bg-red-300 rounded-full" />
-        <div className="absolute bottom-32 left-1/3 w-1.5 h-1.5 bg-amber-500 rounded-full" />
+    <div className="min-h-screen bg-gradient-to-b from-[#F5E6D3] via-[#E8D4C4] to-[#F5E6D3] text-[#5C4033] relative overflow-hidden">
+      {/* 민화 문양 배경 */}
+      <div className="absolute inset-0 opacity-20 pointer-events-none">
+        <div className="absolute top-20 left-10 w-3 h-3 bg-[#C41E3A] rounded-full" />
+        <div className="absolute top-40 right-16 w-2 h-2 bg-[#1E3A5F] rounded-full" />
+        <div className="absolute top-72 left-1/4 w-2.5 h-2.5 bg-[#FFD700] rounded-full" />
+        <div className="absolute bottom-60 right-1/3 w-3 h-3 bg-[#C41E3A] rounded-full" />
+        <div className="absolute bottom-32 left-1/3 w-2 h-2 bg-[#D4AF37] rounded-full" />
       </div>
 
       <main className="container mx-auto px-4 py-8 max-w-lg relative z-10">
         {/* Header */}
         <div className="flex items-center justify-between mb-6">
-          <Link href="/" className="text-amber-700/70 hover:text-amber-600 transition">
+          <Link href="/" className="text-[#C41E3A]/70 hover:text-[#C41E3A] transition">
             ← 돌아가기
           </Link>
           <span className="text-2xl">👤</span>
@@ -184,31 +184,31 @@ export default function FacePage() {
 
         <div className="text-center mb-8">
           <div className="flex justify-center items-center gap-2 mb-3">
-            <span className="text-amber-600/60">━━</span>
+            <span className="text-[#C41E3A]/70">━━</span>
             <span className="text-2xl">☯</span>
-            <span className="text-amber-600/60">━━</span>
+            <span className="text-[#C41E3A]/70">━━</span>
           </div>
-          <h1 className="text-3xl font-bold mb-2 text-transparent bg-clip-text bg-gradient-to-r from-amber-200 via-yellow-400 to-amber-200" style={{ textShadow: "0 0 30px rgba(251, 191, 36, 0.3)" }}>
+          <h1 className="text-3xl font-bold mb-2 text-[#C41E3A]" style={{ textShadow: "0 2px 8px rgba(196, 30, 58, 0.2)" }}>
             AI 관상 분석
           </h1>
-          <p className="text-amber-100/60 text-sm tracking-widest">
+          <p className="text-[#5C4033]/60 text-sm tracking-widest">
             전통 관상학 기반 얼굴 분석
           </p>
           <div className="flex justify-center items-center gap-2 mt-3">
-            <span className="text-red-800/60 text-xs">◆</span>
-            <span className="text-amber-600/40 text-xs">━━━━━</span>
-            <span className="text-red-800/60 text-xs">◆</span>
+            <span className="text-[#FFD700]/80 text-xs">◆</span>
+            <span className="text-[#C41E3A]/60 text-xs">━━━━━</span>
+            <span className="text-[#FFD700]/80 text-xs">◆</span>
           </div>
         </div>
 
         {/* 하루 1회 제한 안내 */}
         {!dailyLimit.canUse && !result && (
-          <div className="bg-gradient-to-r from-purple-900/50 to-indigo-900/50 backdrop-blur-lg rounded-xl p-4 mb-6 border border-purple-500/30 text-center">
-            <p className="text-purple-200 font-medium">🔮 오늘의 AI 분석을 이미 사용하셨습니다</p>
-            <p className="text-purple-300/70 text-sm mt-1">{dailyLimit.remainingTime}</p>
+          <div className="bg-white/70 backdrop-blur-sm rounded-2xl p-4 mb-6 border-2 border-[#1E3A5F]/30 text-center">
+            <p className="text-[#1E3A5F] font-medium">🔮 오늘의 AI 분석을 이미 사용하셨습니다</p>
+            <p className="text-[#5C4033]/70 text-sm mt-1">{dailyLimit.remainingTime}</p>
             <Link
               href="/face2"
-              className="inline-block mt-3 px-4 py-2 bg-amber-600/80 hover:bg-amber-500 rounded-lg text-sm font-medium transition"
+              className="inline-block mt-3 px-4 py-2 bg-gradient-to-r from-[#C41E3A] to-[#D4AF37] hover:opacity-90 rounded-lg text-sm font-medium transition text-white"
             >
               무료 관상 분석 이용하기 →
             </Link>
@@ -217,9 +217,9 @@ export default function FacePage() {
 
         {/* Upload Section */}
         {!result && (
-          <div className="bg-gradient-to-b from-stone-900/80 to-red-950/50 backdrop-blur-lg rounded-2xl p-6 mb-6 border border-amber-600/20">
+          <div className="bg-white/60 backdrop-blur-sm rounded-3xl p-6 mb-6 border-2 border-[#C41E3A]/30 shadow-lg">
             <div
-              className="border-2 border-dashed border-amber-600/30 rounded-xl p-8 text-center cursor-pointer hover:border-amber-500/50 transition"
+              className="border-2 border-dashed border-[#C41E3A]/30 rounded-xl p-8 text-center cursor-pointer hover:border-[#C41E3A]/50 transition"
               onClick={() => fileInputRef.current?.click()}
             >
               {image ? (
@@ -231,8 +231,8 @@ export default function FacePage() {
               ) : (
                 <div>
                   <span className="text-5xl mb-4 block">📷</span>
-                  <p className="text-amber-100/80">얼굴 사진을 업로드하세요</p>
-                  <p className="text-stone-500 text-sm mt-2">
+                  <p className="text-[#5C4033]">얼굴 사진을 업로드하세요</p>
+                  <p className="text-[#5C4033]/60 text-sm mt-2">
                     정면 얼굴이 잘 보이는 사진이 좋아요
                   </p>
                 </div>
@@ -250,14 +250,14 @@ export default function FacePage() {
               <div className="flex gap-3 mt-4">
                 <button
                   onClick={resetAll}
-                  className="flex-1 py-3 bg-stone-800/50 border border-amber-600/20 rounded-xl font-bold hover:bg-stone-700/50 transition text-amber-100/80"
+                  className="flex-1 py-3 bg-white/80 border-2 border-[#C41E3A]/30 rounded-xl font-bold hover:bg-white transition text-[#5C4033]"
                 >
                   다시 선택
                 </button>
                 <button
                   onClick={analyzeImage}
                   disabled={loading}
-                  className="flex-1 py-3 bg-gradient-to-r from-red-700 to-amber-600 rounded-xl font-bold hover:from-red-600 hover:to-amber-500 transition disabled:opacity-50 text-amber-100"
+                  className="flex-1 py-3 bg-gradient-to-r from-[#C41E3A] to-[#D4AF37] rounded-xl font-bold hover:opacity-90 transition disabled:opacity-50 text-white"
                 >
                   {loading ? (
                     <span className="flex items-center justify-center gap-2">
@@ -276,9 +276,9 @@ export default function FacePage() {
         {result && (
           <div className="space-y-4 animate-fade-in">
             {/* 캡쳐 영역 시작 */}
-            <div ref={resultRef} className="space-y-4 bg-stone-900 p-4 -m-4">
+            <div ref={resultRef} className="space-y-4 bg-[#F5E6D3] p-4 -m-4">
             {/* 기본 정보 + 사진 */}
-            <div className="bg-gradient-to-r from-red-900/40 to-amber-900/40 backdrop-blur-lg rounded-2xl p-6 border border-amber-600/20">
+            <div className="bg-white/70 backdrop-blur-sm rounded-3xl p-6 border-2 border-[#C41E3A]/30 shadow-lg">
               <div className="flex gap-4 items-start">
                 {/* 업로드한 사진 */}
                 {image && (
@@ -286,16 +286,16 @@ export default function FacePage() {
                     <img
                       src={image}
                       alt="분석된 얼굴"
-                      className="w-24 h-24 object-cover rounded-xl border-2 border-amber-500/50"
+                      className="w-24 h-24 object-cover rounded-xl border-2 border-[#C41E3A]/50"
                     />
                   </div>
                 )}
                 <div className="flex-1 text-center">
-                  <span className="inline-block px-4 py-1 bg-gradient-to-r from-red-700 to-amber-600 text-amber-100 rounded-full text-sm font-bold mb-2">
+                  <span className="inline-block px-4 py-1 bg-gradient-to-r from-[#C41E3A] to-[#D4AF37] text-white rounded-full text-sm font-bold mb-2">
                     {result.type}
                   </span>
-                  <h2 className="text-xl font-bold mb-2 text-amber-100">{result.title}</h2>
-                  <p className="text-stone-300 text-sm leading-relaxed">
+                  <h2 className="text-xl font-bold mb-2 text-[#5C4033]">{result.title}</h2>
+                  <p className="text-[#5C4033]/80 text-sm leading-relaxed">
                     {result.summary}
                   </p>
                 </div>
@@ -303,71 +303,71 @@ export default function FacePage() {
             </div>
 
             {/* 얼굴 부위별 분석 */}
-            <div className="bg-gradient-to-b from-stone-900/80 to-red-950/50 backdrop-blur-lg rounded-2xl p-6 border border-amber-600/20">
-              <h3 className="text-lg font-bold mb-4 text-amber-100">부위별 관상</h3>
+            <div className="bg-white/60 backdrop-blur-sm rounded-3xl p-6 border-2 border-[#FFD700]/40 shadow-lg">
+              <h3 className="text-lg font-bold mb-4 text-[#C41E3A]">부위별 관상</h3>
               <div className="space-y-3">
                 {Object.entries(result.faceFeatures).map(([부위, 설명]) => (
-                  <div key={부위} className="bg-stone-900/50 rounded-xl p-3 border border-amber-600/10">
-                    <span className="text-amber-400 font-medium">{부위}</span>
-                    <p className="text-sm text-stone-300 mt-1">{설명}</p>
+                  <div key={부위} className="bg-white/70 rounded-xl p-3 border border-[#C41E3A]/20">
+                    <span className="text-[#C41E3A] font-medium">{부위}</span>
+                    <p className="text-sm text-[#5C4033]/80 mt-1">{설명}</p>
                   </div>
                 ))}
               </div>
             </div>
 
             {/* 시기별 운세 */}
-            <div className="bg-gradient-to-b from-stone-900/80 to-red-950/50 backdrop-blur-lg rounded-2xl p-6 border border-amber-600/20">
-              <h3 className="text-lg font-bold mb-4 text-amber-100">시기별 운세</h3>
+            <div className="bg-white/60 backdrop-blur-sm rounded-3xl p-6 border-2 border-[#1E3A5F]/30 shadow-lg">
+              <h3 className="text-lg font-bold mb-4 text-[#C41E3A]">시기별 운세</h3>
               <div className="space-y-4">
                 {Object.entries(result.lifeFortune).map(([시기, 데이터]) => (
                   <div
                     key={시기}
-                    className={`rounded-xl p-4 border ${
+                    className={`rounded-xl p-4 border-2 ${
                       시기 === "초년운"
-                        ? "bg-emerald-900/20 border-emerald-600/20"
+                        ? "bg-green-50/80 border-green-600/30"
                         : 시기 === "중년운"
-                        ? "bg-amber-900/20 border-amber-600/20"
-                        : "bg-red-900/20 border-red-600/20"
+                        ? "bg-[#FFD700]/10 border-[#FFD700]/40"
+                        : "bg-[#C41E3A]/10 border-[#C41E3A]/30"
                     }`}
                   >
                     <div className="flex justify-between items-center mb-2">
                       <div>
-                        <span className="font-bold text-amber-100">
+                        <span className="font-bold text-[#5C4033]">
                           {시기 === "초년운" && "🌱 "}
                           {시기 === "중년운" && "🌳 "}
                           {시기 === "말년운" && "🍂 "}
                           {시기}
                         </span>
-                        <span className="text-xs text-stone-400 ml-2">
+                        <span className="text-xs text-[#5C4033]/60 ml-2">
                           ({데이터.period})
                         </span>
                       </div>
-                      <span className="text-amber-400">
+                      <span className="text-[#FFD700]">
                         {renderStars(데이터.rating)}
                       </span>
                     </div>
-                    <p className="text-sm text-stone-300">{데이터.description}</p>
+                    <p className="text-sm text-[#5C4033]/80">{데이터.description}</p>
                   </div>
                 ))}
               </div>
             </div>
 
             {/* 세부 운세 */}
-            <div className="bg-gradient-to-b from-stone-900/80 to-red-950/50 backdrop-blur-lg rounded-2xl p-6 border border-amber-600/20">
-              <h3 className="text-lg font-bold mb-4 text-amber-100">운세 지수</h3>
+            <div className="bg-white/60 backdrop-blur-sm rounded-3xl p-6 border-2 border-[#FFD700]/40 shadow-lg">
+              <h3 className="text-lg font-bold mb-4 text-[#C41E3A]">운세 지수</h3>
               <div className="space-y-3">
                 {Object.entries(result.categories).map(([항목, 점수]) => (
                   <div key={항목} className="flex items-center gap-3">
-                    <span className="w-20 text-sm text-amber-100">
-                      <span className="text-amber-400">{운아이콘[항목]}</span> {항목}
+                    <span className="w-20 text-sm text-[#5C4033]">
+                      <span>{운아이콘[항목]}</span> {항목}
                     </span>
-                    <div className="flex-1 bg-stone-800/50 rounded-full h-3 overflow-hidden">
+                    <div className="flex-1 bg-white/80 rounded-full h-3 overflow-hidden border border-[#C41E3A]/20">
                       <div
-                        className="h-full bg-gradient-to-r from-red-600 to-amber-500 rounded-full transition-all duration-500"
+                        className="h-full bg-gradient-to-r from-[#C41E3A] to-[#D4AF37] rounded-full transition-all duration-500"
                         style={{ width: `${점수 * 20}%` }}
                       />
                     </div>
-                    <span className="text-amber-400 text-sm w-16 text-right">
+                    <span className="text-[#FFD700] text-sm w-16 text-right">
                       {renderStars(점수)}
                     </span>
                   </div>
@@ -376,13 +376,13 @@ export default function FacePage() {
             </div>
 
             {/* 성격 특성 */}
-            <div className="bg-gradient-to-b from-stone-900/80 to-red-950/50 backdrop-blur-lg rounded-2xl p-6 border border-amber-600/20">
-              <h3 className="text-lg font-bold mb-4 text-amber-100">성격 특성</h3>
+            <div className="bg-white/60 backdrop-blur-sm rounded-3xl p-6 border-2 border-[#1E3A5F]/30 shadow-lg">
+              <h3 className="text-lg font-bold mb-4 text-[#C41E3A]">성격 특성</h3>
               <div className="flex flex-wrap gap-2">
                 {result.personality.map((특성, index) => (
                   <span
                     key={index}
-                    className="px-3 py-1 bg-amber-900/30 text-amber-300/80 rounded-full text-sm border border-amber-600/20"
+                    className="px-3 py-1 bg-[#FFD700]/15 text-[#5C4033] rounded-full text-sm border border-[#FFD700]/40"
                   >
                     {특성}
                   </span>
@@ -391,40 +391,40 @@ export default function FacePage() {
             </div>
 
             {/* 어울리는 직업 */}
-            <div className="bg-gradient-to-b from-stone-900/80 to-red-950/50 backdrop-blur-lg rounded-2xl p-6 border border-amber-600/20">
-              <h3 className="text-lg font-bold mb-3 text-amber-100">어울리는 직업</h3>
-              <p className="text-stone-300">{result.career}</p>
+            <div className="bg-white/60 backdrop-blur-sm rounded-3xl p-6 border-2 border-[#C41E3A]/30 shadow-lg">
+              <h3 className="text-lg font-bold mb-3 text-[#C41E3A]">어울리는 직업</h3>
+              <p className="text-[#5C4033]">{result.career}</p>
             </div>
 
             {/* 행운 요소 & 조언 */}
-            <div className="bg-gradient-to-r from-red-900/40 to-amber-900/40 backdrop-blur-lg rounded-2xl p-6 border border-amber-600/20">
-              <h3 className="text-lg font-bold mb-4 text-amber-100">행운 요소</h3>
+            <div className="bg-white/70 backdrop-blur-sm rounded-3xl p-6 border-2 border-[#FFD700]/40 shadow-lg">
+              <h3 className="text-lg font-bold mb-4 text-[#C41E3A]">행운 요소</h3>
               <div className="grid grid-cols-2 gap-3 mb-4">
-                <div className="bg-stone-900/50 rounded-xl p-3 text-center border border-amber-600/10">
-                  <p className="text-xs text-stone-400">행운의 숫자</p>
-                  <p className="text-2xl font-bold text-amber-400">
+                <div className="bg-white/80 rounded-xl p-3 text-center border border-[#FFD700]/30">
+                  <p className="text-xs text-[#5C4033]/60">행운의 숫자</p>
+                  <p className="text-2xl font-bold text-[#C41E3A]">
                     {result.luckyNumber}
                   </p>
                 </div>
-                <div className="bg-stone-900/50 rounded-xl p-3 text-center border border-amber-600/10">
-                  <p className="text-xs text-stone-400">행운의 색상</p>
-                  <p className="text-xl font-bold text-amber-100">{result.luckyColor}</p>
+                <div className="bg-white/80 rounded-xl p-3 text-center border border-[#FFD700]/30">
+                  <p className="text-xs text-[#5C4033]/60">행운의 색상</p>
+                  <p className="text-xl font-bold text-[#5C4033]">{result.luckyColor}</p>
                 </div>
               </div>
-              <div className="bg-stone-900/50 rounded-xl p-4 text-center border border-amber-600/20">
-                <p className="text-xs text-stone-500 mb-1">관상 조언</p>
-                <p className="text-amber-300 font-medium">"{result.advice}"</p>
+              <div className="bg-white/80 rounded-xl p-4 text-center border border-[#C41E3A]/30">
+                <p className="text-xs text-[#5C4033]/60 mb-1">관상 조언</p>
+                <p className="text-[#C41E3A] font-medium">"{result.advice}"</p>
               </div>
             </div>
 
             {/* 주의사항 */}
             {result.cautions && result.cautions.length > 0 && (
-              <div className="bg-gradient-to-b from-stone-900/80 to-orange-950/50 backdrop-blur-lg rounded-2xl p-6 border border-orange-600/30">
-                <h3 className="text-lg font-bold mb-4 text-orange-200">⚠️ 주의사항</h3>
+              <div className="bg-white/60 backdrop-blur-sm rounded-3xl p-6 border-2 border-orange-500/40 shadow-lg">
+                <h3 className="text-lg font-bold mb-4 text-orange-600">⚠️ 주의사항</h3>
                 <div className="space-y-2">
                   {result.cautions.map((주의, index) => (
-                    <div key={index} className="bg-orange-900/20 rounded-xl p-3 border border-orange-600/20">
-                      <p className="text-sm text-orange-100/90 leading-relaxed">{주의}</p>
+                    <div key={index} className="bg-orange-50/80 rounded-xl p-3 border border-orange-400/30">
+                      <p className="text-sm text-[#5C4033] leading-relaxed">{주의}</p>
                     </div>
                   ))}
                 </div>
@@ -433,7 +433,7 @@ export default function FacePage() {
 
             {/* Coupang Partners Banner */}
             <div className="mt-2">
-              <p className="text-center text-xs text-stone-500 mb-2">추천 상품</p>
+              <p className="text-center text-xs text-[#5C4033]/60 mb-2">추천 상품</p>
               <div className="flex justify-center">
                 <iframe
                   src="https://ads-partners.coupang.com/widgets.html?id=950676&template=carousel&trackingCode=AF6497036&subId=&width=450&height=130&tsource="
@@ -445,7 +445,7 @@ export default function FacePage() {
                   className="rounded-lg max-w-full"
                 />
               </div>
-              <p className="text-center text-stone-700 text-[10px] mt-2">
+              <p className="text-center text-[#5C4033]/50 text-[10px] mt-2">
                 쿠팡 파트너스 활동의 일환으로 일정액의 수수료를 제공받습니다
               </p>
             </div>
@@ -457,14 +457,14 @@ export default function FacePage() {
               <button
                 onClick={() => download(getShareOptions())}
                 disabled={isCapturing}
-                className="flex-1 py-3 bg-gradient-to-r from-emerald-700 to-emerald-600 rounded-xl font-bold text-center hover:from-emerald-600 hover:to-emerald-500 transition text-white disabled:opacity-50 flex items-center justify-center gap-2"
+                className="flex-1 py-3 bg-gradient-to-r from-green-600 to-green-500 rounded-xl font-bold text-center hover:opacity-90 transition text-white disabled:opacity-50 flex items-center justify-center gap-2"
               >
                 {isCapturing ? "⏳ 캡쳐중..." : "📥 이미지 저장"}
               </button>
               <button
                 onClick={() => share(getShareOptions())}
                 disabled={isCapturing}
-                className="flex-1 py-3 bg-gradient-to-r from-blue-700 to-blue-600 rounded-xl font-bold text-center hover:from-blue-600 hover:to-blue-500 transition text-white disabled:opacity-50 flex items-center justify-center gap-2"
+                className="flex-1 py-3 bg-gradient-to-r from-[#1E3A5F] to-[#1E3A5F]/80 rounded-xl font-bold text-center hover:opacity-90 transition text-white disabled:opacity-50 flex items-center justify-center gap-2"
               >
                 {isCapturing ? "⏳ 캡쳐중..." : "📤 내 관상 친구와 비교하기"}
               </button>
@@ -474,13 +474,13 @@ export default function FacePage() {
             <div className="flex gap-3">
               <button
                 onClick={resetAll}
-                className="flex-1 py-3 bg-stone-800/50 border border-amber-600/20 rounded-xl font-bold hover:bg-stone-700/50 transition text-amber-100/80"
+                className="flex-1 py-3 bg-white/80 border-2 border-[#C41E3A]/30 rounded-xl font-bold hover:bg-white transition text-[#5C4033]"
               >
                 다시하기
               </button>
               <Link
                 href="/fortune"
-                className="flex-1 py-3 bg-gradient-to-r from-red-700 to-amber-600 rounded-xl font-bold text-center hover:from-red-600 hover:to-amber-500 transition text-amber-100"
+                className="flex-1 py-3 bg-gradient-to-r from-[#C41E3A] to-[#D4AF37] rounded-xl font-bold text-center hover:opacity-90 transition text-white"
               >
                 운세 보기 🔮
               </Link>
@@ -489,7 +489,7 @@ export default function FacePage() {
         )}
 
         {/* Footer */}
-        <p className="text-center text-stone-600 text-xs mt-8">
+        <p className="text-center text-[#5C4033]/50 text-xs mt-8">
           ⚠️ 재미로만 봐주세요! 전통 관상학을 참고했습니다.
         </p>
       </main>

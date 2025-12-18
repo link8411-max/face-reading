@@ -13,6 +13,42 @@ git add . && git commit -m "메시지" && git push
 - **스타일**: Tailwind CSS 4
 - **AI**: Google Gemini API
 - **얼굴인식**: @vladmandic/face-api (face-api.js 포크)
+- **OG 이미지**: @vercel/og (동적 생성)
+
+---
+
+## 디자인 시스템 (민화 스타일)
+
+전체 UI가 한국 전통 민화 스타일로 통일됨
+
+### 색상 팔레트 (오방색 기반)
+```
+배경 (한지):     #F5E6D3, #E8D4C4
+빨강 (오방색):   #C41E3A
+파랑:           #1E3A5F
+금색:           #FFD700, #D4AF37
+갈색 (텍스트):   #5C4033
+```
+
+### 공통 스타일
+```css
+/* 배경 */
+bg-gradient-to-b from-[#F5E6D3] via-[#E8D4C4] to-[#F5E6D3]
+
+/* 카드 */
+bg-white/60 backdrop-blur-sm rounded-3xl border-2 border-[#C41E3A]/30 shadow-lg
+
+/* 버튼 (주) */
+bg-gradient-to-r from-[#C41E3A] to-[#D4AF37] text-white
+
+/* 태그 */
+bg-[#C41E3A]/15 text-[#C41E3A] rounded-full border border-[#C41E3A]/30
+```
+
+### OG 이미지 API
+- 경로: `/api/og`
+- 파라미터: `?title=제목&subtitle=부제&icon=이모지`
+- 각 페이지 layout.tsx에 OG 이미지 URL 설정됨
 
 ---
 
@@ -32,7 +68,8 @@ src/
 │   └── api/
 │       ├── analyze/route.ts  # AI 관상 API (Gemini)
 │       ├── samguk/route.ts   # 삼국지 API (Gemini)
-│       └── fortune/route.ts  # 운세 API
+│       ├── fortune/route.ts  # 운세 API
+│       └── og/route.tsx      # OG 이미지 동적 생성
 ├── lib/
 │   ├── faceDetection.ts      # face-api.js 얼굴 감지 (68 랜드마크)
 │   ├── faceReadingDB.ts      # 관상 해석 데이터베이스

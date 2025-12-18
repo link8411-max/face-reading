@@ -270,20 +270,20 @@ export default function SamgukPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-stone-950 via-amber-950/30 to-stone-950 text-white relative overflow-hidden">
-      {/* 배경 - 고서/두루마리 느낌 */}
-      <div className="absolute inset-0 opacity-5 pointer-events-none">
-        <div className="absolute top-10 left-10 text-6xl text-amber-200">魏</div>
-        <div className="absolute top-20 right-20 text-6xl text-green-200">蜀</div>
-        <div className="absolute bottom-40 left-20 text-6xl text-red-200">吳</div>
-        <div className="absolute bottom-20 right-10 text-4xl text-amber-200">三國志</div>
-        <div className="absolute top-1/2 left-1/3 text-3xl text-amber-200/50">天下</div>
+    <div className="min-h-screen bg-gradient-to-b from-[#F5E6D3] via-[#E8D4C4] to-[#F5E6D3] text-[#5C4033] relative overflow-hidden">
+      {/* 민화 배경 - 고서/두루마리 느낌 */}
+      <div className="absolute inset-0 opacity-10 pointer-events-none">
+        <div className="absolute top-10 left-10 text-6xl text-[#1E3A5F]">魏</div>
+        <div className="absolute top-20 right-20 text-6xl text-green-700">蜀</div>
+        <div className="absolute bottom-40 left-20 text-6xl text-[#C41E3A]">吳</div>
+        <div className="absolute bottom-20 right-10 text-4xl text-[#D4AF37]">三國志</div>
+        <div className="absolute top-1/2 left-1/3 text-3xl text-[#FFD700]/60">天下</div>
       </div>
 
       <main className="container mx-auto px-4 py-8 max-w-lg relative z-10">
         {/* Header */}
         <div className="flex items-center justify-between mb-6">
-          <Link href="/" className="text-amber-700/70 hover:text-amber-600 transition">
+          <Link href="/" className="text-[#C41E3A]/70 hover:text-[#C41E3A] transition">
             ← 돌아가기
           </Link>
           <span className="text-2xl">⚔️</span>
@@ -291,41 +291,41 @@ export default function SamgukPage() {
 
         <div className="text-center mb-8">
           <div className="flex justify-center items-center gap-2 mb-3">
-            <span className="text-amber-600/60">━━</span>
+            <span className="text-[#C41E3A]/70">━━</span>
             <span className="text-2xl">🏯</span>
-            <span className="text-amber-600/60">━━</span>
+            <span className="text-[#C41E3A]/70">━━</span>
           </div>
-          <h1 className="text-3xl font-bold mb-2 text-transparent bg-clip-text bg-gradient-to-r from-amber-200 via-yellow-400 to-amber-200" style={{ textShadow: "0 0 30px rgba(251, 191, 36, 0.3)" }}>
+          <h1 className="text-3xl font-bold mb-2 text-[#C41E3A]" style={{ textShadow: "0 2px 8px rgba(196, 30, 58, 0.2)" }}>
             삼국지 닮은꼴
           </h1>
-          <p className="text-amber-100/60 text-sm tracking-widest">
+          <p className="text-[#5C4033]/60 text-sm tracking-widest">
             나는 어떤 삼국지 인물일까?
           </p>
           <div className="flex justify-center items-center gap-2 mt-3">
-            <span className="text-red-800/60 text-xs">◆</span>
-            <span className="text-amber-600/40 text-xs">━━━━━</span>
-            <span className="text-red-800/60 text-xs">◆</span>
+            <span className="text-[#FFD700]/80 text-xs">◆</span>
+            <span className="text-[#C41E3A]/60 text-xs">━━━━━</span>
+            <span className="text-[#FFD700]/80 text-xs">◆</span>
           </div>
         </div>
 
         {/* Upload Section */}
         {!result && (
-          <div className="bg-gradient-to-b from-stone-900/80 to-amber-950/50 backdrop-blur-lg rounded-2xl p-6 mb-6 border border-amber-600/30 shadow-lg shadow-amber-900/20">
+          <div className="bg-white/60 backdrop-blur-sm rounded-3xl p-6 mb-6 border-2 border-[#C41E3A]/30 shadow-lg">
             <div
-              className="border-2 border-dashed border-amber-600/40 rounded-xl p-8 text-center cursor-pointer hover:border-amber-500/60 transition bg-stone-900/30"
+              className="border-2 border-dashed border-[#C41E3A]/30 rounded-xl p-8 text-center cursor-pointer hover:border-[#C41E3A]/50 transition"
               onClick={() => fileInputRef.current?.click()}
             >
               {image ? (
                 <img
                   src={image}
                   alt="업로드된 이미지"
-                  className="max-h-64 mx-auto rounded-lg border-2 border-amber-500/30"
+                  className="max-h-64 mx-auto rounded-lg border-2 border-[#C41E3A]/50"
                 />
               ) : (
                 <div>
                   <span className="text-5xl mb-4 block">📸</span>
-                  <p className="text-amber-100/80">얼굴 사진을 업로드하세요</p>
-                  <p className="text-stone-500 text-sm mt-2">
+                  <p className="text-[#5C4033]">얼굴 사진을 업로드하세요</p>
+                  <p className="text-[#5C4033]/60 text-sm mt-2">
                     당신과 닮은 삼국지 영웅을 찾아드립니다
                   </p>
                 </div>
@@ -343,14 +343,14 @@ export default function SamgukPage() {
               <div className="flex gap-3 mt-4">
                 <button
                   onClick={resetAll}
-                  className="flex-1 py-3 bg-stone-800/50 border border-amber-600/30 rounded-xl font-bold hover:bg-stone-700/50 transition text-amber-100/80"
+                  className="flex-1 py-3 bg-white/80 border-2 border-[#C41E3A]/30 rounded-xl font-bold hover:bg-white transition text-[#5C4033]"
                 >
                   다시 선택
                 </button>
                 <button
                   onClick={analyzeImage}
                   disabled={loading}
-                  className="flex-1 py-3 bg-gradient-to-r from-amber-700 to-yellow-600 rounded-xl font-bold hover:from-amber-600 hover:to-yellow-500 transition disabled:opacity-50 text-stone-900"
+                  className="flex-1 py-3 bg-gradient-to-r from-[#C41E3A] to-[#D4AF37] rounded-xl font-bold hover:opacity-90 transition disabled:opacity-50 text-white"
                 >
                   {loading ? (
                     <span className="flex items-center justify-center gap-2">
@@ -369,30 +369,30 @@ export default function SamgukPage() {
         {result && (
           <div className="space-y-4 animate-fade-in">
             {/* 캡쳐 영역 시작 */}
-            <div ref={resultRef} className="space-y-4 bg-stone-900 p-4 -m-4">
-            {/* 메인 결과 카드 - 코에이 스타일 */}
+            <div ref={resultRef} className="space-y-4 bg-[#F5E6D3] p-4 -m-4">
+            {/* 메인 결과 카드 - 민화 스타일 */}
             <div className="relative">
               {/* 외곽 금테 프레임 */}
-              <div className="absolute -inset-1 bg-gradient-to-br from-amber-400 via-yellow-600 to-amber-800 rounded-2xl opacity-75 blur-sm"></div>
+              <div className="absolute -inset-1 bg-gradient-to-br from-[#FFD700] via-[#D4AF37] to-[#FFD700] rounded-3xl opacity-60 blur-sm"></div>
 
-              <div className={`relative bg-gradient-to-b ${getFactionBgClass(result.character.faction)} backdrop-blur-lg rounded-2xl border-4 border-double shadow-2xl overflow-hidden`}
+              <div className={`relative bg-white/80 backdrop-blur-sm rounded-3xl border-2 shadow-lg overflow-hidden`}
                 style={{
-                  borderImage: 'linear-gradient(135deg, #fbbf24, #92400e, #fbbf24) 1',
-                  boxShadow: '0 0 30px rgba(251, 191, 36, 0.3), inset 0 0 20px rgba(0, 0, 0, 0.5)'
+                  borderColor: '#C41E3A',
+                  boxShadow: '0 4px 20px rgba(196, 30, 58, 0.2)'
                 }}>
-                {/* 상단 세력 배너 - 코에이 스타일 */}
+                {/* 상단 세력 배너 - 민화 스타일 */}
                 <div className={`py-3 text-center relative ${
-                  result.character.faction === "위" ? "bg-gradient-to-r from-blue-950 via-blue-800 to-blue-950" :
-                  result.character.faction === "촉" ? "bg-gradient-to-r from-green-950 via-green-800 to-green-950" :
-                  result.character.faction === "오" ? "bg-gradient-to-r from-red-950 via-red-800 to-red-950" :
-                  "bg-gradient-to-r from-purple-950 via-purple-800 to-purple-950"
-                } border-b-2 border-amber-600/50`}>
+                  result.character.faction === "위" ? "bg-gradient-to-r from-[#1E3A5F] via-[#1E3A5F]/90 to-[#1E3A5F]" :
+                  result.character.faction === "촉" ? "bg-gradient-to-r from-green-700 via-green-600 to-green-700" :
+                  result.character.faction === "오" ? "bg-gradient-to-r from-[#C41E3A] via-[#C41E3A]/90 to-[#C41E3A]" :
+                  "bg-gradient-to-r from-purple-700 via-purple-600 to-purple-700"
+                } border-b-2 border-[#FFD700]/50`}>
                   {/* 장식 무늬 */}
-                  <div className="absolute left-4 top-1/2 -translate-y-1/2 text-amber-400/30 text-xl">◆</div>
-                  <div className="absolute right-4 top-1/2 -translate-y-1/2 text-amber-400/30 text-xl">◆</div>
+                  <div className="absolute left-4 top-1/2 -translate-y-1/2 text-[#FFD700]/40 text-xl">◆</div>
+                  <div className="absolute right-4 top-1/2 -translate-y-1/2 text-[#FFD700]/40 text-xl">◆</div>
 
                   <span className="text-white font-bold tracking-[0.3em] text-lg drop-shadow-lg" style={{
-                    textShadow: '2px 2px 4px rgba(0, 0, 0, 0.8)'
+                    textShadow: '2px 2px 4px rgba(0, 0, 0, 0.5)'
                   }}>
                     {result.character.faction === "위" ? "━ 魏 ━" :
                      result.character.faction === "촉" ? "━ 蜀 ━" :
@@ -483,30 +483,30 @@ export default function SamgukPage() {
                           일치도 {result.similarity}%
                         </span>
                       </div>
-                      <h2 className="text-2xl sm:text-3xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-amber-200 via-yellow-400 to-amber-200 mb-1" style={{
-                        textShadow: '0 0 20px rgba(251, 191, 36, 0.3)'
+                      <h2 className="text-2xl sm:text-3xl font-bold text-[#C41E3A] mb-1" style={{
+                        textShadow: '0 2px 8px rgba(196, 30, 58, 0.2)'
                       }}>
                         {result.character.name}
                       </h2>
-                      <p className="text-sm text-amber-300/80 mb-1">{result.character.hanja}</p>
-                      <p className="text-xs text-amber-200/70 bg-amber-950/30 px-2 py-1 rounded inline-block border border-amber-700/30">
+                      <p className="text-sm text-[#5C4033]/80 mb-1">{result.character.hanja}</p>
+                      <p className="text-xs text-[#5C4033] bg-[#FFD700]/20 px-2 py-1 rounded inline-block border border-[#FFD700]/40">
                         {result.character.role}
                       </p>
                     </div>
                   </div>
 
-                  {/* 닮은 이유 - 두루마리 스타일 */}
+                  {/* 닮은 이유 - 민화 스타일 */}
                   <div className="mt-6 relative">
-                    <div className="absolute -inset-0.5 bg-gradient-to-r from-amber-600/20 via-amber-500/30 to-amber-600/20 rounded-xl blur"></div>
-                    <div className="relative p-4 bg-gradient-to-br from-stone-900/90 to-amber-950/80 rounded-xl border-2 border-amber-600/40 shadow-inner">
+                    <div className="absolute -inset-0.5 bg-gradient-to-r from-[#FFD700]/20 via-[#D4AF37]/30 to-[#FFD700]/20 rounded-xl blur"></div>
+                    <div className="relative p-4 bg-white/70 backdrop-blur-sm rounded-xl border-2 border-[#C41E3A]/30 shadow-md">
                       {/* 두루마리 장식 */}
-                      <div className="absolute top-2 left-2 text-amber-600/20 text-xs">◈</div>
-                      <div className="absolute top-2 right-2 text-amber-600/20 text-xs">◈</div>
-                      <div className="absolute bottom-2 left-2 text-amber-600/20 text-xs">◈</div>
-                      <div className="absolute bottom-2 right-2 text-amber-600/20 text-xs">◈</div>
+                      <div className="absolute top-2 left-2 text-[#FFD700]/30 text-xs">◈</div>
+                      <div className="absolute top-2 right-2 text-[#FFD700]/30 text-xs">◈</div>
+                      <div className="absolute bottom-2 left-2 text-[#FFD700]/30 text-xs">◈</div>
+                      <div className="absolute bottom-2 right-2 text-[#FFD700]/30 text-xs">◈</div>
 
-                      <p className="text-xs text-amber-400 mb-2 font-bold tracking-wider">📜 관상 분석</p>
-                      <p className="text-sm text-stone-200 leading-relaxed relative z-10">
+                      <p className="text-xs text-[#C41E3A] mb-2 font-bold tracking-wider">📜 관상 분석</p>
+                      <p className="text-sm text-[#5C4033] leading-relaxed relative z-10">
                         {result.matchReason}
                       </p>
                     </div>
@@ -515,32 +515,26 @@ export default function SamgukPage() {
               </div>
             </div>
 
-            {/* 능력치 - 코에이 스타일 */}
+            {/* 능력치 - 민화 스타일 */}
             <div className="relative">
               {/* 외곽 금테 프레임 */}
-              <div className="absolute -inset-1 bg-gradient-to-br from-amber-500 via-yellow-700 to-amber-900 rounded-2xl opacity-60 blur-sm"></div>
+              <div className="absolute -inset-1 bg-gradient-to-br from-[#FFD700] via-[#D4AF37] to-[#FFD700] rounded-3xl opacity-50 blur-sm"></div>
 
-              <div className="relative bg-gradient-to-b from-stone-900/95 to-amber-950/80 backdrop-blur-lg rounded-2xl p-6 border-4 border-double shadow-2xl overflow-hidden"
+              <div className="relative bg-white/70 backdrop-blur-sm rounded-3xl p-6 border-2 shadow-lg overflow-hidden"
                 style={{
-                  borderImage: 'linear-gradient(135deg, #f59e0b, #78350f, #f59e0b) 1',
-                  boxShadow: '0 0 25px rgba(217, 119, 6, 0.3), inset 0 0 30px rgba(0, 0, 0, 0.6)'
+                  borderColor: '#FFD700',
+                  boxShadow: '0 4px 20px rgba(255, 215, 0, 0.3)'
                 }}>
-                {/* 두루마리 배경 효과 */}
-                <div className="absolute inset-0 opacity-5">
-                  <div className="absolute top-2 left-2 text-4xl text-amber-200">武</div>
-                  <div className="absolute top-2 right-2 text-4xl text-amber-200">智</div>
-                  <div className="absolute bottom-2 left-2 text-4xl text-amber-200">德</div>
-                  <div className="absolute bottom-2 right-2 text-4xl text-amber-200">統</div>
+                {/* 민화 배경 효과 */}
+                <div className="absolute inset-0 opacity-8">
+                  <div className="absolute top-2 left-2 text-4xl text-[#C41E3A]/20">武</div>
+                  <div className="absolute top-2 right-2 text-4xl text-[#1E3A5F]/20">智</div>
+                  <div className="absolute bottom-2 left-2 text-4xl text-[#FFD700]/20">德</div>
+                  <div className="absolute bottom-2 right-2 text-4xl text-[#C41E3A]/20">統</div>
                 </div>
 
-                {/* 나무 질감 */}
-                <div className="absolute inset-0 opacity-10 pointer-events-none" style={{
-                  backgroundImage: 'repeating-linear-gradient(90deg, transparent 0px, rgba(139, 69, 19, 0.4) 1px, transparent 2px, transparent 8px)',
-                  mixBlendMode: 'overlay'
-                }}></div>
-
-                <h3 className="text-xl font-bold mb-4 text-center relative z-10 text-transparent bg-clip-text bg-gradient-to-r from-amber-300 via-yellow-400 to-amber-300"
-                  style={{ textShadow: '0 0 20px rgba(251, 191, 36, 0.5)' }}>
+                <h3 className="text-xl font-bold mb-4 text-center relative z-10 text-[#C41E3A]"
+                  style={{ textShadow: '0 2px 8px rgba(196, 30, 58, 0.2)' }}>
                   ⚔️ 능력치 ⚔️
                 </h3>
 
@@ -556,8 +550,8 @@ export default function SamgukPage() {
                   <div className="flex-1 h-px bg-gradient-to-r from-transparent via-amber-600/50 to-transparent"></div>
                 </div>
 
-                {/* 코에이 스타일 수평 스탯 바 */}
-                <div className="relative z-10 space-y-2 bg-black/20 p-4 rounded-xl border border-amber-800/30">
+                {/* 민화 스타일 수평 스탯 바 */}
+                <div className="relative z-10 space-y-2 bg-white/50 p-4 rounded-xl border border-[#C41E3A]/30">
                   <KoeiStatBar label="통솔" value={result.character.stats.통솔} icon="🏴" />
                   <KoeiStatBar label="무력" value={result.character.stats.무력} icon="⚔️" />
                   <KoeiStatBar label="지력" value={result.character.stats.지력} icon="📜" />
@@ -567,10 +561,10 @@ export default function SamgukPage() {
 
                 {/* 총합 */}
                 <div className="text-center mt-4 relative z-10">
-                  <div className="inline-block bg-gradient-to-r from-amber-900/50 via-amber-800/60 to-amber-900/50 px-6 py-2 rounded-full border-2 border-amber-600/50 shadow-lg">
-                    <span className="text-amber-300/80 text-sm mr-2">총 능력치:</span>
-                    <span className="text-2xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-yellow-400 via-amber-300 to-yellow-400"
-                      style={{ textShadow: '0 0 15px rgba(251, 191, 36, 0.5)' }}>
+                  <div className="inline-block bg-gradient-to-r from-[#FFD700]/20 via-[#D4AF37]/30 to-[#FFD700]/20 px-6 py-2 rounded-full border-2 border-[#FFD700]/50 shadow-md">
+                    <span className="text-[#5C4033] text-sm mr-2">총 능력치:</span>
+                    <span className="text-2xl font-bold text-[#C41E3A]"
+                      style={{ textShadow: '0 2px 8px rgba(196, 30, 58, 0.2)' }}>
                       {Object.values(result.character.stats).reduce((a, b) => a + b, 0)}
                     </span>
                   </div>
@@ -793,7 +787,7 @@ export default function SamgukPage() {
 
             {/* Coupang Partners Banner */}
             <div className="mt-2">
-              <p className="text-center text-xs text-stone-500 mb-2">추천 상품</p>
+              <p className="text-center text-xs text-[#5C4033]/60 mb-2">추천 상품</p>
               <div className="flex justify-center">
                 <iframe
                   src="https://ads-partners.coupang.com/widgets.html?id=950676&template=carousel&trackingCode=AF6497036&subId=&width=450&height=130&tsource="
@@ -805,7 +799,7 @@ export default function SamgukPage() {
                   className="rounded-lg max-w-full"
                 />
               </div>
-              <p className="text-center text-stone-700 text-[10px] mt-2">
+              <p className="text-center text-[#5C4033]/50 text-[10px] mt-2">
                 쿠팡 파트너스 활동의 일환으로 일정액의 수수료를 제공받습니다
               </p>
             </div>
@@ -817,14 +811,14 @@ export default function SamgukPage() {
               <button
                 onClick={() => download(getShareOptions())}
                 disabled={isCapturing}
-                className="flex-1 py-3 bg-gradient-to-r from-emerald-700 to-emerald-600 rounded-xl font-bold text-center hover:from-emerald-600 hover:to-emerald-500 transition text-white disabled:opacity-50 flex items-center justify-center gap-2"
+                className="flex-1 py-3 bg-gradient-to-r from-green-600 to-green-500 rounded-xl font-bold text-center hover:opacity-90 transition text-white disabled:opacity-50 flex items-center justify-center gap-2"
               >
                 {isCapturing ? "⏳ 캡쳐중..." : "📥 이미지 저장"}
               </button>
               <button
                 onClick={() => share(getShareOptions())}
                 disabled={isCapturing}
-                className="flex-1 py-3 bg-gradient-to-r from-blue-700 to-blue-600 rounded-xl font-bold text-center hover:from-blue-600 hover:to-blue-500 transition text-white disabled:opacity-50 flex items-center justify-center gap-2"
+                className="flex-1 py-3 bg-gradient-to-r from-[#1E3A5F] to-[#1E3A5F]/80 rounded-xl font-bold text-center hover:opacity-90 transition text-white disabled:opacity-50 flex items-center justify-center gap-2"
               >
                 {isCapturing ? "⏳ 캡쳐중..." : "📤 친구랑 닮은꼴 비교하기"}
               </button>
@@ -834,13 +828,13 @@ export default function SamgukPage() {
             <div className="flex gap-3">
               <button
                 onClick={resetAll}
-                className="flex-1 py-3 bg-stone-800/50 border border-amber-600/30 rounded-xl font-bold hover:bg-stone-700/50 transition text-amber-100/80"
+                className="flex-1 py-3 bg-white/80 border-2 border-[#C41E3A]/30 rounded-xl font-bold hover:bg-white transition text-[#5C4033]"
               >
                 다시하기
               </button>
               <Link
                 href="/"
-                className="flex-1 py-3 bg-gradient-to-r from-amber-700 to-yellow-600 rounded-xl font-bold text-center hover:from-amber-600 hover:to-yellow-500 transition text-stone-900"
+                className="flex-1 py-3 bg-gradient-to-r from-[#C41E3A] to-[#D4AF37] rounded-xl font-bold text-center hover:opacity-90 transition text-white"
               >
                 다른 운세 보기
               </Link>
@@ -849,7 +843,7 @@ export default function SamgukPage() {
         )}
 
         {/* Footer */}
-        <p className="text-center text-stone-600 text-xs mt-8">
+        <p className="text-center text-[#5C4033]/50 text-xs mt-8">
           ⚔️ 재미로만 봐주세요! AI가 추측한 결과입니다.
         </p>
       </main>
