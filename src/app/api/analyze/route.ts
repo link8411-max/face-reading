@@ -97,6 +97,7 @@ export async function POST(request: NextRequest) {
   "personality": ["성격 특징 1", "성격 특징 2", "성격 특징 3", "성격 특징 4"],
   "career": "어울리는 직업/분야 (2-3개)",
   "advice": "관상학적 조언 (한두 문장)",
+  "cautions": ["주의사항 1 (관상에서 보이는 약점이나 조심해야 할 점)", "주의사항 2", "주의사항 3"],
   "luckyNumber": 1-99 사이 숫자,
   "luckyColor": "행운의 색상",
   "summary": "전체 관상 요약 (2-3문장)"
@@ -104,7 +105,8 @@ export async function POST(request: NextRequest) {
 
 중요:
 - 전통 관상학 용어와 원리를 활용하되 쉽게 설명해주세요
-- 긍정적이고 희망적인 내용으로 작성해주세요
+- 좋은 점뿐만 아니라 주의해야 할 점(cautions)도 균형있게 포함해주세요
+- 주의사항은 관상에서 보이는 약점, 건강 주의점, 성격적 단점 등을 3개 제시해주세요
 - 각 수치는 반드시 숫자로만 응답하세요`;
 
     const text = await tryGenerateWithImage(base64Image, prompt);

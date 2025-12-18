@@ -44,13 +44,13 @@ export default function Home() {
         {/* Menu Cards */}
         <div className="space-y-4">
           {/* 관상 테스트 */}
-          <Link href="/face" className="block">
+          <Link href="/face2" className="block">
             <div className="bg-gradient-to-b from-stone-900/80 to-red-950/50 backdrop-blur-lg rounded-2xl p-6 hover:from-stone-800/80 hover:to-red-900/50 transition group border border-amber-600/20">
               <div className="flex items-center gap-4">
                 <div className="text-5xl">👤</div>
                 <div className="flex-1">
                   <h2 className="text-xl font-bold mb-1 text-amber-100 group-hover:text-amber-300 transition">
-                    AI 관상 분석
+                    무료 관상 분석
                   </h2>
                   <p className="text-stone-400 text-sm">
                     얼굴 사진으로 보는 초년·중년·말년운
@@ -60,7 +60,7 @@ export default function Home() {
               </div>
               <div className="flex gap-2 mt-4">
                 <span className="text-xs px-2 py-1 bg-red-900/30 text-red-300 rounded-full border border-red-600/20">전통 관상학</span>
-                <span className="text-xs px-2 py-1 bg-amber-900/30 text-amber-300 rounded-full border border-amber-600/20">AI 분석</span>
+                <span className="text-xs px-2 py-1 bg-amber-900/30 text-amber-300 rounded-full border border-amber-600/20">무제한 무료</span>
                 <span className="text-xs px-2 py-1 bg-emerald-900/30 text-emerald-300 rounded-full border border-emerald-600/20">재물운</span>
               </div>
             </div>
@@ -225,10 +225,20 @@ export default function Home() {
             <details className="group">
               <summary className="cursor-pointer text-amber-200 hover:text-amber-300 transition list-none flex items-center gap-2">
                 <span className="text-amber-600 group-open:rotate-90 transition-transform">▶</span>
+                AI 관상과 무료 관상의 차이는?
+              </summary>
+              <p className="mt-2 text-stone-400 pl-5 leading-relaxed">
+                무료 관상은 얼굴 인식 라이브러리로 즉시 분석하여 빠른 결과를 제공하며 무제한 이용 가능합니다.
+                AI 관상은 Google Gemini AI가 더 정밀하게 분석하여 개인화된 결과를 제공하며 하루 1회 무료입니다.
+              </p>
+            </details>
+            <details className="group">
+              <summary className="cursor-pointer text-amber-200 hover:text-amber-300 transition list-none flex items-center gap-2">
+                <span className="text-amber-600 group-open:rotate-90 transition-transform">▶</span>
                 무료인가요?
               </summary>
               <p className="mt-2 text-stone-400 pl-5 leading-relaxed">
-                네, 모든 서비스는 완전 무료입니다. AI 관상 분석, 오늘의 운세, 신년운세 모두 무료로 이용하실 수 있습니다.
+                네, 모든 서비스는 무료입니다. 무료 관상 분석은 무제한, AI 관상 분석은 하루 1회 무료로 이용하실 수 있습니다.
               </p>
             </details>
           </div>

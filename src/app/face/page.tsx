@@ -1,8 +1,43 @@
 "use client";
 
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
+import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { useScreenshot } from "@/hooks/useScreenshot";
+
+// 하루 1회 제한 체크 함수
+const AI_LIMIT_KEY = "face_ai_last_used";
+const ONE_DAY_MS = 24 * 60 * 60 * 1000;
+
+function checkDailyLimit(): { canUse: boolean; remainingTime: string } {
+  if (typeof window === "undefined") return { canUse: true, remainingTime: "" };
+
+  const lastUsed = localStorage.getItem(AI_LIMIT_KEY);
+  if (!lastUsed) return { canUse: true, remainingTime: "" };
+
+  const lastTime = parseInt(lastUsed, 10);
+  const now = Date.now();
+  const diff = now - lastTime;
+
+  if (diff >= ONE_DAY_MS) {
+    return { canUse: true, remainingTime: "" };
+  }
+
+  const remaining = ONE_DAY_MS - diff;
+  const hours = Math.floor(remaining / (60 * 60 * 1000));
+  const minutes = Math.floor((remaining % (60 * 60 * 1000)) / (60 * 1000));
+
+  return {
+    canUse: false,
+    remainingTime: `${hours}시간 ${minutes}분 후 이용 가능`
+  };
+}
+
+function setDailyLimit() {
+  if (typeof window !== "undefined") {
+    localStorage.setItem(AI_LIMIT_KEY, Date.now().toString());
+  }
+}
 
 interface AnalysisResult {
   type: string;
@@ -29,18 +64,31 @@ interface AnalysisResult {
   personality: string[];
   career: string;
   advice: string;
+  cautions?: string[];
   luckyNumber: number;
   luckyColor: string;
   summary: string;
 }
 
 export default function FacePage() {
+  const router = useRouter();
   const [image, setImage] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const [result, setResult] = useState<AnalysisResult | null>(null);
+  const [dailyLimit, setDailyLimitState] = useState<{ canUse: boolean; remainingTime: string }>({ canUse: true, remainingTime: "" });
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const { ref: resultRef, isCapturing, download, share } = useScreenshot();
+
+  // 페이지 로드 시 하루 1회 제한 체크 - 이미 사용했으면 face2로 이동
+  useEffect(() => {
+    const limit = checkDailyLimit();
+    if (!limit.canUse) {
+      router.replace("/face2");
+      return;
+    }
+    setDailyLimitState(limit);
+  }, [router]);
 
   const getShareOptions = () => ({
     fileName: `관상분석_${result?.type || "결과"}`,
@@ -63,6 +111,13 @@ export default function FacePage() {
   const analyzeImage = async () => {
     if (!image) return;
 
+    // 하루 1회 제한 체크
+    const limitCheck = checkDailyLimit();
+    if (!limitCheck.canUse) {
+      alert(`오늘은 이미 AI 분석을 이용하셨습니다.\n${limitCheck.remainingTime}`);
+      return;
+    }
+
     setLoading(true);
     try {
       const response = await fetch("/api/analyze", {
@@ -76,6 +131,9 @@ export default function FacePage() {
         alert(data.error);
       } else {
         setResult(data);
+        // 성공 시 사용 시간 기록
+        setDailyLimit();
+        setDailyLimitState({ canUse: false, remainingTime: "23시간 59분 후 이용 가능" });
       }
     } catch {
       alert("분석 중 오류가 발생했습니다.");
@@ -142,6 +200,20 @@ export default function FacePage() {
             <span className="text-red-800/60 text-xs">◆</span>
           </div>
         </div>
+
+        {/* 하루 1회 제한 안내 */}
+        {!dailyLimit.canUse && !result && (
+          <div className="bg-gradient-to-r from-purple-900/50 to-indigo-900/50 backdrop-blur-lg rounded-xl p-4 mb-6 border border-purple-500/30 text-center">
+            <p className="text-purple-200 font-medium">🔮 오늘의 AI 분석을 이미 사용하셨습니다</p>
+            <p className="text-purple-300/70 text-sm mt-1">{dailyLimit.remainingTime}</p>
+            <Link
+              href="/face2"
+              className="inline-block mt-3 px-4 py-2 bg-amber-600/80 hover:bg-amber-500 rounded-lg text-sm font-medium transition"
+            >
+              무료 관상 분석 이용하기 →
+            </Link>
+          </div>
+        )}
 
         {/* Upload Section */}
         {!result && (
@@ -344,6 +416,20 @@ export default function FacePage() {
                 <p className="text-amber-300 font-medium">"{result.advice}"</p>
               </div>
             </div>
+
+            {/* 주의사항 */}
+            {result.cautions && result.cautions.length > 0 && (
+              <div className="bg-gradient-to-b from-stone-900/80 to-orange-950/50 backdrop-blur-lg rounded-2xl p-6 border border-orange-600/30">
+                <h3 className="text-lg font-bold mb-4 text-orange-200">⚠️ 주의사항</h3>
+                <div className="space-y-2">
+                  {result.cautions.map((주의, index) => (
+                    <div key={index} className="bg-orange-900/20 rounded-xl p-3 border border-orange-600/20">
+                      <p className="text-sm text-orange-100/90 leading-relaxed">{주의}</p>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
 
             {/* Coupang Partners Banner */}
             <div className="mt-2">
