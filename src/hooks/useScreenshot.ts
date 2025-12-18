@@ -76,6 +76,7 @@ export function useScreenshot<T extends HTMLElement = HTMLDivElement>() {
         URL.revokeObjectURL(url);
         modal.remove();
       });
+      return;
     } else {
       // Android/PC: 일반 다운로드
       const url = URL.createObjectURL(blob);
