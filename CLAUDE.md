@@ -154,6 +154,7 @@ GEMINI_API_KEY=AIzaSyCltI-V0cYrB71sbi7WhdB-mYQokELViGQ
 2. **AI 제한**: localStorage 기반이라 브라우저별로 따로 카운트
 3. **이미지 캡쳐**: `modern-screenshot` 사용 (CSS lab() 호환)
 4. **모델 파일**: `/public/models/`에 있어야 face-api.js 작동
+5. **페이지 추가/삭제 시**: 반드시 `public/sitemap.xml` 업데이트!
 
 ---
 

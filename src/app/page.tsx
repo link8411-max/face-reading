@@ -95,33 +95,6 @@ export default function Home() {
             </div>
           </Link>
 
-          {/* 삼국지 닮은꼴 */}
-          <Link href="/samguk" className="block">
-            <div className="bg-white/60 backdrop-blur-sm rounded-3xl p-6 hover:bg-white/80 transition group relative overflow-hidden border-2 border-[#1E3A5F]/30 shadow-lg hover:shadow-xl">
-              <div className="absolute top-2 right-2 bg-gradient-to-r from-[#FFD700] to-[#D4AF37] text-[#5C4033] text-xs font-bold px-3 py-1 rounded-full animate-pulse-heart">
-                NEW
-              </div>
-              <div className="flex items-center gap-4">
-                <div className="text-5xl">⚔️</div>
-                <div className="flex-1">
-                  <h2 className="text-xl font-bold mb-1 text-[#5C4033] group-hover:text-[#C41E3A] transition">
-                    삼국지 닮은꼴
-                  </h2>
-                  <p className="text-[#5C4033]/70 text-sm">
-                    나는 어떤 삼국지 영웅일까?
-                  </p>
-                </div>
-                <div className="text-[#C41E3A]/60 group-hover:text-[#C41E3A] transition text-2xl">→</div>
-              </div>
-              <div className="flex gap-2 mt-4">
-                <span className="text-xs px-3 py-1 bg-[#1E3A5F]/15 text-[#1E3A5F] rounded-full border border-[#1E3A5F]/30">위</span>
-                <span className="text-xs px-3 py-1 bg-green-700/15 text-green-700 rounded-full border border-green-700/30">촉</span>
-                <span className="text-xs px-3 py-1 bg-[#C41E3A]/15 text-[#C41E3A] rounded-full border border-[#C41E3A]/30">오</span>
-                <span className="text-xs px-3 py-1 bg-[#FFD700]/15 text-[#D4AF37] rounded-full border border-[#FFD700]/40">50명</span>
-              </div>
-            </div>
-          </Link>
-
           {/* 신년 운세 */}
           <Link href="/fortune" className="block">
             <div className="bg-white/60 backdrop-blur-sm rounded-3xl p-6 hover:bg-white/80 transition group relative overflow-hidden border-2 border-[#C41E3A]/30 shadow-lg hover:shadow-xl">
@@ -147,6 +120,48 @@ export default function Home() {
               </div>
             </div>
           </Link>
+        </div>
+
+        {/* 마당놀이 섹션 */}
+        <div className="mt-10">
+          <div className="flex items-center gap-3 mb-4">
+            <div className="flex-1 h-px bg-gradient-to-r from-transparent via-[#C41E3A]/30 to-transparent"></div>
+            <h2 className="text-lg font-bold text-[#5C4033] flex items-center gap-2">
+              <span>🎭</span> 마당놀이
+            </h2>
+            <div className="flex-1 h-px bg-gradient-to-r from-transparent via-[#C41E3A]/30 to-transparent"></div>
+          </div>
+          <p className="text-center text-[#5C4033]/60 text-sm mb-4">재미로 즐기는 이색 테스트</p>
+
+          <div className="space-y-3">
+            {/* 삼국지 닮은꼴 */}
+            <Link href="/samguk" className="block">
+              <div className="bg-white/50 backdrop-blur-sm rounded-2xl p-5 hover:bg-white/70 transition group border border-[#1E3A5F]/20 shadow-md hover:shadow-lg">
+                <div className="flex items-center gap-4">
+                  <div className="text-4xl">⚔️</div>
+                  <div className="flex-1">
+                    <h3 className="text-lg font-bold text-[#5C4033] group-hover:text-[#C41E3A] transition">
+                      삼국지 닮은꼴
+                    </h3>
+                    <p className="text-[#5C4033]/60 text-xs">
+                      나는 어떤 삼국지 영웅일까?
+                    </p>
+                  </div>
+                  <div className="flex gap-1">
+                    <span className="text-xs px-2 py-0.5 bg-[#1E3A5F]/15 text-[#1E3A5F] rounded-full">위</span>
+                    <span className="text-xs px-2 py-0.5 bg-green-700/15 text-green-700 rounded-full">촉</span>
+                    <span className="text-xs px-2 py-0.5 bg-[#C41E3A]/15 text-[#C41E3A] rounded-full">오</span>
+                  </div>
+                  <div className="text-[#C41E3A]/40 group-hover:text-[#C41E3A] transition text-xl">→</div>
+                </div>
+              </div>
+            </Link>
+
+            {/* 추후 추가될 메뉴들 공간 */}
+            <div className="bg-white/30 backdrop-blur-sm rounded-2xl p-4 border border-dashed border-[#5C4033]/20 text-center">
+              <p className="text-[#5C4033]/40 text-sm">🎲 새로운 놀이 준비 중...</p>
+            </div>
+          </div>
         </div>
 
         {/* Info Section */}
