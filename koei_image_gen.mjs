@@ -1,7 +1,7 @@
 import { GoogleGenerativeAI } from "@google/generative-ai";
 import * as fs from "fs";
 
-const apiKey = "AIzaSyCltI-V0cYrB71sbi7WhdB-mYQokELViGQ";
+const apiKey = process.env.GEMINI_API_KEY;
 const genAI = new GoogleGenerativeAI(apiKey);
 
 async function generateKoeiStylePortrait() {

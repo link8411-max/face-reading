@@ -1,15 +1,14 @@
 import { GoogleGenerativeAI } from "@google/generative-ai";
 import * as fs from "fs";
 
-const apiKey = "AIzaSyCltI-V0cYrB71sbi7WhdB-mYQokELViGQ";
+const apiKey = process.env.GEMINI_API_KEY;
 const genAI = new GoogleGenerativeAI(apiKey);
 
-// 레퍼런스 이미지 로드
-const refImage = fs.readFileSync("/Users/hongseong-il/Downloads/삼국지.webp");
-const refBase64 = refImage.toString("base64");
-
-// 출력 폴더
-const outputDir = "/Users/hongseong-il/Downloads/samguk_portraits";
+// 출력 폴더 (프로젝트 내 public 폴더로 변경)
+const outputDir = "./public/images/samguk";
+if (!fs.existsSync(outputDir)) {
+  fs.mkdirSync(outputDir, { recursive: true });
+}
 
 // 캐릭터 데이터
 const characters = [
@@ -83,75 +82,57 @@ const characters = [
 ];
 
 async function generatePortrait(character, index) {
-  const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash-preview-05-20" });
+  const filePath = `${outputDir}/${character.name}.png`;
 
-  const genderStyle = character.gender === "남"
-    ? `EXTREMELY HANDSOME male:
-- Young, beautiful face (late 20s-30s appearance)
-- SLIM face, NOT round or chubby
-- Sharp jawline, high cheekbones
-- Beautiful intelligent eyes
-- Elegant thin eyebrows
-- Small refined nose
-- Neat beard or clean-shaven
-- Long black hair, elegantly styled
-- Pale fair skin
-- Bishonen/pretty boy aesthetic
-- Think: Korean drama actor handsome`
-    : `EXTREMELY BEAUTIFUL female:
-- Young, beautiful face (early-mid 20s appearance)
-- Elegant oval face shape
-- Delicate features, high cheekbones
-- Beautiful almond-shaped eyes
-- Graceful thin eyebrows
-- Small refined nose
-- Soft pink lips
-- Long black hair, beautifully styled
-- Pale fair porcelain skin
-- Classic Chinese beauty aesthetic
-- Think: Korean actress beautiful`;
-
-  const prompt = `Look at the character portrait art style in this reference image from KOEI's Romance of Three Kingdoms game.
-
-Generate a NEW portrait in that SAME painted pixel art style:
-
-Character: ${character.name} (${character.hanja}) - ${character.role}
-
-${genderStyle}
-
-Physical features from history: ${character.appearance}
-
-Outfit: ${character.outfit}
-
-Style: SAME as reference - classic KOEI game portrait with painted/pixel texture, dark background
-
-This should look like an idealized, beautiful portrait from KOEI Sangokushi game - elegant, noble, ${character.gender === "남" ? "handsome hero" : "beautiful heroine"}.`;
-
-  try {
-    const result = await model.generateContent({
-      contents: [{
-        parts: [
-          { inlineData: { mimeType: "image/webp", data: refBase64 } },
-          { text: prompt }
-        ]
-      }],
-      generationConfig: { responseModalities: ["TEXT", "IMAGE"] }
-    });
-
-    for (const part of result.response.candidates[0].content.parts) {
-      if (part.inlineData) {
-        const filePath = `${outputDir}/${character.name}.png`;
-        fs.writeFileSync(filePath, Buffer.from(part.inlineData.data, "base64"));
-        console.log(`[${index + 1}/${characters.length}] ${character.name} 완료!`);
-        return { success: true, name: character.name };
-      }
-    }
-    console.log(`[${index + 1}/${characters.length}] ${character.name}: 이미지 없음`);
-    return { success: false, name: character.name, error: "no image" };
-  } catch (e) {
-    console.error(`[${index + 1}/${characters.length}] ${character.name} 실패:`, e.message);
-    return { success: false, name: character.name, error: e.message };
+  // 이미 파일이 존재하면 스킵 (쿼터 아끼기)
+  if (fs.existsSync(filePath)) {
+    console.log(`[${index + 1}] ${character.name}: 이미 존재함 (스킵)`);
+    return { success: true, name: character.name, skipped: true };
   }
+
+  const modelNames = ["gemini-2.0-flash-exp", "gemini-2.0-flash"];
+
+  for (const modelName of modelNames) {
+    try {
+      const model = genAI.getGenerativeModel({ model: modelName });
+      const prompt = `Create a 16-bit RETRO GAME PORTRAIT in the style of 1990s KOEI strategy games (Romance of the Three Kingdoms III/IV).
+
+TECHNICAL STYLE:
+- Hand-dotted Pixel Art (Bust Portrait)
+- Heavy use of "DITHERING" (cross-hatch/checkered pixel patterns) for gradients and skin shading. This is CRITICAL for the Koei look.
+- Realistic proportions (Old-school Seinen manga style), not anime.
+- Palette: Desaturated 16/256 color indexed palette (Muted earthy tones, deep colors).
+- Composition: Square bust portrait with dramatic lighting.
+
+SUBJECT: ${character.name} (${character.hanja})
+- Role: ${character.role}
+- Facial Features: ${character.appearance}
+- Attire: ${character.outfit}
+
+AESTHETIC GOAL:
+Must look like a character from a Japanese 1994 PC-9801 or Super Famicom simulation game. Visible chunky pixels, retro dithering shadows, and a "painted-then-scanned" retro digital look. NO modern smooth gradients.`;
+
+      const result = await model.generateContent({
+        contents: [{ parts: [{ text: prompt }] }],
+        generationConfig: { responseModalities: ["TEXT", "IMAGE"] }
+      });
+
+      for (const part of result.response.candidates[0].content.parts) {
+        if (part.inlineData) {
+          fs.writeFileSync(filePath, Buffer.from(part.inlineData.data, "base64"));
+          console.log(`[${index + 1}] ${character.name} 완료! (${modelName})`);
+          return { success: true, name: character.name };
+        }
+      }
+    } catch (e) {
+      if (e.message.includes("429") || e.message.includes("Quota")) {
+        console.log(`[${index + 1}] ${character.name}: ${modelName} 쿼터 초과, 다음 모델 시도...`);
+        continue;
+      }
+      console.error(`[${index + 1}] ${character.name} 실패 (${modelName}):`, e.message);
+    }
+  }
+  return { success: false, name: character.name, error: "all models failed" };
 }
 
 async function main() {
