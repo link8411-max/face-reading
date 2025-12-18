@@ -1,50 +1,127 @@
 # Face Reading Project
 
-## 배포 방법
-**git commit & push = 자동 배포 (Vercel 연동)**
+## 배포
 ```bash
-git add .
-git commit -m "커밋 메시지"
-git push
+git add . && git commit -m "메시지" && git push
+```
+**Vercel 자동 배포** - push하면 끝
+
+---
+
+## 기술 스택
+- **프레임워크**: Next.js 16 (App Router) + TypeScript
+- **스타일**: Tailwind CSS 4
+- **AI**: Google Gemini API
+- **얼굴인식**: @vladmandic/face-api (face-api.js 포크)
+
+---
+
+## 프로젝트 구조
+
+```
+src/
+├── app/
+│   ├── page.tsx              # 메인 페이지 (/)
+│   ├── layout.tsx            # 루트 레이아웃 + SEO (FAQ JSON-LD)
+│   ├── face/page.tsx         # AI 관상 분석 (/face) - 하루 1회
+│   ├── face2/page.tsx        # 무료 관상 분석 (/face2) - 무제한
+│   ├── samguk/page.tsx       # 삼국지 닮은꼴 (/samguk)
+│   ├── fortune/
+│   │   ├── page.tsx          # 신년운세 (/fortune)
+│   │   └── daily/page.tsx    # 오늘의 운세 (/fortune/daily)
+│   └── api/
+│       ├── analyze/route.ts  # AI 관상 API (Gemini)
+│       ├── samguk/route.ts   # 삼국지 API (Gemini)
+│       └── fortune/route.ts  # 운세 API
+├── lib/
+│   ├── faceDetection.ts      # face-api.js 얼굴 감지 (68 랜드마크)
+│   ├── faceReadingDB.ts      # 관상 해석 데이터베이스
+│   ├── faceAnalyzer.ts       # 특징 → 해석 변환
+│   ├── samgukDB.ts           # 삼국지 인물 데이터
+│   ├── fortuneDB.ts          # 운세 데이터
+│   └── saju.ts               # 사주 계산
+└── hooks/
+    └── useScreenshot.ts      # 결과 캡쳐/공유 훅
+
+public/
+├── models/                   # face-api.js 모델 파일
+│   ├── ssd_mobilenetv1_*     # 얼굴 감지 모델
+│   └── face_landmark_68_*    # 랜드마크 모델
+├── sitemap.xml
+└── robots.txt
 ```
 
+---
+
+## 페이지별 기능
+
+| 경로 | 기능 | 제한 | 사용 기술 |
+|------|------|------|-----------|
+| `/` | 메인 | - | - |
+| `/face2` | 무료 관상 | 무제한 | face-api.js + DB |
+| `/face` | AI 관상 | 하루 1회 | Gemini API |
+| `/samguk` | 삼국지 닮은꼴 | - | Gemini API |
+| `/fortune` | 신년운세 | - | DB 기반 |
+| `/fortune/daily` | 오늘의 운세 | - | DB 기반 |
+
+---
+
 ## API Keys
-- **Gemini API Key**: `AIzaSyCltI-V0cYrB71sbi7WhdB-mYQokELViGQ`
+```
+GEMINI_API_KEY=AIzaSyCltI-V0cYrB71sbi7WhdB-mYQokELViGQ
+```
+(.env.local에 설정됨)
 
-## Project Overview
-관상/운세 분석 웹앱 (Next.js + TypeScript + Tailwind CSS)
+---
 
-## 페이지 구조
+## 주요 로직
 
-| 경로 | 설명 | 비고 |
-|------|------|------|
-| `/` | 메인 페이지 | |
-| `/face2` | 무료 관상 분석 | face-api.js 기반, 무제한 |
-| `/face` | AI 관상 분석 | Gemini AI, 하루 1회 제한 |
-| `/samguk` | 삼국지 닮은꼴 | |
-| `/fortune` | 신년운세 | 띠별 |
-| `/fortune/daily` | 오늘의 운세 | 띠별 |
+### 무료 관상 (/face2) 흐름
+1. 이미지 업로드
+2. `faceDetection.ts` - face-api.js로 68개 랜드마크 감지
+3. `faceAnalyzer.ts` - 눈/코/입/얼굴형 등 특징 계산
+4. `faceReadingDB.ts` - 특징별 해석 텍스트 조회
+5. 결과 표시
 
-## 핵심 파일
+### AI 관상 (/face) 흐름
+1. 이미지 업로드
+2. localStorage로 하루 1회 체크 (`face_ai_last_used`)
+3. 제한 초과시 → `/face2`로 자동 리다이렉트
+4. `/api/analyze` → Gemini API 호출
+5. 결과 표시
 
-### 관상 분석 관련
-- `/src/lib/faceDetection.ts` - face-api.js 얼굴 감지
-- `/src/lib/faceReadingDB.ts` - 관상 해석 데이터베이스
-- `/src/lib/faceAnalyzer.ts` - 특징 → 해석 매핑
-- `/src/app/api/analyze/route.ts` - AI 관상 API (Gemini)
+### 결과 공유
+- `useScreenshot` 훅 사용
+- `modern-screenshot` 라이브러리 (html2canvas 대체)
+- iOS: 새 탭에서 길게 눌러 저장
 
-### 공통
-- `/src/hooks/useScreenshot.ts` - 결과 이미지 캡쳐/공유
+---
 
-## 사용 라이브러리
-- `face-api.js` - 얼굴 랜드마크 감지 (68포인트)
-- `modern-screenshot` - DOM 캡쳐 (html2canvas 대체)
-- `@google/generative-ai` - Gemini AI API
+## 자주 수정하는 파일
 
-## 모델 파일
-`/public/models/` - face-api.js 모델 (ssd_mobilenetv1, face_landmark_68)
+| 작업 | 파일 |
+|------|------|
+| 관상 해석 텍스트 수정 | `src/lib/faceReadingDB.ts` |
+| AI 프롬프트 수정 | `src/app/api/analyze/route.ts` |
+| 무료 관상 UI | `src/app/face2/page.tsx` |
+| AI 관상 UI | `src/app/face/page.tsx` |
+| 메인 페이지 | `src/app/page.tsx` |
+| SEO/FAQ | `src/app/layout.tsx` |
+| sitemap | `public/sitemap.xml` |
+
+---
 
 ## 주의사항
-- face-api.js 사용 시 `'use client'` 필수
-- AI 분석 하루 1회 제한은 localStorage 기반 (`face_ai_last_used`)
-- 제한 초과 시 `/face` → `/face2` 자동 리다이렉트
+
+1. **face-api.js**: `'use client'` 필수 (브라우저 전용)
+2. **AI 제한**: localStorage 기반이라 브라우저별로 따로 카운트
+3. **이미지 캡쳐**: `modern-screenshot` 사용 (CSS lab() 호환)
+4. **모델 파일**: `/public/models/`에 있어야 face-api.js 작동
+
+---
+
+## 개발 서버
+```bash
+npm run dev
+# http://localhost:3000
+```
