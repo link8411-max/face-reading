@@ -20,176 +20,85 @@ interface AnalysisResult {
   character: SamgukCharacter;
 }
 
-// 오각형 레이더 차트 컴포넌트
-function RadarChart({ stats }: { stats: { 통솔: number; 무력: number; 지력: number; 정치: number; 매력: number } }) {
-  const size = 200;
-  const center = size / 2;
-  const radius = 70;
-
-  const statKeys = ["통솔", "무력", "지력", "정치", "매력"] as const;
-  const angles = statKeys.map((_, i) => (Math.PI * 2 * i) / 5 - Math.PI / 2);
-
-  // 배경 오각형 (격자)
-  const createPentagon = (r: number) => {
-    return angles.map((angle, i) => {
-      const x = center + r * Math.cos(angle);
-      const y = center + r * Math.sin(angle);
-      return `${i === 0 ? 'M' : 'L'} ${x} ${y}`;
-    }).join(' ') + ' Z';
-  };
-
-  // 스탯 오각형
-  const statPoints = angles.map((angle, i) => {
-    const value = stats[statKeys[i]] / 100;
-    const x = center + radius * value * Math.cos(angle);
-    const y = center + radius * value * Math.sin(angle);
-    return `${x},${y}`;
-  }).join(' ');
-
-  // 레이블 위치
-  const labelPositions = angles.map((angle) => ({
-    x: center + (radius + 25) * Math.cos(angle),
-    y: center + (radius + 25) * Math.sin(angle),
-  }));
-
+// 코에이 스타일 수평 스탯 바
+function KoeiStatLine({ label, value, max = 100 }: { label: string; value: number; max?: number }) {
   return (
-    <svg width={size} height={size} className="mx-auto">
-      {/* 배경 격자 */}
-      {[0.2, 0.4, 0.6, 0.8, 1].map((scale, i) => (
-        <path
-          key={i}
-          d={createPentagon(radius * scale)}
-          fill="none"
-          stroke="rgba(217, 119, 6, 0.2)"
-          strokeWidth="1"
-        />
-      ))}
-
-      {/* 중심에서 꼭짓점으로 선 */}
-      {angles.map((angle, i) => (
-        <line
-          key={i}
-          x1={center}
-          y1={center}
-          x2={center + radius * Math.cos(angle)}
-          y2={center + radius * Math.sin(angle)}
-          stroke="rgba(217, 119, 6, 0.2)"
-          strokeWidth="1"
-        />
-      ))}
-
-      {/* 스탯 영역 */}
-      <polygon
-        points={statPoints}
-        fill="rgba(234, 179, 8, 0.3)"
-        stroke="rgb(234, 179, 8)"
-        strokeWidth="2"
-      />
-
-      {/* 꼭짓점 포인트 */}
-      {angles.map((angle, i) => {
-        const value = stats[statKeys[i]] / 100;
-        const x = center + radius * value * Math.cos(angle);
-        const y = center + radius * value * Math.sin(angle);
-        return (
-          <circle
-            key={i}
-            cx={x}
-            cy={y}
-            r="4"
-            fill="rgb(234, 179, 8)"
-          />
-        );
-      })}
-
-      {/* 레이블 */}
-      {statKeys.map((stat, i) => (
-        <text
-          key={stat}
-          x={labelPositions[i].x}
-          y={labelPositions[i].y}
-          textAnchor="middle"
-          dominantBaseline="middle"
-          className="fill-amber-200 text-xs font-bold"
+    <div className="flex items-center gap-2 mb-2">
+      <div className="w-12 text-amber-200 text-xs font-bold drop-shadow-sm">{label}</div>
+      <div className="flex-1 relative h-4 bg-black/40 rounded shadow-inner border border-stone-800">
+        <div
+          className="absolute inset-y-0.5 left-0.5 bg-gradient-to-r from-red-700 to-red-500 rounded-sm transition-all duration-1000 shadow-[0_0_8px_rgba(185,28,28,0.5)]"
+          style={{ width: `calc(${Math.min(value, max)}% - 4px)` }}
         >
-          {stat}
-        </text>
-      ))}
-
-      {/* 수치 */}
-      {statKeys.map((stat, i) => {
-        const value = stats[stat] / 100;
-        const x = center + (radius * value + 12) * Math.cos(angles[i]);
-        const y = center + (radius * value + 12) * Math.sin(angles[i]);
-        return (
-          <text
-            key={`val-${stat}`}
-            x={x}
-            y={y}
-            textAnchor="middle"
-            dominantBaseline="middle"
-            className={`text-[10px] font-bold ${stats[stat] >= 90 ? 'fill-yellow-400' : 'fill-amber-400'}`}
-          >
-            {stats[stat]}
-          </text>
-        );
-      })}
-    </svg>
+          <div className="absolute inset-0 bg-[linear-gradient(transparent_0%,rgba(255,255,255,0.2)_50%,transparent_100%)]"></div>
+        </div>
+      </div>
+      <div className="w-8 text-right text-white font-mono text-xs font-bold">{value}</div>
+    </div>
   );
 }
 
-// 코에이 스타일 수평 스탯 바 컴포넌트
-function KoeiStatBar({ label, value, icon }: { label: string; value: number; icon: string }) {
-  // 스탯에 따른 색상 결정
-  const getBarColor = (val: number) => {
-    if (val >= 90) return "from-yellow-400 via-amber-500 to-yellow-600";
-    if (val >= 75) return "from-amber-500 via-orange-500 to-amber-600";
-    if (val >= 60) return "from-orange-600 via-amber-700 to-orange-700";
-    return "from-amber-700 via-stone-600 to-amber-800";
-  };
-
-  const getGlowColor = (val: number) => {
-    if (val >= 90) return "shadow-yellow-500/50";
-    if (val >= 75) return "shadow-amber-500/40";
-    return "shadow-amber-700/30";
-  };
-
+// 코에이 스타일 장식 프레임
+function KoeiFrame({ children, title, className = "" }: { children: React.ReactNode; title?: string; className?: string }) {
   return (
-    <div className="flex items-center gap-2">
-      <div className="w-12 text-right">
-        <span className="text-amber-200 text-sm font-bold">{icon}</span>
-      </div>
-      <div className="flex-1">
-        <div className="relative h-5 bg-gradient-to-r from-stone-900 via-stone-800 to-stone-900 rounded border border-amber-900/50 overflow-hidden shadow-inner">
-          {/* 배경 격자 패턴 */}
-          <div className="absolute inset-0 opacity-10" style={{
-            backgroundImage: 'repeating-linear-gradient(90deg, transparent, transparent 10px, rgba(251, 191, 36, 0.3) 10px, rgba(251, 191, 36, 0.3) 11px)'
-          }}></div>
+    <div className={`relative p-4 ${className}`}>
+      {/* 바깥쪽 갈색 나무 테두리 */}
+      <div className="absolute inset-0 border-[6px] border-[#8B4513] rounded-lg shadow-2xl"></div>
+      {/* 안쪽 오렌지색 무늬 테두리 (Koei 특유의 꼬임 무늬) */}
+      <div className="absolute inset-1 border-[3px] border-[#CD853F] rounded-md opacity-80" style={{ backgroundImage: 'radial-gradient(circle, #CD853F 1px, transparent 1px)', backgroundSize: '4px 4px' }}></div>
+      <div className="absolute -inset-1 border border-[#63300C] rounded-xl pointer-events-none opacity-50"></div>
 
-          {/* 스탯 바 */}
-          <div
-            className={`absolute inset-y-0 left-0 bg-gradient-to-r ${getBarColor(value)} transition-all duration-500 ${getGlowColor(value)} shadow-md`}
-            style={{ width: `${value}%` }}
-          >
-            {/* 하이라이트 효과 */}
-            <div className="absolute inset-0 bg-gradient-to-b from-white/30 via-transparent to-black/20"></div>
-            {/* 애니메이션 광택 */}
-            <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent animate-pulse"></div>
-          </div>
+      {/* 메인 배경 (돌 질감) */}
+      <div className="relative bg-[#203a36] min-h-[100px] border-2 border-black/40 rounded shadow-inner p-3 sm:p-4">
+        {/* 돌 질감 오버레이 */}
+        <div className="absolute inset-0 opacity-10 pointer-events-none overflow-hidden" style={{ backgroundImage: 'url("https://www.transparenttextures.com/patterns/dark-leather.png")' }}></div>
 
-          {/* 수치 표시 */}
-          <div className="absolute inset-0 flex items-center justify-end pr-2">
-            <span className={`text-xs font-bold drop-shadow-md ${value >= 50 ? 'text-white' : 'text-amber-200'
-              }`}>
-              {value}
-            </span>
+        {title && (
+          <div className="absolute top-0 left-4 -translate-y-1/2 bg-[#C41E3A] px-4 py-1 border-2 border-[#D4AF37] rounded shadow-[0_2px_4px_black] z-30 whitespace-nowrap">
+            <span className="text-white text-[10px] sm:text-xs font-bold tracking-widest">{title}</span>
           </div>
-        </div>
+        )}
+        {children}
       </div>
-      <div className="w-10 text-left">
-        <span className="text-amber-300/70 text-xs">{label}</span>
-      </div>
+
+      {/* 모서리 못 장식 */}
+      <div className="absolute top-1 left-1 w-2 h-2 rounded-full bg-amber-600 border border-black/50 shadow-sm"></div>
+      <div className="absolute top-1 right-1 w-2 h-2 rounded-full bg-amber-600 border border-black/50 shadow-sm"></div>
+      <div className="absolute bottom-1 left-1 w-2 h-2 rounded-full bg-amber-600 border border-black/50 shadow-sm"></div>
+      <div className="absolute bottom-1 right-1 w-2 h-2 rounded-full bg-amber-600 border border-black/50 shadow-sm"></div>
     </div>
+  );
+}
+
+// 코에이 스타일 인셋 박스
+function KoeiInsetBox({ children, className = "" }: { children: React.ReactNode; className?: string }) {
+  return (
+    <div className={`bg-black/20 border border-stone-900 shadow-[inset_0_2px_10px_rgba(0,0,0,0.5)] p-3 rounded-sm ${className}`}>
+      {children}
+    </div>
+  );
+}
+
+// 하단 버튼 그룹
+function KoeiButtonGroup({ children }: { children: React.ReactNode }) {
+  return (
+    <div className="flex gap-1.5 mt-4 p-1 bg-black/30 rounded border border-black/50">
+      {children}
+    </div>
+  );
+}
+
+function KoeiButton({ label, onClick, highlight = false }: { label: string; onClick?: () => void; highlight?: boolean }) {
+  return (
+    <button
+      onClick={onClick}
+      className={`flex-1 py-1 px-2 text-[10px] font-bold border-2 rounded shadow-sm hover:brightness-110 active:scale-95 transition-all
+        ${highlight
+          ? "bg-[#C41E3A] border-[#D4AF37] text-white"
+          : "bg-stone-700 border-stone-500 text-amber-100 shadow-[inset_0_1px_4px_rgba(255,255,255,0.2)]"}`}
+    >
+      {label}
+    </button>
   );
 }
 
@@ -222,6 +131,7 @@ export default function SamgukPage() {
   const [loading, setLoading] = useState(false);
   const [loadingStep, setLoadingStep] = useState(0);
   const [result, setResult] = useState<AnalysisResult | null>(null);
+  const [selectedTab, setSelectedTab] = useState<string>("열전");
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const { ref: resultRef, isCapturing, download, share } = useScreenshot();
@@ -320,7 +230,7 @@ export default function SamgukPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-[#F5E6D3] via-[#E8D4C4] to-[#F5E6D3] text-[#5C4033] relative overflow-hidden">
+    <div className="min-h-screen bg-gradient-to-b from-[#F5E6D3] via-[#E8D4C4] to-[#F5E6D3] text-[#5C4033] relative">
       {/* 민화 배경 - 고서/두루마리 느낌 */}
       <div className="absolute inset-0 opacity-10 pointer-events-none">
         <div className="absolute top-10 left-10 text-6xl text-[#1E3A5F]">魏</div>
@@ -358,674 +268,427 @@ export default function SamgukPage() {
           </div>
         </div>
 
-        {/* Upload Section */}
-        {!result && (
-          <div className="bg-white/60 backdrop-blur-sm rounded-3xl p-6 mb-6 border-2 border-[#C41E3A]/30 shadow-lg">
-            <div
-              className="border-2 border-dashed border-[#C41E3A]/30 rounded-xl p-8 text-center cursor-pointer hover:border-[#C41E3A]/50 transition"
-              onClick={() => fileInputRef.current?.click()}
-            >
-              {image ? (
-                <img
-                  src={image}
-                  alt="업로드된 이미지"
-                  className="max-h-64 mx-auto rounded-lg border-2 border-[#C41E3A]/50"
-                />
-              ) : (
-                <div>
-                  <span className="text-5xl mb-4 block">📸</span>
-                  <p className="text-[#5C4033]">얼굴 사진을 업로드하세요</p>
-                  <p className="text-[#5C4033]/60 text-sm mt-2">
-                    당신과 닮은 삼국지 영웅을 찾아드립니다
-                  </p>
-                </div>
-              )}
-            </div>
-            <input
-              ref={fileInputRef}
-              type="file"
-              accept="image/*"
-              onChange={handleImageUpload}
-              className="hidden"
-            />
-
-            {image && (
-              <div className="flex gap-3 mt-4">
-                <button
-                  onClick={resetAll}
-                  className="flex-1 py-3 bg-white/80 border-2 border-[#C41E3A]/30 rounded-xl font-bold hover:bg-white transition text-[#5C4033]"
+        {/* Upload Section (Koei Style) */}
+        {!result && !loading && (
+          <div className="animate-fade-in no-screenshot">
+            <KoeiFrame title="장수 탐색">
+              <div className="flex flex-col items-center">
+                <div
+                  className="w-full aspect-square max-w-[280px] bg-black/40 border-2 border-dashed border-stone-600 rounded-lg flex flex-col items-center justify-center cursor-pointer hover:border-amber-500/50 transition-colors group relative overflow-hidden"
+                  onClick={() => fileInputRef.current?.click()}
                 >
-                  다시 선택
-                </button>
-                <button
-                  onClick={analyzeImage}
-                  disabled={loading}
-                  className="flex-1 py-3 bg-gradient-to-r from-[#C41E3A] to-[#D4AF37] rounded-xl font-bold hover:opacity-90 transition disabled:opacity-50 text-white"
-                >
-                  {loading ? (
-                    <div className="flex flex-col items-center gap-2">
-                      <span className="animate-spin text-2xl">⚔️</span>
-                      <div className="flex flex-col items-center">
-                        <span className="text-sm opacity-90 animate-pulse font-medium text-amber-200">
-                          {loadingMessages[loadingStep]}
-                        </span>
-                        <div className="flex gap-1 mt-1">
-                          {loadingMessages.map((_, i) => (
-                            <div
-                              key={i}
-                              className={`w-1.5 h-1.5 rounded-full transition-all duration-300 ${i === loadingStep ? "bg-amber-400 scale-125" : "bg-amber-900/50"
-                                }`}
-                            />
-                          ))}
-                        </div>
+                  <div className="absolute inset-0 bg-grid-animate opacity-5 pointer-events-none"></div>
+                  {image ? (
+                    <img
+                      src={image}
+                      alt="업로드된 이미지"
+                      className="w-full h-full object-cover rounded opacity-80"
+                    />
+                  ) : (
+                    <div className="text-center p-6 space-y-4">
+                      <div className="text-6xl group-hover:scale-110 transition-transform duration-500 opacity-60">📸</div>
+                      <div className="space-y-1">
+                        <p className="text-amber-200 font-bold text-lg tracking-widest drop-shadow-md uppercase">인상 심사 (印象 審査)</p>
+                        <p className="text-stone-400 text-[10px] uppercase tracking-[0.2em]">
+                          초상화를 올려 영웅의 기개를 측정하세요
+                        </p>
+                      </div>
+                      <div className="mt-4 inline-block px-3 py-1 bg-amber-900/30 border border-amber-600/30 rounded text-[10px] text-amber-500/80 animate-pulse">
+                        WANTED: 천하의 영웅
                       </div>
                     </div>
-                  ) : (
-                    "닮은꼴 찾기 ⚔️"
                   )}
-                </button>
+                </div>
+
+                <div className="w-full mt-6 space-y-4">
+                  <div className="flex items-center gap-2 px-1">
+                    <div className="w-2 h-2 rounded-full bg-red-600 animate-pulse"></div>
+                    <p className="text-[10px] font-bold text-amber-100/60 uppercase tracking-widest">기개 측정 지침</p>
+                  </div>
+                  <KoeiInsetBox className="text-[11px] text-stone-300/80 leading-relaxed font-medium">
+                    <p>※ 정면 사진은 인식의 기개가 더욱 높습니다.</p>
+                    <p>※ 안면의 랜드마크를 통해 52인의 장수와 대조합니다.</p>
+                  </KoeiInsetBox>
+                </div>
+
+                <input
+                  ref={fileInputRef}
+                  type="file"
+                  accept="image/*"
+                  onChange={handleImageUpload}
+                  className="hidden"
+                />
+
+                {image && (
+                  <div className="w-full flex gap-3 mt-6">
+                    <button
+                      onClick={resetAll}
+                      className="flex-1 py-3 bg-stone-700/50 border border-stone-500 rounded text-amber-200 text-xs font-bold hover:bg-stone-700 transition"
+                    >
+                      초기화
+                    </button>
+                    <button
+                      onClick={analyzeImage}
+                      disabled={loading}
+                      className="flex-1 py-3 bg-gradient-to-r from-red-800 to-red-600 border border-red-500 rounded text-white text-xs font-bold hover:brightness-110 transition shadow-[0_0_15px_rgba(220,38,38,0.3)]"
+                    >
+                      영웅 탐색 시작 ⚔️
+                    </button>
+                  </div>
+                )}
               </div>
-            )}
+            </KoeiFrame>
           </div>
         )}
 
-        {/* Loading Overlay */}
+        {/* Loading Overlay (Same as before but with minor fixes) */}
         {loading && (
           <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/80 backdrop-blur-md transition-all duration-500">
             <div className="max-w-xs w-full px-6 flex flex-col items-center">
-              {/* Scanning Hexagon Frame */}
               <div className="relative w-48 h-48 mb-8">
                 <div className="absolute inset-0 border-2 border-amber-500/30 rounded-full animate-ping"></div>
                 <div className="absolute inset-2 border border-amber-400/50 rounded-full animate-pulse"></div>
-
-                {/* Image under Scan */}
                 <div className="absolute inset-4 overflow-hidden rounded-full border-2 border-amber-600 shadow-[0_0_20px_rgba(251,191,36,0.5)]">
                   {image ? (
                     <img src={image} alt="Scanning" className="w-full h-full object-cover opacity-50 contrast-125 grayscale" />
                   ) : (
                     <div className="w-full h-full bg-amber-950/50 flex items-center justify-center text-4xl">👤</div>
                   )}
-                  {/* Scanning Line */}
                   <div className="absolute left-0 right-0 h-1 bg-gradient-to-r from-transparent via-amber-400 to-transparent shadow-[0_0_10px_#fbbf24] animate-[scan_2s_ease-in-out_infinite]"></div>
                 </div>
-
-                {/* Rotating Gears/Runes */}
                 <div className="absolute inset-0 border-t-2 border-b-2 border-amber-400/20 rounded-full animate-[spin_10s_linear_infinite]"></div>
                 <div className="absolute inset-0 border-l-2 border-r-2 border-amber-400/10 rounded-full animate-[spin_15s_linear_infinite_reverse]"></div>
               </div>
 
-              {/* Status Text Area */}
               <div className="text-center space-y-4 w-full">
                 <div className="inline-block px-4 py-1 bg-amber-900/50 border border-amber-500/50 rounded-full text-xs text-amber-300 font-bold tracking-widest animate-bounce">
                   SYSTEM: 영웅 탐색 중...
                 </div>
-
-                <h2 className="text-xl font-bold text-white tracking-widest drop-shadow-lg">
+                <h2 className="text-xl font-bold text-white tracking-widest drop-shadow-lg min-h-[1.75em]">
                   {loadingMessages[loadingStep]}
                 </h2>
-
-                {/* Analysis Log Log */}
                 <div className="bg-stone-900/80 border border-amber-900/50 rounded-lg p-3 h-28 overflow-hidden text-left font-mono text-[10px] text-amber-400/80 relative">
                   <div className="space-y-1 transition-all duration-500" style={{ transform: `translateY(-${Math.max(0, (loadingStep - 2) * 16)}px)` }}>
-                    <p className="flex items-center gap-2">
-                      <span className="text-amber-600">●</span>
-                      <span>&gt; 분석 알고리즘 초기화... [OK]</span>
-                    </p>
-                    <p className="flex items-center gap-2">
-                      <span className={loadingStep >= 1 ? "text-emerald-500" : "text-amber-900"}>●</span>
-                      <span>&gt; 안면 골격 랜드마크 추출 중...</span>
-                    </p>
-                    {loadingStep >= 1 && (
-                      <p className="flex items-center gap-2 animate-in fade-in slide-in-from-left-2">
-                        <span className="text-emerald-500">●</span>
-                        <span className="text-emerald-400">&gt; 눈매/미간/비강 데이터 수집 완료.</span>
-                      </p>
-                    )}
-                    {loadingStep >= 2 && (
-                      <p className="flex items-center gap-2 animate-in fade-in slide-in-from-left-2">
-                        <span className="text-amber-600">●</span>
-                        <span>&gt; 삼국지 52인 영웅 데이터베이스 대조 시작...</span>
-                      </p>
-                    )}
-                    {loadingStep >= 3 && (
-                      <p className="flex items-center gap-2 animate-in fade-in slide-in-from-left-2">
-                        <span className="text-amber-600">●</span>
-                        <span>&gt; 기개(氣槪) 및 인상 에너지 계산 중...</span>
-                      </p>
-                    )}
-                    {loadingStep >= 4 && (
-                      <p className="flex items-center gap-3 animate-in fade-in slide-in-from-left-2">
-                        <span className="text-blue-500">●</span>
-                        <span className="text-blue-300 font-bold font-mono animate-pulse">&gt; 매칭 캐릭터 식별됨 (ID: MATCH_FOUND)</span>
-                      </p>
-                    )}
-                    {loadingStep >= 5 && (
-                      <p className="flex items-center gap-2 animate-in fade-in slide-in-from-left-2 text-white">
-                        <span className="text-white animate-ping text-[6px]">●</span>
-                        <span className="font-bold">&gt; 천하를 호령할 영웅의 자태를 렌더링합니다...</span>
-                      </p>
-                    )}
+                    <p className="flex items-center gap-2 italic text-emerald-500">&gt; DATABASE CONNECTION: ESTABLISHED</p>
+                    <p className="flex items-center gap-2"><span className="text-amber-600">●</span><span>&gt; 분석 알고리즘 초기화... [OK]</span></p>
+                    {loadingStep >= 1 && <p className="flex items-center gap-2 items-in text-emerald-400"><span className="text-emerald-500">●</span><span>&gt; 안면 특징점 데이터 수집 완료.</span></p>}
+                    {loadingStep >= 2 && <p className="flex items-center gap-2"><span className="text-amber-600">●</span><span>&gt; 영웅 52인 페르소나 대조 시작...</span></p>}
+                    {loadingStep >= 3 && <p className="flex items-center gap-2"><span className="text-amber-600">●</span><span>&gt; 기개(氣槪) 레벨 측정 중... 89.4%</span></p>}
+                    {loadingStep >= 4 && <p className="flex items-center gap-2 text-blue-300 font-black animate-pulse"><span className="text-blue-500">●</span><span>&gt; MATCHING CHARACTER ID: FOUND</span></p>}
+                    {loadingStep >= 5 && <p className="flex items-center gap-2 text-white"><span className="text-white animate-ping text-[4px]">●</span><span>&gt; 영웅의 자태를 렌더링합니다...</span></p>}
                   </div>
-                  {/* CRT Line Effect */}
-                  <div className="absolute inset-0 pointer-events-none bg-[linear-gradient(rgba(18,16,16,0)_50%,rgba(0,0,0,0.1)_50%),linear-gradient(90deg,rgba(255,0,0,0.03),rgba(0,255,0,0.01),rgba(0,0,255,0.03))] bg-[length:100%_2px,3px_100%]"></div>
+                  <div className="absolute inset-0 pointer-events-none bg-[linear-gradient(transparent_50%,rgba(0,0,0,0.1)_50%),linear-gradient(90deg,rgba(255,0,0,0.03),rgba(0,255,0,0.01),rgba(0,0,255,0.03))] bg-[length:100%_2px,3px_100%]"></div>
                 </div>
-
-                <style jsx>{`
-                  @keyframes scan {
-                    0%, 100% { top: 0%; opacity: 0; }
-                    5% { opacity: 1; }
-                    95% { opacity: 1; }
-                    100% { top: 100%; opacity: 0; }
-                  }
-                  .animate-scan {
-                    animation: scan 2s ease-in-out infinite;
-                  }
-                `}</style>
-
-                {/* Progress Bar */}
                 <div className="w-full h-1 bg-stone-800 rounded-full overflow-hidden">
-                  <div
-                    className="h-full bg-gradient-to-r from-amber-700 via-amber-400 to-amber-700 transition-all duration-500 ease-out"
-                    style={{ width: `${((loadingStep + 1) / loadingMessages.length) * 100}%` }}
-                  ></div>
+                  <div className="h-full bg-gradient-to-r from-amber-700 via-amber-400 to-amber-700 transition-all duration-500 ease-out" style={{ width: `${((loadingStep + 1) / loadingMessages.length) * 100}%` }}></div>
                 </div>
-              </div>
-
-              <div className="mt-8 text-amber-500/50 text-[10px] tracking-tighter italic">
-                ※ 고대의 비기(秘記)를 통해 당신과 가장 닮은 영웅을 찾고 있습니다.
               </div>
             </div>
           </div>
         )}
 
+        <style jsx>{`
+          @keyframes scan { 0%, 100% { top: 0%; opacity: 0; } 5% { opacity: 1; } 95% { opacity: 1; } 100% { top: 100%; opacity: 0; } }
+          @keyframes fade-in { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+          .animate-fade-in { animation: fade-in 0.8s ease-out forwards; }
+          .custom-scrollbar::-webkit-scrollbar { width: 4px; }
+          .custom-scrollbar::-webkit-scrollbar-track { background: rgba(0,0,0,0.2); }
+          .custom-scrollbar::-webkit-scrollbar-thumb { background: #5C4033; border-radius: 2px; }
+        `}</style>
+
         {/* Result Section */}
-
         {result && (
-          <div className="space-y-4 animate-fade-in">
-            {/* 캡쳐 영역 시작 */}
-            <div ref={resultRef} className="space-y-4 bg-[#F5E6D3] p-4 -m-4">
-              {/* 메인 결과 카드 - 민화 스타일 */}
-              <div className="relative">
-                {/* 외곽 금테 프레임 */}
-                <div className="absolute -inset-1 bg-gradient-to-br from-[#FFD700] via-[#D4AF37] to-[#FFD700] rounded-3xl opacity-60 blur-sm"></div>
-
-                <div className={`relative bg-white/80 backdrop-blur-sm rounded-3xl border-2 shadow-lg overflow-hidden`}
-                  style={{
-                    borderColor: '#C41E3A',
-                    boxShadow: '0 4px 20px rgba(196, 30, 58, 0.2)'
-                  }}>
-                  {/* 상단 세력 배너 - 민화 스타일 */}
-                  <div className={`py-3 text-center relative ${result.character.faction === "위" ? "bg-gradient-to-r from-[#1E3A5F] via-[#1E3A5F]/90 to-[#1E3A5F]" :
-                    result.character.faction === "촉" ? "bg-gradient-to-r from-green-700 via-green-600 to-green-700" :
-                      result.character.faction === "오" ? "bg-gradient-to-r from-[#C41E3A] via-[#C41E3A]/90 to-[#C41E3A]" :
-                        "bg-gradient-to-r from-purple-700 via-purple-600 to-purple-700"
-                    } border-b-2 border-[#FFD700]/50`}>
-                    {/* 장식 무늬 */}
-                    <div className="absolute left-4 top-1/2 -translate-y-1/2 text-[#FFD700]/40 text-xl">◆</div>
-                    <div className="absolute right-4 top-1/2 -translate-y-1/2 text-[#FFD700]/40 text-xl">◆</div>
-
-                    <span className="text-white font-bold tracking-[0.3em] text-lg drop-shadow-lg" style={{
-                      textShadow: '2px 2px 4px rgba(0, 0, 0, 0.5)'
-                    }}>
-                      {result.character.faction === "위" ? "━ 魏 ━" :
-                        result.character.faction === "촉" ? "━ 蜀 ━" :
-                          result.character.faction === "오" ? "━ 吳 ━" :
-                            "━ 群雄 ━"}
-                    </span>
-                  </div>
-
-                  {/* 나무 질감 배경 오버레이 */}
-                  <div className="absolute inset-0 opacity-5 pointer-events-none" style={{
-                    backgroundImage: 'repeating-linear-gradient(90deg, transparent 0px, rgba(139, 69, 19, 0.3) 1px, transparent 2px, transparent 10px)',
-                    mixBlendMode: 'overlay'
-                  }}></div>
-
-                  <div className="p-4 sm:p-6 relative z-10">
-                    {/* 모바일: 세로 배치, 데스크톱: 가로 배치 */}
-                    <div className="flex flex-col sm:flex-row gap-4 items-center sm:items-start">
-                      {/* 사진 비교 영역 */}
-                      <div className="flex items-center gap-2 sm:gap-4">
-                        {/* 업로드한 사진 - 정사각형 프레임 */}
-                        {image && (
-                          <div className="flex-shrink-0">
-                            <div className="relative">
-                              {/* 금테 장식 프레임 */}
-                              <div className="absolute -inset-1 bg-gradient-to-br from-amber-400 via-yellow-600 to-amber-700 rounded opacity-60"></div>
-                              <div className="relative bg-gradient-to-br from-amber-900 to-amber-950 p-1 rounded">
-                                <img
-                                  src={image}
-                                  alt="내 얼굴"
-                                  className="w-20 h-20 sm:w-28 sm:h-28 object-cover rounded border-2 border-amber-500/70"
-                                  style={{ boxShadow: 'inset 0 0 10px rgba(0, 0, 0, 0.5)' }}
-                                />
-                              </div>
-                              <div className="absolute -bottom-3 left-1/2 -translate-x-1/2 bg-gradient-to-r from-amber-900 via-amber-700 to-amber-900 px-2 sm:px-3 py-1 rounded-full text-xs text-amber-100 border-2 border-amber-500/50 font-bold shadow-lg">
-                                나
-                              </div>
-                            </div>
-                          </div>
-                        )}
-
-                        {/* 화살표 장식 */}
-                        <div className="flex items-center justify-center">
-                          <div className="text-xl sm:text-2xl text-amber-400" style={{ textShadow: '0 0 10px rgba(251, 191, 36, 0.5)' }}>→</div>
+          <div className="animate-fade-in relative z-10 px-2 sm:px-0">
+            <div ref={resultRef} className="bg-[#1a120b] p-2 sm:p-4 -mx-4 sm:mx-0 shadow-2xl rounded-sm">
+              <KoeiFrame title="장수정보">
+                <div className="space-y-6">
+                  {/* 상단: 이미지와 기본 정보 박스 */}
+                  <div className="flex flex-col sm:flex-row gap-4">
+                    {/* 장수 포트레이트 */}
+                    <div className="flex flex-col items-center gap-2">
+                      <div className="relative p-1 bg-gradient-to-br from-stone-800 to-black border-2 border-[#8B4513] shadow-[0_0_15px_black] rounded-sm shrink-0">
+                        <img
+                          src={`/images/samguk/${result.character.name}.jpg`}
+                          alt={result.character.name}
+                          className="w-28 h-36 sm:w-36 sm:h-48 object-cover border border-black"
+                          onError={(e) => {
+                            (e.target as HTMLImageElement).src = `https://ui-avatars.com/api/?name=${result.character.name}&background=random`;
+                          }}
+                        />
+                        <div className="absolute top-1 right-1 px-1.5 py-0.5 bg-red-900 border border-amber-600 rounded text-[9px] text-white font-bold">
+                          SR
                         </div>
+                        <div className="absolute bottom-1 left-0 right-0 py-1 bg-gradient-to-t from-black to-stone-900/90 text-center border-t border-stone-800">
+                          <span className="text-amber-200 text-xs font-bold leading-none">{result.character.name}</span>
+                        </div>
+                      </div>
+                      <div className="w-full grid grid-cols-2 gap-1 text-[9px] font-bold">
+                        <div className="bg-stone-800 border border-stone-600 px-2 py-0.5 text-amber-200 text-center rounded-sm truncate">{result.character.role}</div>
+                        <div className={`border px-2 py-0.5 text-white text-center rounded-sm ${result.character.faction === "위" ? "bg-blue-900 border-blue-600" :
+                          result.character.faction === "촉" ? "bg-green-900 border-green-600" :
+                            result.character.faction === "오" ? "bg-red-900 border-red-600" : "bg-purple-900 border-purple-600"
+                          }`}>세력: {result.character.faction}</div>
+                      </div>
+                    </div>
 
-                        {/* 인물 초상화 영역 - 정사각형 프레임 (코에이 스타일) */}
-                        <div className="flex-shrink-0">
-                          <div className="relative">
-                            {/* 금테 장식 프레임 */}
-                            <div className="absolute -inset-1 bg-gradient-to-br from-yellow-400 via-amber-600 to-yellow-700 rounded opacity-80"></div>
-                            <div className={`relative p-1 rounded ${result.character.faction === "위" ? "bg-gradient-to-br from-blue-800 to-blue-950" :
-                              result.character.faction === "촉" ? "bg-gradient-to-br from-green-800 to-green-950" :
-                                result.character.faction === "오" ? "bg-gradient-to-br from-red-800 to-red-950" :
-                                  "bg-gradient-to-br from-purple-800 to-purple-950"
-                              }`}>
-                              <div className={`w-20 h-20 sm:w-28 sm:h-28 rounded border-2 overflow-hidden ${result.character.faction === "위" ? "bg-gradient-to-br from-blue-900/80 to-blue-950/90 border-blue-400/70" :
-                                result.character.faction === "촉" ? "bg-gradient-to-br from-green-900/80 to-green-950/90 border-green-400/70" :
-                                  result.character.faction === "오" ? "bg-gradient-to-br from-red-900/80 to-red-950/90 border-red-400/70" :
-                                    "bg-gradient-to-br from-purple-900/80 to-purple-950/90 border-purple-400/70"
-                                }`} style={{ boxShadow: 'inset 0 0 20px rgba(0, 0, 0, 0.5)' }}>
-                                <img
-                                  src={`/images/samguk/${result.character.name}.jpg`}
-                                  alt={result.character.name}
-                                  className="w-full h-full object-cover"
-                                  onError={(e) => {
-                                    // 이미지가 없을 경우 기본 아이콘 표시
-                                    (e.target as HTMLImageElement).style.display = 'none';
-                                    (e.target as HTMLImageElement).parentElement!.innerHTML = `
-                                    <div class="w-full h-full flex items-center justify-center text-4xl sm:text-5xl">
-                                      ${result.character.stats.무력 >= 90 ? "⚔️" :
-                                        result.character.stats.지력 >= 90 ? "📜" :
-                                          result.character.stats.매력 >= 90 ? "👑" :
-                                            result.character.stats.통솔 >= 90 ? "🏴" : "🎭"}
-                                    </div>
-                                  `;
-                                  }}
-                                />
-                              </div>
-                            </div>
-                            <div className="absolute -bottom-3 left-1/2 -translate-x-1/2 bg-gradient-to-r from-amber-900 via-amber-700 to-amber-900 px-2 sm:px-3 py-1 rounded-full text-xs text-amber-100 border-2 border-amber-500/50 font-bold shadow-lg whitespace-nowrap">
-                              {result.character.name}
-                            </div>
+                    {/* 기본 신상 정보 박스 */}
+                    <div className="flex-1 space-y-2">
+                      <div className="flex items-center justify-between mb-1 border-b border-black pb-1">
+                        <div className="flex items-center gap-2">
+                          <span className="text-white text-base font-bold drop-shadow-md">{result.character.name}</span>
+                          <span className="text-amber-300/40 text-[10px]">{result.character.hanja}</span>
+                        </div>
+                        <div className="flex items-center gap-1">
+                          <span className="text-amber-500/80 text-[10px] uppercase font-mono tracking-tighter">Consistency:</span>
+                          <span className="text-white font-mono text-sm font-bold">{result.similarity}%</span>
+                        </div>
+                      </div>
+
+                      <KoeiInsetBox className="grid grid-cols-2 gap-y-1.5 gap-x-4">
+                        <div className="flex justify-between items-center text-[10px]">
+                          <span className="text-amber-300/40">현대 직업:</span>
+                          <span className="text-white truncate max-w-[70px]">{result.character.modernJob}</span>
+                        </div>
+                        <div className="flex justify-between items-center text-[10px]">
+                          <span className="text-amber-300/40">성별:</span>
+                          <span className="text-white">{result.character.gender}</span>
+                        </div>
+                        <div className="flex justify-between items-center text-[10px] col-span-2 border-t border-stone-800/50 pt-1">
+                          <span className="text-amber-300/40">대표 특성:</span>
+                          <div className="flex gap-1">
+                            {result.character.traits.map((t, i) => (
+                              <span key={i} className="bg-amber-900/30 text-amber-200 text-[8px] px-1 rounded border border-amber-900/50">{t}</span>
+                            ))}
                           </div>
                         </div>
-                      </div>
+                      </KoeiInsetBox>
 
-                      {/* 인물 정보 */}
-                      <div className="flex-1 text-center sm:text-left pt-4 sm:pt-2">
-                        <div className="flex items-center justify-center sm:justify-start gap-2 mb-2">
-                          <span className={`px-3 py-1 rounded-full text-sm font-bold shadow-lg ${result.character.faction === "위" ? "bg-gradient-to-r from-blue-600 to-blue-700 text-blue-100" :
-                            result.character.faction === "촉" ? "bg-gradient-to-r from-green-600 to-green-700 text-green-100" :
-                              result.character.faction === "오" ? "bg-gradient-to-r from-red-600 to-red-700 text-red-100" :
-                                "bg-gradient-to-r from-purple-600 to-purple-700 text-purple-100"
-                            } border border-amber-400/30`}>
-                            일치도 {result.similarity}%
-                          </span>
+                      <div className="space-y-1">
+                        <div className="text-[9px] text-amber-500/60 ml-1">◈ 페르소나 안면 분석</div>
+                        <KoeiInsetBox className="text-[10px] text-amber-100/90 leading-relaxed font-medium min-h-[100px] bg-black/40">
+                          <div className="space-y-2">
+                            <div>
+                              <p className="text-amber-500/50 mb-0.5 text-[8px] uppercase tracking-widest underline decoration-amber-900 underline-offset-2">Visual Features</p>
+                              <p className="leading-snug text-[9.5px]">{result.faceAnalysis.눈}, {result.faceAnalysis.코}, {result.faceAnalysis.입}</p>
+                            </div>
+                            <div className="border-t border-stone-800/50 pt-1">
+                              <p className="text-amber-500/50 mb-0.5 text-[8px] uppercase tracking-widest underline decoration-amber-900 underline-offset-2">Neural Impression</p>
+                              <p className="leading-snug text-[9.5px]">{result.faceAnalysis.인상}</p>
+                            </div>
+                          </div>
+                        </KoeiInsetBox>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* 탭 콘텐츠 영역 */}
+                  <div className="min-h-[320px]">
+                    {selectedTab === "열전" && (
+                      <div className="space-y-4 animate-in fade-in slide-in-from-bottom-2 duration-500">
+                        <div className="text-stone-400 text-[10px] font-bold italic tracking-widest flex items-center gap-2">
+                          <span className="w-2 h-2 border border-stone-600 rotate-45"></span>
+                          HEROIC LEGEND & COMMENTARY
                         </div>
-                        <h2 className="text-2xl sm:text-3xl font-bold text-[#C41E3A] mb-1" style={{
-                          textShadow: '0 2px 8px rgba(196, 30, 58, 0.2)'
-                        }}>
-                          {result.character.name}
-                        </h2>
-                        <p className="text-sm text-[#5C4033]/80 mb-1">{result.character.hanja}</p>
-                        <p className="text-xs text-[#5C4033] bg-[#FFD700]/20 px-2 py-1 rounded inline-block border border-[#FFD700]/40">
-                          {result.character.role}
-                        </p>
-                      </div>
-                    </div>
-
-                    {/* 닮은 이유 - 민화 스타일 */}
-                    <div className="mt-6 relative">
-                      <div className="absolute -inset-0.5 bg-gradient-to-r from-[#FFD700]/20 via-[#D4AF37]/30 to-[#FFD700]/20 rounded-xl blur"></div>
-                      <div className="relative p-4 bg-white/70 backdrop-blur-sm rounded-xl border-2 border-[#C41E3A]/30 shadow-md">
-                        {/* 두루마리 장식 */}
-                        <div className="absolute top-2 left-2 text-[#FFD700]/30 text-xs">◈</div>
-                        <div className="absolute top-2 right-2 text-[#FFD700]/30 text-xs">◈</div>
-                        <div className="absolute bottom-2 left-2 text-[#FFD700]/30 text-xs">◈</div>
-                        <div className="absolute bottom-2 right-2 text-[#FFD700]/30 text-xs">◈</div>
-
-                        <p className="text-xs text-[#C41E3A] mb-2 font-bold tracking-wider">📜 관상 분석</p>
-                        <p className="text-sm text-[#5C4033] leading-relaxed relative z-10">
-                          {result.matchReason}
-                        </p>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              {/* 능력치 - 민화 스타일 */}
-              <div className="relative">
-                {/* 외곽 금테 프레임 */}
-                <div className="absolute -inset-1 bg-gradient-to-br from-[#FFD700] via-[#D4AF37] to-[#FFD700] rounded-3xl opacity-50 blur-sm"></div>
-
-                <div className="relative bg-white/70 backdrop-blur-sm rounded-3xl p-6 border-2 shadow-lg overflow-hidden"
-                  style={{
-                    borderColor: '#FFD700',
-                    boxShadow: '0 4px 20px rgba(255, 215, 0, 0.3)'
-                  }}>
-                  {/* 민화 배경 효과 */}
-                  <div className="absolute inset-0 opacity-8">
-                    <div className="absolute top-2 left-2 text-4xl text-[#C41E3A]/20">武</div>
-                    <div className="absolute top-2 right-2 text-4xl text-[#1E3A5F]/20">智</div>
-                    <div className="absolute bottom-2 left-2 text-4xl text-[#FFD700]/20">德</div>
-                    <div className="absolute bottom-2 right-2 text-4xl text-[#C41E3A]/20">統</div>
-                  </div>
-
-                  <h3 className="text-xl font-bold mb-4 text-center relative z-10 text-[#C41E3A]"
-                    style={{ textShadow: '0 2px 8px rgba(196, 30, 58, 0.2)' }}>
-                    ⚔️ 능력치 ⚔️
-                  </h3>
-
-                  {/* 오각형 레이더 차트 */}
-                  <div className="relative z-10 mb-4">
-                    <RadarChart stats={result.character.stats} />
-                  </div>
-
-                  {/* 구분선 */}
-                  <div className="relative z-10 flex items-center justify-center my-4">
-                    <div className="flex-1 h-px bg-gradient-to-r from-transparent via-amber-600/50 to-transparent"></div>
-                    <span className="px-3 text-amber-500/60 text-xs">━━</span>
-                    <div className="flex-1 h-px bg-gradient-to-r from-transparent via-amber-600/50 to-transparent"></div>
-                  </div>
-
-                  {/* 민화 스타일 수평 스탯 바 */}
-                  <div className="relative z-10 space-y-2 bg-white/50 p-4 rounded-xl border border-[#C41E3A]/30">
-                    <KoeiStatBar label="통솔" value={result.character.stats.통솔} icon="🏴" />
-                    <KoeiStatBar label="무력" value={result.character.stats.무력} icon="⚔️" />
-                    <KoeiStatBar label="지력" value={result.character.stats.지력} icon="📜" />
-                    <KoeiStatBar label="정치" value={result.character.stats.정치} icon="👑" />
-                    <KoeiStatBar label="매력" value={result.character.stats.매력} icon="✨" />
-                  </div>
-
-                  {/* 총합 */}
-                  <div className="text-center mt-4 relative z-10">
-                    <div className="inline-block bg-gradient-to-r from-[#FFD700]/20 via-[#D4AF37]/30 to-[#FFD700]/20 px-6 py-2 rounded-full border-2 border-[#FFD700]/50 shadow-md">
-                      <span className="text-[#5C4033] text-sm mr-2">총 능력치:</span>
-                      <span className="text-2xl font-bold text-[#C41E3A]"
-                        style={{ textShadow: '0 2px 8px rgba(196, 30, 58, 0.2)' }}>
-                        {Object.values(result.character.stats).reduce((a, b) => a + b, 0)}
-                      </span>
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              {/* 현대판 능력치 - 코에이 스타일 */}
-              {result.character.modernStats && result.character.funStats && result.character.modernComment && (
-                <div className="relative">
-                  {/* 외곽 금테 프레임 */}
-                  <div className="absolute -inset-1 bg-gradient-to-br from-amber-500 via-yellow-700 to-amber-900 rounded-2xl opacity-60 blur-sm"></div>
-
-                  <div className="relative bg-gradient-to-b from-stone-900/95 to-amber-950/80 backdrop-blur-lg rounded-2xl p-6 border-4 border-double shadow-2xl overflow-hidden"
-                    style={{
-                      borderImage: 'linear-gradient(135deg, #f59e0b, #78350f, #f59e0b) 1',
-                      boxShadow: '0 0 25px rgba(217, 119, 6, 0.3), inset 0 0 30px rgba(0, 0, 0, 0.6)'
-                    }}>
-                    {/* 배경 장식 */}
-                    <div className="absolute inset-0 opacity-5">
-                      <div className="absolute top-2 left-2 text-3xl text-amber-200">💼</div>
-                      <div className="absolute top-2 right-2 text-3xl text-amber-200">🎯</div>
-                      <div className="absolute bottom-2 left-2 text-3xl text-amber-200">💰</div>
-                      <div className="absolute bottom-2 right-2 text-3xl text-amber-200">🔥</div>
-                    </div>
-
-                    {/* 나무 질감 */}
-                    <div className="absolute inset-0 opacity-10 pointer-events-none" style={{
-                      backgroundImage: 'repeating-linear-gradient(90deg, transparent 0px, rgba(139, 69, 19, 0.4) 1px, transparent 2px, transparent 8px)',
-                      mixBlendMode: 'overlay'
-                    }}></div>
-
-                    <h3 className="text-xl font-bold mb-4 text-center relative z-10 text-transparent bg-clip-text bg-gradient-to-r from-amber-300 via-yellow-400 to-amber-300"
-                      style={{ textShadow: '0 0 20px rgba(251, 191, 36, 0.5)' }}>
-                      💼 현대판 능력치 💼
-                    </h3>
-
-                    {/* 현대 능력치 오각형 */}
-                    <div className="relative z-10 mb-4">
-                      <RadarChart stats={{
-                        통솔: result.character.modernStats.리더십,
-                        무력: result.character.modernStats.체력,
-                        지력: result.character.modernStats.두뇌,
-                        정치: result.character.modernStats.눈치,
-                        매력: result.character.modernStats.연애력
-                      }} />
-                    </div>
-
-                    {/* 구분선 */}
-                    <div className="relative z-10 flex items-center justify-center my-4">
-                      <div className="flex-1 h-px bg-gradient-to-r from-transparent via-amber-600/50 to-transparent"></div>
-                      <span className="px-3 text-amber-500/60 text-xs">━━</span>
-                      <div className="flex-1 h-px bg-gradient-to-r from-transparent via-amber-600/50 to-transparent"></div>
-                    </div>
-
-                    {/* 현대 스탯 바 */}
-                    <div className="relative z-10 space-y-2 bg-black/20 p-4 rounded-xl border border-amber-800/30">
-                      <KoeiStatBar label="리더십" value={result.character.modernStats.리더십} icon="🏢" />
-                      <KoeiStatBar label="체력" value={result.character.modernStats.체력} icon="💪" />
-                      <KoeiStatBar label="두뇌" value={result.character.modernStats.두뇌} icon="🧠" />
-                      <KoeiStatBar label="눈치" value={result.character.modernStats.눈치} icon="👀" />
-                      <KoeiStatBar label="연애력" value={result.character.modernStats.연애력} icon="💕" />
-                    </div>
-
-                    {/* Fun Stats 섹션 */}
-                    <div className="relative z-10 mt-6">
-                      <div className="text-center mb-3">
-                        <span className="text-amber-300/80 text-sm font-bold tracking-wider">직장인 생존 스탯</span>
-                      </div>
-                      <div className="space-y-2 bg-black/30 p-4 rounded-xl border border-amber-700/30">
-                        <KoeiStatBar label="술자리생존" value={result.character.funStats.술자리생존} icon="🍺" />
-                        <KoeiStatBar label="재테크" value={result.character.funStats.재테크} icon="💰" />
-                        <KoeiStatBar label="칼퇴력" value={result.character.funStats.칼퇴력} icon="🏃" />
-                        <KoeiStatBar label="꼰대력" value={result.character.funStats.꼰대력} icon="😰" />
-                        <KoeiStatBar label="워라밸" value={result.character.funStats.워라밸} icon="🔥" />
-                      </div>
-                    </div>
-
-                    {/* 현대 해석 말풍선 */}
-                    <div className="relative z-10 mt-6">
-                      <div className="relative">
-                        <div className="absolute -inset-0.5 bg-gradient-to-r from-amber-600/30 via-yellow-600/40 to-amber-600/30 rounded-xl blur"></div>
-                        <div className="relative bg-gradient-to-br from-stone-950 via-amber-950/50 to-stone-950 rounded-xl p-5 border-2 border-amber-500/50 shadow-inner">
-                          {/* 말풍선 꼬리 */}
-                          <div className="absolute -top-2 left-1/2 -translate-x-1/2 w-4 h-4 bg-amber-950 border-l-2 border-t-2 border-amber-500/50 rotate-45"></div>
-
-                          {/* 장식 문양 */}
-                          <div className="absolute top-1 left-2 text-amber-600/20 text-lg">💬</div>
-                          <div className="absolute top-1 right-2 text-amber-600/20 text-lg">💬</div>
-
-                          <p className="text-base text-center text-amber-100 font-medium leading-relaxed relative z-10" style={{
-                            textShadow: '0 0 10px rgba(251, 191, 36, 0.3)'
-                          }}>
-                            {result.character.modernComment}
+                        <div className="bg-black/40 border border-stone-800 p-4 rounded-sm space-y-4">
+                          <div className="relative pl-6 py-2">
+                            <span className="absolute left-0 top-0 text-3xl text-amber-900/40 font-serif">&ldquo;</span>
+                            <p className="text-amber-200 text-sm italic leading-relaxed font-medium">&quot;{result.character.quote}&quot;</p>
+                            <span className="absolute right-2 bottom-0 text-3xl text-amber-900/40 font-serif rotate-180">&ldquo;</span>
+                          </div>
+                          <p className="text-stone-300 text-[11px] leading-relaxed pt-4 border-t border-stone-800/50">
+                            {result.character.description}
                           </p>
+                          <div className="bg-stone-800/40 p-3 rounded border border-stone-700/50">
+                            <p className="text-stone-400 text-[9px] font-bold mb-1">[현대적 재구성] - {result.character.modernJob}</p>
+                            <p className="text-stone-200/80 text-[10px] font-medium leading-snug">{result.character.modernComment}</p>
+                          </div>
                         </div>
                       </div>
-                    </div>
-                  </div>
-                </div>
-              )}
+                    )}
 
-              {/* 인물 설명 - 코에이 스타일 */}
-              <div className="relative">
-                <div className="absolute -inset-0.5 bg-gradient-to-br from-amber-500/30 via-yellow-700/40 to-amber-900/30 rounded-2xl opacity-60 blur"></div>
-                <div className="relative bg-gradient-to-b from-stone-900/90 to-amber-950/70 backdrop-blur-lg rounded-2xl p-6 border-2 border-amber-600/40 shadow-xl"
-                  style={{ boxShadow: '0 0 20px rgba(217, 119, 6, 0.2), inset 0 0 15px rgba(0, 0, 0, 0.5)' }}>
-                  <h3 className="text-lg font-bold mb-3 text-transparent bg-clip-text bg-gradient-to-r from-amber-200 via-yellow-400 to-amber-200 flex items-center gap-2">
-                    <span>📜</span> 인물 소개
-                  </h3>
-                  <p className="text-stone-200 text-sm leading-relaxed mb-4">
-                    {result.character.description}
-                  </p>
-                  <div className="flex flex-wrap gap-2">
-                    {result.character.traits.map((trait, index) => (
-                      <span
-                        key={index}
-                        className="px-3 py-1 bg-gradient-to-r from-amber-900/50 to-amber-950/60 text-amber-200 rounded-full text-xs border-2 border-amber-600/40 shadow-md"
-                      >
-                        {trait}
-                      </span>
-                    ))}
-                  </div>
-                </div>
-              </div>
-
-              {/* 성격 & 명대사 - 코에이 스타일 */}
-              <div className="relative">
-                <div className="absolute -inset-0.5 bg-gradient-to-br from-amber-500/30 via-yellow-700/40 to-amber-900/30 rounded-2xl opacity-60 blur"></div>
-                <div className="relative bg-gradient-to-b from-stone-900/90 to-amber-950/70 backdrop-blur-lg rounded-2xl p-6 border-2 border-amber-600/40 shadow-xl"
-                  style={{ boxShadow: '0 0 20px rgba(217, 119, 6, 0.2), inset 0 0 15px rgba(0, 0, 0, 0.5)' }}>
-                  <h3 className="text-lg font-bold mb-3 text-transparent bg-clip-text bg-gradient-to-r from-amber-200 via-yellow-400 to-amber-200 flex items-center gap-2">
-                    <span>💬</span> 명대사
-                  </h3>
-                  {/* 두루마리 스타일 명대사 박스 */}
-                  <div className="relative">
-                    <div className="absolute -inset-0.5 bg-gradient-to-r from-amber-600/30 via-yellow-600/40 to-amber-600/30 rounded-xl blur"></div>
-                    <div className="relative bg-gradient-to-br from-stone-950 via-amber-950/50 to-stone-950 rounded-xl p-5 border-2 border-amber-500/50 shadow-inner">
-                      {/* 장식 문양 */}
-                      <div className="absolute top-1 left-2 text-amber-600/20 text-lg">❖</div>
-                      <div className="absolute top-1 right-2 text-amber-600/20 text-lg">❖</div>
-                      <div className="absolute bottom-1 left-2 text-amber-600/20 text-lg">❖</div>
-                      <div className="absolute bottom-1 right-2 text-amber-600/20 text-lg">❖</div>
-
-                      <p className="text-lg text-center text-amber-100 italic font-medium leading-relaxed relative z-10" style={{
-                        textShadow: '0 0 10px rgba(251, 191, 36, 0.3)'
-                      }}>
-                        "{result.character.quote}"
-                      </p>
-                    </div>
-                  </div>
-                  <div className="mt-4 pt-4 border-t border-amber-700/30">
-                    <p className="text-xs text-amber-400/80 mb-2 font-bold tracking-wider">성격</p>
-                    <p className="text-sm text-stone-200 leading-relaxed">{result.character.personality}</p>
-                  </div>
-                </div>
-              </div>
-
-              {/* 현대 직업 & 내 얼굴 분석 - 코에이 스타일 */}
-              <div className="grid grid-cols-2 gap-3">
-                <div className="relative">
-                  <div className="absolute -inset-0.5 bg-gradient-to-br from-amber-500/20 via-yellow-700/30 to-amber-900/20 rounded-xl opacity-60 blur"></div>
-                  <div className="relative bg-gradient-to-b from-stone-900/85 to-amber-950/60 backdrop-blur-lg rounded-xl p-4 border-2 border-amber-600/40 shadow-lg"
-                    style={{ boxShadow: '0 0 15px rgba(217, 119, 6, 0.15), inset 0 0 10px rgba(0, 0, 0, 0.5)' }}>
-                    <p className="text-xs text-amber-400/70 mb-2 font-bold">현대에 태어났다면?</p>
-                    <p className="text-sm text-amber-100 font-medium">{result.character.modernJob}</p>
-                  </div>
-                </div>
-                <div className="relative">
-                  <div className="absolute -inset-0.5 bg-gradient-to-br from-amber-500/20 via-yellow-700/30 to-amber-900/20 rounded-xl opacity-60 blur"></div>
-                  <div className="relative bg-gradient-to-b from-stone-900/85 to-amber-950/60 backdrop-blur-lg rounded-xl p-4 border-2 border-amber-600/40 shadow-lg"
-                    style={{ boxShadow: '0 0 15px rgba(217, 119, 6, 0.15), inset 0 0 10px rgba(0, 0, 0, 0.5)' }}>
-                    <p className="text-xs text-amber-400/70 mb-2 font-bold">전체 인상</p>
-                    <p className="text-sm text-amber-100">{result.faceAnalysis.인상}</p>
-                  </div>
-                </div>
-              </div>
-
-              {/* Coupang Partners Banner 1 */}
-              <div className="mt-2">
-                <p className="text-center text-xs text-stone-500 mb-2">추천 상품</p>
-                <div className="flex justify-center">
-                  <iframe
-                    src="https://ads-partners.coupang.com/widgets.html?id=950676&template=carousel&trackingCode=AF6497036&subId=&width=450&height=130&tsource="
-                    width="450"
-                    height="130"
-                    frameBorder="0"
-                    scrolling="no"
-                    referrerPolicy="unsafe-url"
-                    className="rounded-lg max-w-full"
-                  />
-                </div>
-                <p className="text-center text-stone-700 text-[10px] mt-2">
-                  쿠팡 파트너스 활동의 일환으로 일정액의 수수료를 제공받습니다
-                </p>
-              </div>
-
-              {/* 내 얼굴 분석 상세 - 코에이 스타일 */}
-              <div className="relative">
-                <div className="absolute -inset-0.5 bg-gradient-to-br from-amber-500/30 via-yellow-700/40 to-amber-900/30 rounded-2xl opacity-60 blur"></div>
-                <div className="relative bg-gradient-to-b from-stone-900/90 to-amber-950/70 backdrop-blur-lg rounded-2xl p-6 border-2 border-amber-600/40 shadow-xl"
-                  style={{ boxShadow: '0 0 20px rgba(217, 119, 6, 0.2), inset 0 0 15px rgba(0, 0, 0, 0.5)' }}>
-                  <h3 className="text-lg font-bold mb-4 text-transparent bg-clip-text bg-gradient-to-r from-amber-200 via-yellow-400 to-amber-200 flex items-center gap-2">
-                    <span>🔍</span> 얼굴 분석
-                  </h3>
-                  <div className="grid grid-cols-2 gap-3">
-                    {Object.entries(result.faceAnalysis).filter(([key]) => key !== "인상").map(([part, desc]) => (
-                      <div key={part} className="relative">
-                        <div className="absolute -inset-0.5 bg-gradient-to-br from-amber-600/20 via-yellow-700/25 to-amber-800/20 rounded-lg opacity-60 blur-sm"></div>
-                        <div className="relative bg-gradient-to-br from-stone-950/90 to-amber-950/60 rounded-lg p-3 border border-amber-600/40 shadow-md"
-                          style={{ boxShadow: 'inset 0 0 8px rgba(0, 0, 0, 0.5)' }}>
-                          <p className="text-xs text-amber-300 mb-1 font-bold">{part}</p>
-                          <p className="text-sm text-stone-200 leading-snug">{desc}</p>
+                    {selectedTab === "능력" && (
+                      <div className="space-y-4 animate-in fade-in slide-in-from-bottom-2 duration-500">
+                        <div className="text-emerald-400 text-[10px] font-black flex items-center gap-2 tracking-widest italic">
+                          <span className="w-2 h-0.5 bg-emerald-500"></span>
+                          CLASSIC ABILITIES
+                        </div>
+                        <div className="bg-black/30 p-6 rounded border border-stone-800 space-y-3">
+                          <KoeiStatLine label="통솔" value={result.character.stats.통솔} />
+                          <KoeiStatLine label="무력" value={result.character.stats.무력} />
+                          <KoeiStatLine label="지력" value={result.character.stats.지력} />
+                          <KoeiStatLine label="정치" value={result.character.stats.정치} />
+                          <KoeiStatLine label="매력" value={result.character.stats.매력} />
+                          <div className="mt-6 pt-4 border-t border-stone-800/50">
+                            <p className="text-[10px] text-stone-500 italic">※ 코에이 삼국지 시리즈의 능력치 밸런스를 기준으로 산출되었습니다.</p>
+                          </div>
                         </div>
                       </div>
-                    ))}
+                    )}
+
+                    {selectedTab === "현대" && (
+                      <div className="space-y-4 animate-in fade-in slide-in-from-bottom-2 duration-500">
+                        <div className="text-blue-400 text-[10px] font-black flex items-center gap-2 tracking-widest italic">
+                          <span className="w-2 h-0.5 bg-blue-500"></span>
+                          MODERN SOCIAL STATS
+                        </div>
+                        <div className="bg-black/30 p-6 rounded border border-stone-800 space-y-3">
+                          <KoeiStatLine label="리더십" value={result.character.modernStats.리더십} />
+                          <KoeiStatLine label="체력" value={result.character.modernStats.체력} />
+                          <KoeiStatLine label="두뇌" value={result.character.modernStats.두뇌} />
+                          <KoeiStatLine label="처세술" value={result.character.modernStats.눈치} />
+                          <KoeiStatLine label="연애력" value={result.character.modernStats.연애력} />
+                          <div className="mt-4 p-3 bg-blue-900/10 border border-blue-900/30 rounded">
+                            <p className="text-blue-300 text-[10px] font-bold">권장 현대 직무</p>
+                            <p className="text-white text-xs mt-1">{result.character.modernJob}</p>
+                          </div>
+                        </div>
+                      </div>
+                    )}
+
+                    {selectedTab === "특기" && (
+                      <div className="space-y-4 animate-in fade-in slide-in-from-bottom-2 duration-500">
+                        <div className="text-purple-400 text-[10px] font-black flex items-center gap-2 tracking-widest italic">
+                          <span className="w-2 h-0.5 bg-purple-500"></span>
+                          SPECIAL TRAITS & LIFESTYLE
+                        </div>
+                        <div className="space-y-4">
+                          <KoeiInsetBox className="flex flex-wrap gap-2">
+                            {result.character.traits.map((t, i) => (
+                              <span key={i} className="bg-purple-900/40 text-purple-200 text-xs px-3 py-1 rounded-full border border-purple-500/30">
+                                # {t}
+                              </span>
+                            ))}
+                          </KoeiInsetBox>
+
+                          <div className="bg-black/20 p-4 rounded border border-stone-800">
+                            <p className="text-amber-400/60 text-[8px] font-bold mb-4 uppercase tracking-[0.3em] text-center">Lifestyle Index</p>
+                            <div className="grid grid-cols-5 gap-2">
+                              {Object.entries(result.character.funStats).map(([label, val]) => (
+                                <div key={label} className="text-center">
+                                  <p className="text-[9px] text-stone-500 mb-2 h-8 flex items-center justify-center leading-tight">{label}</p>
+                                  <div className="relative w-1.5 h-16 bg-stone-800 rounded-full overflow-hidden mx-auto">
+                                    <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-purple-700 to-purple-400" style={{ height: `${val}%` }}></div>
+                                  </div>
+                                  <p className="text-[10px] text-purple-300 mt-2 font-mono font-bold">{val}</p>
+                                </div>
+                              ))}
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    )}
+
+                    {selectedTab === "분석" && (
+                      <div className="space-y-4 animate-in fade-in slide-in-from-bottom-2 duration-500">
+                        <div className="text-amber-500 text-[10px] font-black flex items-center gap-2 tracking-widest italic">
+                          <span className="w-2 h-0.5 bg-amber-600"></span>
+                          NEURAL FACE ANALYSIS
+                        </div>
+                        <div className="space-y-4">
+                          <KoeiInsetBox className="space-y-3 bg-black/40 p-4">
+                            <div className="grid grid-cols-2 gap-4">
+                              <div>
+                                <p className="text-amber-600/60 text-[8px] uppercase tracking-tighter mb-1 border-b border-amber-900/30">Eye/Nose/Mouth</p>
+                                <p className="text-white text-[11px] leading-snug">{result.faceAnalysis.눈}, {result.faceAnalysis.코}, {result.faceAnalysis.입}</p>
+                              </div>
+                              <div>
+                                <p className="text-amber-600/60 text-[8px] uppercase tracking-tighter mb-1 border-b border-amber-900/30">Overall Impression</p>
+                                <p className="text-white text-[11px] leading-snug">{result.faceAnalysis.인상}</p>
+                              </div>
+                            </div>
+                          </KoeiInsetBox>
+
+                          <div className="bg-amber-900/10 border border-amber-600/30 p-4 rounded relative overflow-hidden">
+                            <div className="absolute top-0 right-0 p-1 opacity-10 text-4xl italic font-black text-amber-500">MATCH</div>
+                            <p className="text-amber-500 text-[10px] font-bold mb-2 flex items-center gap-1">
+                              <span className="w-1 h-1 bg-amber-500 rounded-full"></span>
+                              유사 영웅 식별 사유
+                            </p>
+                            <p className="text-amber-100/90 text-xs leading-relaxed font-medium">
+                              {result.matchReason}
+                            </p>
+                          </div>
+                        </div>
+                      </div>
+                    )}
                   </div>
+
+                  {/* 하단 버튼 인터페이스 */}
+                  <div className="flex flex-col gap-2 pt-4 border-t border-black/40">
+                    <div className="flex justify-between items-center px-1">
+                      <div className="text-[9px] text-stone-600 font-serif tracking-tighter italic">천하의 기운이 영웅의 자태에 머무나니...</div>
+                      <div className="flex gap-1 opacity-50">
+                        <div className="w-1 h-1 rounded-full bg-emerald-500"></div>
+                        <div className="w-1 h-1 rounded-full bg-red-500"></div>
+                        <div className="w-1 h-1 rounded-full bg-blue-500"></div>
+                      </div>
+                    </div>
+                    <KoeiButtonGroup>
+                      <KoeiButton label="열전" onClick={() => setSelectedTab("열전")} highlight={selectedTab === "열전"} />
+                      <KoeiButton label="능력" onClick={() => setSelectedTab("능력")} highlight={selectedTab === "능력"} />
+                      <KoeiButton label="현대" onClick={() => setSelectedTab("현대")} highlight={selectedTab === "현대"} />
+                      <KoeiButton label="특기" onClick={() => setSelectedTab("특기")} highlight={selectedTab === "특기"} />
+                      <KoeiButton label="분석" onClick={() => setSelectedTab("분석")} highlight={selectedTab === "분석"} />
+                    </KoeiButtonGroup>
+                  </div>
+
                 </div>
+              </KoeiFrame>
+
+              {/* 공유 및 제어 버튼 */}
+              <div className="grid grid-cols-2 gap-3 mt-4 no-screenshot px-1 sm:px-0">
+                <button
+                  onClick={() => download(getShareOptions())}
+                  disabled={isCapturing}
+                  className="flex items-center justify-center gap-2 py-3 bg-gradient-to-b from-[#8B4513] to-[#5C4033] text-white rounded shadow-[0_4px_0_#3d1e08] hover:translate-y-[2px] hover:shadow-[0_2px_0_#3d1e08] active:translate-y-[4px] active:shadow-none transition-all text-sm font-bold border border-[#CD853F] disabled:opacity-50"
+                >
+                  <span className="text-lg">💾</span> {isCapturing ? "기록중..." : "결과 저장"}
+                </button>
+                <button
+                  onClick={resetAll}
+                  className="flex items-center justify-center gap-2 py-3 bg-gradient-to-b from-stone-700 to-stone-800 text-stone-200 rounded shadow-[0_4px_0_#1c1c1c] hover:translate-y-[2px] hover:shadow-[0_2px_0_#1c1c1c] active:translate-y-[4px] active:shadow-none transition-all text-sm font-bold border border-stone-500"
+                >
+                  <span className="text-lg">🔄</span> 다시 하기
+                </button>
               </div>
 
-              {/* Coupang Partners Banner */}
-              <div className="mt-2">
-                <p className="text-center text-xs text-[#5C4033]/60 mb-2">추천 상품</p>
-                <div className="flex justify-center">
-                  <iframe
-                    src="https://ads-partners.coupang.com/widgets.html?id=950676&template=carousel&trackingCode=AF6497036&subId=&width=450&height=130&tsource="
-                    width="450"
-                    height="130"
-                    frameBorder="0"
-                    scrolling="no"
-                    referrerPolicy="unsafe-url"
-                    className="rounded-lg max-w-full"
-                  />
+              {/* 쿠팡 파트너스 배너 */}
+              <div className="mt-6 no-screenshot">
+                <div className="p-3 bg-white/5 backdrop-blur-md rounded-lg border border-white/10 flex items-center justify-between gap-3 shadow-inner">
+                  <div className="text-[8px] text-stone-500 leading-tight">
+                    이 포스팅은 쿠팡 파트너스 활동의 일환으로, <br />이에 따른 일정액의 수수료를 제공받습니다.
+                  </div>
+                  <Link
+                    href="https://link.coupang.com/a/bS8K6n"
+                    target="_blank"
+                    className="flex-shrink-0 bg-[#C41E3A] text-white text-[9px] font-bold px-3 py-1.5 rounded shadow-[0_2px_0_black] active:translate-y-[1px] active:shadow-none transition-all"
+                  >
+                    영웅의 장비 쇼핑
+                  </Link>
                 </div>
-                <p className="text-center text-[#5C4033]/50 text-[10px] mt-2">
-                  쿠팡 파트너스 활동의 일환으로 일정액의 수수료를 제공받습니다
-                </p>
               </div>
             </div>
-            {/* 캡쳐 영역 끝 */}
 
-            {/* 공유 버튼 */}
-            <div className="flex gap-3">
-              <button
-                onClick={() => download(getShareOptions())}
-                disabled={isCapturing}
-                className="flex-1 py-3 bg-gradient-to-r from-green-600 to-green-500 rounded-xl font-bold text-center hover:opacity-90 transition text-white disabled:opacity-50 flex items-center justify-center gap-2"
-              >
-                {isCapturing ? "⏳ 캡쳐중..." : "📥 이미지 저장"}
-              </button>
+            {/* 하단 모바일 공유 */}
+            <div className="mt-4 px-2 no-screenshot text-center pb-10">
+              <p className="text-[10px] text-stone-600 italic mb-2 tracking-tighter">※ 저장 버튼이 작동하지 않으면 이미지를 길게 터치하여 저장하세요.</p>
               <button
                 onClick={() => share(getShareOptions())}
-                disabled={isCapturing}
-                className="flex-1 py-3 bg-gradient-to-r from-[#1E3A5F] to-[#1E3A5F]/80 rounded-xl font-bold text-center hover:opacity-90 transition text-white disabled:opacity-50 flex items-center justify-center gap-2"
+                className="w-full py-2 bg-emerald-900/60 border border-emerald-800 text-emerald-200 text-[10px] font-bold rounded shadow-sm hover:bg-emerald-800 transition-colors"
               >
-                {isCapturing ? "⏳ 캡쳐중..." : "📤 친구랑 닮은꼴 비교하기"}
+                카카오톡으로 나의 기개 뽐내기 ⚔️
               </button>
-            </div>
-
-            {/* 버튼 */}
-            <div className="flex gap-3">
-              <button
-                onClick={resetAll}
-                className="flex-1 py-3 bg-white/80 border-2 border-[#C41E3A]/30 rounded-xl font-bold hover:bg-white transition text-[#5C4033]"
-              >
-                다시하기
-              </button>
-              <Link
-                href="/"
-                className="flex-1 py-3 bg-gradient-to-r from-[#C41E3A] to-[#D4AF37] rounded-xl font-bold text-center hover:opacity-90 transition text-white"
-              >
-                다른 운세 보기
-              </Link>
             </div>
           </div>
         )}
 
         {/* Footer */}
-        <p className="text-center text-[#5C4033]/50 text-xs mt-8">
-          ⚔️ 재미로만 봐주세요! AI가 추측한 결과입니다.
-        </p>
+        <div className="mt-20 text-center pb-10">
+          <div className="w-12 h-0.5 bg-stone-700 mx-auto mb-4 opacity-30"></div>
+          <p className="text-stone-500 text-[10px] font-serif italic">
+            &copy; 2024 Samguk Persona. All rights reserved.
+          </p>
+        </div>
       </main>
     </div>
   );

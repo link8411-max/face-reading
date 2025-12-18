@@ -2,21 +2,32 @@
 
 :root {
   /* 민화 오방색 */
-  --minhwa-red: #C41E3A;      /* 적색 - 남쪽, 여름, 화 */
-  --minhwa-blue: #1E3A5F;     /* 청색 - 동쪽, 봄, 목 */
-  --minhwa-yellow: #FFD700;   /* 황색 - 중앙, 토 */
-  --minhwa-black: #1a1a1a;    /* 흑색 - 북쪽, 겨울, 수 */
-  --minhwa-white: #F5F5F5;    /* 백색 - 서쪽, 가을, 금 */
+  --minhwa-red: #C41E3A;
+  /* 적색 - 남쪽, 여름, 화 */
+  --minhwa-blue: #1E3A5F;
+  /* 청색 - 동쪽, 봄, 목 */
+  --minhwa-yellow: #FFD700;
+  /* 황색 - 중앙, 토 */
+  --minhwa-black: #1a1a1a;
+  /* 흑색 - 북쪽, 겨울, 수 */
+  --minhwa-white: #F5F5F5;
+  /* 백색 - 서쪽, 가을, 금 */
 
   /* 한지 배경색 */
-  --hanji-light: #F5E6D3;     /* 밝은 한지 */
-  --hanji-medium: #E8D4C4;    /* 중간 한지 */
-  --hanji-dark: #D4C4B4;      /* 어두운 한지 */
+  --hanji-light: #F5E6D3;
+  /* 밝은 한지 */
+  --hanji-medium: #E8D4C4;
+  /* 중간 한지 */
+  --hanji-dark: #D4C4B4;
+  /* 어두운 한지 */
 
   /* 전통 보조색 */
-  --traditional-brown: #5C4033;  /* 진한 갈색 */
-  --traditional-gold: #D4AF37;   /* 금색 */
-  --traditional-beige: #EAE0D5;  /* 베이지 */
+  --traditional-brown: #5C4033;
+  /* 진한 갈색 */
+  --traditional-gold: #D4AF37;
+  /* 금색 */
+  --traditional-beige: #EAE0D5;
+  /* 베이지 */
 
   --background: var(--hanji-light);
   --foreground: var(--traditional-brown);
@@ -47,6 +58,7 @@ body {
     opacity: 0;
     transform: translateY(20px);
   }
+
   to {
     opacity: 1;
     transform: translateY(0);
@@ -59,10 +71,23 @@ body {
 
 /* 방울 흔들리기 */
 @keyframes shake {
-  0%, 100% { transform: rotate(0deg); }
-  25% { transform: rotate(-15deg); }
-  50% { transform: rotate(15deg); }
-  75% { transform: rotate(-10deg); }
+
+  0%,
+  100% {
+    transform: rotate(0deg);
+  }
+
+  25% {
+    transform: rotate(-15deg);
+  }
+
+  50% {
+    transform: rotate(15deg);
+  }
+
+  75% {
+    transform: rotate(-10deg);
+  }
 }
 
 .animate-shake {
@@ -75,8 +100,17 @@ body {
 
 /* 반짝반짝 */
 @keyframes twinkle {
-  0%, 100% { opacity: 1; transform: scale(1); }
-  50% { opacity: 0.5; transform: scale(1.2); }
+
+  0%,
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+
+  50% {
+    opacity: 0.5;
+    transform: scale(1.2);
+  }
 }
 
 .animate-twinkle {
@@ -85,8 +119,15 @@ body {
 
 /* 두근두근 */
 @keyframes pulse-heart {
-  0%, 100% { transform: scale(1); }
-  50% { transform: scale(1.1); }
+
+  0%,
+  100% {
+    transform: scale(1);
+  }
+
+  50% {
+    transform: scale(1.1);
+  }
 }
 
 .animate-pulse-heart {
@@ -95,8 +136,15 @@ body {
 
 /* 떠다니기 */
 @keyframes float {
-  0%, 100% { transform: translateY(0); }
-  50% { transform: translateY(-10px); }
+
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+
+  50% {
+    transform: translateY(-10px);
+  }
 }
 
 .animate-float {
@@ -105,8 +153,13 @@ body {
 
 /* 빙글빙글 */
 @keyframes spin-slow {
-  from { transform: rotate(0deg); }
-  to { transform: rotate(360deg); }
+  from {
+    transform: rotate(0deg);
+  }
+
+  to {
+    transform: rotate(360deg);
+  }
 }
 
 .animate-spin-slow {
@@ -115,9 +168,19 @@ body {
 
 /* 튀어오르기 */
 @keyframes bounce-in {
-  0% { transform: scale(0); opacity: 0; }
-  50% { transform: scale(1.1); }
-  100% { transform: scale(1); opacity: 1; }
+  0% {
+    transform: scale(0);
+    opacity: 0;
+  }
+
+  50% {
+    transform: scale(1.1);
+  }
+
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
 }
 
 .animate-bounce-in {
@@ -126,10 +189,58 @@ body {
 
 /* 별똥별 */
 @keyframes shooting-star {
-  0% { transform: translateX(0) translateY(0); opacity: 1; }
-  100% { transform: translateX(100px) translateY(100px); opacity: 0; }
+  0% {
+    transform: translateX(0) translateY(0);
+    opacity: 1;
+  }
+
+  100% {
+    transform: translateX(100px) translateY(100px);
+    opacity: 0;
+  }
 }
 
 .animate-shooting-star {
   animation: shooting-star 1s ease-out;
+}
+
+/* Cyber/Kedeheon Effects - Used in Samguk HUD */
+@keyframes grid-animate {
+  0% {
+    background-position: 0 0;
+  }
+
+  100% {
+    background-position: 0 40px;
+  }
+}
+
+.bg-grid-animate {
+  background-image:
+    linear-gradient(to right, rgba(255, 255, 255, 0.05) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(255, 255, 255, 0.05) 1px, transparent 1px);
+  background-size: 20px 20px;
+  animation: grid-animate 20s linear infinite;
+}
+
+.neon-glow-cyan {
+  box-shadow: 0 0 10px rgba(0, 243, 255, 0.5), 0 0 20px rgba(0, 243, 255, 0.2);
+}
+
+.neon-glow-pink {
+  box-shadow: 0 0 10px rgba(255, 0, 127, 0.5), 0 0 20px rgba(255, 0, 127, 0.2);
+}
+
+@keyframes shimmer {
+  0% {
+    background-position: -200% 0;
+  }
+
+  100% {
+    background-position: 200% 0;
+  }
+}
+
+.animate-shimmer {
+  animation: shimmer 3s infinite;
 }
