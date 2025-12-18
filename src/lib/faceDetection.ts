@@ -16,6 +16,7 @@ export interface FaceFeatures {
     size: 'small' | 'medium' | 'large';        // 작음/보통/큼
     shape: 'round' | 'almond' | 'narrow';      // 둥근/아몬드/가늘음
     spacing: 'close' | 'medium' | 'wide';      // 가까움/보통/넓음
+    corners: 'down' | 'neutral' | 'up';        // 처짐/평평/올라감
   };
 
   // 눈썹
@@ -101,45 +102,25 @@ export async function loadModels(): Promise<void> {
 export async function detectFaceFeatures(
   imageElement: HTMLImageElement | HTMLVideoElement | HTMLCanvasElement
 ): Promise<FaceFeatures> {
-  // 모델이 로드되지 않았다면 먼저 로드
-  if (!modelsLoaded) {
-    await loadModels();
+  await loadModels();
+
+  const detection = await faceapi
+    .detectSingleFace(imageElement)
+    .withFaceLandmarks();
+
+  if (!detection) {
+    throw new Error('Face not detected');
   }
 
-  try {
-    // 얼굴 감지 + 68개 랜드마크 추출
-    const detection = await faceapi
-      .detectSingleFace(imageElement)
-      .withFaceLandmarks();
-
-    if (!detection) {
-      throw new Error('No face detected in the image');
-    }
-
-    const landmarks = detection.landmarks;
-    const positions = landmarks.positions;
-
-    // 68 랜드마크 인덱스
-    // 0-16: 얼굴 윤곽 (턱선)
-    // 17-21: 왼쪽 눈썹
-    // 22-26: 오른쪽 눈썹
-    // 27-35: 코
-    // 36-41: 왼쪽 눈
-    // 42-47: 오른쪽 눈
-    // 48-67: 입
-
-    return calculateFaceFeatures(positions);
-  } catch (error) {
-    console.error('Error detecting face features:', error);
-    throw error;
-  }
+  return calculateFaceFeatures(detection.landmarks.positions);
 }
 
 /**
- * 68 랜드마크 포인트로부터 얼굴 특징 계산
+ * 랜드마크 포인트들을 기반으로 관상 특징 계산
+ * @param landmarks - faceapi.Point[] 68개의 랜드마크 포인트
  */
 function calculateFaceFeatures(landmarks: faceapi.Point[]): FaceFeatures {
-  // 얼굴 기준 치수 계산
+  // 기준 거리 계산 (얼굴 폭, 높이)
   const faceWidth = Math.abs(landmarks[16].x - landmarks[0].x);
   const faceHeight = Math.abs(landmarks[8].y - landmarks[27].y);
 
@@ -156,6 +137,16 @@ function calculateFaceFeatures(landmarks: faceapi.Point[]): FaceFeatures {
   const avgEyeWidth = (leftEyeWidth + rightEyeWidth) / 2;
   const avgEyeHeight = (leftEyeHeight + rightEyeHeight) / 2;
   const eyeAspectRatio = avgEyeHeight / avgEyeWidth;
+
+  // 눈꼬리 각도 계산 (눈머리 대비 눈꼬리 높이)
+  const leftOuterCornerY = landmarks[36].y;
+  const leftInnerCornerY = landmarks[39].y;
+  const rightInnerCornerY = landmarks[42].y;
+  const rightOuterCornerY = landmarks[45].y;
+
+  const leftCornerDiff = leftInnerCornerY - leftOuterCornerY;
+  const rightCornerDiff = rightInnerCornerY - rightOuterCornerY;
+  const avgCornerDiff = (leftCornerDiff + rightCornerDiff) / 2;
 
   // 눈썹 특징 계산
   const leftBrow = landmarks.slice(17, 22);
@@ -192,7 +183,7 @@ function calculateFaceFeatures(landmarks: faceapi.Point[]): FaceFeatures {
   // 턱 특징 계산
   const jawLine = landmarks.slice(0, 17);
   const chinPoint = landmarks[8];
-  const chinWidth = Math.abs(landmarks[16].x - landmarks[0].x);
+  const chinWidth = Math.abs(landmarks[14].x - landmarks[2].x); // 턱 너비 추정
   const chinLength = Math.abs(chinPoint.y - landmarks[27].y);
 
   // 턱 형태 (각진 정도)
@@ -205,8 +196,8 @@ function calculateFaceFeatures(landmarks: faceapi.Point[]): FaceFeatures {
   const foreheadHeight = Math.abs(landmarks[27].y - ((leftBrow[2].y + rightBrow[2].y) / 2));
   const foreheadWidth = Math.abs(landmarks[16].x - landmarks[0].x);
 
-  // 광대뼈 폭 추정 (눈 바깥쪽과 코 위치 기준)
-  const cheekboneWidth = Math.abs(landmarks[16].x - landmarks[0].x) * 0.9;
+  // 광대뼈 폭 추정
+  const cheekboneWidth = Math.abs(landmarks[14].x - landmarks[2].x);
 
   return {
     forehead: {
@@ -218,6 +209,7 @@ function calculateFaceFeatures(landmarks: faceapi.Point[]): FaceFeatures {
       size: classifySize(avgEyeWidth / faceWidth, 0.1, 0.13),
       shape: eyeAspectRatio < 0.35 ? 'narrow' : eyeAspectRatio > 0.45 ? 'round' : 'almond',
       spacing: classifySpacing(eyeDistance / faceWidth, 0.15, 0.2),
+      corners: avgCornerDiff > 2 ? 'up' : avgCornerDiff < -2 ? 'down' : 'neutral',
     },
     eyebrows: {
       thickness: classifyThickness(browThickness / faceHeight, 0.01, 0.02),
@@ -245,7 +237,7 @@ function calculateFaceFeatures(landmarks: faceapi.Point[]): FaceFeatures {
       width: classifyWidth(cheekboneWidth / faceWidth, 0.8, 0.9),
     },
     ears: {
-      size: 'medium', // 귀는 정면 사진에서 감지가 어려움
+      size: 'medium',
       position: 'medium',
       lobe: 'medium',
     },
@@ -256,164 +248,75 @@ function calculateFaceFeatures(landmarks: faceapi.Point[]): FaceFeatures {
   };
 }
 
-/**
- * 크기 분류 헬퍼 (작음/보통/큼)
- */
-function classifySize(
-  value: number,
-  smallThreshold: number,
-  largeThreshold: number
-): 'small' | 'medium' | 'large' {
-  if (value < smallThreshold) return 'small';
-  if (value > largeThreshold) return 'large';
+function classifySize(v: number, s: number, l: number): 'small' | 'medium' | 'large' {
+  if (v < s) return 'small';
+  if (v > l) return 'large';
   return 'medium';
 }
 
-/**
- * 폭 분류 헬퍼 (좁음/보통/넓음)
- */
-function classifyWidth(
-  value: number,
-  narrowThreshold: number,
-  wideThreshold: number
-): 'narrow' | 'medium' | 'wide' {
-  if (value < narrowThreshold) return 'narrow';
-  if (value > wideThreshold) return 'wide';
+function classifyWidth(v: number, n: number, w: number): 'narrow' | 'medium' | 'wide' {
+  if (v < n) return 'narrow';
+  if (v > w) return 'wide';
   return 'medium';
 }
 
-/**
- * 높이 분류 헬퍼 (낮음/보통/높음)
- */
-function classifyHeight(
-  value: number,
-  lowThreshold: number,
-  highThreshold: number
-): 'low' | 'medium' | 'high' {
-  if (value < lowThreshold) return 'low';
-  if (value > highThreshold) return 'high';
+function classifyHeight(v: number, l: number, h: number): 'low' | 'medium' | 'high' {
+  if (v < l) return 'low';
+  if (v > h) return 'high';
   return 'medium';
 }
 
-/**
- * 눈 간격 분류 헬퍼
- */
-function classifySpacing(
-  value: number,
-  closeThreshold: number,
-  wideThreshold: number
-): 'close' | 'medium' | 'wide' {
-  if (value < closeThreshold) return 'close';
-  if (value > wideThreshold) return 'wide';
+function classifySpacing(v: number, c: number, w: number): 'close' | 'medium' | 'wide' {
+  if (v < c) return 'close';
+  if (v > w) return 'wide';
   return 'medium';
 }
 
-/**
- * 두께 분류 헬퍼
- */
-function classifyThickness(
-  value: number,
-  thinThreshold: number,
-  thickThreshold: number
-): 'thin' | 'medium' | 'thick' {
-  if (value < thinThreshold) return 'thin';
-  if (value > thickThreshold) return 'thick';
+function classifyThickness(v: number, t: number, th: number): 'thin' | 'medium' | 'thick' {
+  if (v < t) return 'thin';
+  if (v > th) return 'thick';
   return 'medium';
 }
 
-/**
- * 길이 분류 헬퍼
- */
-function classifyLength(
-  value: number,
-  shortThreshold: number,
-  longThreshold: number
-): 'short' | 'medium' | 'long' {
-  if (value < shortThreshold) return 'short';
-  if (value > longThreshold) return 'long';
+function classifyLength(v: number, s: number, l: number): 'short' | 'medium' | 'long' {
+  if (v < s) return 'short';
+  if (v > l) return 'long';
   return 'medium';
 }
 
-/**
- * 돌출 분류 헬퍼
- */
-function classifyProminence(
-  value: number,
-  flatThreshold: number,
-  highThreshold: number
-): 'flat' | 'medium' | 'high' {
-  if (value < flatThreshold) return 'flat';
-  if (value > highThreshold) return 'high';
+function classifyProminence(v: number, f: number, h: number): 'flat' | 'medium' | 'high' {
+  if (v < f) return 'flat';
+  if (v > h) return 'high';
   return 'medium';
 }
 
-/**
- * 입술 두께 분류 헬퍼
- */
-function classifyLipShape(
-  value: number,
-  thinThreshold: number,
-  fullThreshold: number
-): 'thin' | 'medium' | 'full' {
-  if (value < thinThreshold) return 'thin';
-  if (value > fullThreshold) return 'full';
+function classifyLipShape(v: number, t: number, f: number): 'thin' | 'medium' | 'full' {
+  if (v < t) return 'thin';
+  if (v > f) return 'full';
   return 'medium';
 }
 
-/**
- * 형태 분류 헬퍼
- */
-function classifyShape(
-  ratio: number,
-  flatThreshold: number,
-  prominentThreshold: number
-): 'flat' | 'rounded' | 'prominent' {
-  if (ratio < flatThreshold) return 'flat';
-  if (ratio > prominentThreshold) return 'prominent';
+function classifyShape(r: number, f: number, p: number): 'flat' | 'rounded' | 'prominent' {
+  if (r < f) return 'flat';
+  if (r > p) return 'prominent';
   return 'rounded';
 }
 
-/**
- * 얼굴형 결정
- */
-function determineFaceShape(
-  width: number,
-  height: number,
-  chinWidth: number,
-  jawAngle: number
-): 'oval' | 'round' | 'square' | 'heart' | 'long' | 'diamond' {
-  const ratio = height / width;
-
-  if (ratio > 1.35) return 'long';
-  if (ratio < 1.1) return 'round';
-
-  if (jawAngle < 2.0) return 'square';
-  if (jawAngle > 2.5 && chinWidth / width < 0.85) return 'heart';
-  if (chinWidth / width < 0.8) return 'diamond';
-
+function determineFaceShape(w: number, h: number, cw: number, ja: number): 'oval' | 'round' | 'square' | 'heart' | 'long' | 'diamond' {
+  const r = h / w;
+  if (r > 1.35) return 'long';
+  if (r < 1.1) return 'round';
+  if (ja < 2.0) return 'square';
+  if (ja > 2.5 && cw / w < 0.85) return 'heart';
+  if (cw / w < 0.8) return 'diamond';
   return 'oval';
 }
 
-/**
- * 좌우 대칭성 계산
- */
 function calculateSymmetry(landmarks: faceapi.Point[]): 'asymmetric' | 'balanced' | 'symmetric' {
-  // 중심선 (코끝) 기준 좌우 대칭성 계산
-  const centerX = landmarks[33].x; // 코끝
-
-  // 주요 포인트들의 좌우 대칭 차이 계산
-  const leftEyeCenter = (landmarks[36].x + landmarks[39].x) / 2;
-  const rightEyeCenter = (landmarks[42].x + landmarks[45].x) / 2;
-  const eyeSymmetry = Math.abs((centerX - leftEyeCenter) - (rightEyeCenter - centerX));
-
-  const leftMouth = landmarks[48].x;
-  const rightMouth = landmarks[54].x;
-  const mouthSymmetry = Math.abs((centerX - leftMouth) - (rightMouth - centerX));
-
-  const avgSymmetry = (eyeSymmetry + mouthSymmetry) / 2;
-  const faceWidth = Math.abs(landmarks[16].x - landmarks[0].x);
-  const symmetryRatio = avgSymmetry / faceWidth;
-
+  const centerX = landmarks[33].x;
+  const eyeSymmetry = Math.abs((centerX - (landmarks[36].x + landmarks[39].x) / 2) - ((landmarks[42].x + landmarks[45].x) / 2 - centerX));
+  const mouthSymmetry = Math.abs((centerX - landmarks[48].x) - (landmarks[54].x - centerX));
+  const symmetryRatio = (eyeSymmetry + mouthSymmetry) / 2 / Math.abs(landmarks[16].x - landmarks[0].x);
   if (symmetryRatio < 0.03) return 'symmetric';
   if (symmetryRatio > 0.08) return 'asymmetric';
   return 'balanced';

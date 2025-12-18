@@ -179,9 +179,8 @@ function KoeiStatBar({ label, value, icon }: { label: string; value: number; ico
 
           {/* 수치 표시 */}
           <div className="absolute inset-0 flex items-center justify-end pr-2">
-            <span className={`text-xs font-bold drop-shadow-md ${
-              value >= 50 ? 'text-white' : 'text-amber-200'
-            }`}>
+            <span className={`text-xs font-bold drop-shadow-md ${value >= 50 ? 'text-white' : 'text-amber-200'
+              }`}>
               {value}
             </span>
           </div>
@@ -372,247 +371,183 @@ export default function SamgukPage() {
           <div className="space-y-4 animate-fade-in">
             {/* 캡쳐 영역 시작 */}
             <div ref={resultRef} className="space-y-4 bg-[#F5E6D3] p-4 -m-4">
-            {/* 메인 결과 카드 - 민화 스타일 */}
-            <div className="relative">
-              {/* 외곽 금테 프레임 */}
-              <div className="absolute -inset-1 bg-gradient-to-br from-[#FFD700] via-[#D4AF37] to-[#FFD700] rounded-3xl opacity-60 blur-sm"></div>
-
-              <div className={`relative bg-white/80 backdrop-blur-sm rounded-3xl border-2 shadow-lg overflow-hidden`}
-                style={{
-                  borderColor: '#C41E3A',
-                  boxShadow: '0 4px 20px rgba(196, 30, 58, 0.2)'
-                }}>
-                {/* 상단 세력 배너 - 민화 스타일 */}
-                <div className={`py-3 text-center relative ${
-                  result.character.faction === "위" ? "bg-gradient-to-r from-[#1E3A5F] via-[#1E3A5F]/90 to-[#1E3A5F]" :
-                  result.character.faction === "촉" ? "bg-gradient-to-r from-green-700 via-green-600 to-green-700" :
-                  result.character.faction === "오" ? "bg-gradient-to-r from-[#C41E3A] via-[#C41E3A]/90 to-[#C41E3A]" :
-                  "bg-gradient-to-r from-purple-700 via-purple-600 to-purple-700"
-                } border-b-2 border-[#FFD700]/50`}>
-                  {/* 장식 무늬 */}
-                  <div className="absolute left-4 top-1/2 -translate-y-1/2 text-[#FFD700]/40 text-xl">◆</div>
-                  <div className="absolute right-4 top-1/2 -translate-y-1/2 text-[#FFD700]/40 text-xl">◆</div>
-
-                  <span className="text-white font-bold tracking-[0.3em] text-lg drop-shadow-lg" style={{
-                    textShadow: '2px 2px 4px rgba(0, 0, 0, 0.5)'
-                  }}>
-                    {result.character.faction === "위" ? "━ 魏 ━" :
-                     result.character.faction === "촉" ? "━ 蜀 ━" :
-                     result.character.faction === "오" ? "━ 吳 ━" :
-                     "━ 群雄 ━"}
-                  </span>
-                </div>
-
-                {/* 나무 질감 배경 오버레이 */}
-                <div className="absolute inset-0 opacity-5 pointer-events-none" style={{
-                  backgroundImage: 'repeating-linear-gradient(90deg, transparent 0px, rgba(139, 69, 19, 0.3) 1px, transparent 2px, transparent 10px)',
-                  mixBlendMode: 'overlay'
-                }}></div>
-
-                <div className="p-4 sm:p-6 relative z-10">
-                  {/* 모바일: 세로 배치, 데스크톱: 가로 배치 */}
-                  <div className="flex flex-col sm:flex-row gap-4 items-center sm:items-start">
-                    {/* 사진 비교 영역 */}
-                    <div className="flex items-center gap-2 sm:gap-4">
-                      {/* 업로드한 사진 - 정사각형 프레임 */}
-                      {image && (
-                        <div className="flex-shrink-0">
-                          <div className="relative">
-                            {/* 금테 장식 프레임 */}
-                            <div className="absolute -inset-1 bg-gradient-to-br from-amber-400 via-yellow-600 to-amber-700 rounded opacity-60"></div>
-                            <div className="relative bg-gradient-to-br from-amber-900 to-amber-950 p-1 rounded">
-                              <img
-                                src={image}
-                                alt="내 얼굴"
-                                className="w-20 h-20 sm:w-28 sm:h-28 object-cover rounded border-2 border-amber-500/70"
-                                style={{ boxShadow: 'inset 0 0 10px rgba(0, 0, 0, 0.5)' }}
-                              />
-                            </div>
-                            <div className="absolute -bottom-3 left-1/2 -translate-x-1/2 bg-gradient-to-r from-amber-900 via-amber-700 to-amber-900 px-2 sm:px-3 py-1 rounded-full text-xs text-amber-100 border-2 border-amber-500/50 font-bold shadow-lg">
-                              나
-                            </div>
-                          </div>
-                        </div>
-                      )}
-
-                      {/* 화살표 장식 */}
-                      <div className="flex items-center justify-center">
-                        <div className="text-xl sm:text-2xl text-amber-400" style={{ textShadow: '0 0 10px rgba(251, 191, 36, 0.5)' }}>→</div>
-                      </div>
-
-                      {/* 인물 초상화 영역 - 정사각형 프레임 (코에이 스타일) */}
-                      <div className="flex-shrink-0">
-                        <div className="relative">
-                          {/* 금테 장식 프레임 */}
-                          <div className="absolute -inset-1 bg-gradient-to-br from-yellow-400 via-amber-600 to-yellow-700 rounded opacity-80"></div>
-                          <div className={`relative p-1 rounded ${
-                            result.character.faction === "위" ? "bg-gradient-to-br from-blue-800 to-blue-950" :
-                            result.character.faction === "촉" ? "bg-gradient-to-br from-green-800 to-green-950" :
-                            result.character.faction === "오" ? "bg-gradient-to-br from-red-800 to-red-950" :
-                            "bg-gradient-to-br from-purple-800 to-purple-950"
-                          }`}>
-                            <div className={`w-20 h-20 sm:w-28 sm:h-28 rounded border-2 flex items-center justify-center text-4xl sm:text-5xl ${
-                              result.character.faction === "위" ? "bg-gradient-to-br from-blue-900/80 to-blue-950/90 border-blue-400/70" :
-                              result.character.faction === "촉" ? "bg-gradient-to-br from-green-900/80 to-green-950/90 border-green-400/70" :
-                              result.character.faction === "오" ? "bg-gradient-to-br from-red-900/80 to-red-950/90 border-red-400/70" :
-                              "bg-gradient-to-br from-purple-900/80 to-purple-950/90 border-purple-400/70"
-                            }`} style={{ boxShadow: 'inset 0 0 20px rgba(0, 0, 0, 0.5)' }}>
-                              {/* 세력별 대표 이모지 */}
-                              <span style={{ textShadow: '0 0 20px rgba(0, 0, 0, 0.8)' }}>
-                                {result.character.stats.무력 >= 90 ? "⚔️" :
-                                 result.character.stats.지력 >= 90 ? "📜" :
-                                 result.character.stats.매력 >= 90 ? "👑" :
-                                 result.character.stats.통솔 >= 90 ? "🏴" : "🎭"}
-                              </span>
-                            </div>
-                          </div>
-                          <div className="absolute -bottom-3 left-1/2 -translate-x-1/2 bg-gradient-to-r from-amber-900 via-amber-700 to-amber-900 px-2 sm:px-3 py-1 rounded-full text-xs text-amber-100 border-2 border-amber-500/50 font-bold shadow-lg whitespace-nowrap">
-                            {result.character.name}
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-
-                    {/* 인물 정보 */}
-                    <div className="flex-1 text-center sm:text-left pt-4 sm:pt-2">
-                      <div className="flex items-center justify-center sm:justify-start gap-2 mb-2">
-                        <span className={`px-3 py-1 rounded-full text-sm font-bold shadow-lg ${
-                          result.character.faction === "위" ? "bg-gradient-to-r from-blue-600 to-blue-700 text-blue-100" :
-                          result.character.faction === "촉" ? "bg-gradient-to-r from-green-600 to-green-700 text-green-100" :
-                          result.character.faction === "오" ? "bg-gradient-to-r from-red-600 to-red-700 text-red-100" :
-                          "bg-gradient-to-r from-purple-600 to-purple-700 text-purple-100"
-                        } border border-amber-400/30`}>
-                          일치도 {result.similarity}%
-                        </span>
-                      </div>
-                      <h2 className="text-2xl sm:text-3xl font-bold text-[#C41E3A] mb-1" style={{
-                        textShadow: '0 2px 8px rgba(196, 30, 58, 0.2)'
-                      }}>
-                        {result.character.name}
-                      </h2>
-                      <p className="text-sm text-[#5C4033]/80 mb-1">{result.character.hanja}</p>
-                      <p className="text-xs text-[#5C4033] bg-[#FFD700]/20 px-2 py-1 rounded inline-block border border-[#FFD700]/40">
-                        {result.character.role}
-                      </p>
-                    </div>
-                  </div>
-
-                  {/* 닮은 이유 - 민화 스타일 */}
-                  <div className="mt-6 relative">
-                    <div className="absolute -inset-0.5 bg-gradient-to-r from-[#FFD700]/20 via-[#D4AF37]/30 to-[#FFD700]/20 rounded-xl blur"></div>
-                    <div className="relative p-4 bg-white/70 backdrop-blur-sm rounded-xl border-2 border-[#C41E3A]/30 shadow-md">
-                      {/* 두루마리 장식 */}
-                      <div className="absolute top-2 left-2 text-[#FFD700]/30 text-xs">◈</div>
-                      <div className="absolute top-2 right-2 text-[#FFD700]/30 text-xs">◈</div>
-                      <div className="absolute bottom-2 left-2 text-[#FFD700]/30 text-xs">◈</div>
-                      <div className="absolute bottom-2 right-2 text-[#FFD700]/30 text-xs">◈</div>
-
-                      <p className="text-xs text-[#C41E3A] mb-2 font-bold tracking-wider">📜 관상 분석</p>
-                      <p className="text-sm text-[#5C4033] leading-relaxed relative z-10">
-                        {result.matchReason}
-                      </p>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            {/* 능력치 - 민화 스타일 */}
-            <div className="relative">
-              {/* 외곽 금테 프레임 */}
-              <div className="absolute -inset-1 bg-gradient-to-br from-[#FFD700] via-[#D4AF37] to-[#FFD700] rounded-3xl opacity-50 blur-sm"></div>
-
-              <div className="relative bg-white/70 backdrop-blur-sm rounded-3xl p-6 border-2 shadow-lg overflow-hidden"
-                style={{
-                  borderColor: '#FFD700',
-                  boxShadow: '0 4px 20px rgba(255, 215, 0, 0.3)'
-                }}>
-                {/* 민화 배경 효과 */}
-                <div className="absolute inset-0 opacity-8">
-                  <div className="absolute top-2 left-2 text-4xl text-[#C41E3A]/20">武</div>
-                  <div className="absolute top-2 right-2 text-4xl text-[#1E3A5F]/20">智</div>
-                  <div className="absolute bottom-2 left-2 text-4xl text-[#FFD700]/20">德</div>
-                  <div className="absolute bottom-2 right-2 text-4xl text-[#C41E3A]/20">統</div>
-                </div>
-
-                <h3 className="text-xl font-bold mb-4 text-center relative z-10 text-[#C41E3A]"
-                  style={{ textShadow: '0 2px 8px rgba(196, 30, 58, 0.2)' }}>
-                  ⚔️ 능력치 ⚔️
-                </h3>
-
-                {/* 오각형 레이더 차트 */}
-                <div className="relative z-10 mb-4">
-                  <RadarChart stats={result.character.stats} />
-                </div>
-
-                {/* 구분선 */}
-                <div className="relative z-10 flex items-center justify-center my-4">
-                  <div className="flex-1 h-px bg-gradient-to-r from-transparent via-amber-600/50 to-transparent"></div>
-                  <span className="px-3 text-amber-500/60 text-xs">━━</span>
-                  <div className="flex-1 h-px bg-gradient-to-r from-transparent via-amber-600/50 to-transparent"></div>
-                </div>
-
-                {/* 민화 스타일 수평 스탯 바 */}
-                <div className="relative z-10 space-y-2 bg-white/50 p-4 rounded-xl border border-[#C41E3A]/30">
-                  <KoeiStatBar label="통솔" value={result.character.stats.통솔} icon="🏴" />
-                  <KoeiStatBar label="무력" value={result.character.stats.무력} icon="⚔️" />
-                  <KoeiStatBar label="지력" value={result.character.stats.지력} icon="📜" />
-                  <KoeiStatBar label="정치" value={result.character.stats.정치} icon="👑" />
-                  <KoeiStatBar label="매력" value={result.character.stats.매력} icon="✨" />
-                </div>
-
-                {/* 총합 */}
-                <div className="text-center mt-4 relative z-10">
-                  <div className="inline-block bg-gradient-to-r from-[#FFD700]/20 via-[#D4AF37]/30 to-[#FFD700]/20 px-6 py-2 rounded-full border-2 border-[#FFD700]/50 shadow-md">
-                    <span className="text-[#5C4033] text-sm mr-2">총 능력치:</span>
-                    <span className="text-2xl font-bold text-[#C41E3A]"
-                      style={{ textShadow: '0 2px 8px rgba(196, 30, 58, 0.2)' }}>
-                      {Object.values(result.character.stats).reduce((a, b) => a + b, 0)}
-                    </span>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            {/* 현대판 능력치 - 코에이 스타일 */}
-            {result.character.modernStats && result.character.funStats && result.character.modernComment && (
+              {/* 메인 결과 카드 - 민화 스타일 */}
               <div className="relative">
                 {/* 외곽 금테 프레임 */}
-                <div className="absolute -inset-1 bg-gradient-to-br from-amber-500 via-yellow-700 to-amber-900 rounded-2xl opacity-60 blur-sm"></div>
+                <div className="absolute -inset-1 bg-gradient-to-br from-[#FFD700] via-[#D4AF37] to-[#FFD700] rounded-3xl opacity-60 blur-sm"></div>
 
-                <div className="relative bg-gradient-to-b from-stone-900/95 to-amber-950/80 backdrop-blur-lg rounded-2xl p-6 border-4 border-double shadow-2xl overflow-hidden"
+                <div className={`relative bg-white/80 backdrop-blur-sm rounded-3xl border-2 shadow-lg overflow-hidden`}
                   style={{
-                    borderImage: 'linear-gradient(135deg, #f59e0b, #78350f, #f59e0b) 1',
-                    boxShadow: '0 0 25px rgba(217, 119, 6, 0.3), inset 0 0 30px rgba(0, 0, 0, 0.6)'
+                    borderColor: '#C41E3A',
+                    boxShadow: '0 4px 20px rgba(196, 30, 58, 0.2)'
                   }}>
-                  {/* 배경 장식 */}
-                  <div className="absolute inset-0 opacity-5">
-                    <div className="absolute top-2 left-2 text-3xl text-amber-200">💼</div>
-                    <div className="absolute top-2 right-2 text-3xl text-amber-200">🎯</div>
-                    <div className="absolute bottom-2 left-2 text-3xl text-amber-200">💰</div>
-                    <div className="absolute bottom-2 right-2 text-3xl text-amber-200">🔥</div>
+                  {/* 상단 세력 배너 - 민화 스타일 */}
+                  <div className={`py-3 text-center relative ${result.character.faction === "위" ? "bg-gradient-to-r from-[#1E3A5F] via-[#1E3A5F]/90 to-[#1E3A5F]" :
+                      result.character.faction === "촉" ? "bg-gradient-to-r from-green-700 via-green-600 to-green-700" :
+                        result.character.faction === "오" ? "bg-gradient-to-r from-[#C41E3A] via-[#C41E3A]/90 to-[#C41E3A]" :
+                          "bg-gradient-to-r from-purple-700 via-purple-600 to-purple-700"
+                    } border-b-2 border-[#FFD700]/50`}>
+                    {/* 장식 무늬 */}
+                    <div className="absolute left-4 top-1/2 -translate-y-1/2 text-[#FFD700]/40 text-xl">◆</div>
+                    <div className="absolute right-4 top-1/2 -translate-y-1/2 text-[#FFD700]/40 text-xl">◆</div>
+
+                    <span className="text-white font-bold tracking-[0.3em] text-lg drop-shadow-lg" style={{
+                      textShadow: '2px 2px 4px rgba(0, 0, 0, 0.5)'
+                    }}>
+                      {result.character.faction === "위" ? "━ 魏 ━" :
+                        result.character.faction === "촉" ? "━ 蜀 ━" :
+                          result.character.faction === "오" ? "━ 吳 ━" :
+                            "━ 群雄 ━"}
+                    </span>
                   </div>
 
-                  {/* 나무 질감 */}
-                  <div className="absolute inset-0 opacity-10 pointer-events-none" style={{
-                    backgroundImage: 'repeating-linear-gradient(90deg, transparent 0px, rgba(139, 69, 19, 0.4) 1px, transparent 2px, transparent 8px)',
+                  {/* 나무 질감 배경 오버레이 */}
+                  <div className="absolute inset-0 opacity-5 pointer-events-none" style={{
+                    backgroundImage: 'repeating-linear-gradient(90deg, transparent 0px, rgba(139, 69, 19, 0.3) 1px, transparent 2px, transparent 10px)',
                     mixBlendMode: 'overlay'
                   }}></div>
 
-                  <h3 className="text-xl font-bold mb-4 text-center relative z-10 text-transparent bg-clip-text bg-gradient-to-r from-amber-300 via-yellow-400 to-amber-300"
-                    style={{ textShadow: '0 0 20px rgba(251, 191, 36, 0.5)' }}>
-                    💼 현대판 능력치 💼
+                  <div className="p-4 sm:p-6 relative z-10">
+                    {/* 모바일: 세로 배치, 데스크톱: 가로 배치 */}
+                    <div className="flex flex-col sm:flex-row gap-4 items-center sm:items-start">
+                      {/* 사진 비교 영역 */}
+                      <div className="flex items-center gap-2 sm:gap-4">
+                        {/* 업로드한 사진 - 정사각형 프레임 */}
+                        {image && (
+                          <div className="flex-shrink-0">
+                            <div className="relative">
+                              {/* 금테 장식 프레임 */}
+                              <div className="absolute -inset-1 bg-gradient-to-br from-amber-400 via-yellow-600 to-amber-700 rounded opacity-60"></div>
+                              <div className="relative bg-gradient-to-br from-amber-900 to-amber-950 p-1 rounded">
+                                <img
+                                  src={image}
+                                  alt="내 얼굴"
+                                  className="w-20 h-20 sm:w-28 sm:h-28 object-cover rounded border-2 border-amber-500/70"
+                                  style={{ boxShadow: 'inset 0 0 10px rgba(0, 0, 0, 0.5)' }}
+                                />
+                              </div>
+                              <div className="absolute -bottom-3 left-1/2 -translate-x-1/2 bg-gradient-to-r from-amber-900 via-amber-700 to-amber-900 px-2 sm:px-3 py-1 rounded-full text-xs text-amber-100 border-2 border-amber-500/50 font-bold shadow-lg">
+                                나
+                              </div>
+                            </div>
+                          </div>
+                        )}
+
+                        {/* 화살표 장식 */}
+                        <div className="flex items-center justify-center">
+                          <div className="text-xl sm:text-2xl text-amber-400" style={{ textShadow: '0 0 10px rgba(251, 191, 36, 0.5)' }}>→</div>
+                        </div>
+
+                        {/* 인물 초상화 영역 - 정사각형 프레임 (코에이 스타일) */}
+                        <div className="flex-shrink-0">
+                          <div className="relative">
+                            {/* 금테 장식 프레임 */}
+                            <div className="absolute -inset-1 bg-gradient-to-br from-yellow-400 via-amber-600 to-yellow-700 rounded opacity-80"></div>
+                            <div className={`relative p-1 rounded ${result.character.faction === "위" ? "bg-gradient-to-br from-blue-800 to-blue-950" :
+                                result.character.faction === "촉" ? "bg-gradient-to-br from-green-800 to-green-950" :
+                                  result.character.faction === "오" ? "bg-gradient-to-br from-red-800 to-red-950" :
+                                    "bg-gradient-to-br from-purple-800 to-purple-950"
+                              }`}>
+                              <div className={`w-20 h-20 sm:w-28 sm:h-28 rounded border-2 overflow-hidden ${result.character.faction === "위" ? "bg-gradient-to-br from-blue-900/80 to-blue-950/90 border-blue-400/70" :
+                                  result.character.faction === "촉" ? "bg-gradient-to-br from-green-900/80 to-green-950/90 border-green-400/70" :
+                                    result.character.faction === "오" ? "bg-gradient-to-br from-red-900/80 to-red-950/90 border-red-400/70" :
+                                      "bg-gradient-to-br from-purple-900/80 to-purple-950/90 border-purple-400/70"
+                                }`} style={{ boxShadow: 'inset 0 0 20px rgba(0, 0, 0, 0.5)' }}>
+                                <img
+                                  src={`/images/samguk/${result.character.name}.jpg`}
+                                  alt={result.character.name}
+                                  className="w-full h-full object-cover"
+                                  onError={(e) => {
+                                    // 이미지가 없을 경우 기본 아이콘 표시
+                                    (e.target as HTMLImageElement).style.display = 'none';
+                                    (e.target as HTMLImageElement).parentElement!.innerHTML = `
+                                    <div class="w-full h-full flex items-center justify-center text-4xl sm:text-5xl">
+                                      ${result.character.stats.무력 >= 90 ? "⚔️" :
+                                        result.character.stats.지력 >= 90 ? "📜" :
+                                          result.character.stats.매력 >= 90 ? "👑" :
+                                            result.character.stats.통솔 >= 90 ? "🏴" : "🎭"}
+                                    </div>
+                                  `;
+                                  }}
+                                />
+                              </div>
+                            </div>
+                            <div className="absolute -bottom-3 left-1/2 -translate-x-1/2 bg-gradient-to-r from-amber-900 via-amber-700 to-amber-900 px-2 sm:px-3 py-1 rounded-full text-xs text-amber-100 border-2 border-amber-500/50 font-bold shadow-lg whitespace-nowrap">
+                              {result.character.name}
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* 인물 정보 */}
+                      <div className="flex-1 text-center sm:text-left pt-4 sm:pt-2">
+                        <div className="flex items-center justify-center sm:justify-start gap-2 mb-2">
+                          <span className={`px-3 py-1 rounded-full text-sm font-bold shadow-lg ${result.character.faction === "위" ? "bg-gradient-to-r from-blue-600 to-blue-700 text-blue-100" :
+                              result.character.faction === "촉" ? "bg-gradient-to-r from-green-600 to-green-700 text-green-100" :
+                                result.character.faction === "오" ? "bg-gradient-to-r from-red-600 to-red-700 text-red-100" :
+                                  "bg-gradient-to-r from-purple-600 to-purple-700 text-purple-100"
+                            } border border-amber-400/30`}>
+                            일치도 {result.similarity}%
+                          </span>
+                        </div>
+                        <h2 className="text-2xl sm:text-3xl font-bold text-[#C41E3A] mb-1" style={{
+                          textShadow: '0 2px 8px rgba(196, 30, 58, 0.2)'
+                        }}>
+                          {result.character.name}
+                        </h2>
+                        <p className="text-sm text-[#5C4033]/80 mb-1">{result.character.hanja}</p>
+                        <p className="text-xs text-[#5C4033] bg-[#FFD700]/20 px-2 py-1 rounded inline-block border border-[#FFD700]/40">
+                          {result.character.role}
+                        </p>
+                      </div>
+                    </div>
+
+                    {/* 닮은 이유 - 민화 스타일 */}
+                    <div className="mt-6 relative">
+                      <div className="absolute -inset-0.5 bg-gradient-to-r from-[#FFD700]/20 via-[#D4AF37]/30 to-[#FFD700]/20 rounded-xl blur"></div>
+                      <div className="relative p-4 bg-white/70 backdrop-blur-sm rounded-xl border-2 border-[#C41E3A]/30 shadow-md">
+                        {/* 두루마리 장식 */}
+                        <div className="absolute top-2 left-2 text-[#FFD700]/30 text-xs">◈</div>
+                        <div className="absolute top-2 right-2 text-[#FFD700]/30 text-xs">◈</div>
+                        <div className="absolute bottom-2 left-2 text-[#FFD700]/30 text-xs">◈</div>
+                        <div className="absolute bottom-2 right-2 text-[#FFD700]/30 text-xs">◈</div>
+
+                        <p className="text-xs text-[#C41E3A] mb-2 font-bold tracking-wider">📜 관상 분석</p>
+                        <p className="text-sm text-[#5C4033] leading-relaxed relative z-10">
+                          {result.matchReason}
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* 능력치 - 민화 스타일 */}
+              <div className="relative">
+                {/* 외곽 금테 프레임 */}
+                <div className="absolute -inset-1 bg-gradient-to-br from-[#FFD700] via-[#D4AF37] to-[#FFD700] rounded-3xl opacity-50 blur-sm"></div>
+
+                <div className="relative bg-white/70 backdrop-blur-sm rounded-3xl p-6 border-2 shadow-lg overflow-hidden"
+                  style={{
+                    borderColor: '#FFD700',
+                    boxShadow: '0 4px 20px rgba(255, 215, 0, 0.3)'
+                  }}>
+                  {/* 민화 배경 효과 */}
+                  <div className="absolute inset-0 opacity-8">
+                    <div className="absolute top-2 left-2 text-4xl text-[#C41E3A]/20">武</div>
+                    <div className="absolute top-2 right-2 text-4xl text-[#1E3A5F]/20">智</div>
+                    <div className="absolute bottom-2 left-2 text-4xl text-[#FFD700]/20">德</div>
+                    <div className="absolute bottom-2 right-2 text-4xl text-[#C41E3A]/20">統</div>
+                  </div>
+
+                  <h3 className="text-xl font-bold mb-4 text-center relative z-10 text-[#C41E3A]"
+                    style={{ textShadow: '0 2px 8px rgba(196, 30, 58, 0.2)' }}>
+                    ⚔️ 능력치 ⚔️
                   </h3>
 
-                  {/* 현대 능력치 오각형 */}
+                  {/* 오각형 레이더 차트 */}
                   <div className="relative z-10 mb-4">
-                    <RadarChart stats={{
-                      통솔: result.character.modernStats.리더십,
-                      무력: result.character.modernStats.체력,
-                      지력: result.character.modernStats.두뇌,
-                      정치: result.character.modernStats.눈치,
-                      매력: result.character.modernStats.연애력
-                    }} />
+                    <RadarChart stats={result.character.stats} />
                   </div>
 
                   {/* 구분선 */}
@@ -622,189 +557,259 @@ export default function SamgukPage() {
                     <div className="flex-1 h-px bg-gradient-to-r from-transparent via-amber-600/50 to-transparent"></div>
                   </div>
 
-                  {/* 현대 스탯 바 */}
-                  <div className="relative z-10 space-y-2 bg-black/20 p-4 rounded-xl border border-amber-800/30">
-                    <KoeiStatBar label="리더십" value={result.character.modernStats.리더십} icon="🏢" />
-                    <KoeiStatBar label="체력" value={result.character.modernStats.체력} icon="💪" />
-                    <KoeiStatBar label="두뇌" value={result.character.modernStats.두뇌} icon="🧠" />
-                    <KoeiStatBar label="눈치" value={result.character.modernStats.눈치} icon="👀" />
-                    <KoeiStatBar label="연애력" value={result.character.modernStats.연애력} icon="💕" />
+                  {/* 민화 스타일 수평 스탯 바 */}
+                  <div className="relative z-10 space-y-2 bg-white/50 p-4 rounded-xl border border-[#C41E3A]/30">
+                    <KoeiStatBar label="통솔" value={result.character.stats.통솔} icon="🏴" />
+                    <KoeiStatBar label="무력" value={result.character.stats.무력} icon="⚔️" />
+                    <KoeiStatBar label="지력" value={result.character.stats.지력} icon="📜" />
+                    <KoeiStatBar label="정치" value={result.character.stats.정치} icon="👑" />
+                    <KoeiStatBar label="매력" value={result.character.stats.매력} icon="✨" />
                   </div>
 
-                  {/* Fun Stats 섹션 */}
-                  <div className="relative z-10 mt-6">
-                    <div className="text-center mb-3">
-                      <span className="text-amber-300/80 text-sm font-bold tracking-wider">직장인 생존 스탯</span>
-                    </div>
-                    <div className="space-y-2 bg-black/30 p-4 rounded-xl border border-amber-700/30">
-                      <KoeiStatBar label="술자리생존" value={result.character.funStats.술자리생존} icon="🍺" />
-                      <KoeiStatBar label="재테크" value={result.character.funStats.재테크} icon="💰" />
-                      <KoeiStatBar label="칼퇴력" value={result.character.funStats.칼퇴력} icon="🏃" />
-                      <KoeiStatBar label="꼰대력" value={result.character.funStats.꼰대력} icon="😰" />
-                      <KoeiStatBar label="워라밸" value={result.character.funStats.워라밸} icon="🔥" />
-                    </div>
-                  </div>
-
-                  {/* 현대 해석 말풍선 */}
-                  <div className="relative z-10 mt-6">
-                    <div className="relative">
-                      <div className="absolute -inset-0.5 bg-gradient-to-r from-amber-600/30 via-yellow-600/40 to-amber-600/30 rounded-xl blur"></div>
-                      <div className="relative bg-gradient-to-br from-stone-950 via-amber-950/50 to-stone-950 rounded-xl p-5 border-2 border-amber-500/50 shadow-inner">
-                        {/* 말풍선 꼬리 */}
-                        <div className="absolute -top-2 left-1/2 -translate-x-1/2 w-4 h-4 bg-amber-950 border-l-2 border-t-2 border-amber-500/50 rotate-45"></div>
-
-                        {/* 장식 문양 */}
-                        <div className="absolute top-1 left-2 text-amber-600/20 text-lg">💬</div>
-                        <div className="absolute top-1 right-2 text-amber-600/20 text-lg">💬</div>
-
-                        <p className="text-base text-center text-amber-100 font-medium leading-relaxed relative z-10" style={{
-                          textShadow: '0 0 10px rgba(251, 191, 36, 0.3)'
-                        }}>
-                          {result.character.modernComment}
-                        </p>
-                      </div>
+                  {/* 총합 */}
+                  <div className="text-center mt-4 relative z-10">
+                    <div className="inline-block bg-gradient-to-r from-[#FFD700]/20 via-[#D4AF37]/30 to-[#FFD700]/20 px-6 py-2 rounded-full border-2 border-[#FFD700]/50 shadow-md">
+                      <span className="text-[#5C4033] text-sm mr-2">총 능력치:</span>
+                      <span className="text-2xl font-bold text-[#C41E3A]"
+                        style={{ textShadow: '0 2px 8px rgba(196, 30, 58, 0.2)' }}>
+                        {Object.values(result.character.stats).reduce((a, b) => a + b, 0)}
+                      </span>
                     </div>
                   </div>
                 </div>
               </div>
-            )}
 
-            {/* 인물 설명 - 코에이 스타일 */}
-            <div className="relative">
-              <div className="absolute -inset-0.5 bg-gradient-to-br from-amber-500/30 via-yellow-700/40 to-amber-900/30 rounded-2xl opacity-60 blur"></div>
-              <div className="relative bg-gradient-to-b from-stone-900/90 to-amber-950/70 backdrop-blur-lg rounded-2xl p-6 border-2 border-amber-600/40 shadow-xl"
-                style={{ boxShadow: '0 0 20px rgba(217, 119, 6, 0.2), inset 0 0 15px rgba(0, 0, 0, 0.5)' }}>
-                <h3 className="text-lg font-bold mb-3 text-transparent bg-clip-text bg-gradient-to-r from-amber-200 via-yellow-400 to-amber-200 flex items-center gap-2">
-                  <span>📜</span> 인물 소개
-                </h3>
-                <p className="text-stone-200 text-sm leading-relaxed mb-4">
-                  {result.character.description}
-                </p>
-                <div className="flex flex-wrap gap-2">
-                  {result.character.traits.map((trait, index) => (
-                    <span
-                      key={index}
-                      className="px-3 py-1 bg-gradient-to-r from-amber-900/50 to-amber-950/60 text-amber-200 rounded-full text-xs border-2 border-amber-600/40 shadow-md"
-                    >
-                      {trait}
-                    </span>
-                  ))}
-                </div>
-              </div>
-            </div>
-
-            {/* 성격 & 명대사 - 코에이 스타일 */}
-            <div className="relative">
-              <div className="absolute -inset-0.5 bg-gradient-to-br from-amber-500/30 via-yellow-700/40 to-amber-900/30 rounded-2xl opacity-60 blur"></div>
-              <div className="relative bg-gradient-to-b from-stone-900/90 to-amber-950/70 backdrop-blur-lg rounded-2xl p-6 border-2 border-amber-600/40 shadow-xl"
-                style={{ boxShadow: '0 0 20px rgba(217, 119, 6, 0.2), inset 0 0 15px rgba(0, 0, 0, 0.5)' }}>
-                <h3 className="text-lg font-bold mb-3 text-transparent bg-clip-text bg-gradient-to-r from-amber-200 via-yellow-400 to-amber-200 flex items-center gap-2">
-                  <span>💬</span> 명대사
-                </h3>
-                {/* 두루마리 스타일 명대사 박스 */}
+              {/* 현대판 능력치 - 코에이 스타일 */}
+              {result.character.modernStats && result.character.funStats && result.character.modernComment && (
                 <div className="relative">
-                  <div className="absolute -inset-0.5 bg-gradient-to-r from-amber-600/30 via-yellow-600/40 to-amber-600/30 rounded-xl blur"></div>
-                  <div className="relative bg-gradient-to-br from-stone-950 via-amber-950/50 to-stone-950 rounded-xl p-5 border-2 border-amber-500/50 shadow-inner">
-                    {/* 장식 문양 */}
-                    <div className="absolute top-1 left-2 text-amber-600/20 text-lg">❖</div>
-                    <div className="absolute top-1 right-2 text-amber-600/20 text-lg">❖</div>
-                    <div className="absolute bottom-1 left-2 text-amber-600/20 text-lg">❖</div>
-                    <div className="absolute bottom-1 right-2 text-amber-600/20 text-lg">❖</div>
+                  {/* 외곽 금테 프레임 */}
+                  <div className="absolute -inset-1 bg-gradient-to-br from-amber-500 via-yellow-700 to-amber-900 rounded-2xl opacity-60 blur-sm"></div>
 
-                    <p className="text-lg text-center text-amber-100 italic font-medium leading-relaxed relative z-10" style={{
-                      textShadow: '0 0 10px rgba(251, 191, 36, 0.3)'
+                  <div className="relative bg-gradient-to-b from-stone-900/95 to-amber-950/80 backdrop-blur-lg rounded-2xl p-6 border-4 border-double shadow-2xl overflow-hidden"
+                    style={{
+                      borderImage: 'linear-gradient(135deg, #f59e0b, #78350f, #f59e0b) 1',
+                      boxShadow: '0 0 25px rgba(217, 119, 6, 0.3), inset 0 0 30px rgba(0, 0, 0, 0.6)'
                     }}>
-                      "{result.character.quote}"
-                    </p>
-                  </div>
-                </div>
-                <div className="mt-4 pt-4 border-t border-amber-700/30">
-                  <p className="text-xs text-amber-400/80 mb-2 font-bold tracking-wider">성격</p>
-                  <p className="text-sm text-stone-200 leading-relaxed">{result.character.personality}</p>
-                </div>
-              </div>
-            </div>
+                    {/* 배경 장식 */}
+                    <div className="absolute inset-0 opacity-5">
+                      <div className="absolute top-2 left-2 text-3xl text-amber-200">💼</div>
+                      <div className="absolute top-2 right-2 text-3xl text-amber-200">🎯</div>
+                      <div className="absolute bottom-2 left-2 text-3xl text-amber-200">💰</div>
+                      <div className="absolute bottom-2 right-2 text-3xl text-amber-200">🔥</div>
+                    </div>
 
-            {/* 현대 직업 & 내 얼굴 분석 - 코에이 스타일 */}
-            <div className="grid grid-cols-2 gap-3">
-              <div className="relative">
-                <div className="absolute -inset-0.5 bg-gradient-to-br from-amber-500/20 via-yellow-700/30 to-amber-900/20 rounded-xl opacity-60 blur"></div>
-                <div className="relative bg-gradient-to-b from-stone-900/85 to-amber-950/60 backdrop-blur-lg rounded-xl p-4 border-2 border-amber-600/40 shadow-lg"
-                  style={{ boxShadow: '0 0 15px rgba(217, 119, 6, 0.15), inset 0 0 10px rgba(0, 0, 0, 0.5)' }}>
-                  <p className="text-xs text-amber-400/70 mb-2 font-bold">현대에 태어났다면?</p>
-                  <p className="text-sm text-amber-100 font-medium">{result.character.modernJob}</p>
-                </div>
-              </div>
-              <div className="relative">
-                <div className="absolute -inset-0.5 bg-gradient-to-br from-amber-500/20 via-yellow-700/30 to-amber-900/20 rounded-xl opacity-60 blur"></div>
-                <div className="relative bg-gradient-to-b from-stone-900/85 to-amber-950/60 backdrop-blur-lg rounded-xl p-4 border-2 border-amber-600/40 shadow-lg"
-                  style={{ boxShadow: '0 0 15px rgba(217, 119, 6, 0.15), inset 0 0 10px rgba(0, 0, 0, 0.5)' }}>
-                  <p className="text-xs text-amber-400/70 mb-2 font-bold">전체 인상</p>
-                  <p className="text-sm text-amber-100">{result.faceAnalysis.인상}</p>
-                </div>
-              </div>
-            </div>
+                    {/* 나무 질감 */}
+                    <div className="absolute inset-0 opacity-10 pointer-events-none" style={{
+                      backgroundImage: 'repeating-linear-gradient(90deg, transparent 0px, rgba(139, 69, 19, 0.4) 1px, transparent 2px, transparent 8px)',
+                      mixBlendMode: 'overlay'
+                    }}></div>
 
-            {/* Coupang Partners Banner 1 */}
-            <div className="mt-2">
-              <p className="text-center text-xs text-stone-500 mb-2">추천 상품</p>
-              <div className="flex justify-center">
-                <iframe
-                  src="https://ads-partners.coupang.com/widgets.html?id=950676&template=carousel&trackingCode=AF6497036&subId=&width=450&height=130&tsource="
-                  width="450"
-                  height="130"
-                  frameBorder="0"
-                  scrolling="no"
-                  referrerPolicy="unsafe-url"
-                  className="rounded-lg max-w-full"
-                />
-              </div>
-              <p className="text-center text-stone-700 text-[10px] mt-2">
-                쿠팡 파트너스 활동의 일환으로 일정액의 수수료를 제공받습니다
-              </p>
-            </div>
+                    <h3 className="text-xl font-bold mb-4 text-center relative z-10 text-transparent bg-clip-text bg-gradient-to-r from-amber-300 via-yellow-400 to-amber-300"
+                      style={{ textShadow: '0 0 20px rgba(251, 191, 36, 0.5)' }}>
+                      💼 현대판 능력치 💼
+                    </h3>
 
-            {/* 내 얼굴 분석 상세 - 코에이 스타일 */}
-            <div className="relative">
-              <div className="absolute -inset-0.5 bg-gradient-to-br from-amber-500/30 via-yellow-700/40 to-amber-900/30 rounded-2xl opacity-60 blur"></div>
-              <div className="relative bg-gradient-to-b from-stone-900/90 to-amber-950/70 backdrop-blur-lg rounded-2xl p-6 border-2 border-amber-600/40 shadow-xl"
-                style={{ boxShadow: '0 0 20px rgba(217, 119, 6, 0.2), inset 0 0 15px rgba(0, 0, 0, 0.5)' }}>
-                <h3 className="text-lg font-bold mb-4 text-transparent bg-clip-text bg-gradient-to-r from-amber-200 via-yellow-400 to-amber-200 flex items-center gap-2">
-                  <span>🔍</span> 얼굴 분석
-                </h3>
-                <div className="grid grid-cols-2 gap-3">
-                  {Object.entries(result.faceAnalysis).filter(([key]) => key !== "인상").map(([part, desc]) => (
-                    <div key={part} className="relative">
-                      <div className="absolute -inset-0.5 bg-gradient-to-br from-amber-600/20 via-yellow-700/25 to-amber-800/20 rounded-lg opacity-60 blur-sm"></div>
-                      <div className="relative bg-gradient-to-br from-stone-950/90 to-amber-950/60 rounded-lg p-3 border border-amber-600/40 shadow-md"
-                        style={{ boxShadow: 'inset 0 0 8px rgba(0, 0, 0, 0.5)' }}>
-                        <p className="text-xs text-amber-300 mb-1 font-bold">{part}</p>
-                        <p className="text-sm text-stone-200 leading-snug">{desc}</p>
+                    {/* 현대 능력치 오각형 */}
+                    <div className="relative z-10 mb-4">
+                      <RadarChart stats={{
+                        통솔: result.character.modernStats.리더십,
+                        무력: result.character.modernStats.체력,
+                        지력: result.character.modernStats.두뇌,
+                        정치: result.character.modernStats.눈치,
+                        매력: result.character.modernStats.연애력
+                      }} />
+                    </div>
+
+                    {/* 구분선 */}
+                    <div className="relative z-10 flex items-center justify-center my-4">
+                      <div className="flex-1 h-px bg-gradient-to-r from-transparent via-amber-600/50 to-transparent"></div>
+                      <span className="px-3 text-amber-500/60 text-xs">━━</span>
+                      <div className="flex-1 h-px bg-gradient-to-r from-transparent via-amber-600/50 to-transparent"></div>
+                    </div>
+
+                    {/* 현대 스탯 바 */}
+                    <div className="relative z-10 space-y-2 bg-black/20 p-4 rounded-xl border border-amber-800/30">
+                      <KoeiStatBar label="리더십" value={result.character.modernStats.리더십} icon="🏢" />
+                      <KoeiStatBar label="체력" value={result.character.modernStats.체력} icon="💪" />
+                      <KoeiStatBar label="두뇌" value={result.character.modernStats.두뇌} icon="🧠" />
+                      <KoeiStatBar label="눈치" value={result.character.modernStats.눈치} icon="👀" />
+                      <KoeiStatBar label="연애력" value={result.character.modernStats.연애력} icon="💕" />
+                    </div>
+
+                    {/* Fun Stats 섹션 */}
+                    <div className="relative z-10 mt-6">
+                      <div className="text-center mb-3">
+                        <span className="text-amber-300/80 text-sm font-bold tracking-wider">직장인 생존 스탯</span>
+                      </div>
+                      <div className="space-y-2 bg-black/30 p-4 rounded-xl border border-amber-700/30">
+                        <KoeiStatBar label="술자리생존" value={result.character.funStats.술자리생존} icon="🍺" />
+                        <KoeiStatBar label="재테크" value={result.character.funStats.재테크} icon="💰" />
+                        <KoeiStatBar label="칼퇴력" value={result.character.funStats.칼퇴력} icon="🏃" />
+                        <KoeiStatBar label="꼰대력" value={result.character.funStats.꼰대력} icon="😰" />
+                        <KoeiStatBar label="워라밸" value={result.character.funStats.워라밸} icon="🔥" />
                       </div>
                     </div>
-                  ))}
+
+                    {/* 현대 해석 말풍선 */}
+                    <div className="relative z-10 mt-6">
+                      <div className="relative">
+                        <div className="absolute -inset-0.5 bg-gradient-to-r from-amber-600/30 via-yellow-600/40 to-amber-600/30 rounded-xl blur"></div>
+                        <div className="relative bg-gradient-to-br from-stone-950 via-amber-950/50 to-stone-950 rounded-xl p-5 border-2 border-amber-500/50 shadow-inner">
+                          {/* 말풍선 꼬리 */}
+                          <div className="absolute -top-2 left-1/2 -translate-x-1/2 w-4 h-4 bg-amber-950 border-l-2 border-t-2 border-amber-500/50 rotate-45"></div>
+
+                          {/* 장식 문양 */}
+                          <div className="absolute top-1 left-2 text-amber-600/20 text-lg">💬</div>
+                          <div className="absolute top-1 right-2 text-amber-600/20 text-lg">💬</div>
+
+                          <p className="text-base text-center text-amber-100 font-medium leading-relaxed relative z-10" style={{
+                            textShadow: '0 0 10px rgba(251, 191, 36, 0.3)'
+                          }}>
+                            {result.character.modernComment}
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {/* 인물 설명 - 코에이 스타일 */}
+              <div className="relative">
+                <div className="absolute -inset-0.5 bg-gradient-to-br from-amber-500/30 via-yellow-700/40 to-amber-900/30 rounded-2xl opacity-60 blur"></div>
+                <div className="relative bg-gradient-to-b from-stone-900/90 to-amber-950/70 backdrop-blur-lg rounded-2xl p-6 border-2 border-amber-600/40 shadow-xl"
+                  style={{ boxShadow: '0 0 20px rgba(217, 119, 6, 0.2), inset 0 0 15px rgba(0, 0, 0, 0.5)' }}>
+                  <h3 className="text-lg font-bold mb-3 text-transparent bg-clip-text bg-gradient-to-r from-amber-200 via-yellow-400 to-amber-200 flex items-center gap-2">
+                    <span>📜</span> 인물 소개
+                  </h3>
+                  <p className="text-stone-200 text-sm leading-relaxed mb-4">
+                    {result.character.description}
+                  </p>
+                  <div className="flex flex-wrap gap-2">
+                    {result.character.traits.map((trait, index) => (
+                      <span
+                        key={index}
+                        className="px-3 py-1 bg-gradient-to-r from-amber-900/50 to-amber-950/60 text-amber-200 rounded-full text-xs border-2 border-amber-600/40 shadow-md"
+                      >
+                        {trait}
+                      </span>
+                    ))}
+                  </div>
                 </div>
               </div>
-            </div>
 
-            {/* Coupang Partners Banner */}
-            <div className="mt-2">
-              <p className="text-center text-xs text-[#5C4033]/60 mb-2">추천 상품</p>
-              <div className="flex justify-center">
-                <iframe
-                  src="https://ads-partners.coupang.com/widgets.html?id=950676&template=carousel&trackingCode=AF6497036&subId=&width=450&height=130&tsource="
-                  width="450"
-                  height="130"
-                  frameBorder="0"
-                  scrolling="no"
-                  referrerPolicy="unsafe-url"
-                  className="rounded-lg max-w-full"
-                />
+              {/* 성격 & 명대사 - 코에이 스타일 */}
+              <div className="relative">
+                <div className="absolute -inset-0.5 bg-gradient-to-br from-amber-500/30 via-yellow-700/40 to-amber-900/30 rounded-2xl opacity-60 blur"></div>
+                <div className="relative bg-gradient-to-b from-stone-900/90 to-amber-950/70 backdrop-blur-lg rounded-2xl p-6 border-2 border-amber-600/40 shadow-xl"
+                  style={{ boxShadow: '0 0 20px rgba(217, 119, 6, 0.2), inset 0 0 15px rgba(0, 0, 0, 0.5)' }}>
+                  <h3 className="text-lg font-bold mb-3 text-transparent bg-clip-text bg-gradient-to-r from-amber-200 via-yellow-400 to-amber-200 flex items-center gap-2">
+                    <span>💬</span> 명대사
+                  </h3>
+                  {/* 두루마리 스타일 명대사 박스 */}
+                  <div className="relative">
+                    <div className="absolute -inset-0.5 bg-gradient-to-r from-amber-600/30 via-yellow-600/40 to-amber-600/30 rounded-xl blur"></div>
+                    <div className="relative bg-gradient-to-br from-stone-950 via-amber-950/50 to-stone-950 rounded-xl p-5 border-2 border-amber-500/50 shadow-inner">
+                      {/* 장식 문양 */}
+                      <div className="absolute top-1 left-2 text-amber-600/20 text-lg">❖</div>
+                      <div className="absolute top-1 right-2 text-amber-600/20 text-lg">❖</div>
+                      <div className="absolute bottom-1 left-2 text-amber-600/20 text-lg">❖</div>
+                      <div className="absolute bottom-1 right-2 text-amber-600/20 text-lg">❖</div>
+
+                      <p className="text-lg text-center text-amber-100 italic font-medium leading-relaxed relative z-10" style={{
+                        textShadow: '0 0 10px rgba(251, 191, 36, 0.3)'
+                      }}>
+                        "{result.character.quote}"
+                      </p>
+                    </div>
+                  </div>
+                  <div className="mt-4 pt-4 border-t border-amber-700/30">
+                    <p className="text-xs text-amber-400/80 mb-2 font-bold tracking-wider">성격</p>
+                    <p className="text-sm text-stone-200 leading-relaxed">{result.character.personality}</p>
+                  </div>
+                </div>
               </div>
-              <p className="text-center text-[#5C4033]/50 text-[10px] mt-2">
-                쿠팡 파트너스 활동의 일환으로 일정액의 수수료를 제공받습니다
-              </p>
-            </div>
+
+              {/* 현대 직업 & 내 얼굴 분석 - 코에이 스타일 */}
+              <div className="grid grid-cols-2 gap-3">
+                <div className="relative">
+                  <div className="absolute -inset-0.5 bg-gradient-to-br from-amber-500/20 via-yellow-700/30 to-amber-900/20 rounded-xl opacity-60 blur"></div>
+                  <div className="relative bg-gradient-to-b from-stone-900/85 to-amber-950/60 backdrop-blur-lg rounded-xl p-4 border-2 border-amber-600/40 shadow-lg"
+                    style={{ boxShadow: '0 0 15px rgba(217, 119, 6, 0.15), inset 0 0 10px rgba(0, 0, 0, 0.5)' }}>
+                    <p className="text-xs text-amber-400/70 mb-2 font-bold">현대에 태어났다면?</p>
+                    <p className="text-sm text-amber-100 font-medium">{result.character.modernJob}</p>
+                  </div>
+                </div>
+                <div className="relative">
+                  <div className="absolute -inset-0.5 bg-gradient-to-br from-amber-500/20 via-yellow-700/30 to-amber-900/20 rounded-xl opacity-60 blur"></div>
+                  <div className="relative bg-gradient-to-b from-stone-900/85 to-amber-950/60 backdrop-blur-lg rounded-xl p-4 border-2 border-amber-600/40 shadow-lg"
+                    style={{ boxShadow: '0 0 15px rgba(217, 119, 6, 0.15), inset 0 0 10px rgba(0, 0, 0, 0.5)' }}>
+                    <p className="text-xs text-amber-400/70 mb-2 font-bold">전체 인상</p>
+                    <p className="text-sm text-amber-100">{result.faceAnalysis.인상}</p>
+                  </div>
+                </div>
+              </div>
+
+              {/* Coupang Partners Banner 1 */}
+              <div className="mt-2">
+                <p className="text-center text-xs text-stone-500 mb-2">추천 상품</p>
+                <div className="flex justify-center">
+                  <iframe
+                    src="https://ads-partners.coupang.com/widgets.html?id=950676&template=carousel&trackingCode=AF6497036&subId=&width=450&height=130&tsource="
+                    width="450"
+                    height="130"
+                    frameBorder="0"
+                    scrolling="no"
+                    referrerPolicy="unsafe-url"
+                    className="rounded-lg max-w-full"
+                  />
+                </div>
+                <p className="text-center text-stone-700 text-[10px] mt-2">
+                  쿠팡 파트너스 활동의 일환으로 일정액의 수수료를 제공받습니다
+                </p>
+              </div>
+
+              {/* 내 얼굴 분석 상세 - 코에이 스타일 */}
+              <div className="relative">
+                <div className="absolute -inset-0.5 bg-gradient-to-br from-amber-500/30 via-yellow-700/40 to-amber-900/30 rounded-2xl opacity-60 blur"></div>
+                <div className="relative bg-gradient-to-b from-stone-900/90 to-amber-950/70 backdrop-blur-lg rounded-2xl p-6 border-2 border-amber-600/40 shadow-xl"
+                  style={{ boxShadow: '0 0 20px rgba(217, 119, 6, 0.2), inset 0 0 15px rgba(0, 0, 0, 0.5)' }}>
+                  <h3 className="text-lg font-bold mb-4 text-transparent bg-clip-text bg-gradient-to-r from-amber-200 via-yellow-400 to-amber-200 flex items-center gap-2">
+                    <span>🔍</span> 얼굴 분석
+                  </h3>
+                  <div className="grid grid-cols-2 gap-3">
+                    {Object.entries(result.faceAnalysis).filter(([key]) => key !== "인상").map(([part, desc]) => (
+                      <div key={part} className="relative">
+                        <div className="absolute -inset-0.5 bg-gradient-to-br from-amber-600/20 via-yellow-700/25 to-amber-800/20 rounded-lg opacity-60 blur-sm"></div>
+                        <div className="relative bg-gradient-to-br from-stone-950/90 to-amber-950/60 rounded-lg p-3 border border-amber-600/40 shadow-md"
+                          style={{ boxShadow: 'inset 0 0 8px rgba(0, 0, 0, 0.5)' }}>
+                          <p className="text-xs text-amber-300 mb-1 font-bold">{part}</p>
+                          <p className="text-sm text-stone-200 leading-snug">{desc}</p>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </div>
+
+              {/* Coupang Partners Banner */}
+              <div className="mt-2">
+                <p className="text-center text-xs text-[#5C4033]/60 mb-2">추천 상품</p>
+                <div className="flex justify-center">
+                  <iframe
+                    src="https://ads-partners.coupang.com/widgets.html?id=950676&template=carousel&trackingCode=AF6497036&subId=&width=450&height=130&tsource="
+                    width="450"
+                    height="130"
+                    frameBorder="0"
+                    scrolling="no"
+                    referrerPolicy="unsafe-url"
+                    className="rounded-lg max-w-full"
+                  />
+                </div>
+                <p className="text-center text-[#5C4033]/50 text-[10px] mt-2">
+                  쿠팡 파트너스 활동의 일환으로 일정액의 수수료를 제공받습니다
+                </p>
+              </div>
             </div>
             {/* 캡쳐 영역 끝 */}
 
