@@ -53,7 +53,35 @@ export function useScreenshot<T extends HTMLElement = HTMLDivElement>() {
     const blob = await capture();
     setIsCapturing(false);
 
-    if (blob) {
+    if (!blob) {
+      alert("이미지 생성에 실패했습니다.");
+      return;
+    }
+
+    const isIOS = /iPhone|iPad|iPod/i.test(navigator.userAgent);
+
+    if (isIOS) {
+      // iOS: 새 탭에서 이미지 열기 (길게 눌러서 저장)
+      const url = URL.createObjectURL(blob);
+      const newTab = window.open();
+      if (newTab) {
+        newTab.document.write(`
+          <html>
+            <head><title>이미지 저장</title></head>
+            <body style="margin:0;display:flex;justify-content:center;align-items:center;min-height:100vh;background:#000;">
+              <div style="text-align:center;">
+                <p style="color:#fff;margin-bottom:10px;">👆 이미지를 길게 눌러 저장하세요</p>
+                <img src="${url}" style="max-width:100%;height:auto;" />
+              </div>
+            </body>
+          </html>
+        `);
+      } else {
+        // 팝업 차단된 경우
+        alert("팝업이 차단되었습니다. 팝업을 허용해주세요.");
+      }
+    } else {
+      // Android/PC: 일반 다운로드
       const url = URL.createObjectURL(blob);
       const a = document.createElement("a");
       a.href = url;
@@ -62,8 +90,6 @@ export function useScreenshot<T extends HTMLElement = HTMLDivElement>() {
       a.click();
       document.body.removeChild(a);
       URL.revokeObjectURL(url);
-    } else {
-      alert("이미지 생성에 실패했습니다.");
     }
   }, [capture]);
 
