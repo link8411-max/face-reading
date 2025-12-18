@@ -18,12 +18,28 @@ export function useScreenshot<T extends HTMLElement = HTMLDivElement>() {
       return null;
     }
 
+    // 모바일 감지
+    const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
+
     try {
       const { domToBlob } = await import("modern-screenshot");
-      const blob = await domToBlob(ref.current, {
+
+      // 타임아웃 설정 (15초)
+      const timeoutPromise = new Promise<null>((_, reject) =>
+        setTimeout(() => reject(new Error("캡쳐 시간 초과")), 15000)
+      );
+
+      const capturePromise = domToBlob(ref.current, {
         backgroundColor: "#1c1917",
-        scale: 2,
+        scale: isMobile ? 1.5 : 2, // 모바일은 낮은 해상도
+        filter: (node) => {
+          // iframe 제외 (쿠팡 배너 등)
+          if (node instanceof HTMLIFrameElement) return false;
+          return true;
+        },
       });
+
+      const blob = await Promise.race([capturePromise, timeoutPromise]);
       return blob;
     } catch (error) {
       console.error("캡쳐 실패:", error);
