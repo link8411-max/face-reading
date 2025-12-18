@@ -659,7 +659,7 @@ export default function SamgukPage() {
                     이 포스팅은 쿠팡 파트너스 활동의 일환으로, <br />이에 따른 일정액의 수수료를 제공받습니다.
                   </div>
                   <Link
-                    href="https://link.coupang.com/a/bS8K6n"
+                    href="https://link.coupang.com/a/dfIih6"
                     target="_blank"
                     className="flex-shrink-0 bg-[#C41E3A] text-white text-[9px] font-bold px-3 py-1.5 rounded shadow-[0_2px_0_black] active:translate-y-[1px] active:shadow-none transition-all"
                   >
