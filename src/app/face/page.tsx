@@ -176,9 +176,9 @@ export default function FacePage() {
       <main className="container mx-auto px-4 py-8 max-w-lg relative z-10">
         {/* Header */}
         <div className="flex items-center justify-between mb-6">
-          <Link href="/" className="text-[#C41E3A]/70 hover:text-[#C41E3A] transition">
+          <button onClick={() => router.back()} className="text-[#C41E3A]/70 hover:text-[#C41E3A] transition">
             ← 돌아가기
-          </Link>
+          </button>
           <span className="text-2xl">👤</span>
         </div>
 
