@@ -23,6 +23,13 @@ export const metadata: Metadata = {
     type: "website",
     locale: "ko_KR",
     siteName: "운명을 읽다",
+    images: [{ url: "/api/og?title=운명을%20읽다&subtitle=AI%20관상%20%26%20신년운세&icon=☯", width: 1200, height: 630 }],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "운명을 읽다 | 무료 AI 관상 분석 & 2026 신년운세",
+    description: "무료 AI 관상 분석과 사주팔자 기반 2026년 병오년 신년운세를 확인하세요!",
+    images: ["/api/og?title=운명을%20읽다&subtitle=AI%20관상%20%26%20신년운세&icon=☯"],
   },
   robots: {
     index: true,

@@ -1,8 +1,25 @@
 @import "tailwindcss";
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  /* 민화 오방색 */
+  --minhwa-red: #C41E3A;      /* 적색 - 남쪽, 여름, 화 */
+  --minhwa-blue: #1E3A5F;     /* 청색 - 동쪽, 봄, 목 */
+  --minhwa-yellow: #FFD700;   /* 황색 - 중앙, 토 */
+  --minhwa-black: #1a1a1a;    /* 흑색 - 북쪽, 겨울, 수 */
+  --minhwa-white: #F5F5F5;    /* 백색 - 서쪽, 가을, 금 */
+
+  /* 한지 배경색 */
+  --hanji-light: #F5E6D3;     /* 밝은 한지 */
+  --hanji-medium: #E8D4C4;    /* 중간 한지 */
+  --hanji-dark: #D4C4B4;      /* 어두운 한지 */
+
+  /* 전통 보조색 */
+  --traditional-brown: #5C4033;  /* 진한 갈색 */
+  --traditional-gold: #D4AF37;   /* 금색 */
+  --traditional-beige: #EAE0D5;  /* 베이지 */
+
+  --background: var(--hanji-light);
+  --foreground: var(--traditional-brown);
 }
 
 @theme inline {
@@ -14,8 +31,8 @@
 
 @media (prefers-color-scheme: dark) {
   :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+    --background: var(--hanji-medium);
+    --foreground: var(--traditional-brown);
   }
 }
 
