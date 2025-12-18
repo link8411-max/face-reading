@@ -663,7 +663,7 @@ export default function SamgukPage() {
                     target="_blank"
                     className="flex-shrink-0 bg-[#C41E3A] text-white text-[9px] font-bold px-3 py-1.5 rounded shadow-[0_2px_0_black] active:translate-y-[1px] active:shadow-none transition-all"
                   >
-                    영웅의 장비 쇼핑
+                    <span className="opacity-70 mr-1">[AD]</span> 영웅의 장비 쇼핑
                   </Link>
                 </div>
               </div>
