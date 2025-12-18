@@ -7,24 +7,25 @@ const genAI = new GoogleGenerativeAI(apiKey);
 async function gen() {
   const model = genAI.getGenerativeModel({ model: "gemini-2.0-flash-exp" });
 
-  const prompt = `Create a 64x64 PIXEL ART portrait, then upscaled to show the pixels clearly.
+  const prompt = `Create a 16-bit RETRO GAME PORTRAIT in the exact style of 1990s KOEI strategy games (Romance of the Three Kingdoms III/IV).
 
-MUST be actual PIXEL ART with visible square pixels like:
-- Final Fantasy 6 character portraits
-- Suikoden 1/2 character faces
-- Old KOEI strategy games from Super Famicom era
-- Retro 16-bit JRPG style
+TECHNICAL SPECIFICATIONS:
+- STYLE: Hand-dotted Pixel Art (Bust Portrait)
+- PALETTE: Limited 16-color or 256-color palette (Indexed color look)
+- TECHNIQUE: Heavy use of "DITHERING" (checkered pixel patterns) for shading and gradients
+- RESOLUTION: Render as if it were 64x80 pixels, but sharp and clean
+- LIGHTING: Dramatic side-lighting (Chiaroscuro) with deep shadows and high contrast
+- BACKGROUND: Solid dark neutral color (navy, dark brown) or simple stone texture
 
-Subject: Zhuge Liang, Chinese strategist
-- Handsome bishonen style face
-- Green scholar robes, gold trim
-- White feather fan
-- Black hair tied up
-- Thin elegant beard
-- Sharp intelligent eyes
-- Noble heroic look
+SUBJECT: Zhuge Liang, the legendary strategist
+- Appearance: Handsome, refined scholar, late 20s
+- Features: Sharp intelligent eyes, thin elegant mustache and goatee, fair skin
+- Clothing: Forest green silk scholar robes with intricate gold-threaded embroidery
+- Accessory: Holding a white crane-feather fan near his chest
+- Hat: Traditional black scholar's headcloth (Guan)
 
-IMPORTANT: Must look like actual retro game pixel art with blocky pixels visible, not smooth digital art. Like a sprite from a 1995 SNES game.`;
+AESTHETIC GOAL:
+Must look like a character from a Japanese 16-bit PC-98 or Super Famicom simulation game. Visible chunky pixels, retro dithering artifacts, and a "painted" but pixelated look. NO smooth gradients, NO modern digital art look.`;
 
   try {
     const result = await model.generateContent({

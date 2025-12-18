@@ -134,6 +134,32 @@ export default function Home() {
           <p className="text-center text-[#5C4033]/60 text-sm mb-4">재미로 즐기는 이색 테스트</p>
 
           <div className="space-y-3">
+            {/* 동물상 테스트 */}
+            <Link href="/animal" className="block">
+              <div className="bg-white/50 backdrop-blur-sm rounded-2xl p-5 hover:bg-white/70 transition group border border-[#FFD700]/30 shadow-md hover:shadow-lg relative overflow-hidden">
+                <div className="absolute top-2 right-2 bg-gradient-to-r from-[#C41E3A] to-[#FFD700] text-white text-xs font-bold px-2 py-0.5 rounded-full animate-pulse-heart">
+                  NEW
+                </div>
+                <div className="flex items-center gap-4">
+                  <div className="text-4xl">🦊</div>
+                  <div className="flex-1">
+                    <h3 className="text-lg font-bold text-[#5C4033] group-hover:text-[#C41E3A] transition">
+                      동물상 테스트
+                    </h3>
+                    <p className="text-[#5C4033]/60 text-xs">
+                      나는 어떤 동물을 닮았을까?
+                    </p>
+                  </div>
+                  <div className="flex gap-1">
+                    <span className="text-lg">🐶</span>
+                    <span className="text-lg">🐱</span>
+                    <span className="text-lg">🐰</span>
+                  </div>
+                  <div className="text-[#C41E3A]/40 group-hover:text-[#C41E3A] transition text-xl">→</div>
+                </div>
+              </div>
+            </Link>
+
             {/* 삼국지 닮은꼴 */}
             <Link href="/samguk" className="block">
               <div className="bg-white/50 backdrop-blur-sm rounded-2xl p-5 hover:bg-white/70 transition group border border-[#1E3A5F]/20 shadow-md hover:shadow-lg">
@@ -156,11 +182,6 @@ export default function Home() {
                 </div>
               </div>
             </Link>
-
-            {/* 추후 추가될 메뉴들 공간 */}
-            <div className="bg-white/30 backdrop-blur-sm rounded-2xl p-4 border border-dashed border-[#5C4033]/20 text-center">
-              <p className="text-[#5C4033]/40 text-sm">🎲 새로운 놀이 준비 중...</p>
-            </div>
           </div>
         </div>
 

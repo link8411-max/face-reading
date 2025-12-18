@@ -116,6 +116,15 @@ export default function RootLayout({
   return (
     <html lang="ko">
       <head>
+        {/* PWA 메타 태그 */}
+        <meta name="application-name" content="운명을읽다" />
+        <meta name="apple-mobile-web-app-capable" content="yes" />
+        <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+        <meta name="apple-mobile-web-app-title" content="운명을읽다" />
+        <meta name="mobile-web-app-capable" content="yes" />
+        <meta name="theme-color" content="#C41E3A" />
+        <link rel="apple-touch-icon" href="/icons/icon-192x192.svg" />
+
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
@@ -123,6 +132,26 @@ export default function RootLayout({
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd) }}
+        />
+
+        {/* 서비스 워커 등록 */}
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `
+              if ('serviceWorker' in navigator) {
+                window.addEventListener('load', function() {
+                  navigator.serviceWorker.register('/sw.js').then(
+                    function(registration) {
+                      console.log('SW registered: ', registration);
+                    },
+                    function(err) {
+                      console.log('SW registration failed: ', err);
+                    }
+                  );
+                });
+              }
+            `,
+          }}
         />
       </head>
       <body
