@@ -161,6 +161,9 @@ export default function AnimalTypePage() {
                   <p className="text-[#5C4033]/60 text-sm mt-2">
                     정면 얼굴이 잘 보이는 사진이 좋아요
                   </p>
+                  <p className="text-[#C41E3A]/60 text-[10px] mt-4">
+                    ※ 사진은 서버에 저장되지 않으며 분석 후 즉시 삭제됩니다.
+                  </p>
                 </div>
               )}
             </div>

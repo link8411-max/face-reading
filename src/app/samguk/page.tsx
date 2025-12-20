@@ -308,6 +308,7 @@ export default function SamgukPage() {
                   <KoeiInsetBox className="text-[11px] text-stone-300/80 leading-relaxed font-medium">
                     <p>※ 정면 사진은 인식의 기개가 더욱 높습니다.</p>
                     <p>※ 안면의 랜드마크를 통해 52인의 장수와 대조합니다.</p>
+                    <p className="text-amber-500/80 mt-1">※ 사용자의 사진은 서버에 저장되지 않으며 분석 후 즉시 소멸됩니다.</p>
                   </KoeiInsetBox>
                 </div>
 

@@ -180,6 +180,9 @@ export default function Face2Page() {
                   <p className="text-[#5C4033]/60 text-sm mt-2">
                     정면 얼굴이 잘 보이는 사진이 좋아요
                   </p>
+                  <p className="text-[#C41E3A]/60 text-[10px] mt-4">
+                    ※ 사진은 서버에 저장되지 않으며 분석 후 즉시 삭제됩니다.
+                  </p>
                 </div>
               )}
             </div>
@@ -228,183 +231,182 @@ export default function Face2Page() {
           <div className="space-y-4 animate-fade-in">
             {/* 캡쳐 영역 시작 */}
             <div ref={resultRef} className="space-y-4 bg-[#E8D4C4] p-4 -m-4">
-            {/* 기본 정보 + 사진 */}
-            <div className="bg-gradient-to-r from-white/80 to-white/60 backdrop-blur-sm rounded-3xl p-6 border-2 border-[#C41E3A]/30 shadow-lg">
-              <div className="flex gap-4 items-start">
-                {/* 업로드한 사진 */}
-                {image && (
-                  <div className="flex-shrink-0">
-                    <img
-                      src={image}
-                      alt="분석된 얼굴"
-                      className="w-24 h-24 object-cover rounded-2xl border-2 border-[#FFD700]/60"
-                    />
-                  </div>
-                )}
-                <div className="flex-1 text-center">
-                  <span className="inline-block px-4 py-1 bg-gradient-to-r from-[#C41E3A] to-[#FFD700] text-white rounded-full text-sm font-bold mb-2">
-                    {result.type}
-                  </span>
-                  <h2 className="text-xl font-bold mb-2 text-[#5C4033]">{result.title}</h2>
-                  <p className="text-[#5C4033]/80 text-sm leading-relaxed">
-                    {result.summary}
-                  </p>
-                </div>
-              </div>
-            </div>
-
-            {/* 얼굴 부위별 분석 */}
-            <div className="bg-white/70 backdrop-blur-sm rounded-3xl p-6 border-2 border-[#FFD700]/30 shadow-md">
-              <h3 className="text-lg font-bold mb-4 text-[#C41E3A]">부위별 관상</h3>
-              <div className="space-y-3">
-                {Object.entries(result.faceFeatures).map(([부위, 설명]) => (
-                  <div key={부위} className="bg-white/50 rounded-2xl p-3 border border-[#C41E3A]/20">
-                    <span className="text-[#C41E3A] font-medium">{부위}</span>
-                    <p className="text-sm text-[#5C4033]/80 mt-1">{설명}</p>
-                  </div>
-                ))}
-              </div>
-            </div>
-
-            {/* 시기별 운세 */}
-            <div className="bg-white/70 backdrop-blur-sm rounded-3xl p-6 border-2 border-[#FFD700]/30 shadow-md">
-              <h3 className="text-lg font-bold mb-4 text-[#C41E3A]">시기별 운세</h3>
-              <div className="space-y-4">
-                {Object.entries(result.lifeFortune).map(([시기, 데이터]) => (
-                  <div
-                    key={시기}
-                    className={`rounded-2xl p-4 border-2 ${
-                      시기 === "초년운"
-                        ? "bg-green-50/50 border-green-600/30"
-                        : 시기 === "중년운"
-                        ? "bg-[#FFD700]/10 border-[#FFD700]/40"
-                        : "bg-[#C41E3A]/10 border-[#C41E3A]/30"
-                    }`}
-                  >
-                    <div className="flex justify-between items-center mb-2">
-                      <div>
-                        <span className="font-bold text-[#5C4033]">
-                          {시기 === "초년운" && "🌱 "}
-                          {시기 === "중년운" && "🌳 "}
-                          {시기 === "말년운" && "🍂 "}
-                          {시기}
-                        </span>
-                        <span className="text-xs text-[#5C4033]/60 ml-2">
-                          ({데이터.period})
-                        </span>
-                      </div>
-                      <span className="text-[#FFD700]">
-                        {renderStars(데이터.rating)}
-                      </span>
-                    </div>
-                    <p className="text-sm text-[#5C4033]/80">{데이터.description}</p>
-                  </div>
-                ))}
-              </div>
-            </div>
-
-            {/* 세부 운세 */}
-            <div className="bg-white/70 backdrop-blur-sm rounded-3xl p-6 border-2 border-[#FFD700]/30 shadow-md">
-              <h3 className="text-lg font-bold mb-4 text-[#C41E3A]">운세 지수</h3>
-              <div className="space-y-3">
-                {Object.entries(result.categories).map(([항목, 점수]) => (
-                  <div key={항목} className="flex items-center gap-3">
-                    <span className="w-20 text-sm text-[#5C4033] font-medium">
-                      <span className="text-[#C41E3A]">{운아이콘[항목]}</span> {항목}
-                    </span>
-                    <div className="flex-1 bg-white/50 rounded-full h-3 overflow-hidden border border-[#C41E3A]/20">
-                      <div
-                        className="h-full bg-gradient-to-r from-[#C41E3A] to-[#FFD700] rounded-full transition-all duration-500"
-                        style={{ width: `${점수 * 20}%` }}
+              {/* 기본 정보 + 사진 */}
+              <div className="bg-gradient-to-r from-white/80 to-white/60 backdrop-blur-sm rounded-3xl p-6 border-2 border-[#C41E3A]/30 shadow-lg">
+                <div className="flex gap-4 items-start">
+                  {/* 업로드한 사진 */}
+                  {image && (
+                    <div className="flex-shrink-0">
+                      <img
+                        src={image}
+                        alt="분석된 얼굴"
+                        className="w-24 h-24 object-cover rounded-2xl border-2 border-[#FFD700]/60"
                       />
                     </div>
-                    <span className="text-[#FFD700] text-sm w-16 text-right">
-                      {renderStars(점수)}
+                  )}
+                  <div className="flex-1 text-center">
+                    <span className="inline-block px-4 py-1 bg-gradient-to-r from-[#C41E3A] to-[#FFD700] text-white rounded-full text-sm font-bold mb-2">
+                      {result.type}
                     </span>
-                  </div>
-                ))}
-              </div>
-            </div>
-
-            {/* 성격 특성 */}
-            <div className="bg-white/70 backdrop-blur-sm rounded-3xl p-6 border-2 border-[#FFD700]/30 shadow-md">
-              <h3 className="text-lg font-bold mb-4 text-[#C41E3A]">성격 특성</h3>
-              <div className="flex flex-wrap gap-2">
-                {result.personality.map((특성, index) => (
-                  <span
-                    key={index}
-                    className="px-3 py-1 bg-[#FFD700]/15 text-[#5C4033] rounded-full text-sm border border-[#FFD700]/40 font-medium"
-                  >
-                    {특성}
-                  </span>
-                ))}
-              </div>
-            </div>
-
-            {/* 주의사항 */}
-            {result.cautions && result.cautions.length > 0 && (
-              <div className="bg-orange-50/50 backdrop-blur-sm rounded-3xl p-6 border-2 border-orange-400/30 shadow-md">
-                <h3 className="text-lg font-bold mb-4 text-orange-700 flex items-center gap-2">
-                  <span>주의사항</span>
-                </h3>
-                <div className="space-y-2">
-                  {result.cautions.map((주의, index) => (
-                    <p
-                      key={index}
-                      className="text-sm text-[#5C4033]/90 leading-relaxed pl-1"
-                    >
-                      {주의}
+                    <h2 className="text-xl font-bold mb-2 text-[#5C4033]">{result.title}</h2>
+                    <p className="text-[#5C4033]/80 text-sm leading-relaxed">
+                      {result.summary}
                     </p>
+                  </div>
+                </div>
+              </div>
+
+              {/* 얼굴 부위별 분석 */}
+              <div className="bg-white/70 backdrop-blur-sm rounded-3xl p-6 border-2 border-[#FFD700]/30 shadow-md">
+                <h3 className="text-lg font-bold mb-4 text-[#C41E3A]">부위별 관상</h3>
+                <div className="space-y-3">
+                  {Object.entries(result.faceFeatures).map(([부위, 설명]) => (
+                    <div key={부위} className="bg-white/50 rounded-2xl p-3 border border-[#C41E3A]/20">
+                      <span className="text-[#C41E3A] font-medium">{부위}</span>
+                      <p className="text-sm text-[#5C4033]/80 mt-1">{설명}</p>
+                    </div>
                   ))}
                 </div>
               </div>
-            )}
 
-            {/* 어울리는 직업 */}
-            <div className="bg-white/70 backdrop-blur-sm rounded-3xl p-6 border-2 border-[#FFD700]/30 shadow-md">
-              <h3 className="text-lg font-bold mb-3 text-[#C41E3A]">어울리는 직업</h3>
-              <p className="text-[#5C4033]/90">{result.career}</p>
-            </div>
-
-            {/* 행운 요소 & 조언 */}
-            <div className="bg-gradient-to-r from-white/80 to-white/60 backdrop-blur-sm rounded-3xl p-6 border-2 border-[#C41E3A]/30 shadow-lg">
-              <h3 className="text-lg font-bold mb-4 text-[#C41E3A]">행운 요소</h3>
-              <div className="grid grid-cols-2 gap-3 mb-4">
-                <div className="bg-[#FFD700]/15 rounded-2xl p-3 text-center border border-[#FFD700]/40">
-                  <p className="text-xs text-[#5C4033]/70">행운의 숫자</p>
-                  <p className="text-2xl font-bold text-[#C41E3A]">
-                    {result.luckyNumber}
-                  </p>
+              {/* 시기별 운세 */}
+              <div className="bg-white/70 backdrop-blur-sm rounded-3xl p-6 border-2 border-[#FFD700]/30 shadow-md">
+                <h3 className="text-lg font-bold mb-4 text-[#C41E3A]">시기별 운세</h3>
+                <div className="space-y-4">
+                  {Object.entries(result.lifeFortune).map(([시기, 데이터]) => (
+                    <div
+                      key={시기}
+                      className={`rounded-2xl p-4 border-2 ${시기 === "초년운"
+                          ? "bg-green-50/50 border-green-600/30"
+                          : 시기 === "중년운"
+                            ? "bg-[#FFD700]/10 border-[#FFD700]/40"
+                            : "bg-[#C41E3A]/10 border-[#C41E3A]/30"
+                        }`}
+                    >
+                      <div className="flex justify-between items-center mb-2">
+                        <div>
+                          <span className="font-bold text-[#5C4033]">
+                            {시기 === "초년운" && "🌱 "}
+                            {시기 === "중년운" && "🌳 "}
+                            {시기 === "말년운" && "🍂 "}
+                            {시기}
+                          </span>
+                          <span className="text-xs text-[#5C4033]/60 ml-2">
+                            ({데이터.period})
+                          </span>
+                        </div>
+                        <span className="text-[#FFD700]">
+                          {renderStars(데이터.rating)}
+                        </span>
+                      </div>
+                      <p className="text-sm text-[#5C4033]/80">{데이터.description}</p>
+                    </div>
+                  ))}
                 </div>
-                <div className="bg-[#FFD700]/15 rounded-2xl p-3 text-center border border-[#FFD700]/40">
-                  <p className="text-xs text-[#5C4033]/70">행운의 색상</p>
-                  <p className="text-xl font-bold text-[#5C4033]">{result.luckyColor}</p>
+              </div>
+
+              {/* 세부 운세 */}
+              <div className="bg-white/70 backdrop-blur-sm rounded-3xl p-6 border-2 border-[#FFD700]/30 shadow-md">
+                <h3 className="text-lg font-bold mb-4 text-[#C41E3A]">운세 지수</h3>
+                <div className="space-y-3">
+                  {Object.entries(result.categories).map(([항목, 점수]) => (
+                    <div key={항목} className="flex items-center gap-3">
+                      <span className="w-20 text-sm text-[#5C4033] font-medium">
+                        <span className="text-[#C41E3A]">{운아이콘[항목]}</span> {항목}
+                      </span>
+                      <div className="flex-1 bg-white/50 rounded-full h-3 overflow-hidden border border-[#C41E3A]/20">
+                        <div
+                          className="h-full bg-gradient-to-r from-[#C41E3A] to-[#FFD700] rounded-full transition-all duration-500"
+                          style={{ width: `${점수 * 20}%` }}
+                        />
+                      </div>
+                      <span className="text-[#FFD700] text-sm w-16 text-right">
+                        {renderStars(점수)}
+                      </span>
+                    </div>
+                  ))}
                 </div>
               </div>
-              <div className="bg-[#C41E3A]/10 rounded-2xl p-4 text-center border-2 border-[#C41E3A]/30">
-                <p className="text-xs text-[#5C4033]/60 mb-1">관상 조언</p>
-                <p className="text-[#C41E3A] font-medium">&quot;{result.advice}&quot;</p>
-              </div>
-            </div>
 
-            {/* Coupang Partners Banner */}
-            <div className="mt-2">
-              <p className="text-center text-xs text-[#5C4033]/60 mb-2">추천 상품</p>
-              <div className="flex justify-center">
-                <iframe
-                  src="https://ads-partners.coupang.com/widgets.html?id=950676&template=carousel&trackingCode=AF6497036&subId=&width=450&height=130&tsource="
-                  width="450"
-                  height="130"
-                  frameBorder="0"
-                  scrolling="no"
-                  referrerPolicy="unsafe-url"
-                  className="rounded-2xl max-w-full"
-                />
+              {/* 성격 특성 */}
+              <div className="bg-white/70 backdrop-blur-sm rounded-3xl p-6 border-2 border-[#FFD700]/30 shadow-md">
+                <h3 className="text-lg font-bold mb-4 text-[#C41E3A]">성격 특성</h3>
+                <div className="flex flex-wrap gap-2">
+                  {result.personality.map((특성, index) => (
+                    <span
+                      key={index}
+                      className="px-3 py-1 bg-[#FFD700]/15 text-[#5C4033] rounded-full text-sm border border-[#FFD700]/40 font-medium"
+                    >
+                      {특성}
+                    </span>
+                  ))}
+                </div>
               </div>
-              <p className="text-center text-[#5C4033]/50 text-[10px] mt-2">
-                쿠팡 파트너스 활동의 일환으로 일정액의 수수료를 제공받습니다
-              </p>
-            </div>
+
+              {/* 주의사항 */}
+              {result.cautions && result.cautions.length > 0 && (
+                <div className="bg-orange-50/50 backdrop-blur-sm rounded-3xl p-6 border-2 border-orange-400/30 shadow-md">
+                  <h3 className="text-lg font-bold mb-4 text-orange-700 flex items-center gap-2">
+                    <span>주의사항</span>
+                  </h3>
+                  <div className="space-y-2">
+                    {result.cautions.map((주의, index) => (
+                      <p
+                        key={index}
+                        className="text-sm text-[#5C4033]/90 leading-relaxed pl-1"
+                      >
+                        {주의}
+                      </p>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {/* 어울리는 직업 */}
+              <div className="bg-white/70 backdrop-blur-sm rounded-3xl p-6 border-2 border-[#FFD700]/30 shadow-md">
+                <h3 className="text-lg font-bold mb-3 text-[#C41E3A]">어울리는 직업</h3>
+                <p className="text-[#5C4033]/90">{result.career}</p>
+              </div>
+
+              {/* 행운 요소 & 조언 */}
+              <div className="bg-gradient-to-r from-white/80 to-white/60 backdrop-blur-sm rounded-3xl p-6 border-2 border-[#C41E3A]/30 shadow-lg">
+                <h3 className="text-lg font-bold mb-4 text-[#C41E3A]">행운 요소</h3>
+                <div className="grid grid-cols-2 gap-3 mb-4">
+                  <div className="bg-[#FFD700]/15 rounded-2xl p-3 text-center border border-[#FFD700]/40">
+                    <p className="text-xs text-[#5C4033]/70">행운의 숫자</p>
+                    <p className="text-2xl font-bold text-[#C41E3A]">
+                      {result.luckyNumber}
+                    </p>
+                  </div>
+                  <div className="bg-[#FFD700]/15 rounded-2xl p-3 text-center border border-[#FFD700]/40">
+                    <p className="text-xs text-[#5C4033]/70">행운의 색상</p>
+                    <p className="text-xl font-bold text-[#5C4033]">{result.luckyColor}</p>
+                  </div>
+                </div>
+                <div className="bg-[#C41E3A]/10 rounded-2xl p-4 text-center border-2 border-[#C41E3A]/30">
+                  <p className="text-xs text-[#5C4033]/60 mb-1">관상 조언</p>
+                  <p className="text-[#C41E3A] font-medium">&quot;{result.advice}&quot;</p>
+                </div>
+              </div>
+
+              {/* Coupang Partners Banner */}
+              <div className="mt-2">
+                <p className="text-center text-xs text-[#5C4033]/60 mb-2">추천 상품</p>
+                <div className="flex justify-center">
+                  <iframe
+                    src="https://ads-partners.coupang.com/widgets.html?id=950676&template=carousel&trackingCode=AF6497036&subId=&width=450&height=130&tsource="
+                    width="450"
+                    height="130"
+                    frameBorder="0"
+                    scrolling="no"
+                    referrerPolicy="unsafe-url"
+                    className="rounded-2xl max-w-full"
+                  />
+                </div>
+                <p className="text-center text-[#5C4033]/50 text-[10px] mt-2">
+                  쿠팡 파트너스 활동의 일환으로 일정액의 수수료를 제공받습니다
+                </p>
+              </div>
             </div>
             {/* 캡쳐 영역 끝 */}
 
