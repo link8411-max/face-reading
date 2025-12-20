@@ -445,16 +445,10 @@ export default function SamgukPage() {
                         </div>
                       </div>
 
-                      <KoeiInsetBox className="p-4 space-y-3 bg-black/40">
-                        <div className="grid grid-cols-2 gap-x-4">
-                          <div className="flex flex-col gap-1">
-                            <span className="text-amber-300/60 font-black text-[11px] uppercase tracking-wider">현대 직무</span>
-                            <span className="text-white font-bold text-[14px] leading-tight break-keep">{result.character.modernJob}</span>
-                          </div>
-                          <div className="flex flex-col gap-1 border-l border-stone-800/50 pl-4">
-                            <span className="text-amber-300/60 font-black text-[11px] uppercase tracking-wider">성별</span>
-                            <span className="text-white font-bold text-[14px]">{result.character.gender}</span>
-                          </div>
+                      <KoeiInsetBox className="p-4 space-y-4 bg-black/40">
+                        <div className="flex flex-col gap-1.5">
+                          <span className="text-amber-300/60 font-black text-[11px] uppercase tracking-wider">영웅의 추천 현대 직무</span>
+                          <span className="text-white font-bold text-[16px] leading-snug break-keep">{result.character.modernJob}</span>
                         </div>
                         <div className="border-t border-stone-800/80 pt-3">
                           <span className="text-amber-300/60 font-black text-[11px] uppercase tracking-wider block mb-2">영웅 대변 특성</span>
