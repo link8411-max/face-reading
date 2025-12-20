@@ -23,17 +23,17 @@ interface AnalysisResult {
 // 코에이 스타일 수평 스탯 바
 function KoeiStatLine({ label, value, max = 100 }: { label: string; value: number; max?: number }) {
   return (
-    <div className="flex items-center gap-2 mb-2">
-      <div className="w-12 text-amber-200 text-xs font-bold drop-shadow-sm">{label}</div>
-      <div className="flex-1 relative h-4 bg-black/40 rounded shadow-inner border border-stone-800">
+    <div className="flex items-center gap-2 mb-3">
+      <div className="w-16 text-amber-200 text-[14.5px] font-black drop-shadow-sm italic tracking-tighter">{label}</div>
+      <div className="flex-1 relative h-5 bg-black/50 rounded shadow-[inset_0_2px_4px_rgba(0,0,0,0.8)] border border-stone-800">
         <div
-          className="absolute inset-y-0.5 left-0.5 bg-gradient-to-r from-red-700 to-red-500 rounded-sm transition-all duration-1000 shadow-[0_0_8px_rgba(185,28,28,0.5)]"
+          className="absolute inset-y-0.5 left-0.5 bg-gradient-to-r from-red-700 to-red-500 rounded-sm transition-all duration-1000 shadow-[0_0_10px_rgba(185,28,28,0.6)]"
           style={{ width: `calc(${Math.min(value, max)}% - 4px)` }}
         >
           <div className="absolute inset-0 bg-[linear-gradient(transparent_0%,rgba(255,255,255,0.2)_50%,transparent_100%)]"></div>
         </div>
       </div>
-      <div className="w-8 text-right text-white font-mono text-xs font-bold">{value}</div>
+      <div className="w-10 text-right text-white font-mono text-[14.5px] font-black italic">{value}</div>
     </div>
   );
 }
@@ -434,47 +434,49 @@ export default function SamgukPage() {
 
                     {/* 기본 신상 정보 박스 */}
                     <div className="flex-1 space-y-2">
-                      <div className="flex items-center justify-between mb-1 border-b border-black pb-1">
+                      <div className="flex items-center justify-between mb-2 border-b-2 border-black/60 pb-1.5">
                         <div className="flex items-center gap-2">
-                          <span className="text-white text-base font-bold drop-shadow-md">{result.character.name}</span>
-                          <span className="text-amber-300/40 text-[10px]">{result.character.hanja}</span>
+                          <span className="text-white text-xl font-black drop-shadow-lg leading-tight">{result.character.name}</span>
+                          <span className="text-amber-300/50 text-[13px] font-medium">{result.character.hanja}</span>
                         </div>
-                        <div className="flex items-center gap-1">
-                          <span className="text-amber-500/80 text-[10px] uppercase font-mono tracking-tighter">Consistency:</span>
-                          <span className="text-white font-mono text-sm font-bold">{result.similarity}%</span>
+                        <div className="flex items-center gap-1.5 bg-black/20 px-2 py-0.5 rounded border border-white/5">
+                          <span className="text-amber-500 font-black text-[11px] uppercase tracking-widest italic">Match:</span>
+                          <span className="text-white font-mono text-base font-black italic">{result.similarity}%</span>
                         </div>
                       </div>
 
-                      <KoeiInsetBox className="grid grid-cols-2 gap-y-1.5 gap-x-4">
-                        <div className="flex justify-between items-center text-[11px]">
-                          <span className="text-amber-300/60 font-semibold">현대 직업:</span>
-                          <span className="text-white truncate max-w-[80px]">{result.character.modernJob}</span>
+                      <KoeiInsetBox className="p-4 space-y-3 bg-black/40">
+                        <div className="grid grid-cols-2 gap-x-4">
+                          <div className="flex flex-col gap-1">
+                            <span className="text-amber-300/60 font-black text-[11px] uppercase tracking-wider">현대 직무</span>
+                            <span className="text-white font-bold text-[14px] leading-tight break-keep">{result.character.modernJob}</span>
+                          </div>
+                          <div className="flex flex-col gap-1 border-l border-stone-800/50 pl-4">
+                            <span className="text-amber-300/60 font-black text-[11px] uppercase tracking-wider">성별</span>
+                            <span className="text-white font-bold text-[14px]">{result.character.gender}</span>
+                          </div>
                         </div>
-                        <div className="flex justify-between items-center text-[11px]">
-                          <span className="text-amber-300/60 font-semibold">성별:</span>
-                          <span className="text-white">{result.character.gender}</span>
-                        </div>
-                        <div className="flex justify-between items-center text-[11px] col-span-2 border-t border-stone-800/50 pt-2">
-                          <span className="text-amber-300/60 font-semibold">대표 특성:</span>
-                          <div className="flex flex-wrap gap-1 justify-end">
+                        <div className="border-t border-stone-800/80 pt-3">
+                          <span className="text-amber-300/60 font-black text-[11px] uppercase tracking-wider block mb-2">영웅 대변 특성</span>
+                          <div className="flex flex-wrap gap-2">
                             {result.character.traits.map((t, i) => (
-                              <span key={i} className="bg-amber-900/40 text-amber-200 text-[9.5px] px-1.5 py-0.5 rounded border border-amber-900/50">{t}</span>
+                              <span key={i} className="bg-amber-900/50 text-amber-100 text-[11.5px] px-2.5 py-1 rounded border border-amber-500/20 font-bold shadow-sm">{t}</span>
                             ))}
                           </div>
                         </div>
                       </KoeiInsetBox>
 
-                      <div className="space-y-1.5">
-                        <div className="text-[11px] text-amber-500/80 ml-1 font-bold">◈ 페르소나 안면 분석</div>
-                        <KoeiInsetBox className="text-[11px] text-amber-100/90 leading-relaxed font-medium min-h-[110px] bg-black/40">
-                          <div className="space-y-3">
+                      <div className="space-y-2">
+                        <div className="text-[13px] text-amber-500 ml-1 font-black italic tracking-widest">◈ 페르소나 안면 분석</div>
+                        <KoeiInsetBox className="text-[13px] text-amber-100 leading-relaxed font-bold min-h-[120px] bg-black/60 p-4">
+                          <div className="space-y-4">
                             <div>
-                              <p className="text-amber-500/70 mb-1 text-[10px] uppercase tracking-widest underline decoration-amber-900 underline-offset-2 font-bold">Visual Features</p>
-                              <p className="leading-snug text-[11px]">{result.faceAnalysis.눈}, {result.faceAnalysis.코}, {result.faceAnalysis.입}</p>
+                              <p className="text-amber-600 mb-1.5 text-[11.5px] uppercase tracking-[0.2em] underline decoration-amber-900/50 underline-offset-4 font-black">Visual Features</p>
+                              <p className="leading-relaxed text-[13px] drop-shadow-sm">{result.faceAnalysis.눈}, {result.faceAnalysis.코}, {result.faceAnalysis.입}</p>
                             </div>
-                            <div className="border-t border-stone-800/50 pt-2">
-                              <p className="text-amber-500/70 mb-1 text-[10px] uppercase tracking-widest underline decoration-amber-900 underline-offset-2 font-bold">Neural Impression</p>
-                              <p className="leading-snug text-[11px]">{result.faceAnalysis.인상}</p>
+                            <div className="border-t border-amber-900/30 pt-3">
+                              <p className="text-amber-600 mb-1.5 text-[11.5px] uppercase tracking-[0.2em] underline decoration-amber-900/50 underline-offset-4 font-black">Neural Impression</p>
+                              <p className="leading-relaxed text-[13px] drop-shadow-sm">{result.faceAnalysis.인상}</p>
                             </div>
                           </div>
                         </KoeiInsetBox>
@@ -485,23 +487,23 @@ export default function SamgukPage() {
                   {/* 탭 콘텐츠 영역 */}
                   <div className="min-h-[320px]">
                     {selectedTab === "열전" && (
-                      <div className="space-y-4 animate-in fade-in slide-in-from-bottom-2 duration-500">
-                        <div className="text-stone-400 text-[11px] font-bold italic tracking-widest flex items-center gap-2">
-                          <span className="w-2 h-2 border border-stone-600 rotate-45"></span>
+                      <div className="space-y-5 animate-in fade-in slide-in-from-bottom-2 duration-500">
+                        <div className="text-stone-400 text-[13px] font-black italic tracking-[0.2em] flex items-center gap-2">
+                          <span className="w-2.5 h-2.5 bg-stone-600 rotate-45 shadow-[0_0_8px_rgba(0,0,0,1)]"></span>
                           HEROIC LEGEND & COMMENTARY
                         </div>
-                        <div className="bg-black/40 border border-stone-800 p-4 rounded-sm space-y-4">
-                          <div className="relative pl-6 py-2">
-                            <span className="absolute left-0 top-0 text-3xl text-amber-900/40 font-serif">&ldquo;</span>
-                            <p className="text-amber-200 text-base italic leading-relaxed font-bold">&quot;{result.character.quote}&quot;</p>
-                            <span className="absolute right-2 bottom-0 text-3xl text-amber-900/40 font-serif rotate-180">&ldquo;</span>
+                        <div className="bg-black/50 border border-stone-800 p-5 rounded-sm space-y-5 shadow-2xl">
+                          <div className="relative pl-8 py-3 border-l-4 border-amber-900/30">
+                            <span className="absolute left-1 top-0 text-4xl text-amber-800 font-serif">&ldquo;</span>
+                            <p className="text-amber-200 text-lg sm:text-xl italic leading-relaxed font-black drop-shadow-md">&quot;{result.character.quote}&quot;</p>
+                            <span className="absolute right-2 bottom-0 text-4xl text-amber-800 font-serif rotate-180">&ldquo;</span>
                           </div>
-                          <p className="text-stone-200 text-[12.5px] leading-relaxed pt-4 border-t border-stone-800/50 font-medium">
+                          <p className="text-stone-100 text-[15px] sm:text-[17px] leading-loose pt-5 border-t border-stone-800 font-bold tracking-tight">
                             {result.character.description}
                           </p>
-                          <div className="bg-stone-800/40 p-3 rounded border border-stone-700/50">
-                            <p className="text-stone-400 text-[10.5px] font-bold mb-1.5">[현대적 재구성] - {result.character.modernJob}</p>
-                            <p className="text-stone-200/90 text-[11.5px] font-medium leading-relaxed">{result.character.modernComment}</p>
+                          <div className="bg-gradient-to-br from-stone-800 to-stone-900 p-4 rounded-md border border-stone-700 shadow-inner">
+                            <p className="text-amber-600 text-[13px] font-black mb-2 tracking-widest uppercase italic">[현대적 재구성] - {result.character.modernJob}</p>
+                            <p className="text-amber-100 text-[14px] sm:text-[15.5px] font-bold leading-relaxed">{result.character.modernComment}</p>
                           </div>
                         </div>
                       </div>
