@@ -102,8 +102,11 @@ export default function AnimalTypePage() {
       <main className="container mx-auto px-4 py-8 max-w-lg relative z-10">
         {/* Header */}
         <div className="flex items-center justify-between mb-6">
-          <button onClick={() => router.back()} className="text-[#C41E3A]/80 hover:text-[#C41E3A] transition font-medium">
-            ← 돌아가기
+          <button
+            onClick={() => result ? resetAll() : router.back()}
+            className="text-[#C41E3A]/80 hover:text-[#C41E3A] transition font-medium"
+          >
+            ← {result ? '다시하기' : '돌아가기'}
           </button>
           <span className="text-2xl">🐾</span>
         </div>
