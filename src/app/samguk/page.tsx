@@ -445,35 +445,35 @@ export default function SamgukPage() {
                       </div>
 
                       <KoeiInsetBox className="grid grid-cols-2 gap-y-1.5 gap-x-4">
-                        <div className="flex justify-between items-center text-[10px]">
-                          <span className="text-amber-300/40">현대 직업:</span>
-                          <span className="text-white truncate max-w-[70px]">{result.character.modernJob}</span>
+                        <div className="flex justify-between items-center text-[11px]">
+                          <span className="text-amber-300/60 font-semibold">현대 직업:</span>
+                          <span className="text-white truncate max-w-[80px]">{result.character.modernJob}</span>
                         </div>
-                        <div className="flex justify-between items-center text-[10px]">
-                          <span className="text-amber-300/40">성별:</span>
+                        <div className="flex justify-between items-center text-[11px]">
+                          <span className="text-amber-300/60 font-semibold">성별:</span>
                           <span className="text-white">{result.character.gender}</span>
                         </div>
-                        <div className="flex justify-between items-center text-[10px] col-span-2 border-t border-stone-800/50 pt-1">
-                          <span className="text-amber-300/40">대표 특성:</span>
-                          <div className="flex gap-1">
+                        <div className="flex justify-between items-center text-[11px] col-span-2 border-t border-stone-800/50 pt-2">
+                          <span className="text-amber-300/60 font-semibold">대표 특성:</span>
+                          <div className="flex flex-wrap gap-1 justify-end">
                             {result.character.traits.map((t, i) => (
-                              <span key={i} className="bg-amber-900/30 text-amber-200 text-[8px] px-1 rounded border border-amber-900/50">{t}</span>
+                              <span key={i} className="bg-amber-900/40 text-amber-200 text-[9.5px] px-1.5 py-0.5 rounded border border-amber-900/50">{t}</span>
                             ))}
                           </div>
                         </div>
                       </KoeiInsetBox>
 
-                      <div className="space-y-1">
-                        <div className="text-[9px] text-amber-500/60 ml-1">◈ 페르소나 안면 분석</div>
-                        <KoeiInsetBox className="text-[10px] text-amber-100/90 leading-relaxed font-medium min-h-[100px] bg-black/40">
-                          <div className="space-y-2">
+                      <div className="space-y-1.5">
+                        <div className="text-[11px] text-amber-500/80 ml-1 font-bold">◈ 페르소나 안면 분석</div>
+                        <KoeiInsetBox className="text-[11px] text-amber-100/90 leading-relaxed font-medium min-h-[110px] bg-black/40">
+                          <div className="space-y-3">
                             <div>
-                              <p className="text-amber-500/50 mb-0.5 text-[8px] uppercase tracking-widest underline decoration-amber-900 underline-offset-2">Visual Features</p>
-                              <p className="leading-snug text-[9.5px]">{result.faceAnalysis.눈}, {result.faceAnalysis.코}, {result.faceAnalysis.입}</p>
+                              <p className="text-amber-500/70 mb-1 text-[10px] uppercase tracking-widest underline decoration-amber-900 underline-offset-2 font-bold">Visual Features</p>
+                              <p className="leading-snug text-[11px]">{result.faceAnalysis.눈}, {result.faceAnalysis.코}, {result.faceAnalysis.입}</p>
                             </div>
-                            <div className="border-t border-stone-800/50 pt-1">
-                              <p className="text-amber-500/50 mb-0.5 text-[8px] uppercase tracking-widest underline decoration-amber-900 underline-offset-2">Neural Impression</p>
-                              <p className="leading-snug text-[9.5px]">{result.faceAnalysis.인상}</p>
+                            <div className="border-t border-stone-800/50 pt-2">
+                              <p className="text-amber-500/70 mb-1 text-[10px] uppercase tracking-widest underline decoration-amber-900 underline-offset-2 font-bold">Neural Impression</p>
+                              <p className="leading-snug text-[11px]">{result.faceAnalysis.인상}</p>
                             </div>
                           </div>
                         </KoeiInsetBox>
@@ -485,22 +485,22 @@ export default function SamgukPage() {
                   <div className="min-h-[320px]">
                     {selectedTab === "열전" && (
                       <div className="space-y-4 animate-in fade-in slide-in-from-bottom-2 duration-500">
-                        <div className="text-stone-400 text-[10px] font-bold italic tracking-widest flex items-center gap-2">
+                        <div className="text-stone-400 text-[11px] font-bold italic tracking-widest flex items-center gap-2">
                           <span className="w-2 h-2 border border-stone-600 rotate-45"></span>
                           HEROIC LEGEND & COMMENTARY
                         </div>
                         <div className="bg-black/40 border border-stone-800 p-4 rounded-sm space-y-4">
                           <div className="relative pl-6 py-2">
                             <span className="absolute left-0 top-0 text-3xl text-amber-900/40 font-serif">&ldquo;</span>
-                            <p className="text-amber-200 text-sm italic leading-relaxed font-medium">&quot;{result.character.quote}&quot;</p>
+                            <p className="text-amber-200 text-base italic leading-relaxed font-bold">&quot;{result.character.quote}&quot;</p>
                             <span className="absolute right-2 bottom-0 text-3xl text-amber-900/40 font-serif rotate-180">&ldquo;</span>
                           </div>
-                          <p className="text-stone-300 text-[11px] leading-relaxed pt-4 border-t border-stone-800/50">
+                          <p className="text-stone-200 text-[12.5px] leading-relaxed pt-4 border-t border-stone-800/50 font-medium">
                             {result.character.description}
                           </p>
                           <div className="bg-stone-800/40 p-3 rounded border border-stone-700/50">
-                            <p className="text-stone-400 text-[9px] font-bold mb-1">[현대적 재구성] - {result.character.modernJob}</p>
-                            <p className="text-stone-200/80 text-[10px] font-medium leading-snug">{result.character.modernComment}</p>
+                            <p className="text-stone-400 text-[10.5px] font-bold mb-1.5">[현대적 재구성] - {result.character.modernJob}</p>
+                            <p className="text-stone-200/90 text-[11.5px] font-medium leading-relaxed">{result.character.modernComment}</p>
                           </div>
                         </div>
                       </div>
@@ -615,8 +615,8 @@ export default function SamgukPage() {
 
                   {/* 하단 버튼 인터페이스 */}
                   <div className="flex flex-col gap-2 pt-4 border-t border-black/40">
-                    <div className="flex justify-between items-center px-1">
-                      <div className="text-[9px] text-stone-600 font-serif tracking-tighter italic">천하의 기운이 영웅의 자태에 머무나니...</div>
+                    <div className="flex justify-between items-center px-1 pt-2">
+                      <div className="text-[10px] text-stone-400 font-serif tracking-tighter italic">천하의 기운이 영웅의 자태에 머무나니...</div>
                       <div className="flex gap-1 opacity-50">
                         <div className="w-1 h-1 rounded-full bg-emerald-500"></div>
                         <div className="w-1 h-1 rounded-full bg-red-500"></div>
@@ -655,7 +655,7 @@ export default function SamgukPage() {
               {/* 쿠팡 파트너스 배너 */}
               <div className="mt-6 no-screenshot">
                 <div className="p-3 bg-white/5 backdrop-blur-md rounded-lg border border-white/10 flex items-center justify-between gap-3 shadow-inner">
-                  <div className="text-[8px] text-stone-500 leading-tight">
+                  <div className="text-[9.5px] text-stone-400 leading-tight">
                     이 포스팅은 쿠팡 파트너스 활동의 일환으로, <br />이에 따른 일정액의 수수료를 제공받습니다.
                   </div>
                   <Link
@@ -670,11 +670,11 @@ export default function SamgukPage() {
             </div>
 
             {/* 하단 모바일 공유 */}
-            <div className="mt-4 px-2 no-screenshot text-center pb-10">
-              <p className="text-[10px] text-stone-600 italic mb-2 tracking-tighter">※ 저장 버튼이 작동하지 않으면 이미지를 길게 터치하여 저장하세요.</p>
+            <div className="mt-6 px-2 no-screenshot text-center pb-12">
+              <p className="text-[11px] text-stone-500 italic mb-3 tracking-tighter">※ 저장 버튼이 작동하지 않으면 이미지를 길게 터치하여 저장하세요.</p>
               <button
                 onClick={() => share(getShareOptions())}
-                className="w-full py-2 bg-emerald-900/60 border border-emerald-800 text-emerald-200 text-[10px] font-bold rounded shadow-sm hover:bg-emerald-800 transition-colors"
+                className="w-full py-3 bg-emerald-900/60 border border-emerald-800 text-emerald-200 text-[12px] font-bold rounded shadow-sm hover:bg-emerald-800 transition-colors"
               >
                 카카오톡으로 나의 기개 뽐내기 ⚔️
               </button>
