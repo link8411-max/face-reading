@@ -169,6 +169,37 @@ GEMINI_API_KEY=xxx  # .env.local에서 관리 (절대 커밋 금지!)
 
 ---
 
+## SEO 구성
+
+### 각 페이지별 layout.tsx
+모든 페이지에 개별 `layout.tsx`가 있으며 다음을 포함:
+- `title`, `description`, `keywords`
+- `openGraph` (title, description, siteName, images)
+- `twitter` card
+- `alternates.canonical` (정규 URL)
+- `JSON-LD` 구조화 데이터 (SoftwareApplication)
+
+### 새 페이지 추가 시 SEO 체크리스트
+1. `layout.tsx` 생성 (메타데이터 + JSON-LD)
+2. `public/sitemap.xml`에 URL 추가 (lastmod 포함)
+3. 루트 `layout.tsx`의 FAQ JSON-LD 업데이트 (필요시)
+
+---
+
+## 네비게이션 패턴
+
+결과 화면의 "돌아가기" 버튼 동작:
+- **결과 화면**: `resetAll()` 호출 → 입력 화면으로 (텍스트: "← 다시하기")
+- **입력 화면**: `router.back()` → 이전 페이지로 (텍스트: "← 돌아가기")
+
+```tsx
+<button onClick={() => result ? resetAll() : router.back()}>
+  ← {result ? '다시하기' : '돌아가기'}
+</button>
+```
+
+---
+
 ## 주의사항
 
 1. **face-api.js**: `'use client'` 필수 (브라우저 전용)
@@ -176,6 +207,7 @@ GEMINI_API_KEY=xxx  # .env.local에서 관리 (절대 커밋 금지!)
 3. **이미지 캡쳐**: `modern-screenshot` 사용 (CSS lab() 호환)
 4. **모델 파일**: `/public/models/`에 있어야 face-api.js 작동
 5. **페이지 추가/삭제 시**: 반드시 `public/sitemap.xml` 업데이트!
+6. **SEO**: 새 페이지는 layout.tsx + sitemap + canonical URL 필수
 
 ---
 
