@@ -130,6 +130,8 @@ export default function RootLayout({
         <meta name="mobile-web-app-capable" content="yes" />
         <meta name="theme-color" content="#C41E3A" />
         <link rel="apple-touch-icon" href="/icons/icon-192x192.svg" />
+        <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-9670928093323234"
+          crossorigin="anonymous"></script>
 
         <script
           type="application/ld+json"
