@@ -13,7 +13,7 @@ export const metadata: Metadata = {
     type: "website",
     locale: "ko_KR",
     siteName: "운명을 읽다",
-    url: "https://facetest.ai/fortune",
+    url: "https://unse-ai.com/fortune",
     images: [{ url: "/api/og?title=2026%20신년운세&subtitle=병오년%20새해%20운세&icon=🐍", width: 1200, height: 630 }],
   },
   twitter: {
@@ -27,7 +27,7 @@ const jsonLd = {
   "@type": "SoftwareApplication",
   "name": "2026 무료 신년운세",
   "description": "2026년 병오년 신년운세와 토정비결 무료 분석",
-  "url": "https://facetest.ai/fortune",
+  "url": "https://unse-ai.com/fortune",
   "applicationCategory": "EntertainmentApplication",
   "operatingSystem": "Web",
   "offers": { "@type": "Offer", "price": "0", "priceCurrency": "KRW" }
@@ -41,13 +41,13 @@ const breadcrumbJsonLd = {
       "@type": "ListItem",
       "position": 1,
       "name": "운명을 읽다",
-      "item": "https://facetest.ai"
+      "item": "https://unse-ai.com"
     },
     {
       "@type": "ListItem",
       "position": 2,
       "name": "2026 신년운세",
-      "item": "https://facetest.ai/fortune"
+      "item": "https://unse-ai.com/fortune"
     }
   ]
 };

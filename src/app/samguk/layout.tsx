@@ -13,7 +13,7 @@ export const metadata: Metadata = {
     type: "website",
     locale: "ko_KR",
     siteName: "운명을 읽다",
-    url: "https://facetest.ai/samguk",
+    url: "https://unse-ai.com/samguk",
     images: [{ url: "/api/og?title=삼국지%20닮은꼴&subtitle=나는%20어떤%20영웅?&icon=⚔️", width: 1200, height: 630 }],
   },
   twitter: {
@@ -27,7 +27,7 @@ const jsonLd = {
   "@type": "SoftwareApplication",
   "name": "삼국지 닮은꼴 테스트",
   "description": "AI가 분석하는 삼국지 영웅 닮은꼴 테스트",
-  "url": "https://facetest.ai/samguk",
+  "url": "https://unse-ai.com/samguk",
   "applicationCategory": "EntertainmentApplication",
   "operatingSystem": "Web",
   "offers": { "@type": "Offer", "price": "0", "priceCurrency": "KRW" }
@@ -41,13 +41,13 @@ const breadcrumbJsonLd = {
       "@type": "ListItem",
       "position": 1,
       "name": "운명을 읽다",
-      "item": "https://facetest.ai"
+      "item": "https://unse-ai.com"
     },
     {
       "@type": "ListItem",
       "position": 2,
       "name": "삼국지 닮은꼴",
-      "item": "https://facetest.ai/samguk"
+      "item": "https://unse-ai.com/samguk"
     }
   ]
 };

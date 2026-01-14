@@ -1,7 +1,7 @@
 import { MetadataRoute } from 'next'
 
 export default function sitemap(): MetadataRoute.Sitemap {
-    const baseUrl = 'https://facetest.ai'
+    const baseUrl = 'https://unse-ai.com'
 
     const routes = [
         '',

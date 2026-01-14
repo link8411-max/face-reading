@@ -28,7 +28,7 @@ const jsonLd = {
   "@type": "SoftwareApplication",
   "name": "동물상 테스트",
   "description": "AI가 분석하는 당신의 동물상",
-  "url": "https://facetest.ai/animal",
+  "url": "https://unse-ai.com/animal",
   "applicationCategory": "EntertainmentApplication",
   "operatingSystem": "Web",
   "offers": { "@type": "Offer", "price": "0", "priceCurrency": "KRW" }
@@ -42,13 +42,13 @@ const breadcrumbJsonLd = {
       "@type": "ListItem",
       "position": 1,
       "name": "운명을 읽다",
-      "item": "https://facetest.ai"
+      "item": "https://unse-ai.com"
     },
     {
       "@type": "ListItem",
       "position": 2,
       "name": "동물상 테스트",
-      "item": "https://facetest.ai/animal"
+      "item": "https://unse-ai.com/animal"
     }
   ]
 };

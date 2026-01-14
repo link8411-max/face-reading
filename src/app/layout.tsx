@@ -37,7 +37,7 @@ export const metadata: Metadata = {
     follow: true,
   },
   alternates: {
-    canonical: "https://facetest.ai",
+    canonical: "https://unse-ai.com",
   },
 };
 

@@ -36,7 +36,7 @@ const jsonLd = {
   "@type": "SoftwareApplication",
   "name": "무료 관상 분석",
   "description": "얼굴 사진으로 보는 무료 AI 관상 분석 서비스",
-  "url": "https://facetest.ai/face2",
+  "url": "https://unse-ai.com/face2",
   "applicationCategory": "EntertainmentApplication",
   "operatingSystem": "Web",
   "offers": { "@type": "Offer", "price": "0", "priceCurrency": "KRW" }
@@ -50,13 +50,13 @@ const breadcrumbJsonLd = {
       "@type": "ListItem",
       "position": 1,
       "name": "운명을 읽다",
-      "item": "https://facetest.ai"
+      "item": "https://unse-ai.com"
     },
     {
       "@type": "ListItem",
       "position": 2,
       "name": "무료 관상 분석",
-      "item": "https://facetest.ai/face2"
+      "item": "https://unse-ai.com/face2"
     }
   ]
 };
