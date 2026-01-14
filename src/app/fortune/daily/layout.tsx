@@ -5,7 +5,7 @@ export const metadata: Metadata = {
   description: "오늘의 운세를 띠별로 확인하세요! 출생년도로 간편하게 오늘의 운세, 행운의 시간, 행운의 색을 알려드립니다. 매일 업데이트되는 무료 일일운세!",
   keywords: "오늘의 운세, 일일운세, 띠별 운세, 매일 운세, 무료 운세, 행운의 시간, 행운의 색, 12띠 운세",
   alternates: {
-    canonical: "https://face-reading.vercel.app/fortune/daily",
+    canonical: "https://unse-ai.com/fortune/daily",
   },
   openGraph: {
     title: "오늘의 운세 | 운명을 읽다",

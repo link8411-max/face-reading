@@ -5,7 +5,7 @@ export const metadata: Metadata = {
   description: "Google Gemini AI가 분석하는 정밀 관상! 얼굴 사진으로 성격, 운세, 재물운, 애정운을 상세하게 분석합니다. 하루 1회 무료 이용.",
   keywords: "AI 관상, 관상 분석, 인공지능 관상, 얼굴 분석, 운세, 재물운, 애정운, AI 운세, Google Gemini",
   alternates: {
-    canonical: "https://face-reading.vercel.app/face",
+    canonical: "https://unse-ai.com/face",
   },
   openGraph: {
     title: "AI 관상 분석 | 운명을 읽다",

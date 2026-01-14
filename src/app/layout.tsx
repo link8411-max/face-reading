@@ -39,6 +39,11 @@ export const metadata: Metadata = {
   alternates: {
     canonical: "https://unse-ai.com",
   },
+  verification: {
+    other: {
+      "naver-site-verification": "83370e21ac5424788768cbcd73b43b0fa3a350db",
+    },
+  },
 };
 
 const jsonLd = {
@@ -46,7 +51,7 @@ const jsonLd = {
   "@type": "WebApplication",
   "name": "운명을 읽다",
   "description": "무료 AI 관상 분석과 사주팔자 기반 2026년 병오년 신년운세 서비스",
-  "url": "https://face-reading.vercel.app",
+  "url": "https://unse-ai.com",
   "applicationCategory": "EntertainmentApplication",
   "operatingSystem": "Web",
   "offers": {
