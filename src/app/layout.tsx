@@ -188,6 +188,13 @@ export default function RootLayout({
                     <li><Link href="/animal" className="hover:text-[#C41E3A]">동물상 테스트</Link></li>
                   </ul>
                 </div>
+                <div className="space-y-3 col-span-2 md:col-span-1 border-t pt-6 md:border-0 md:pt-0">
+                  <h4 className="text-stone-400 font-bold text-sm uppercase">Info</h4>
+                  <ul className="text-sm space-y-2 text-stone-500">
+                    <li><Link href="/about" className="hover:text-[#C41E3A]">서비스 소개</Link></li>
+                    <li><Link href="/privacy" className="hover:text-[#C41E3A]">개인정보처리방침</Link></li>
+                  </ul>
+                </div>
               </div>
               <div className="text-center pt-6 border-t border-stone-200">
                 <p className="text-xs text-stone-400">© 2026 운명을 읽다. All rights reserved.</p>
