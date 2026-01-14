@@ -1,9 +1,9 @@
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "무료 관상 분석 | 운명을 읽다",
-  description: "얼굴 사진으로 보는 무료 관상 분석! 눈, 코, 입, 얼굴형으로 초년운·중년운·말년운과 재물운, 애정운, 직장운을 확인하세요. 무제한 무료 이용 가능!",
-  keywords: "무료 관상, 관상 분석, 얼굴 관상, 관상 보기, 관상 테스트, 얼굴 분석, 운세, 재물운, 애정운, 직장운",
+  title: "무료 AI 관상 분석 | 얼굴로 보는 운세 - 운명을 읽다",
+  description: "얼굴 사진으로 보는 무료 AI 관상 분석! 눈, 코, 입, 얼굴형으로 초년운·중년운·말년운과 재물운, 애정운을 확인하세요. 정밀한 AI 관상 분석이 무료!",
+  keywords: "무료 관상, AI 관상, 관상 분석, 얼굴 관상, 관상 보기, 관상 테스트, 얼굴 분석, 운세, 무료 관상 테스트",
   alternates: {
     canonical: "https://face-reading.vercel.app/face2",
   },
@@ -31,6 +31,48 @@ export const metadata: Metadata = {
   },
 };
 
+const jsonLd = {
+  "@context": "https://schema.org",
+  "@type": "SoftwareApplication",
+  "name": "무료 관상 분석",
+  "description": "얼굴 사진으로 보는 무료 AI 관상 분석 서비스",
+  "url": "https://facetest.ai/face2",
+  "applicationCategory": "EntertainmentApplication",
+  "operatingSystem": "Web",
+  "offers": { "@type": "Offer", "price": "0", "priceCurrency": "KRW" }
+};
+
+const breadcrumbJsonLd = {
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    {
+      "@type": "ListItem",
+      "position": 1,
+      "name": "운명을 읽다",
+      "item": "https://facetest.ai"
+    },
+    {
+      "@type": "ListItem",
+      "position": 2,
+      "name": "무료 관상 분석",
+      "item": "https://facetest.ai/face2"
+    }
+  ]
+};
+
 export default function Layout({ children }: { children: React.ReactNode }) {
-  return children;
+  return (
+    <>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+      />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }}
+      />
+      {children}
+    </>
+  );
 }

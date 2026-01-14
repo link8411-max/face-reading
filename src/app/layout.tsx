@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import { Analytics } from "@vercel/analytics/react";
+import Link from "next/link";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -14,29 +15,29 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "운명을 읽다 | 무료 AI 관상 분석 & 2026 신년운세",
-  description: "무료 AI 관상 분석과 사주팔자 기반 2026년 병오년 신년운세! 얼굴로 보는 초년·중년·말년운, 음력 생년월일로 보는 토정비결. 삼국지 닮은꼴 테스트도 해보세요.",
-  keywords: "무료 관상, AI 관상, 관상 분석, 신년운세, 2026운세, 2026 토정비결, 사주, 사주팔자, 병오년, 무료운세, 토정비결, 얼굴분석, 오늘의 운세, 띠별 운세, 삼국지 닮은꼴",
+  title: "운명을 읽다 | 2026 무료 신년운세 & AI 관상 테스트",
+  description: "2026년 병오년 신년운세와 토정비결을 사주팔자로 확인하세요! AI 얼굴 분석으로 보는 무료 관상 테스트, 삼국지 닮은꼴 캐릭터 서비스로 당신의 운명을 확인하세요.",
+  keywords: "2026 신년운세, 무료 토정비결, 사주팔자, AI 관상, 관상 테스트, 얼굴 테스트, 무료 운세, 병오년 운세, 삼국지 닮은꼴, 관상 분석",
   openGraph: {
-    title: "운명을 읽다 | 무료 AI 관상 분석 & 2026 신년운세",
-    description: "무료 AI 관상 분석과 사주팔자 기반 2026년 병오년 신년운세를 확인하세요!",
+    title: "운명을 읽다 | 2026 무료 신년운세 & AI 관상 테스트",
+    description: "2026년 병오년 신년운세와 토정비결, AI 관상 테스트를 지금 바로 무료로 확인하세요!",
     type: "website",
     locale: "ko_KR",
     siteName: "운명을 읽다",
-    images: [{ url: "/api/og?title=운명을%20읽다&subtitle=AI%20관상%20%26%20신년운세&icon=☯", width: 1200, height: 630 }],
+    images: [{ url: "/api/og?title=운명을%20읽다&subtitle=2026%20신년운세%20%26%20AI%20관상&icon=☯", width: 1200, height: 630 }],
   },
   twitter: {
     card: "summary_large_image",
-    title: "운명을 읽다 | 무료 AI 관상 분석 & 2026 신년운세",
-    description: "무료 AI 관상 분석과 사주팔자 기반 2026년 병오년 신년운세를 확인하세요!",
-    images: ["/api/og?title=운명을%20읽다&subtitle=AI%20관상%20%26%20신년운세&icon=☯"],
+    title: "운명을 읽다 | 2026 무료 신년운세 & AI 관상 테스트",
+    description: "2026년 병오년 신년운세와 토정비결, AI 관상 테스트를 지금 바로 무료로 확인하세요!",
+    images: ["/api/og?title=운명을%20읽다&subtitle=2026%20신년운세%20%26%20AI%20관상&icon=☯"],
   },
   robots: {
     index: true,
     follow: true,
   },
   alternates: {
-    canonical: "https://face-reading.vercel.app",
+    canonical: "https://facetest.ai",
   },
 };
 
@@ -157,7 +158,36 @@ export default function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
-        {children}
+        <div className="flex flex-col min-h-screen">
+          <main className="flex-grow">
+            {children}
+          </main>
+
+          <footer className="bg-stone-100 border-t border-stone-200 py-8 px-4 no-screenshot">
+            <div className="max-w-lg mx-auto">
+              <div className="grid grid-cols-2 gap-6 mb-8">
+                <div className="space-y-3">
+                  <h4 className="text-[#C41E3A] font-bold text-sm">관상/운세</h4>
+                  <ul className="text-sm space-y-2 text-stone-600">
+                    <li><Link href="/face2" className="hover:text-[#C41E3A]">무료 관상 분석</Link></li>
+                    <li><Link href="/fortune" className="hover:text-[#C41E3A]">2026 신년운세</Link></li>
+                    <li><Link href="/fortune/daily" className="hover:text-[#C41E3A]">오늘의 운세</Link></li>
+                  </ul>
+                </div>
+                <div className="space-y-3">
+                  <h4 className="text-[#C41E3A] font-bold text-sm">이색 테스트</h4>
+                  <ul className="text-sm space-y-2 text-stone-600">
+                    <li><Link href="/samguk" className="hover:text-[#C41E3A]">삼국지 닮은꼴</Link></li>
+                    <li><Link href="/animal" className="hover:text-[#C41E3A]">동물상 테스트</Link></li>
+                  </ul>
+                </div>
+              </div>
+              <div className="text-center pt-6 border-t border-stone-200">
+                <p className="text-xs text-stone-400">© 2026 운명을 읽다. All rights reserved.</p>
+              </div>
+            </div>
+          </footer>
+        </div>
         <Analytics />
       </body>
     </html>
