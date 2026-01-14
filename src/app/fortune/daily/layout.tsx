@@ -13,7 +13,7 @@ export const metadata: Metadata = {
     type: "website",
     locale: "ko_KR",
     siteName: "운명을 읽다",
-    url: "https://face-reading.vercel.app/fortune/daily",
+    url: "https://unse-ai.com/fortune/daily",
     images: [{ url: "/api/og?title=오늘의%20운세&subtitle=하루를%20시작하는%20운세&icon=✨", width: 1200, height: 630 }],
   },
   twitter: {
@@ -27,7 +27,7 @@ const jsonLd = {
   "@type": "SoftwareApplication",
   "name": "오늘의 운세",
   "description": "띠별 오늘의 운세",
-  "url": "https://face-reading.vercel.app/fortune/daily",
+  "url": "https://unse-ai.com/fortune/daily",
   "applicationCategory": "EntertainmentApplication",
   "operatingSystem": "Web",
   "offers": { "@type": "Offer", "price": "0", "priceCurrency": "KRW" }

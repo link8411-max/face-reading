@@ -5,7 +5,7 @@ export const metadata: Metadata = {
   description: "AI가 분석하는 나의 동물상! 강아지상, 고양이상, 여우상, 곰상, 토끼상, 사슴상, 호랑이상, 독수리상 중 나는 어떤 동물을 닮았을까요? 무료 동물상 테스트로 확인해보세요.",
   keywords: "동물상 테스트, 동물상, 강아지상, 고양이상, 여우상, 곰상, 토끼상, 사슴상, 호랑이상, 독수리상, 무료 테스트, 얼굴 분석",
   alternates: {
-    canonical: "https://face-reading.vercel.app/animal",
+    canonical: "https://unse-ai.com/animal",
   },
   openGraph: {
     title: "동물상 테스트 | 나는 어떤 동물을 닮았을까?",

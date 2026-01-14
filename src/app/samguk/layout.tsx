@@ -1,11 +1,11 @@
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "2026 신년운세 & 토정비결 | 운명을 읽다",
-  description: "2026년 병오년 신년운세를 사주팔자와 토정비결로 확인하세요! 음력 생년월일로 총운, 재물운, 애정운, 직장운, 건강운을 상세하게 알려드리는 무료 운세 서비스입니다.",
-  keywords: "2026 운세, 2026년 운세, 신년운세, 병오년, 사주, 사주팔자, 토정비결, 무료운세, 띠별운세, 2026년 무료운세",
+  title: "삼국지 닮은꼴 찾기 | 나는 어떤 영웅을 닮았을까? - 운명을 읽다",
+  description: "AI가 당신의 얼굴을 분석하여 삼국지 최고의 영웅들과 비교해 드립니다. 제갈량, 조조, 유비 중 당신과 가장 닮은 인물은 누구일까요? 무료 닮은꼴 테스트!",
+  keywords: "삼국지 닮은꼴, 삼국지 테스트, 삼국지 얼굴, AI 얼굴 분석, 삼국지 인물, 제갈량, 조조, 유비, 관우, 장비, 무료 테스트",
   alternates: {
-    canonical: "https://face-reading.vercel.app/samguk",
+    canonical: "https://unse-ai.com/samguk",
   },
   openGraph: {
     title: "삼국지 닮은꼴 찾기 | 운명을 읽다",

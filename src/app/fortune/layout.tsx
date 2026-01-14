@@ -5,7 +5,7 @@ export const metadata: Metadata = {
   description: "2026년 병오년 신년운세를 사주팔자와 토정비결로 확인하세요! 음력 생년월일로 총운, 재물운, 애정운, 직장운, 건강운을 상세하게 알려드리는 무료 운세 서비스입니다.",
   keywords: "2026 운세, 2026년 운세, 신년운세, 병오년, 사주, 사주팔자, 토정비결, 무료운세, 띠별운세, 2026년 무료운세",
   alternates: {
-    canonical: "https://face-reading.vercel.app/fortune",
+    canonical: "https://unse-ai.com/fortune",
   },
   openGraph: {
     title: "2026 신년운세 | 운명을 읽다",

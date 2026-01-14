@@ -13,7 +13,7 @@ export const metadata: Metadata = {
     type: "website",
     locale: "ko_KR",
     siteName: "운명을 읽다",
-    url: "https://face-reading.vercel.app/face",
+    url: "https://unse-ai.com/face",
     images: [{ url: "/api/og?title=AI%20관상%20분석&subtitle=인공지능이%20읽는%20당신의%20얼굴&icon=🔮", width: 1200, height: 630 }],
   },
   twitter: {
