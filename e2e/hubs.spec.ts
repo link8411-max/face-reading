@@ -16,8 +16,9 @@ for (const [path, h1, links] of [
   })
 }
 
-test('/mbti 준비 중 페이지: noindex, 다른 테스트로 이어진다', async ({ page }) => {
+test('/mbti 허브: 검색 허용, 궁합 계산기와 16유형으로 이어진다', async ({ page }) => {
   await page.goto('/mbti')
-  await expect(page.locator('meta[name="robots"]')).toHaveAttribute('content', /noindex/)
-  await expect(page.locator('main a[href="/face-tests"]')).toBeVisible()
+  await expect(page.locator('meta[name="robots"][content*="noindex"]')).toHaveCount(0)
+  await expect(page.locator('main a[href="/mbti/match"]')).toBeVisible()
+  await expect(page.locator('main a[href="/mbti/infp"]')).toBeVisible()
 })

@@ -236,6 +236,12 @@ export default function DailyFortunePage() {
             </div>
 
             {/* 버튼 */}
+            <Link
+              href="/mbti/match"
+              className="block w-full mb-3 py-3 text-center bg-white/60 border-2 border-[#C41E3A]/30 rounded-xl font-bold text-[#C41E3A] hover:bg-white/80 transition"
+            >
+              🧩 MBTI 궁합도 보기 →
+            </Link>
             <div className="flex gap-3">
               <button
                 onClick={resetAll}

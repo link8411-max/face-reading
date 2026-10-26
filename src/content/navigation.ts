@@ -56,8 +56,11 @@ export const CATEGORIES: Category[] = [
     title: 'MBTI',
     tabLabel: 'MBTI',
     href: '/mbti',
-    intro: 'MBTI 궁합과 16유형별 운세·여행지·직업을 준비하고 있어요.',
-    items: [],
+    intro: 'MBTI 16유형별 성격과 잘 맞는 궁합, 연애 스타일, 여행지와 직업, 이달의 운세를 모았어요. 궁합 계산기로 두 유형의 궁합 점수도 확인해 보세요.',
+    items: [
+      { title: 'MBTI 궁합 계산기', desc: '두 유형의 연애·친구·직장 궁합 점수', href: '/mbti/match', thumb: { emoji: '💞', bg: '#EDE6F7' }, chip: '결과 저장·공유' },
+      { title: 'MBTI 16유형 풀이', desc: '궁합·연애·여행지·직업·이달의 운세', href: '/mbti', thumb: { emoji: '🧩', bg: '#E3F2E8' }, chip: '16유형' },
+    ],
   },
 ]
 

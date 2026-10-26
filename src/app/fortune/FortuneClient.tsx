@@ -434,6 +434,12 @@ export default function FortuneClient() {
             >
               {result.사주정보.띠이모지} {result.사주정보.띠}띠 {FORTUNE_YEAR.year} 운세 자세히 보기 →
             </Link>
+            <Link
+              href="/mbti/match"
+              className="block w-full mb-3 py-3 text-center bg-white/60 border-2 border-[#C41E3A]/30 rounded-xl font-bold text-[#C41E3A] hover:bg-white/80 transition"
+            >
+              🧩 MBTI 궁합도 보기 →
+            </Link>
             <div className="flex gap-3">
               <button
                 onClick={resetAll}

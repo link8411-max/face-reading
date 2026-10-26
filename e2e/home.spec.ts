@@ -25,7 +25,7 @@ test('묶음 탭 전환: 운세·사주를 누르면 운세 항목이 보인다'
   await tabs.getByRole('tab', { name: '운세·사주' }).click()
   await expect(tabs.locator('a[href="/fortune/daily"]')).toBeVisible()
   await tabs.getByRole('tab', { name: 'MBTI' }).click()
-  await expect(tabs.getByText(/곧 열려요/)).toBeVisible()
+  await expect(tabs.locator('a[href="/mbti/match"]')).toBeVisible()
 })
 
 test('홈에서 6개 테스트에 두 번 탭 이내로 도달', async ({ page }) => {

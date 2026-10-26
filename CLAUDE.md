@@ -118,7 +118,6 @@ public/
 - 메뉴와 묶음은 `src/content/navigation.ts` 한 곳에서 정의한다(TABS, CATEGORIES, tabForPath). 홈 묶음 탭·허브(`/face-tests`, `/unse`)·하단 탭바·푸터가 모두 이걸 쓴다. 새 테스트를 추가하면 CATEGORIES에 항목을 넣는다.
 - 하단 탭바 `BottomTabBar`(모든 페이지, no-screenshot). 본문은 탭바 높이만큼 아래 여백이 있다.
 - 메인 상단 히어로는 `src/content/season.ts`만 바꾸면 시즌 교체(수능 합격운 등). 홈 FAQ는 `src/content/homeFaq.ts`(화면·구조화 데이터 공용).
-- `/mbti`는 MBTI 단계 전까지 준비 중 페이지(noindex, 사이트맵 제외).
 - 디자인 토큰: `bg-paper`, `bg-paper-2`, `text-ink`, `text-muted`, `text-vermilion`, `text-gold`, `text-navy`, `border-line` / 글꼴 `font-sans`(Noto Sans KR), `font-serif`(Noto Serif KR)
 - 참여자 수·인기 순위 같은 숫자는 실제 집계 전까지 넣지 않는다(테스트로 막음).
 
@@ -127,6 +126,11 @@ public/
 - 사주 계산 `src/lib/saju.ts`: 일주는 `korean-lunar-calendar`(천문연 데이터), 년주·월주는 입춘·절기 근사 날짜 기준(입춘 2/4 등). 음력 입력은 `src/lib/fortuneService.ts`에서 양력으로 변환(윤달 포함).
 - 띠별 페이지: `/fortune/2027`(허브), `/fortune/2027/[zodiac]`(rat~pig, 정적 생성, 띠당 본문 1,500자 이상 테스트로 고정)
 - `/fortune/layout.tsx`에는 구조화 데이터를 두지 않는다 (하위 페이지에 중첩됨). `/fortune/page.tsx`에서 렌더.
+
+## MBTI (5단계)
+- 궁합 `src/lib/mbti/compat.ts`: 네 축 같음/다름 × 맥락(연애·친구·직장) 가중치 → 55~100으로 펼침. 맥락마다 가장 잘 맞는 쌍이 정확히 100점(테스트로 고정). 대칭·결정적. 널리 쓰이는 궁합표 경향(E/I·J/P 반대, S/N 같음)을 따른다.
+- 유형 본문 `src/content/mbtiTypes.ts`(16유형, 페이지 본문 1,500자 이상). **이달의 운세는 `monthly.month`가 현재 달과 다르면 숨는다** → 매달 갱신(7단계 파이프라인 전까지 수동).
+- 페이지: `/mbti`(허브), `/mbti/[type]`(소문자 16개, 정적), `/mbti/match`(계산기, `?a=&b=` 미리 선택). 조합별 개별 페이지는 만들지 않는다(얇은 콘텐츠).
 
 ## 페이지별 기능
 
