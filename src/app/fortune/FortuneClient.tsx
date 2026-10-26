@@ -2,6 +2,8 @@
 
 import { useState } from "react";
 import { useBackOrHome } from "@/hooks/useBackOrHome";
+import BirthDateFields from "@/components/BirthDateFields";
+import { validateBirthDate } from "@/lib/birthDate";
 import Link from "next/link";
 import { useScreenshot } from "@/hooks/useScreenshot";
 
@@ -35,6 +37,7 @@ export default function FortuneClient() {
   const [birthHour, setBirthHour] = useState<string>("모름");
   const [isLunar, setIsLunar] = useState(false);
   const [loading, setLoading] = useState(false);
+  const dateCheck = validateBirthDate(birthDate);
   const [result, setResult] = useState<FortuneResult | null>(null);
 
   const { ref: resultRef, isCapturing, download, share } = useScreenshot();
@@ -46,10 +49,7 @@ export default function FortuneClient() {
   });
 
   const handleSubmit = async () => {
-    if (!birthDate.year || !birthDate.month || !birthDate.day) {
-      alert("생년월일을 모두 입력해주세요.");
-      return;
-    }
+    if (!dateCheck.ok) return;
 
     setLoading(true);
     try {
@@ -191,42 +191,7 @@ export default function FortuneClient() {
               </p>
             )}
 
-            <div className="grid grid-cols-3 gap-3 mb-4">
-              <div>
-                <label className="block text-sm text-[#5C4033]/70 mb-1">년도</label>
-                <input
-                  type="number"
-                  placeholder="1990"
-                  value={birthDate.year}
-                  onChange={(e) => setBirthDate({ ...birthDate, year: e.target.value })}
-                  className="w-full px-4 py-3 bg-white/50 border border-[#C41E3A]/30 rounded-xl text-center text-lg text-[#5C4033] focus:outline-none focus:ring-2 focus:ring-[#C41E3A]/50 placeholder-[#5C4033]/40"
-                />
-              </div>
-              <div>
-                <label className="block text-sm text-[#5C4033]/70 mb-1">월</label>
-                <input
-                  type="number"
-                  placeholder="5"
-                  min="1"
-                  max="12"
-                  value={birthDate.month}
-                  onChange={(e) => setBirthDate({ ...birthDate, month: e.target.value })}
-                  className="w-full px-4 py-3 bg-white/50 border border-[#C41E3A]/30 rounded-xl text-center text-lg text-[#5C4033] focus:outline-none focus:ring-2 focus:ring-[#C41E3A]/50 placeholder-[#5C4033]/40"
-                />
-              </div>
-              <div>
-                <label className="block text-sm text-[#5C4033]/70 mb-1">일</label>
-                <input
-                  type="number"
-                  placeholder="15"
-                  min="1"
-                  max="31"
-                  value={birthDate.day}
-                  onChange={(e) => setBirthDate({ ...birthDate, day: e.target.value })}
-                  className="w-full px-4 py-3 bg-white/50 border border-[#C41E3A]/30 rounded-xl text-center text-lg text-[#5C4033] focus:outline-none focus:ring-2 focus:ring-[#C41E3A]/50 placeholder-[#5C4033]/40"
-                />
-              </div>
-            </div>
+            <BirthDateFields value={birthDate} onChange={setBirthDate} error={dateCheck.error} />
 
             {/* 태어난 시간 */}
             <div className="mb-6">
@@ -249,7 +214,7 @@ export default function FortuneClient() {
 
             <button
               onClick={handleSubmit}
-              disabled={loading}
+              disabled={loading || !dateCheck.ok}
               className="w-full py-3 bg-gradient-to-r from-[#C41E3A] to-[#FFD700] rounded-xl font-bold text-lg hover:shadow-xl transition disabled:opacity-50 text-white shadow-lg"
             >
               {loading ? (

@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { useBackOrHome } from "@/hooks/useBackOrHome";
+import { sanitizeDigits, validateBirthYear } from "@/lib/birthDate";
 import Link from "next/link";
 import { fortuneDB } from "@/lib/fortuneDB";
 import { useScreenshot } from "@/hooks/useScreenshot";
@@ -43,12 +44,11 @@ export default function DailyFortunePage() {
     shareText: `${오늘날짜} - ${result?.운세.한마디}`,
   });
 
+  const yearCheck = validateBirthYear(birthYear);
+
   const handleSubmit = () => {
-    const year = parseInt(birthYear);
-    if (!birthYear || isNaN(year) || year < 1920 || year > 2024) {
-      alert("올바른 출생년도를 입력해주세요 (1920-2024)");
-      return;
-    }
+    if (!yearCheck.ok) return;
+    const year = Number(birthYear);
 
     // 1-2월생이고 음력 설 전이면 전년도 띠 사용
     const 계산년도 = isEarlyYear ? year - 1 : year;
@@ -115,12 +115,20 @@ export default function DailyFortunePage() {
             <h2 className="text-lg font-bold mb-4 text-center text-[#5C4033]">태어난 해를 알려주세요</h2>
 
             <input
-              type="number"
+              type="text"
+              inputMode="numeric"
+              autoComplete="bday-year"
+              maxLength={4}
               placeholder="예: 1990"
+              aria-label="태어난 해"
               value={birthYear}
-              onChange={(e) => setBirthYear(e.target.value)}
-              className="w-full px-4 py-4 bg-white/50 border border-[#C41E3A]/30 rounded-xl text-center text-2xl text-[#5C4033] focus:outline-none focus:ring-2 focus:ring-[#C41E3A]/50 focus:border-[#C41E3A]/50 mb-4 placeholder-[#5C4033]/40"
+              onChange={(e) => setBirthYear(sanitizeDigits(e.target.value, 4))}
+              onKeyDown={(e) => { if (e.key === "Enter") handleSubmit(); }}
+              aria-invalid={!!yearCheck.error}
+              className="w-full px-4 py-4 bg-white/50 border border-[#C41E3A]/30 rounded-xl text-center text-2xl text-[#5C4033] focus:outline-none focus:ring-2 focus:ring-[#C41E3A]/50 focus:border-[#C41E3A]/50 mb-2 placeholder-[#5C4033]/40"
             />
+            {yearCheck.error && <p role="alert" className="text-sm text-center text-[#C41E3A] mb-2">{yearCheck.error}</p>}
+            <div className="mb-2" />
 
             {/* 음력 설 전 체크박스 */}
             <label className="flex items-center justify-center gap-2 mb-4 cursor-pointer">
@@ -140,7 +148,8 @@ export default function DailyFortunePage() {
 
             <button
               onClick={handleSubmit}
-              className="w-full py-4 bg-gradient-to-r from-[#C41E3A] to-[#FFD700] rounded-xl font-bold text-lg hover:shadow-xl transition text-white shadow-lg"
+              disabled={!yearCheck.ok}
+              className="disabled:opacity-50 w-full py-4 bg-gradient-to-r from-[#C41E3A] to-[#FFD700] rounded-xl font-bold text-lg hover:shadow-xl transition text-white shadow-lg"
             >
               운세 보기 ☯
             </button>
