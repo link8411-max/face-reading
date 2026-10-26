@@ -16,6 +16,7 @@ import { animalTypeDB } from "@/lib/animalTypeDB";
 import ResultCard, { type ResultCardProps } from "@/components/result/ResultCard";
 import ResultActions from "@/components/result/ResultActions";
 import { useResultShare } from "@/hooks/useResultShare";
+import { faceSlug, parseShared, shareUrl, SITE } from "@/lib/shareLinks";
 import { Icon } from "@/components/icons";
 
 const firstSentence = (t: string) => (t.match(/^.*?[.!?요다](?=\s|$)/)?.[0] ?? t).trim();
@@ -46,7 +47,7 @@ export default function AnimalTypePage() {
   const imageRef = useRef<HTMLImageElement>(null);
 
   const { ref: resultRef, isCapturing, download } = useScreenshot<HTMLElement>();
-  const { busy, notice, share: shareCard } = useResultShare(resultRef, result ? { fileName: `동물상_${result.data.name}`, title: `나의 동물상: ${result.data.name}`, text: `나는 ${result.data.name}이래요 (닮음 ${result.matchScore}%). 무료 동물상 테스트` } : null);
+  const { busy, notice, share: shareCard } = useResultShare(result ? { title: '운명을 읽다 · 동물상 테스트', text: parseShared('animal', result.type, result.matchScore)!.phrase, url: shareUrl('animal', result.type, result.matchScore) } : null);
 
   const getShareOptions = () => ({
     fileName: `동물상_${result?.data.name || "결과"}`,
@@ -146,7 +147,7 @@ export default function AnimalTypePage() {
           <div className="pb-6 animate-fade-in">
             <ResultCard captureRef={resultRef} {...cardProps(result)} />
             <ResultActions
-              onShare={() => { track("share_click", { test_name: "animal", method: "share" }); shareCard(); }}
+              onShare={() => { track("share_click", { test_name: "animal", method: "link" }); shareCard(); }}
               onSave={() => { track("share_click", { test_name: "animal", method: "save_image" }); download(getShareOptions()); }}
               onRetry={resetAll}
               busy={busy || isCapturing}

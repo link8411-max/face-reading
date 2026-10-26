@@ -50,3 +50,20 @@ test('개인정보처리방침에 GA 수집 항목과 사진·생년월일 미�
   expect(src).toContain('Google 애널리틱스')
   expect(src).toMatch(/사진[^<]*생년월일[^<]*수집하지 않/)
 })
+
+test('GA가 아직 준비 전이면 이벤트를 모아 두었다가 준비되면 보낸다 (첫 화면 이벤트 유실 방지)', async () => {
+  vi.useFakeTimers()
+  try {
+    vi.resetModules()
+    const { track: freshTrack } = await import('@/lib/analytics')
+    const w = (globalThis as unknown as { window: W }).window
+    delete w.gtag
+    freshTrack('shared_landing', { test_name: 'animal', result_id: 'cat' })
+    expect(calls).toEqual([])
+    w.gtag = (...a: unknown[]) => calls.push(a)
+    await vi.advanceTimersByTimeAsync(500)
+    expect(calls).toEqual([['event', 'shared_landing', { test_name: 'animal', result_id: 'cat' }]])
+  } finally {
+    vi.useRealTimers()
+  }
+})

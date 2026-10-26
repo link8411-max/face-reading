@@ -35,7 +35,7 @@ export async function GET(request: NextRequest) {
 
             <div style={{ display: 'flex', fontSize: '30px', color: '#9A4F35', fontWeight: 700 }}>운명을 읽다</div>
             <div style={{ display: 'flex', alignItems: 'center', gap: '24px', marginTop: '24px' }}>
-              {icon && <span style={{ fontSize: '84px' }}>{icon}</span>}
+              {icon ? <span style={{ fontSize: '84px' }}>{icon}</span> : null}
               <span style={{ fontSize: '84px', fontWeight: 700, color: '#2E2A27', lineHeight: 1.2 }}>{title}</span>
             </div>
             <div style={{ display: 'flex', fontSize: '38px', color: '#6B6259', marginTop: '24px' }}>{subtitle}</div>

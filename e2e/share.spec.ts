@@ -29,33 +29,20 @@ test.describe('관상 결과: 요약 카드 먼저, 공유하기', () => {
     expect(errors).toEqual([])
   })
 
-  test('공유하기: 기본 공유창에 결과 이미지(PNG)와 주소가 담긴 문구를 보낸다', async ({ page }) => {
-    await page.addInitScript(() => {
-      const w = window as unknown as { __shared: { files: string[]; text?: string }[] }
-      w.__shared = []
-      Object.assign(navigator, {
-        canShare: () => true,
-        share: async (d: ShareData) => { w.__shared.push({ files: (d.files ?? []).map((f) => f.type), text: d.text }) },
-      })
-    })
-    await faceResult(page)
-    await page.getByRole('button', { name: '공유하기' }).click()
-    await expect.poll(() => page.evaluate(() => (window as unknown as { __shared: unknown[] }).__shared.length), { timeout: 20000 }).toBe(1)
-    const sent = await page.evaluate(() => (window as unknown as { __shared: { files: string[]; text?: string }[] }).__shared[0])
-    expect(sent.files).toEqual(['image/png'])
-    expect(sent.text).toContain('localhost:3200/face2')
-    await expect(page.getByRole('status')).toHaveCount(0)
-  })
-
-  test('공유하기: 이미지 공유가 안 되면 링크와 문구만 공유한다', async ({ page }) => {
+  test('공유하기: 기본 공유창에 결과 링크와 1인칭 문구를 보낸다 (이름·사진 없음)', async ({ page }) => {
     await page.addInitScript(() => {
       const w = window as unknown as { __shared: ShareData[] }
       w.__shared = []
-      Object.assign(navigator, { canShare: () => false, share: async (d: ShareData) => { w.__shared.push({ title: d.title, text: d.text, url: d.url }) } })
+      Object.assign(navigator, { canShare: () => true, share: async (d: ShareData) => { w.__shared.push({ title: d.title, text: d.text, url: d.url, files: d.files }) } })
     })
     await faceResult(page)
     await page.getByRole('button', { name: '공유하기' }).click()
-    await expect.poll(() => page.evaluate(() => (window as unknown as { __shared: ShareData[] }).__shared[0]?.url), { timeout: 20000 }).toContain('/face2')
+    await expect.poll(() => page.evaluate(() => (window as unknown as { __shared: ShareData[] }).__shared.length), { timeout: 20000 }).toBe(1)
+    const sent = await page.evaluate(() => (window as unknown as { __shared: ShareData[] }).__shared[0])
+    expect(sent.url).toMatch(/^https:\/\/unse-ai\.com\/face2\/r\/[a-z]+\?utm_source=share&utm_medium=friend_link&utm_campaign=face$/)
+    expect(sent.text).toMatch(/^나는 .+이래\. 너 관상도 봐줄까\?$/)
+    expect(sent.files).toBeUndefined()
+    await expect(page.getByRole('status')).toHaveCount(0)
   })
 
   test('공유하기: 공유창이 없으면(PC) 링크를 복사하고 안내한다', async ({ page, context }) => {
@@ -64,7 +51,7 @@ test.describe('관상 결과: 요약 카드 먼저, 공유하기', () => {
     await faceResult(page)
     await page.getByRole('button', { name: '공유하기' }).click()
     await expect(page.getByRole('status')).toContainText('링크를 복사했어요')
-    expect(await page.evaluate(() => navigator.clipboard.readText())).toContain('/face2')
+    expect(await page.evaluate(() => navigator.clipboard.readText())).toMatch(/나는 .+ https:\/\/unse-ai\.com\/face2\/r\//)
   })
 
   test('사용자가 공유를 취소하면 아무 안내도 하지 않는다', async ({ page }) => {
