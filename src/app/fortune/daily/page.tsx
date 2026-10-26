@@ -25,7 +25,7 @@ export default function DailyFortunePage() {
     운세: { rating: number; 한마디: string; 행운시간: string; 행운색: string };
   } | null>(null);
 
-  const { ref: resultRef, isCapturing, download, share } = useScreenshot();
+  const { ref: resultRef, isCapturing, download, share, shareNotice } = useScreenshot();
 
   const today = new Date();
   const 오늘요일 = 요일목록[today.getDay()];
@@ -186,9 +186,10 @@ export default function DailyFortunePage() {
 
             <div className="no-screenshot flex flex-col">
               <button onClick={() => { track("share_click", { test_name: "daily", method: "share" }); share(getShareOptions()); }} disabled={isCapturing} className="h-[52px] rounded-full flex items-center justify-center gap-2 bg-ink text-paper text-[15px] font-medium disabled:opacity-50">
-                <Icon name="story" size={18} />
+                <Icon name="share" size={18} />
                 {isCapturing ? "이미지 만드는 중…" : "오늘 운세 공유하기"}
               </button>
+              {shareNotice && <p role="status" className="mt-2 text-xs text-center text-muted">{shareNotice}</p>}
               <div className="grid grid-cols-2 gap-2 mt-2">
                 <button onClick={() => { track("share_click", { test_name: "daily", method: "save_image" }); download(getShareOptions()); }} disabled={isCapturing} className="h-12 rounded-full bg-white border border-line text-sm font-medium flex items-center justify-center gap-1.5 disabled:opacity-50">
                   <Icon name="download" size={16} />
