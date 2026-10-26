@@ -474,15 +474,15 @@ export default function SamgukPage() {
                       </KoeiInsetBox>
 
                       <div className="space-y-2">
-                        <div className="text-[13px] text-amber-500 ml-1 font-black italic tracking-widest">◈ 페르소나 안면 분석</div>
+                        <div className="text-[13px] text-amber-500 ml-1 font-black italic tracking-widest">◈ 나의 인상 풀이</div>
                         <KoeiInsetBox className="text-[13px] text-amber-100 leading-relaxed font-bold min-h-[120px] bg-black/60 p-4">
                           <div className="space-y-4">
                             <div>
-                              <p className="text-amber-600 mb-1.5 text-[11.5px] uppercase tracking-[0.2em] underline decoration-amber-900/50 underline-offset-4 font-black">Visual Features</p>
+                              <p className="text-amber-600 mb-1.5 text-[11.5px] uppercase tracking-[0.2em] underline decoration-amber-900/50 underline-offset-4 font-black">돋보이는 이목구비</p>
                               <p className="leading-relaxed text-[13px] drop-shadow-sm">{result.faceAnalysis.눈}, {result.faceAnalysis.코}, {result.faceAnalysis.입}</p>
                             </div>
                             <div className="border-t border-amber-900/30 pt-3">
-                              <p className="text-amber-600 mb-1.5 text-[11.5px] uppercase tracking-[0.2em] underline decoration-amber-900/50 underline-offset-4 font-black">Neural Impression</p>
+                              <p className="text-amber-600 mb-1.5 text-[11.5px] uppercase tracking-[0.2em] underline decoration-amber-900/50 underline-offset-4 font-black">첫인상</p>
                               <p className="leading-relaxed text-[13px] drop-shadow-sm">{result.faceAnalysis.인상}</p>
                             </div>
                           </div>
@@ -571,7 +571,7 @@ export default function SamgukPage() {
                           </KoeiInsetBox>
 
                           <div className="bg-black/20 p-4 rounded border border-stone-800">
-                            <p className="text-amber-400/60 text-[8px] font-bold mb-4 uppercase tracking-[0.3em] text-center">Lifestyle Index</p>
+                            <p className="text-amber-400/60 text-[8px] font-bold mb-4 uppercase tracking-[0.3em] text-center">생활 능력치</p>
                             <div className="grid grid-cols-5 gap-2">
                               {Object.entries(result.character.funStats).map(([label, val]) => (
                                 <div key={label} className="text-center">
@@ -598,11 +598,11 @@ export default function SamgukPage() {
                           <KoeiInsetBox className="space-y-3 bg-black/40 p-4">
                             <div className="grid grid-cols-2 gap-4">
                               <div>
-                                <p className="text-amber-600/60 text-[8px] uppercase tracking-tighter mb-1 border-b border-amber-900/30">Eye/Nose/Mouth</p>
+                                <p className="text-amber-600/60 text-[8px] uppercase tracking-tighter mb-1 border-b border-amber-900/30">이목구비</p>
                                 <p className="text-white text-[11px] leading-snug">{result.faceAnalysis.눈}, {result.faceAnalysis.코}, {result.faceAnalysis.입}</p>
                               </div>
                               <div>
-                                <p className="text-amber-600/60 text-[8px] uppercase tracking-tighter mb-1 border-b border-amber-900/30">Overall Impression</p>
+                                <p className="text-amber-600/60 text-[8px] uppercase tracking-tighter mb-1 border-b border-amber-900/30">첫인상</p>
                                 <p className="text-white text-[11px] leading-snug">{result.faceAnalysis.인상}</p>
                               </div>
                             </div>

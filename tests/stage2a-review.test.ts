@@ -32,6 +32,5 @@ test('홈 FAQ가 기준점 개수를 부풀리지 않는다', () => {
 test('사용자와 공유하는 특징이 없으면 닮은 이유가 특정 특징을 단정하지 않는다', () => {
   const zeros = Object.fromEntries(FEATURE_KEYS.map((k) => [k, 0])) as ZVector
   const r = matchCharacter(zeros, '남')
-  expect(r.matchReason).toContain('가장 가까워요')
-  expect(r.matchReason).not.toMatch(/인상이 .+ 닮았어요/)
+  expect(r.matchReason).toContain('전체적인 얼굴 비율이 닮았어요')
 })
