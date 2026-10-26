@@ -1,5 +1,6 @@
 "use client";
 
+import { track } from "@/lib/analytics";
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { MBTI_TYPES, compatSummary, isMbti, type MbtiType } from "@/lib/mbti/compat";
@@ -63,8 +64,8 @@ export default function MatchCalculator() {
           <p className="text-xs text-muted mt-4">unse-ai.com/mbti/match · 재미로 보는 궁합</p>
         </section>
         <div className="grid grid-cols-2 gap-2">
-          <button type="button" onClick={() => download(opts)} disabled={isCapturing} className="py-3 rounded-full bg-white border border-line font-bold">{isCapturing ? "저장 중…" : "결과 저장"}</button>
-          <button type="button" onClick={() => share(opts)} disabled={isCapturing} className="py-3 rounded-full bg-ink text-paper font-bold">공유하기</button>
+          <button type="button" onClick={() => { track("share_click", { test_name: "mbti_match", method: "save_image" }); download(opts); }} disabled={isCapturing} className="py-3 rounded-full bg-white border border-line font-bold">{isCapturing ? "저장 중…" : "결과 저장"}</button>
+          <button type="button" onClick={() => { track("share_click", { test_name: "mbti_match", method: "share" }); share(opts); }} disabled={isCapturing} className="py-3 rounded-full bg-ink text-paper font-bold">공유하기</button>
         </div>
         <div className="grid grid-cols-2 gap-2 text-sm">
           <Link href={`/mbti/${a.toLowerCase()}`} className="text-center py-2.5 rounded-xl bg-card-2 font-bold">{a}: {mbtiProfiles[a].nickname}</Link>
@@ -79,7 +80,7 @@ export default function MatchCalculator() {
     <div className="space-y-5">
       <TypeGroup label="나의 MBTI" value={a} onChange={setA} />
       <TypeGroup label="상대의 MBTI" value={b} onChange={setB} />
-      <button type="button" disabled={!a || !b} onClick={() => setShown(true)}
+      <button type="button" disabled={!a || !b} onClick={() => { setShown(true); if (a && b) track("result_view", { test_name: "mbti_match", result_id: `${a}_${b}` }); }}
         className="w-full h-[52px] rounded-full bg-ink text-paper font-medium text-[15px] disabled:opacity-45">
         {a && b ? `${a} × ${b} 궁합 보기` : "두 유형을 골라 궁합 보기"}
       </button>

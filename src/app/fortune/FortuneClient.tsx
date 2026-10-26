@@ -1,5 +1,6 @@
 "use client";
 
+import { track } from "@/lib/analytics";
 import { useState } from "react";
 import CoupangBanner from "@/components/CoupangBanner";
 import { useBackOrHome } from "@/hooks/useBackOrHome";
@@ -59,6 +60,7 @@ export default function FortuneClient() {
     if (!dateCheck.ok) return;
 
     setLoading(true);
+    track("fortune_submit", { test_name: "fortune" });
     try {
       const response = await fetch("/api/fortune", {
         method: "POST",
@@ -78,6 +80,7 @@ export default function FortuneClient() {
         alert(data.error);
       } else {
         setResult(data);
+        track("result_view", { test_name: "fortune", result_id: data.사주정보?.띠 });
       }
     } catch {
       alert("운세 분석 중 오류가 발생했습니다.");
@@ -280,7 +283,7 @@ export default function FortuneClient() {
 
             <div className="no-screenshot flex flex-col">
               <button
-                onClick={() => share(getShareOptions())}
+                onClick={() => { track("share_click", { test_name: "fortune", method: "share" }); share(getShareOptions()); }}
                 disabled={isCapturing}
                 className="h-[52px] rounded-full flex items-center justify-center gap-2 bg-ink text-paper text-[15px] font-medium disabled:opacity-50"
               >
@@ -288,7 +291,7 @@ export default function FortuneClient() {
                 {isCapturing ? "이미지 만드는 중…" : `${FORTUNE_YEAR.year} 운세 공유하기`}
               </button>
               <div className="grid grid-cols-2 gap-2 mt-2">
-                <button onClick={() => download(getShareOptions())} disabled={isCapturing} className="h-12 rounded-full bg-white border border-line text-sm font-medium flex items-center justify-center gap-1.5 disabled:opacity-50">
+                <button onClick={() => { track("share_click", { test_name: "fortune", method: "save_image" }); download(getShareOptions()); }} disabled={isCapturing} className="h-12 rounded-full bg-white border border-line text-sm font-medium flex items-center justify-center gap-1.5 disabled:opacity-50">
                   <Icon name="download" size={16} />
                   이미지 저장
                 </button>

@@ -1,5 +1,6 @@
 "use client";
 
+import { track } from "@/lib/analytics";
 import { useState, useRef } from "react";
 import CoupangBanner from "@/components/CoupangBanner";
 import { useBackOrHome } from "@/hooks/useBackOrHome";
@@ -64,6 +65,7 @@ export default function AnimalTypePage() {
         setResult(null);
         setError(null);
       };
+      track("photo_selected", { test_name: "animal" });
       reader.readAsDataURL(file);
     }
   };
@@ -73,6 +75,7 @@ export default function AnimalTypePage() {
     if (!image || !gender || !img) return;
 
     setLoading(true);
+    track("test_start", { test_name: "animal" });
     setError(null);
     try {
       await img.decode().catch(() => {});
@@ -95,7 +98,9 @@ export default function AnimalTypePage() {
         return;
       }
       const features = extractFeatures(lm);
-      setResult(matchAnimal(toZ(features, gender), animalCalibration.bias));
+      const matched = matchAnimal(toZ(features, gender), animalCalibration.bias);
+      setResult(matched);
+      track("result_view", { test_name: "animal", result_id: matched.type });
     } catch (err) {
       console.error("Analysis error:", err);
       setError("사진을 읽지 못했어요. JPG나 PNG 사진으로 다시 올려 주세요.");
@@ -142,8 +147,8 @@ export default function AnimalTypePage() {
           <div className="pb-6 animate-fade-in">
             <ResultCard captureRef={resultRef} {...cardProps(result)} />
             <ResultActions
-              onStory={() => shareStory(`동물상_${result.data.name}_스토리`)}
-              onSave={() => download(getShareOptions())}
+              onStory={() => { track("share_click", { test_name: "animal", method: "story" }); shareStory(`동물상_${result.data.name}_스토리`); }}
+              onSave={() => { track("share_click", { test_name: "animal", method: "save_image" }); download(getShareOptions()); }}
               onRetry={resetAll}
               busy={busy || isCapturing}
               notice={notice}

@@ -50,10 +50,23 @@ export default function PrivacyPage() {
                 </p>
             </section>
 
+            <section className="mb-8">
+                <h2 className="text-xl font-bold mb-4">5. 방문 통계 분석 (Google 애널리틱스)</h2>
+                <p>
+                    서비스 개선을 위해 Google 애널리틱스로 방문 통계를 수집합니다. 이 과정에서 쿠키, 접속 기기·브라우저 정보, 유입 경로, 페이지 이동과 같은 이용 기록이 Google에 전송될 수 있습니다.
+                </p>
+                <ul className="list-disc ml-6 mt-2 space-y-1">
+                    <li>테스트 시작·결과 보기·공유 버튼 누름 같은 이용 흐름과 결과 유형 이름(예: 여우상)만 기록합니다.</li>
+                    <li>얼굴 사진과 생년월일, 얼굴 측정값은 수집하지 않으며 Google 애널리틱스로 보내지 않습니다.</li>
+                    <li>Google 애널리틱스 수집을 원하지 않으면 브라우저의 쿠키 차단이나 Google 애널리틱스 차단 부가 기능(tools.google.com/dlpage/gaoptout)을 이용할 수 있습니다.</li>
+                </ul>
+            </section>
+
             <section className="mb-8 border-t pt-8">
                 <p className="text-sm text-muted">
                     공고일자: 2026년 1월 15일<br />
-                    시행일자: 2026년 1월 15일
+                    시행일자: 2026년 1월 15일<br />
+                    개정일자: 2026년 10월 26일 (Google 애널리틱스 항목 추가)
                 </p>
             </section>
         </div>
