@@ -108,3 +108,17 @@ export function parseInvite(key: string, rel: string) {
   const name = animalTypeDB[key].name
   return { key, rel, name, phrase: `나는 ${name}이야. 우리 ${REL_NAME[rel]} 궁합 볼래?` }
 }
+
+// ===== 우리 팀 삼국지 (8단계) =====
+// 링크에는 장수 id 2~6개만 담는다(중복 허용). 별칭은 넣지 않는다.
+export function teamUrl(ids: string[]): string {
+  return `${SITE}/samguk/team/r/${ids.join('-')}?${UTM('team_samguk')}`
+}
+
+export function parseTeam(path: string) {
+  const ids = path.split('-')
+  if (ids.length < 2 || ids.length > 6) return null
+  const members = ids.map((id) => samgukCharacters.find((c) => c.id === id))
+  if (members.some((m) => !m)) return null
+  return { ids, members: members as NonNullable<(typeof members)[number]>[] }
+}

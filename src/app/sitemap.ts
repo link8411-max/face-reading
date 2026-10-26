@@ -21,6 +21,7 @@ export const SITEMAP_ROUTES = [
     '/mbti/match',
     ...MBTI_SLUGS.map((s) => `/mbti/${s}`),
     '/face-match',
+    '/samguk/team',
 ]
 
 // 페이지 내용을 바꾸면 해당 라우트 날짜도 갱신할 것 (new Date()를 쓰면 매 요청마다 바뀌어 검색엔진이 무시함)
@@ -40,6 +41,7 @@ export const LAST_MODIFIED: Record<string, string> = {
     '/mbti': '2026-10-26',
     '/mbti/match': '2026-10-26',
     '/face-match': '2026-10-27',
+    '/samguk/team': '2026-10-27',
     ...Object.fromEntries(MBTI_SLUGS.map((s) => [`/mbti/${s}`, '2026-10-26'])),
 }
 
