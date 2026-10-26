@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useRef, useEffect } from "react";
+import CoupangBanner from "@/components/CoupangBanner";
 import { useBackOrHome } from "@/hooks/useBackOrHome";
 import Link from "next/link";
 import { SamgukCharacter } from "@/lib/samgukDB";
@@ -628,21 +629,7 @@ export default function SamgukPage() {
                 </button>
               </div>
 
-              {/* 쿠팡 파트너스 배너 */}
-              <div className="mt-6 no-screenshot">
-                <div className="p-3 bg-white/5 backdrop-blur-md rounded-lg border border-white/10 flex items-center justify-between gap-3 shadow-inner">
-                  <div className="text-[9.5px] text-stone-400 leading-tight">
-                    이 포스팅은 쿠팡 파트너스 활동의 일환으로, <br />이에 따른 일정액의 수수료를 제공받습니다.
-                  </div>
-                  <Link
-                    href="https://link.coupang.com/a/dfIih6"
-                    target="_blank"
-                    className="flex-shrink-0 bg-[#C41E3A] text-white text-[9px] font-bold px-3 py-1.5 rounded shadow-[0_2px_0_black] active:translate-y-[1px] active:shadow-none transition-all"
-                  >
-                    <span className="opacity-70 mr-1">[AD]</span> 영웅의 장비 쇼핑
-                  </Link>
-                </div>
-              </div>
+              <CoupangBanner subId="samguk" tone="dark" />
             </div>
 
             {/* 하단 모바일 공유 */}

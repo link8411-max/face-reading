@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import CoupangBanner from "@/components/CoupangBanner";
 
 // 홈 전용 FAQ 구조화 데이터 (테스트 페이지는 PageGuide가 각자 FAQPage를 렌더)
 const faqJsonLd = {
@@ -260,24 +261,7 @@ export default function Home() {
           </div>
         </div>
 
-        {/* Coupang Partners Banner */}
-        <div className="mt-8">
-          <p className="text-center text-xs text-[#5C4033]/60 mb-2">추천 상품</p>
-          <div className="flex justify-center">
-            <iframe
-              src="https://ads-partners.coupang.com/widgets.html?id=950676&template=carousel&trackingCode=AF6497036&subId=&width=450&height=130&tsource="
-              width="450"
-              height="130"
-              frameBorder="0"
-              scrolling="no"
-              referrerPolicy="unsafe-url"
-              className="rounded-2xl max-w-full"
-            />
-          </div>
-          <p className="text-center text-[#5C4033]/50 text-[10px] mt-2">
-            쿠팡 파트너스 활동의 일환으로 일정액의 수수료를 제공받습니다
-          </p>
-        </div>
+        <CoupangBanner subId="home" />
 
         {/* FAQ Section */}
         <div className="mt-12 bg-white/50 backdrop-blur-sm rounded-3xl p-6 border-2 border-[#C41E3A]/20 shadow-md">
