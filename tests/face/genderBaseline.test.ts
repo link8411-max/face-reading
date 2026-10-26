@@ -51,8 +51,9 @@ test('여성 가상 얼굴을 남성 기준으로 재면 장수 쏠림이 맞는
 
 // 리뷰 Critical (c): 화면 코드가 사용자가 고른 성별 기준을 쓴다
 test.each([
-  ['src/app/samguk/page.tsx', 'toZ(features, gender)'],
-  ['src/app/animal/page.tsx', 'toZ(features, gender)'],
+  ['src/app/samguk/page.tsx', 'analyzePhoto(image, gender)'],
+  ['src/app/animal/page.tsx', 'analyzePhoto(image, gender)'],
+  ['src/lib/face/analyzePhoto.ts', 'toZ(extractFeatures(lm), gender)'],
   ['src/app/dev/face-lab/FaceLab.tsx', 'toZ(features, job.gender)'],
 ])('%s는 성별 기준으로 z를 낸다', (file, call) => {
   expect(readFileSync(file, 'utf8')).toContain(call)

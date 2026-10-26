@@ -11,7 +11,7 @@ test('api/samguk 라우트가 없다', () => {
 test('삼국지 페이지는 성별 선택과 브라우저 매칭을 쓴다', () => {
   const src = readFileSync('src/app/samguk/page.tsx', 'utf8')
   expect(src).toContain('matchCharacter')
-  expect(src).toContain('detectLandmarks')
+  expect(src).toContain('analyzePhoto(image, gender)')
 })
 
 test('삼국지 결과에서 인상 풀이·분석 탭을 뺐다', () => {

@@ -11,7 +11,7 @@ import Link from "next/link";
 import { useScreenshot } from "@/hooks/useScreenshot";
 import { matchAnimal, type AnimalTypeResult } from "@/lib/animal/matcher";
 import animalCalibration from "@/lib/animal/calibration.json";
-import { toZ } from "@/lib/face/featureStats";
+import { analyzePhoto, REASON_TEXT } from "@/lib/face/analyzePhoto";
 import { animalTypeDB } from "@/lib/animalTypeDB";
 import ResultCard, { type ResultCardProps } from "@/components/result/ResultCard";
 import ResultActions from "@/components/result/ResultActions";
@@ -71,34 +71,18 @@ export default function AnimalTypePage() {
   };
 
   const analyzeImage = async () => {
-    const img = imageRef.current;
-    if (!image || !gender || !img) return;
+    if (!image || !gender) return;
 
     setLoading(true);
     track("test_start", { test_name: "animal" });
     setError(null);
     try {
-      await img.decode().catch(() => {});
-      const { extractFeatures, checkFrontal } = await import("@/lib/face/landmarkFeatures");
-      // 모델·WASM을 못 받은 경우(오프라인, CDN 차단)는 사진 문제가 아니라 도구 문제로 안내한다
-      let lm;
-      try {
-        const { detectLandmarks } = await import("@/lib/face/mediapipe");
-        lm = await detectLandmarks(img);
-      } catch {
-        setError("분석 도구를 불러오지 못했어요. 인터넷 연결을 확인하고 새로고침해 주세요.");
+      const r = await analyzePhoto(image, gender);
+      if (!r.ok) {
+        setError(REASON_TEXT[r.reason]);
         return;
       }
-      if (!lm) {
-        setError("얼굴을 찾지 못했어요. 얼굴이 잘 보이는 사진을 올려 주세요.");
-        return;
-      }
-      if (!checkFrontal(lm).ok) {
-        setError("정면 사진을 올려 주세요. 고개를 돌린 사진은 동물상을 찾기 어려워요.");
-        return;
-      }
-      const features = extractFeatures(lm);
-      const matched = matchAnimal(toZ(features, gender), animalCalibration.bias);
+      const matched = matchAnimal(r.z, animalCalibration.bias);
       setResult(matched);
       track("result_view", { test_name: "animal", result_id: matched.type });
     } catch (err) {
