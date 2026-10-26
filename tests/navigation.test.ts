@@ -29,3 +29,9 @@ test('얼굴·운세 묶음에 기존 테스트 6개가 모두 들어 있다', (
   const hrefs = CATEGORIES.flatMap((c) => c.items.map((i) => i.href))
   for (const h of ['/face2', '/animal', '/samguk', '/fortune', '/fortune/2027', '/fortune/daily']) expect(hrefs).toContain(h)
 })
+
+test('8단계 메뉴: 궁합 묶음에 얼굴 궁합, 얼굴 묶음에 우리 팀 삼국지', () => {
+  const hrefs = (k: string) => CATEGORIES.find((c) => c.key === k)!.items.map((i) => i.href)
+  expect(hrefs('mbti')).toContain('/face-match')
+  expect(hrefs('face')).toContain('/samguk/team')
+})

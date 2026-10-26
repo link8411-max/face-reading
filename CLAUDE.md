@@ -143,6 +143,15 @@ public/
 
 ---
 
+## 함께 하는 테스트 (8단계)
+- 사진 한 장 분석은 `lib/face/analyzePhoto.ts` 공용 함수(압축→MediaPipe→정면 판정→성별 기준 z). 실패 이유별 안내 `REASON_TEXT`. 동물상·삼국지·얼굴 궁합·우리 팀이 같이 쓴다.
+- **얼굴 궁합** `/face-match`: 관계(친구·연인·짝사랑)를 먼저 고르고 두 얼굴의 동물상으로 궁합(`lib/faceMatch/compat.ts`, 8×8×3, 55~100, 관계별 최고 100점).
+  - `?me=cat`(동물상 결과에서 진입)이면 내 칸은 결과로 채워지고, 친구·연인은 초대 링크 `/face-match/i/[동물상]?rel=`를 보낼 수 있다. **짝사랑은 초대 링크를 만들지 않는다.**
+  - 결과 공유 `/face-match/r/[a]-[b]?rel=`. 궁합 탭(`tabForPath`) 소속.
+- **우리 팀 삼국지** `/samguk/team`: 2~6명, 역할(군주→책사→선봉장→살림꾼, 한 사람 한 역할, 동점은 먼저 올린 사람), 팀의 기운(기타 최다=군웅할거, 위·촉·오 동수 최다=천하삼분), 팀 funStats 평균(`lib/samguk/team.ts`).
+  - 별칭은 화면·저장 이미지에만, 공유 링크 `/samguk/team/r/[id-id-…]`와 GA에는 넣지 않는다.
+- 진입점: 동물상 결과 "친구 얼굴이랑 궁합"(`ResultActions` companion), 삼국지 결과 "우리 팀 삼국지 만들기"(lead), 홈 "친구랑 같이 해봐요" 4번째 칸, 궁합 허브.
+
 ## 방문 통계 (GA4)
 - 측정 ID `G-L99JPMPT9D` (`src/lib/analytics.ts`), `layout.tsx`의 `ga4-init` 스크립트. 로컬(localhost)에서는 gtag.js를 받지 않고 config도 안 해서 실제 통계에 안 섞인다(E2E는 `dataLayer`로 검사).
 - 이벤트는 `track()`만 쓴다: `photo_selected`, `test_start`, `result_view(result_id)`, `share_click(method: link·save_image·share)`, `fortune_submit`, `shared_landing`. GA 준비 전 이벤트는 잠시 모았다가 보낸다. / `test_name`: face·animal·samguk·fortune·daily·mbti_match

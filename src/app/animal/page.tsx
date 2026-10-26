@@ -132,6 +132,7 @@ export default function AnimalTypePage() {
             <ResultCard captureRef={resultRef} {...cardProps(result)} />
             <ResultActions
               onShare={shareCard}
+              companion={{ label: "친구 얼굴이랑 궁합", href: `/face-match?me=${result.type}` }}
               onSave={() => { track("share_click", { test_name: "animal", method: "save_image" }); download(getShareOptions()); }}
               onRetry={resetAll}
               busy={busy || isCapturing}

@@ -27,6 +27,11 @@ export default function MbtiHub() {
           MBTI는 에너지 방향(E/I), 세상을 보는 방식(S/N), 판단 방식(T/F), 생활 방식(J/P) 네 가지 축으로 성격을 16가지로 나눠요. 내 유형을 눌러 잘 맞는 궁합과 연애 스타일, 어울리는 여행지와 직업, 이달의 운세를 확인해 보세요.
         </p>
       </header>
+      <Link href="/face-match" className="block bg-card text-ink rounded-[22px] p-5">
+        <Icon name="heart" size={26} className="mb-1" />
+        <span className="block font-bold text-lg">얼굴 궁합</span>
+        <span className="block text-sm text-muted">두 얼굴로 보는 친구·연인·짝사랑 궁합</span>
+      </Link>
       <Link href="/mbti/match" className="block bg-[#E6E8DF] text-ink rounded-[22px] p-5">
         <Icon name="rings" size={26} className="mb-1" />
         <span className="block font-bold text-lg mt-1">MBTI 궁합 계산기</span>

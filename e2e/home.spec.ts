@@ -28,7 +28,7 @@ test('묶음 탭 전환: 운세·사주를 누르면 운세 항목이 보인다'
   await expect(tabs.locator('a[href="/samguk"]')).toBeVisible()
   await tabs.getByRole('tab', { name: '운세·사주' }).click()
   await expect(tabs.locator('a[href="/fortune/daily"]')).toBeVisible()
-  await tabs.getByRole('tab', { name: 'MBTI' }).click()
+  await tabs.getByRole('tab', { name: '궁합' }).click()
   await expect(tabs.locator('a[href="/mbti/match"]')).toBeVisible()
 })
 
