@@ -1,4 +1,5 @@
 import { MetadataRoute } from 'next'
+import { ZODIAC_SLUGS } from '@/content/fortune2027Zodiac'
 
 const baseUrl = 'https://unse-ai.com'
 
@@ -11,7 +12,9 @@ export const SITEMAP_ROUTES = [
     '/animal',
     '/about',
     '/privacy',
-] as const
+    '/fortune/2027',
+    ...ZODIAC_SLUGS.map((s) => `/fortune/2027/${s}` as const),
+]
 
 // 페이지 내용을 바꾸면 해당 라우트 날짜도 갱신할 것 (new Date()를 쓰면 매 요청마다 바뀌어 검색엔진이 무시함)
 export const LAST_MODIFIED: Record<string, string> = {
@@ -23,6 +26,8 @@ export const LAST_MODIFIED: Record<string, string> = {
     '/animal': '2026-10-26',
     '/about': '2026-10-26',
     '/privacy': '2026-10-26',
+    '/fortune/2027': '2026-10-27',
+    ...Object.fromEntries(ZODIAC_SLUGS.map((s) => [`/fortune/2027/${s}`, '2026-10-27'])),
 }
 
 type ChangeFrequency = MetadataRoute.Sitemap[number]['changeFrequency']

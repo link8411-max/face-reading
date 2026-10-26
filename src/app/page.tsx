@@ -173,6 +173,18 @@ export default function Home() {
               </div>
             </div>
           </Link>
+
+          {/* 2027 띠별 운세 */}
+          <Link href="/fortune/2027" className="block">
+            <div className="bg-white/60 backdrop-blur-sm rounded-3xl p-5 hover:bg-white/80 transition group border-2 border-[#C41E3A]/30 shadow-lg flex items-center gap-4">
+              <div className="text-4xl">🐑</div>
+              <div className="flex-1">
+                <h2 className="text-lg font-bold text-[#5C4033] group-hover:text-[#C41E3A] transition">2027 띠별 운세</h2>
+                <p className="text-[#5C4033]/70 text-sm">쥐띠부터 돼지띠까지, 정미년 12띠 운세</p>
+              </div>
+              <div className="text-[#C41E3A]/60 group-hover:text-[#C41E3A] transition text-2xl">→</div>
+            </div>
+          </Link>
         </div>
 
         {/* 마당놀이 섹션 */}

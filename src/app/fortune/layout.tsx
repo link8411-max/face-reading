@@ -22,48 +22,7 @@ export const metadata: Metadata = {
   },
 };
 
-const jsonLd = {
-  "@context": "https://schema.org",
-  "@type": "SoftwareApplication",
-  "name": "2027 무료 신년운세",
-  "description": "2027년 정미년 신년운세 무료 사주 분석",
-  "url": "https://unse-ai.com/fortune",
-  "applicationCategory": "EntertainmentApplication",
-  "operatingSystem": "Web",
-  "offers": { "@type": "Offer", "price": "0", "priceCurrency": "KRW" }
-};
-
-const breadcrumbJsonLd = {
-  "@context": "https://schema.org",
-  "@type": "BreadcrumbList",
-  "itemListElement": [
-    {
-      "@type": "ListItem",
-      "position": 1,
-      "name": "운명을 읽다",
-      "item": "https://unse-ai.com"
-    },
-    {
-      "@type": "ListItem",
-      "position": 2,
-      "name": "2027 신년운세",
-      "item": "https://unse-ai.com/fortune"
-    }
-  ]
-};
-
+// 구조화 데이터는 page.tsx에서 렌더한다. layout에 두면 /fortune/daily, /fortune/2027/* 같은 하위 페이지에도 붙는다.
 export default function Layout({ children }: { children: React.ReactNode }) {
-  return (
-    <>
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
-      />
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }}
-      />
-      {children}
-    </>
-  );
+  return children;
 }

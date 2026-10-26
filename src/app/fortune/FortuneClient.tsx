@@ -5,6 +5,7 @@ import CoupangBanner from "@/components/CoupangBanner";
 import { useBackOrHome } from "@/hooks/useBackOrHome";
 import BirthDateFields from "@/components/BirthDateFields";
 import { FORTUNE_YEAR } from "@/lib/fortuneYear";
+import { SLUG_BY_띠 } from "@/content/fortune2027Zodiac";
 import { validateBirthDate } from "@/lib/birthDate";
 import Link from "next/link";
 import { useScreenshot } from "@/hooks/useScreenshot";
@@ -426,6 +427,12 @@ export default function FortuneClient() {
             </div>
 
             {/* 버튼 */}
+            <Link
+              href={`/fortune/2027/${SLUG_BY_띠[result.사주정보.띠]}`}
+              className="block w-full mb-3 py-3 text-center bg-white/60 border-2 border-[#C41E3A]/30 rounded-xl font-bold text-[#C41E3A] hover:bg-white/80 transition"
+            >
+              {result.사주정보.띠이모지} {result.사주정보.띠}띠 {FORTUNE_YEAR.year} 운세 자세히 보기 →
+            </Link>
             <div className="flex gap-3">
               <button
                 onClick={resetAll}
