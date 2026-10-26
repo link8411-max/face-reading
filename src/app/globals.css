@@ -12,11 +12,6 @@
   --color-blush: #E9BCA8;
   --color-navy-game: #23263A;
   --color-gold-game: #E8B547;
-  /* 옛 토큰 이름 임시 별칭 (7번 작업에서 제거) */
-  --color-paper-2: #F1EBE2;
-  --color-vermilion: #A4553A;
-  --color-gold: #A4553A;
-  --color-navy: #2E2A27;
 }
 
 @theme inline {

@@ -3,8 +3,8 @@ import { birthYears, zodiac2027, ZODIAC_SLUGS, type ZodiacSlug } from "@/content
 import { FORTUNE_YEAR } from "@/lib/fortuneYear";
 import CoupangBanner from "@/components/CoupangBanner";
 
-const card = "bg-white/60 rounded-3xl border-2 border-[#C41E3A]/30 p-5";
-const h2 = "font-bold text-lg mb-2 text-[#C41E3A]";
+const card = "bg-white rounded-[22px] border border-line p-5";
+const h2 = "font-serif font-bold text-lg mb-2";
 
 export function zodiacFaqs(slug: ZodiacSlug) {
   const z = zodiac2027[slug];
@@ -43,23 +43,22 @@ export default function Zodiac2027Article({ slug }: { slug: ZodiacSlug }) {
   ];
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-[#F5E6D3] via-[#E8D4C4] to-[#F5E6D3] text-[#5C4033]">
+    <div className="min-h-screen bg-paper text-ink">
       <main className="max-w-lg mx-auto px-4 py-8 space-y-5">
-        <nav className="text-sm text-[#5C4033]/70">
-          <Link href="/" className="hover:text-[#C41E3A]">홈</Link> › <Link href="/fortune/2027" className="hover:text-[#C41E3A]">{FORTUNE_YEAR.year} 띠별 운세</Link> › {z.띠}띠
+        <nav className="text-sm text-muted">
+          <Link href="/" className="hover:text-accent">홈</Link> › <Link href="/fortune/2027" className="hover:text-accent">{FORTUNE_YEAR.year} 띠별 운세</Link> › {z.띠}띠
         </nav>
 
         <header className="text-center space-y-2">
-          <div className="text-6xl">{z.이모지}</div>
-          <h1 className="text-3xl font-bold text-[#C41E3A]">{FORTUNE_YEAR.year}년 {z.띠}띠 운세</h1>
-          <p className="text-sm text-[#5C4033]/70">{FORTUNE_YEAR.간지}년({FORTUNE_YEAR.한자}) · {FORTUNE_YEAR.특징}</p>
+          <h1 className="font-serif text-3xl font-bold">{FORTUNE_YEAR.year}년 {z.띠}띠 운세</h1>
+          <p className="text-sm text-muted">{FORTUNE_YEAR.간지}년({FORTUNE_YEAR.한자}) · {FORTUNE_YEAR.특징}</p>
           <p className="font-medium">{z.한줄}</p>
         </header>
 
         <section className={card}>
           <h2 className={h2}>{z.띠}띠 출생연도</h2>
           <p className="leading-relaxed">{years.map((y) => `${y}년`).join(", ")}생</p>
-          <p className="text-xs text-[#5C4033]/60 mt-2">※ 띠는 입춘(2월 4일 무렵)에 바뀌어요. 1월 1일~2월 3일에 태어났다면 전년도 띠의 운세를 보세요.</p>
+          <p className="text-xs text-muted mt-2">※ 띠는 입춘(2월 4일 무렵)에 바뀌어요. 1월 1일~2월 3일에 태어났다면 전년도 띠의 운세를 보세요.</p>
         </section>
 
         {([["총운", z.총운], ["재물운", z.재물], ["연애·인간관계", z.연애관계], ["직장·학업운", z.직장학업], ["건강운", z.건강]] as const).map(([title, body]) => (
@@ -91,10 +90,10 @@ export default function Zodiac2027Article({ slug }: { slug: ZodiacSlug }) {
         <section className={card}>
           <h2 className={h2}>행운을 부르는 것</h2>
           <dl className="grid grid-cols-2 gap-2 text-sm">
-            <dt className="text-[#5C4033]/60">행운의 색</dt><dd>{z.행운.색}</dd>
-            <dt className="text-[#5C4033]/60">행운의 숫자</dt><dd>{z.행운.숫자}</dd>
-            <dt className="text-[#5C4033]/60">행운의 방위</dt><dd>{z.행운.방위}</dd>
-            <dt className="text-[#5C4033]/60">행운의 아이템</dt><dd>{z.행운.아이템}</dd>
+            <dt className="text-muted">행운의 색</dt><dd>{z.행운.색}</dd>
+            <dt className="text-muted">행운의 숫자</dt><dd>{z.행운.숫자}</dd>
+            <dt className="text-muted">행운의 방위</dt><dd>{z.행운.방위}</dd>
+            <dt className="text-muted">행운의 아이템</dt><dd>{z.행운.아이템}</dd>
           </dl>
         </section>
 
@@ -103,19 +102,19 @@ export default function Zodiac2027Article({ slug }: { slug: ZodiacSlug }) {
           <p className="leading-relaxed">{z.조언}</p>
         </section>
 
-        <Link href="/fortune" className="block text-center py-4 bg-gradient-to-r from-[#C41E3A] to-[#D4AF37] rounded-2xl font-bold text-white">
-          내 생년월일 사주로 {FORTUNE_YEAR.year} 운세 자세히 보기 →
+        <Link href="/fortune" className="block text-center h-[52px] leading-[52px] bg-ink rounded-full font-medium text-paper">
+          내 생년월일 사주로 {FORTUNE_YEAR.year} 운세 자세히 보기
         </Link>
 
-        <Link href="/mbti/match" className="block text-center py-3 bg-white/60 border-2 border-[#C41E3A]/30 rounded-2xl font-bold text-[#C41E3A] hover:bg-white/80">
-          🧩 MBTI 궁합도 보기 →
+        <Link href="/mbti/match" className="block text-center py-3 bg-white border border-line rounded-2xl font-bold text-accent hover:bg-white">
+          MBTI 궁합도 보기
         </Link>
 
         <section className={card}>
           <h2 className={h2}>자주 묻는 질문</h2>
           <div className="space-y-2">
             {faqs.map((f) => (
-              <details key={f.q} className="bg-white/60 rounded-2xl border border-[#C41E3A]/20 px-4 py-3">
+              <details key={f.q} className="bg-white rounded-2xl border border-line px-4 py-3">
                 <summary className="font-medium cursor-pointer">{f.q}</summary>
                 <p className="mt-2 leading-relaxed">{f.a}</p>
               </details>
@@ -127,15 +126,15 @@ export default function Zodiac2027Article({ slug }: { slug: ZodiacSlug }) {
           <h2 className={h2}>다른 띠 {FORTUNE_YEAR.year} 운세</h2>
           <div className="grid grid-cols-4 gap-2 text-center text-sm">
             {ZODIAC_SLUGS.filter((s) => s !== slug).map((s) => (
-              <Link key={s} href={`/fortune/2027/${s}`} className="bg-white/60 rounded-xl border border-[#C41E3A]/20 py-2 hover:bg-white/80">
-                {zodiac2027[s].이모지} {zodiac2027[s].띠}띠
+              <Link key={s} href={`/fortune/2027/${s}`} className="bg-white rounded-xl border border-line py-2 hover:bg-white">
+                {zodiac2027[s].띠}띠
               </Link>
             ))}
           </div>
         </section>
 
         <CoupangBanner subId={`zodiac-${slug}`} />
-        <p className="text-center text-xs text-[#5C4033]/50">⚠️ 재미로 읽는 운세예요. 과학적 근거는 없어요.</p>
+        <p className="text-center text-xs text-muted">재미로 읽는 운세예요. 과학적 근거는 없어요.</p>
       </main>
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd).replace(/</g, "\\u003c") }} />
     </div>

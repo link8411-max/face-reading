@@ -5,7 +5,7 @@ import { mbtiProfiles, monthlyFor } from "@/content/mbtiTypes";
 import { MBTI_TYPES, bestMatches, compatSummary, type MbtiType } from "@/lib/mbti/compat";
 
 const card = "bg-white border border-line rounded-3xl p-5";
-const h2 = "font-bold text-lg text-vermilion mb-2";
+const h2 = "font-bold text-lg text-accent mb-2";
 
 export function mbtiFaqs(type: MbtiType) {
   const p = mbtiProfiles[type];
@@ -38,10 +38,10 @@ export default function MbtiArticle({ type }: { type: MbtiType }) {
     <div className="max-w-lg mx-auto px-4 py-6 space-y-5">
       <nav className="text-sm text-muted"><Link href="/">홈</Link> › <Link href="/mbti">MBTI</Link> › {type}</nav>
       <header className="text-center">
-        <p className="text-sm font-bold text-gold">{p.nickname}</p>
-        <h1 className="font-serif text-4xl font-bold text-vermilion mt-1">{type}</h1>
+        <p className="text-sm font-bold text-accent">{p.nickname}</p>
+        <h1 className="font-serif text-4xl font-bold mt-1">{type}</h1>
         <div className="flex flex-wrap justify-center gap-1.5 mt-3">
-          {p.strengths.map((s) => <span key={s} className="text-xs font-bold px-2.5 py-1 rounded-full bg-vermilion/10 text-vermilion">{s}</span>)}
+          {p.strengths.map((s) => <span key={s} className="text-xs font-bold px-2.5 py-1 rounded-full bg-accent/10 text-accent">{s}</span>)}
         </div>
       </header>
 
@@ -54,7 +54,7 @@ export default function MbtiArticle({ type }: { type: MbtiType }) {
             const s = compatSummary(type, b);
             return (
               <div key={b} className="rounded-2xl bg-paper p-3">
-                <p className="font-bold"><Link href={`/mbti/${b.toLowerCase()}`} className="text-vermilion">{b}</Link> · {s.label} <span className="text-gold">{s.total}점</span></p>
+                <p className="font-bold"><Link href={`/mbti/${b.toLowerCase()}`} className="text-accent">{b}</Link> · {s.label} <span className="text-accent">{s.total}점</span></p>
                 <p className="text-sm leading-relaxed mt-1">{s.lines.join(" ")}</p>
               </div>
             );
@@ -62,7 +62,7 @@ export default function MbtiArticle({ type }: { type: MbtiType }) {
         </div>
         <p className="text-sm mt-3"><b>친구로 잘 맞는 유형</b> · {bestMatches(type, "friend").join(", ")} — {compatSummary(type, bestMatches(type, "friend")[0]).lines[0]}</p>
         <p className="text-sm mt-1"><b>함께 일하기 좋은 유형</b> · {bestMatches(type, "work").join(", ")} — {compatSummary(type, bestMatches(type, "work")[0]).lines[2]}</p>
-        <Link href={`/mbti/match?a=${type}`} className="block text-center mt-4 py-3 rounded-2xl bg-vermilion text-white font-bold">궁합 계산기로 자세히 보기 →</Link>
+        <Link href={`/mbti/match?a=${type}`} className="block text-center mt-4 h-[52px] leading-[52px] rounded-full bg-ink text-paper font-medium">궁합 계산기로 자세히 보기</Link>
       </section>
 
       <section className={card}>
@@ -74,7 +74,7 @@ export default function MbtiArticle({ type }: { type: MbtiType }) {
               <tr key={b} className="border-t border-line">
                 <td className="py-1.5"><Link href={`/mbti/match?a=${type}&b=${b}`} className="font-bold">{b}</Link></td>
                 <td className="text-center">{s.love}</td><td className="text-center">{s.friend}</td><td className="text-center">{s.work}</td>
-                <td className="text-center font-bold text-vermilion">{s.total}</td>
+                <td className="text-center font-bold text-accent">{s.total}</td>
               </tr>
             ))}
           </tbody>

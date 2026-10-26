@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import { Icon } from "@/components/icons";
 import { mbtiProfiles } from "@/content/mbtiTypes";
 import type { MbtiType } from "@/lib/mbti/compat";
 
@@ -11,25 +12,25 @@ export const metadata: Metadata = {
 };
 
 const GROUPS: { title: string; types: MbtiType[]; color: string }[] = [
-  { title: '분석가형 (NT)', types: ['INTJ', 'INTP', 'ENTJ', 'ENTP'], color: 'bg-[#EDE6F7]' },
-  { title: '외교관형 (NF)', types: ['INFJ', 'INFP', 'ENFJ', 'ENFP'], color: 'bg-[#E3F2E8]' },
-  { title: '관리자형 (SJ)', types: ['ISTJ', 'ISFJ', 'ESTJ', 'ESFJ'], color: 'bg-[#E7EDF6]' },
-  { title: '탐험가형 (SP)', types: ['ISTP', 'ISFP', 'ESTP', 'ESFP'], color: 'bg-[#FBF1D3]' },
+  { title: '분석가형 (NT)', types: ['INTJ', 'INTP', 'ENTJ', 'ENTP'], color: 'bg-[#F1EBE2]' },
+  { title: '외교관형 (NF)', types: ['INFJ', 'INFP', 'ENFJ', 'ENFP'], color: 'bg-[#E8EEE6]' },
+  { title: '관리자형 (SJ)', types: ['ISTJ', 'ISFJ', 'ESTJ', 'ESFJ'], color: 'bg-[#E6E8DF]' },
+  { title: '탐험가형 (SP)', types: ['ISTP', 'ISFP', 'ESTP', 'ESFP'], color: 'bg-[#F3EBDD]' },
 ];
 
 export default function MbtiHub() {
   return (
     <div className="max-w-lg mx-auto px-4 py-6 space-y-6">
       <header>
-        <h1 className="font-serif text-3xl font-bold text-vermilion">MBTI 궁합·16유형 풀이</h1>
+        <h1 className="font-serif text-3xl font-bold">MBTI 궁합·16유형 풀이</h1>
         <p className="text-sm text-muted leading-relaxed mt-2">
           MBTI는 에너지 방향(E/I), 세상을 보는 방식(S/N), 판단 방식(T/F), 생활 방식(J/P) 네 가지 축으로 성격을 16가지로 나눠요. 내 유형을 눌러 잘 맞는 궁합과 연애 스타일, 어울리는 여행지와 직업, 이달의 운세를 확인해 보세요.
         </p>
       </header>
-      <Link href="/mbti/match" className="block bg-gradient-to-br from-[#6B3FA0] to-[#9466C9] text-white rounded-3xl p-5">
-        <span className="block text-2xl" aria-hidden>💞</span>
+      <Link href="/mbti/match" className="block bg-[#E6E8DF] text-ink rounded-[22px] p-5">
+        <Icon name="rings" size={26} className="mb-1" />
         <span className="block font-bold text-lg mt-1">MBTI 궁합 계산기</span>
-        <span className="block text-sm opacity-85">두 유형의 연애·친구·직장 궁합 점수 →</span>
+        <span className="block text-sm text-muted">두 유형의 연애·친구·직장 궁합 점수 →</span>
       </Link>
       {GROUPS.map((g) => (
         <section key={g.title}>

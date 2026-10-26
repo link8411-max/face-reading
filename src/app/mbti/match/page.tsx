@@ -13,7 +13,7 @@ export default function MatchPage() {
   return (
     <div className="max-w-lg mx-auto px-4 py-6 space-y-5">
       <header>
-        <h1 className="font-serif text-3xl font-bold text-vermilion">MBTI 궁합 계산기</h1>
+        <h1 className="font-serif text-3xl font-bold">MBTI 궁합 계산기</h1>
         <p className="text-sm text-muted mt-1">두 유형을 고르면 연애·친구·직장 궁합 점수와 잘 맞는 이유를 알려 드려요.</p>
       </header>
       <MatchCalculator />

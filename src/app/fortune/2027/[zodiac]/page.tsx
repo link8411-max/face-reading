@@ -25,7 +25,7 @@ export async function generateMetadata({ params }: { params: Promise<{ zodiac: s
     alternates: { canonical: url },
     openGraph: {
       title, description: z.한줄, url, type: "article", locale: "ko_KR", siteName: "운명을 읽다",
-      images: [{ url: `/api/og?title=${encodeURIComponent(`${FORTUNE_YEAR.year}년 ${z.띠}띠 운세`)}&subtitle=${encodeURIComponent(`${FORTUNE_YEAR.간지}년 띠별 신년운세`)}&icon=${encodeURIComponent(z.이모지)}`, width: 1200, height: 630 }],
+      images: [{ url: `/api/og?title=${encodeURIComponent(`${FORTUNE_YEAR.year}년 ${z.띠}띠 운세`)}&subtitle=${encodeURIComponent(`${FORTUNE_YEAR.간지}년 띠별 신년운세`)}`, width: 1200, height: 630 }],
     },
   };
 }

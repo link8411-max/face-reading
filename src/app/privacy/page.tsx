@@ -7,8 +7,8 @@ export const metadata: Metadata = {
 
 export default function PrivacyPage() {
     return (
-        <div className="max-w-2xl mx-auto px-4 py-12 text-stone-800 leading-relaxed">
-            <h1 className="text-3xl font-bold mb-8 text-[#C41E3A]">개인정보처리방침</h1>
+        <div className="max-w-2xl mx-auto px-4 py-12 text-ink leading-relaxed">
+            <h1 className="text-3xl font-bold mb-8 text-accent">개인정보처리방침</h1>
 
             <section className="mb-8">
                 <h2 className="text-xl font-bold mb-4">1. 개인정보의 수집 및 이용 목적</h2>
@@ -31,7 +31,7 @@ export default function PrivacyPage() {
                     <li>입력 항목: 생년월일, 태어난 시간(운세용). 얼굴 사진은 이용자 브라우저 안에서만 분석되며 수집하지 않습니다.</li>
                     <li>자동 수집: IP 주소, 쿠키, 서비스 이용 기록, 접속 로그</li>
                 </ul>
-                <p className="mt-4 font-bold text-[#C41E3A]">
+                <p className="mt-4 font-bold text-accent">
                     ※ 얼굴 사진은 이용자의 브라우저 안에서만 분석되며, 서버나 외부 서비스로 전송되거나 저장되지 않습니다.
                 </p>
             </section>
@@ -51,7 +51,7 @@ export default function PrivacyPage() {
             </section>
 
             <section className="mb-8 border-t pt-8">
-                <p className="text-sm text-stone-500">
+                <p className="text-sm text-muted">
                     공고일자: 2026년 1월 15일<br />
                     시행일자: 2026년 1월 15일
                 </p>

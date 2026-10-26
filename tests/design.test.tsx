@@ -53,3 +53,18 @@ test('불러오지 않는 굵기(900)를 쓰지 않는다 — 가짜 굵게 방�
   const hits = execSync("grep -rl 'font-black' src || true", { encoding: 'utf8' }).trim()
   expect(hits).toBe('')
 })
+
+test('옛 민화 팔레트 색이 src에 남아 있지 않다', () => {
+  const { execSync } = require('node:child_process')
+  const hits = execSync("grep -rniE '#(F5E6D3|C41E3A|E8D4C4|5C4033|FFD700|D4AF37|C8323E)' src || true", { encoding: 'utf8' }).trim()
+  expect(hits).toBe('')
+})
+
+test('임시 별칭 토큰(vermilion·gold·navy·paper-2)이 없다', () => {
+  const { execSync } = require('node:child_process')
+  expect(css).not.toMatch(/--color-(vermilion|gold|navy|paper-2):/)
+  const files: string[] = execSync("grep -rlE 'vermilion|gold|navy|paper-2' src || true", { encoding: 'utf8' }).trim().split('\n').filter(Boolean)
+  const { readFileSync: read } = require('node:fs')
+  const re = /\b(?:text|bg|border|from|to|via|ring|outline)-(?:vermilion|gold|navy|paper-2)(?![-\w])/
+  expect(files.filter((f) => re.test(read(f, 'utf8')))).toEqual([])
+})

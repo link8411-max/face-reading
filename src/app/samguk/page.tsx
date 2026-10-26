@@ -199,7 +199,7 @@ export default function SamgukPage() {
           .animate-fade-in { animation: fade-in 0.8s ease-out forwards; }
           .custom-scrollbar::-webkit-scrollbar { width: 4px; }
           .custom-scrollbar::-webkit-scrollbar-track { background: rgba(0,0,0,0.2); }
-          .custom-scrollbar::-webkit-scrollbar-thumb { background: #5C4033; border-radius: 2px; }
+          .custom-scrollbar::-webkit-scrollbar-thumb { background: #6B6259; border-radius: 2px; }
         `}</style>
 
         {/* Result Section */}

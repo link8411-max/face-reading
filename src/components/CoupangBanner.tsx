@@ -7,7 +7,7 @@ const HEIGHT = 140;
 
 export default function CoupangBanner({ subId, tone = "light" }: { subId: string; tone?: "light" | "dark" }) {
   const src = `https://ads-partners.coupang.com/widgets.html?id=${COUPANG_WIDGET_ID}&template=carousel&trackingCode=${TRACKING_CODE}&subId=${subId}&width=${WIDTH}&height=${HEIGHT}&tsource=`;
-  const muted = tone === "dark" ? "text-stone-400" : "text-[#5C4033]/60";
+  const muted = tone === "dark" ? "text-stone-400" : "text-muted";
   return (
     <div className="mt-6 no-screenshot">
       <p className={`text-center text-xs mb-2 ${muted}`}>추천 상품</p>

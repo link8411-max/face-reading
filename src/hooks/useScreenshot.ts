@@ -67,7 +67,7 @@ export function useScreenshot<T extends HTMLElement = HTMLDivElement>() {
       modal.id = "ios-save-modal";
       modal.style.cssText = "position:fixed;inset:0;z-index:9999;background:rgba(0,0,0,0.95);display:flex;flex-direction:column;justify-content:center;align-items:center;padding:20px;";
       modal.innerHTML = `
-        <p style="color:#fff;margin-bottom:15px;font-size:16px;">👆 이미지를 길게 눌러 저장하세요</p>
+        <p style="color:#fff;margin-bottom:15px;font-size:16px;">이미지를 길게 눌러 저장하세요</p>
         <img src="${url}" style="max-width:100%;max-height:70vh;border-radius:8px;" />
         <button id="ios-modal-close" style="margin-top:20px;padding:12px 30px;background:#f59e0b;color:#000;border:none;border-radius:8px;font-size:16px;font-weight:bold;">닫기</button>
       `;
