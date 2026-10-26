@@ -88,3 +88,26 @@ test('삼국지 이미지 저장: 저장 PNG에 남색 카드 배경이 살아 �
   }, buf.toString('base64'))
   expect(px[0] + px[1] + px[2], `pixel ${px}`).toBeLessThan(250) // 남색(#23263A ≈ 35+38+58)
 })
+
+// 카카오톡(안드로이드) 인앱: blob 다운로드가 "지원하지 않는 파일 형식"으로 실패하던 문제
+test.describe('카카오톡 인앱 브라우저', () => {
+  test.use({ userAgent: 'Mozilla/5.0 (Linux; Android 14; SM-S918N; wv) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/129.0 Mobile Safari/537.36 KAKAOTALK/10.9.0' })
+
+  test('이미지 저장·스토리: 다운로드 대신 길게 눌러 저장 화면(data 이미지)과 다른 브라우저로 열기', async ({ page }) => {
+    test.skip(!existsSync(FACE), '개발용 테스트 얼굴이 없으면 건너뜀')
+    await page.addInitScript(() => { Object.assign(navigator, { canShare: undefined, share: undefined }) })
+    const downloads: string[] = []
+    page.on('download', (d) => downloads.push(d.suggestedFilename()))
+    await faceResult(page)
+    for (const btn of ['이미지 저장', '스토리에 올리기']) {
+      await page.getByRole('button', { name: btn }).click()
+      const dialog = page.getByRole('dialog', { name: '이미지 저장' })
+      await expect(dialog).toBeVisible({ timeout: 20000 })
+      await expect(dialog.getByRole('img')).toHaveAttribute('src', /^data:image\/png;base64,/)
+      await expect(dialog.getByRole('button', { name: '다른 브라우저로 열기' })).toBeVisible()
+      await dialog.getByRole('button', { name: '닫기' }).click()
+      await expect(dialog).toHaveCount(0)
+    }
+    expect(downloads).toEqual([])
+  })
+})
