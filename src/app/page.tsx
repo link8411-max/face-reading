@@ -1,6 +1,9 @@
 import Link from "next/link";
 import CoupangBanner from "@/components/CoupangBanner";
-import SeasonHero from "@/components/home/SeasonHero";
+import FaceHero from "@/components/home/FaceHero";
+import PlayTogether from "@/components/home/PlayTogether";
+import SeasonCard from "@/components/home/SeasonCard";
+import { Icon } from "@/components/icons";
 import ZodiacPicker from "@/components/home/ZodiacPicker";
 import CategoryTabs from "@/components/home/CategoryTabs";
 import { HOME_FAQS } from "@/content/homeFaq";
@@ -16,50 +19,56 @@ const faqJsonLd = {
 
 export default function Home() {
   return (
-    <div className="max-w-lg mx-auto px-4 pt-4 pb-6 space-y-6">
+    <div className="max-w-lg mx-auto px-4 pt-5 pb-6 space-y-[30px]">
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd).replace(/</g, "\\u003c") }} />
 
-      <header>
+      <header className="flex items-start justify-between px-1.5">
         <h1 className="flex flex-col">
-          <Link href="/" className="font-serif text-xl font-black text-vermilion">
-            운명을 <span className="text-gold">읽다</span>
-          </Link>
+          <Link href="/" className="font-serif text-[19px] font-bold text-ink">운명을 읽다</Link>
           <span className="text-xs text-muted font-normal mt-0.5">무료 AI 관상·얼굴 테스트와 {FORTUNE_YEAR.year} 신년운세</span>
         </h1>
+        <Icon name="moon" className="text-ink mt-0.5" />
       </header>
 
-      <SeasonHero />
-      <ZodiacPicker />
-      {/* 쿠팡 배너: 첫 화면(히어로·띠 고르기) 바로 다음 */}
+      <div className="!mt-[18px]">
+        <FaceHero />
+      </div>
+      <div className="px-1.5">
+        <PlayTogether />
+      </div>
+      <div className="px-1.5">
+        <ZodiacPicker />
+      </div>
+      {/* 쿠팡 배너: 첫 흐름(히어로·친구랑·띠) 다음 */}
       <CoupangBanner subId="home" />
+      <SeasonCard />
       <CategoryTabs />
 
       <section aria-label={`${FORTUNE_YEAR.year} 띠별 운세`}>
-        <div className="flex items-baseline justify-between mb-2">
-          <h2 className="font-black text-base">{FORTUNE_YEAR.year} 띠별 운세</h2>
-          <Link href="/fortune/2027" className="text-xs text-muted">전체 →</Link>
+        <div className="flex items-baseline justify-between mb-3">
+          <h2 className="font-serif font-bold text-[17px]">{FORTUNE_YEAR.year} 띠별 운세</h2>
+          <Link href="/fortune/2027" className="text-[13px] text-muted">전체 보기</Link>
         </div>
-        <div className="flex gap-2 overflow-x-auto pb-1 -mx-4 px-4 [scrollbar-width:none]">
+        <div className="flex flex-wrap gap-2">
           {ZODIAC_SLUGS.map((s) => (
-            <Link key={s} href={`/fortune/2027/${s}`} className="flex-none w-16 text-center bg-white border border-line rounded-2xl py-2 text-[11px] font-bold">
-              <span aria-hidden className="block text-2xl">{zodiac2027[s].이모지}</span>
-              {zodiac2027[s].띠}
+            <Link key={s} href={`/fortune/2027/${s}`} className="h-10 px-4 rounded-full border border-[#E2D8CA] bg-white grid place-items-center text-sm">
+              {zodiac2027[s].띠}띠
             </Link>
           ))}
         </div>
       </section>
 
       <section aria-label="자주 묻는 질문">
-        <h2 className="font-black text-base mb-2">자주 묻는 질문</h2>
+        <h2 className="font-serif font-bold text-[17px] mb-3">자주 묻는 질문</h2>
         <div className="space-y-2">
           {HOME_FAQS.map((f) => (
-            <details key={f.q} className="bg-white border border-line rounded-2xl px-4 py-3">
+            <details key={f.q} className="bg-white border border-line rounded-[18px] px-4 py-3">
               <summary className="font-medium cursor-pointer">{f.q}</summary>
-              <p className="mt-2 text-sm leading-relaxed text-ink/80">{f.a}</p>
+              <p className="mt-2 text-sm leading-relaxed text-muted">{f.a}</p>
             </details>
           ))}
         </div>
-        <p className="text-xs text-muted text-center mt-4">⚠️ 재미로만 봐주세요! 과학적 근거는 없습니다.</p>
+        <p className="text-xs text-muted text-center mt-4">재미로만 봐 주세요. 과학적 근거는 없어요.</p>
       </section>
     </div>
   );

@@ -10,14 +10,16 @@ test('시즌 히어로 설정: 2027 신년운세로 연결', () => {
 test('홈은 서버 페이지이고 시즌 설정·FAQ 데이터를 쓴다', () => {
   const src = readFileSync('src/app/page.tsx', 'utf8')
   expect(src).not.toMatch(/^"use client"/)
-  expect(src).toContain('SeasonHero')
+  expect(src).toContain('FaceHero')
+  expect(src).toContain('PlayTogether')
+  expect(src).toContain('SeasonCard')
   expect(src).toContain('ZodiacPicker')
   expect(src).toContain('CategoryTabs')
   expect(src).toContain('HOME_FAQS')
 })
 
 test('홈에 근거 없는 참여자 수·순위 숫자가 없다', () => {
-  const all = ['src/app/page.tsx', 'src/components/home/SeasonHero.tsx', 'src/components/home/ZodiacPicker.tsx', 'src/components/home/CategoryTabs.tsx', 'src/content/season.ts'].map((f) => readFileSync(f, 'utf8')).join('\n')
+  const all = ['src/app/page.tsx', 'src/components/home/FaceHero.tsx', 'src/components/home/PlayTogether.tsx', 'src/components/home/SeasonCard.tsx', 'src/components/home/ZodiacPicker.tsx', 'src/components/home/CategoryTabs.tsx', 'src/content/season.ts'].map((f) => readFileSync(f, 'utf8')).join('\n')
   expect(all).not.toMatch(/\d[\d,]*명\s*(확인|참여|이용)|인기\s*순위|HOT/)
 })
 
@@ -32,4 +34,19 @@ test('띠 고르기는 요일을 마운트 뒤에 계산한다(서버·브라우
   const src = readFileSync('src/components/home/ZodiacPicker.tsx', 'utf8')
   expect(src).toContain('useEffect')
   expect(src).not.toMatch(/^const .*new Date\(\)/m)
+})
+
+const HOME_FILES = ['src/app/page.tsx', 'src/components/home/FaceHero.tsx', 'src/components/home/PlayTogether.tsx', 'src/components/home/SeasonCard.tsx', 'src/components/home/ZodiacPicker.tsx', 'src/components/home/CategoryTabs.tsx', 'src/content/season.ts']
+
+test('홈 화면 파일에 이모지가 없다 (선 아이콘·텍스트 칩)', () => {
+  for (const f of HOME_FILES) expect(readFileSync(f, 'utf8'), f).not.toMatch(/\p{Extended_Pictographic}/u)
+})
+
+test('홈에 "곧 열려요" 같은 열리지 않은 기능 안내가 없다', () => {
+  for (const f of HOME_FILES) expect(readFileSync(f, 'utf8'), f).not.toContain('곧 열려요')
+})
+
+test('친구랑 같이 해봐요: 관상·동물상·삼국지·MBTI 궁합 4개', async () => {
+  const { PLAY_TOGETHER } = await import('@/components/home/PlayTogether')
+  expect(PLAY_TOGETHER.map((c) => c.href)).toEqual(['/face2', '/animal', '/samguk', '/mbti/match'])
 })

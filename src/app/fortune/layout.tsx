@@ -14,11 +14,11 @@ export const metadata: Metadata = {
     locale: "ko_KR",
     siteName: "운명을 읽다",
     url: "https://unse-ai.com/fortune",
-    images: [{ url: "/api/og?title=2027%20신년운세&subtitle=정미년%20새해%20운세&icon=🐑", width: 1200, height: 630 }],
+    images: [{ url: "/api/og?title=2027%20신년운세&subtitle=정미년%20새해%20운세", width: 1200, height: 630 }],
   },
   twitter: {
     card: "summary_large_image",
-    images: ["/api/og?title=2027%20신년운세&subtitle=정미년%20새해%20운세&icon=🐑"],
+    images: ["/api/og?title=2027%20신년운세&subtitle=정미년%20새해%20운세"],
   },
 };
 

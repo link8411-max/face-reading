@@ -14,13 +14,13 @@ export const metadata: Metadata = {
     type: "website",
     locale: "ko_KR",
     siteName: "운명을 읽다",
-    images: [{ url: "/api/og?title=동물상%20테스트&subtitle=나는%20어떤%20동물을%20닮았을까?&icon=🦊", width: 1200, height: 630 }],
+    images: [{ url: "/api/og?title=동물상%20테스트&subtitle=나는%20어떤%20동물을%20닮았을까?", width: 1200, height: 630 }],
   },
   twitter: {
     card: "summary_large_image",
     title: "동물상 테스트 | 나는 어떤 동물을 닮았을까?",
     description: "AI가 분석하는 나의 동물상! 8가지 동물상 중 나는 어떤 동물을 닮았을까요?",
-    images: ["/api/og?title=동물상%20테스트&subtitle=나는%20어떤%20동물을%20닮았을까?&icon=🦊"],
+    images: ["/api/og?title=동물상%20테스트&subtitle=나는%20어떤%20동물을%20닮았을까?"],
   },
 };
 

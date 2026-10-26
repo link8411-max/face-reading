@@ -15,7 +15,7 @@ for (const [path, label] of CASES) {
 test('탭을 눌러 묶음 페이지로 이동', async ({ page }) => {
   await page.goto('/')
   const bar = page.getByRole('navigation', { name: '하단 메뉴' })
-  for (const [label, url] of [['얼굴', /\/face-tests$/], ['운세', /\/unse$/], ['MBTI', /\/mbti$/], ['홈', /3200\/$/]] as const) {
+  for (const [label, url] of [['얼굴', /\/face-tests$/], ['운세', /\/unse$/], ['궁합', /\/mbti$/], ['홈', /3200\/$/]] as const) {
     await bar.getByRole('link', { name: label }).click()
     await expect(page).toHaveURL(url)
   }

@@ -15,11 +15,11 @@ export const metadata: Metadata = {
     locale: "ko_KR",
     siteName: "운명을 읽다",
     url: "https://unse-ai.com/fortune/daily",
-    images: [{ url: "/api/og?title=오늘의%20운세&subtitle=하루를%20시작하는%20운세&icon=✨", width: 1200, height: 630 }],
+    images: [{ url: "/api/og?title=오늘의%20운세&subtitle=하루를%20시작하는%20운세", width: 1200, height: 630 }],
   },
   twitter: {
     card: "summary_large_image",
-    images: ["/api/og?title=오늘의%20운세&subtitle=하루를%20시작하는%20운세&icon=✨"],
+    images: ["/api/og?title=오늘의%20운세&subtitle=하루를%20시작하는%20운세"],
   },
 };
 

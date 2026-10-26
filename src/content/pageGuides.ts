@@ -15,12 +15,12 @@ export interface PageGuideData {
   related: GuideRoute[]
 }
 
-export const TEST_LINKS: Record<GuideRoute, { label: string; emoji: string }> = {
-  '/face2': { label: 'AI 관상 테스트', emoji: '👤' },
-  '/animal': { label: '동물상 테스트', emoji: '🦊' },
-  '/samguk': { label: '삼국지 닮은꼴', emoji: '⚔️' },
-  '/fortune': { label: '사주 신년운세', emoji: '🔮' },
-  '/fortune/daily': { label: '띠별 오늘의 운세', emoji: '☯' },
+export const TEST_LINKS: Record<GuideRoute, { label: string }> = {
+  '/face2': { label: 'AI 관상 테스트' },
+  '/animal': { label: '동물상 테스트' },
+  '/samguk': { label: '나는 삼국지 속 누구?' },
+  '/fortune': { label: '사주 신년운세' },
+  '/fortune/daily': { label: '띠별 오늘의 운세' },
 }
 
 export const pageGuides: Record<GuideRoute, PageGuideData> = {
@@ -126,7 +126,7 @@ export const pageGuides: Record<GuideRoute, PageGuideData> = {
       '오늘의 운세는 정해진 미래를 알려주는 것이 아니라 하루를 어떤 마음으로 보낼지 돌아보게 하는 작은 길잡이예요. 운이 좋다고 나오면 자신감을 갖고, 조심하라고 나오면 한 번 더 살피는 계기로 삼아 보세요. 더 자세한 한 해의 흐름이 궁금하다면 생년월일과 태어난 시간으로 보는 사주 신년운세도 함께 확인해 보세요.',
     ],
     highlights: [
-      { title: '열두 띠', body: '🐭 쥐, 🐮 소, 🐯 호랑이, 🐰 토끼, 🐲 용, 🐍 뱀, 🐴 말, 🐑 양, 🐵 원숭이, 🐔 닭, 🐶 개, 🐷 돼지띠 모두 확인할 수 있어요.' },
+      { title: '열두 띠', body: '쥐, 소, 호랑이, 토끼, 용, 뱀, 말, 양, 원숭이, 닭, 개, 돼지띠 모두 확인할 수 있어요.' },
       { title: '오늘의 한마디', body: '오늘 하루 어떤 마음가짐으로 보내면 좋을지 짧은 조언과 운세 점수로 알려드려요.' },
       { title: '행운의 시간과 색', body: '오늘 기운이 좋은 시간대와 곁에 두면 좋은 색을 알려드려요. 옷이나 소품을 고를 때 참고해 보세요.' },
     ],

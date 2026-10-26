@@ -4,7 +4,7 @@ import { useRef } from "react";
 import { sanitizeDigits, type BirthDateInput } from "@/lib/birthDate";
 
 const inputClass =
-  "w-full px-4 py-3 bg-white/50 border border-[#C41E3A]/30 rounded-xl text-center text-lg text-[#5C4033] focus:outline-none focus:ring-2 focus:ring-[#C41E3A]/50 placeholder-[#5C4033]/40";
+  "w-full px-4 py-3 bg-white border border-line rounded-xl text-center text-lg text-ink focus:outline-none focus:ring-2 focus:ring-accent/40 placeholder-muted/60";
 
 // 생년월일 입력: 숫자만, 자릿수 제한, 다 채우면 다음 칸으로 자동 이동, 오류는 아래에 문구로 표시
 export default function BirthDateFields({
@@ -36,22 +36,22 @@ export default function BirthDateFields({
     <div className="mb-4">
       <div className="grid grid-cols-3 gap-3">
         <div>
-          <label className="block text-sm text-[#5C4033]/70 mb-1" htmlFor="birth-year">년도</label>
+          <label className="block text-sm text-muted mb-1" htmlFor="birth-year">년도</label>
           <input id="birth-year" type="text" inputMode="numeric" autoComplete="bday-year" maxLength={4} placeholder="1990"
             value={value.year} onChange={(e) => setYear(e.target.value)} aria-invalid={!!error} className={inputClass} />
         </div>
         <div>
-          <label className="block text-sm text-[#5C4033]/70 mb-1" htmlFor="birth-month">월</label>
+          <label className="block text-sm text-muted mb-1" htmlFor="birth-month">월</label>
           <input id="birth-month" ref={monthRef} type="text" inputMode="numeric" autoComplete="bday-month" maxLength={2} placeholder="5"
             value={value.month} onChange={(e) => setMonth(e.target.value)} aria-invalid={!!error} className={inputClass} />
         </div>
         <div>
-          <label className="block text-sm text-[#5C4033]/70 mb-1" htmlFor="birth-day">일</label>
+          <label className="block text-sm text-muted mb-1" htmlFor="birth-day">일</label>
           <input id="birth-day" ref={dayRef} type="text" inputMode="numeric" autoComplete="bday-day" maxLength={2} placeholder="15"
             value={value.day} onChange={(e) => setDay(e.target.value)} aria-invalid={!!error} className={inputClass} />
         </div>
       </div>
-      {error && <p role="alert" className="mt-2 text-sm text-center text-[#C41E3A]">{error}</p>}
+      {error && <p role="alert" className="mt-2 text-sm text-center text-accent">{error}</p>}
     </div>
   );
 }

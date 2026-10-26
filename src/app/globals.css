@@ -1,62 +1,23 @@
 @import "tailwindcss";
 
-:root {
-  /* 민화 오방색 */
-  --minhwa-red: #C41E3A;
-  /* 적색 - 남쪽, 여름, 화 */
-  --minhwa-blue: #1E3A5F;
-  /* 청색 - 동쪽, 봄, 목 */
-  --minhwa-yellow: #FFD700;
-  /* 황색 - 중앙, 토 */
-  --minhwa-black: #1a1a1a;
-  /* 흑색 - 북쪽, 겨울, 수 */
-  --minhwa-white: #F5F5F5;
-  /* 백색 - 서쪽, 가을, 금 */
-
-  /* 한지 배경색 */
-  --hanji-light: #F5E6D3;
-  /* 밝은 한지 */
-  --hanji-medium: #E8D4C4;
-  /* 중간 한지 */
-  --hanji-dark: #D4C4B4;
-  /* 어두운 한지 */
-
-  /* 전통 보조색 */
-  --traditional-brown: #5C4033;
-  /* 진한 갈색 */
-  --traditional-gold: #D4AF37;
-  /* 금색 */
-  --traditional-beige: #EAE0D5;
-  /* 베이지 */
-
-  --background: var(--hanji-light);
-  --foreground: var(--traditional-brown);
-}
-
-/* 민화 현대화 디자인 토큰 (4a): bg-paper, text-ink, text-vermilion 등으로 쓴다 */
+/* 뉴트럴 디자인 토큰 (4b, 디자인 캔버스 시안): bg-paper, bg-card, text-ink, text-accent 등으로 쓴다 */
 @theme {
-  --color-paper: #FBF6EE;
-  --color-paper-2: #F3E9DA;
-  --color-ink: #3E2C23;
-  --color-muted: #8A7466;
-  --color-vermilion: #C8323E;
-  --color-gold: #C9A227;
-  --color-navy: #24426B;
-  --color-line: #E6D7C3;
+  --color-paper: #FBF6F1;
+  --color-card: #ECE5D9;
+  --color-card-2: #F1EBE2;
+  --color-line: #E6DED2;
+  --color-ink: #2E2A27;
+  --color-muted: #6B6259;
+  --color-accent: #9A4F35;
+  --color-blush: #E9BCA8;
+  --color-navy-game: #23263A;
+  --color-gold-game: #E8B547;
 }
 
 @theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
   --font-sans: var(--font-noto-sans-kr);
-  --font-serif: var(--font-noto-serif-kr);
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: var(--hanji-medium);
-    --foreground: var(--traditional-brown);
-  }
+  --font-serif: var(--font-gowun-batang);
+  --font-pixel: var(--font-silkscreen);
 }
 
 /* 본문 글꼴·배경·글자색은 layout의 body 클래스(font-sans bg-paper text-ink)가 정한다.

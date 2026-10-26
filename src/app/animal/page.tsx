@@ -3,10 +3,34 @@
 import { useState, useRef, useEffect } from "react";
 import CoupangBanner from "@/components/CoupangBanner";
 import { useBackOrHome } from "@/hooks/useBackOrHome";
+import TestHeader from "@/components/test/TestHeader";
+import TestStart from "@/components/test/TestStart";
+import type { Gender } from "@/components/test/GenderPills";
 import Link from "next/link";
 import { useScreenshot } from "@/hooks/useScreenshot";
 import type { AnimalTypeResult } from "@/lib/animalTypeAnalyzer";
 import { animalTypeDB } from "@/lib/animalTypeDB";
+import ResultCard, { type ResultCardProps } from "@/components/result/ResultCard";
+import ResultActions from "@/components/result/ResultActions";
+import StoryFrame from "@/components/result/StoryFrame";
+import { useStoryShare } from "@/hooks/useStoryShare";
+import { Icon } from "@/components/icons";
+
+const firstSentence = (t: string) => (t.match(/^.*?[.!?요다](?=\s|$)/)?.[0] ?? t).trim();
+
+// 결과 카드: 동물상은 숫자 특성이 없어서 막대 대신 성격 칩 3개를 쓴다
+function cardProps(r: AnimalTypeResult): ResultCardProps {
+  return {
+    eyebrow: `${r.data.name} · 닮음 ${r.matchScore}%`,
+    title: r.data.title,
+    summary: firstSentence(r.data.description),
+    chips: r.data.personality.positive.slice(0, 3),
+    reasons: [
+      { label: "매력", text: r.data.charm },
+      { label: "얼굴", text: `${r.features.눈} · 얼굴형 ${r.features.얼굴형}` },
+    ],
+  };
+}
 
 export default function AnimalTypePage() {
   const goBack = useBackOrHome();
@@ -15,10 +39,13 @@ export default function AnimalTypePage() {
   const [modelsLoading, setModelsLoading] = useState(true);
   const [result, setResult] = useState<AnimalTypeResult | null>(null);
   const [error, setError] = useState<string | null>(null);
+  // 성별: 2b단계부터 성별별 얼굴 기준값에 쓴다
+  const [gender, setGender] = useState<Gender | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const imageRef = useRef<HTMLImageElement>(null);
 
-  const { ref: resultRef, isCapturing, download, share } = useScreenshot();
+  const { ref: resultRef, isCapturing, download } = useScreenshot<HTMLElement>();
+  const { frameRef, busy, notice, shareStory } = useStoryShare();
 
   // 모델 사전 로딩
   useEffect(() => {
@@ -56,7 +83,7 @@ export default function AnimalTypePage() {
   };
 
   const analyzeImage = async () => {
-    if (!image || !imageRef.current) return;
+    if (!image || !gender || !imageRef.current) return;
 
     setLoading(true);
     setError(null);
@@ -92,306 +119,124 @@ export default function AnimalTypePage() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-[#F5E6D3] via-[#E8D4C4] to-[#F5E6D3] text-[#5C4033] relative overflow-hidden">
-      {/* 배경 장식 */}
-      <div className="absolute inset-0 opacity-20 pointer-events-none">
-        <div className="absolute top-20 left-10 w-3 h-3 bg-[#C41E3A] rounded-full" />
-        <div className="absolute top-40 right-16 w-2 h-2 bg-[#1E3A5F] rounded-full" />
-        <div className="absolute top-72 left-1/4 w-2.5 h-2.5 bg-[#FFD700] rounded-full" />
-        <div className="absolute bottom-60 right-1/3 w-3 h-3 bg-[#C41E3A] rounded-full" />
-        <div className="absolute bottom-32 left-1/3 w-2 h-2 bg-[#D4AF37] rounded-full" />
-      </div>
+    <div className="min-h-screen bg-paper text-ink">
 
-      <main className="container mx-auto px-4 py-8 max-w-lg relative z-10">
-        {/* Header */}
-        <div className="flex items-center justify-between mb-6">
-          <button
-            onClick={() => result ? resetAll() : goBack()}
-            className="text-[#C41E3A]/80 hover:text-[#C41E3A] transition font-medium"
-          >
-            ← {result ? '다시하기' : '돌아가기'}
-          </button>
-          <span className="text-2xl">🐾</span>
-        </div>
+      <main className="mx-auto px-[22px] max-w-lg">
+        <TestHeader title="동물상 테스트" onBack={() => (result ? resetAll() : goBack())} backLabel={result ? "다시하기" : "돌아가기"} />
 
-        <div className="text-center mb-8">
-          <div className="flex justify-center items-center gap-2 mb-3">
-            <span className="text-[#C41E3A]/70">━━</span>
-            <span className="text-2xl">🦊</span>
-            <span className="text-[#C41E3A]/70">━━</span>
-          </div>
-          <h1 className="text-3xl font-bold mb-2 text-[#C41E3A]" style={{ textShadow: "0 2px 8px rgba(196, 30, 58, 0.2)" }}>
-            동물상 테스트
-          </h1>
-          <p className="text-[#5C4033]/70 text-sm tracking-widest">
-            나는 어떤 동물을 닮았을까?
-          </p>
-          <p className="text-[#1E3A5F]/70 text-xs mt-1">
-            AI가 분석하는 나의 동물상
-          </p>
-          <div className="flex justify-center items-center gap-2 mt-3">
-            <span className="text-[#FFD700]/80 text-xs">◆</span>
-            <span className="text-[#C41E3A]/60 text-xs">━━━━━</span>
-            <span className="text-[#FFD700]/80 text-xs">◆</span>
-          </div>
-        </div>
-
-        {/* 모델 로딩 상태 */}
-        {modelsLoading && (
-          <div className="bg-white/60 backdrop-blur-sm rounded-3xl p-6 mb-6 border-2 border-[#FFD700]/40 text-center shadow-md">
-            <div className="animate-spin text-3xl mb-3">🐾</div>
-            <p className="text-[#5C4033] font-medium">분석 모델 로딩 중...</p>
-            <p className="text-[#5C4033]/60 text-sm mt-1">첫 방문 시 약간의 시간이 걸립니다</p>
-          </div>
-        )}
-
-        {/* Upload Section */}
-        {!result && !modelsLoading && (
-          <div className="bg-white/60 backdrop-blur-sm rounded-3xl p-6 mb-6 border-2 border-[#C41E3A]/30 shadow-lg">
-            <div
-              className="border-2 border-dashed border-[#C41E3A]/40 rounded-2xl p-8 text-center cursor-pointer hover:border-[#C41E3A]/60 hover:bg-[#F5E6D3]/50 transition"
-              onClick={() => fileInputRef.current?.click()}
-            >
-              {image ? (
-                <img
-                  ref={imageRef}
-                  src={image}
-                  alt="업로드된 이미지"
-                  className="max-h-64 mx-auto rounded-2xl border-2 border-[#FFD700]/50"
-                  crossOrigin="anonymous"
-                />
-              ) : (
-                <div>
-                  <span className="text-5xl mb-4 block">📷</span>
-                  <p className="text-[#5C4033] font-medium">얼굴 사진을 업로드하세요</p>
-                  <p className="text-[#5C4033]/60 text-sm mt-2">
-                    정면 얼굴이 잘 보이는 사진이 좋아요
-                  </p>
-                  <p className="text-[#C41E3A]/60 text-[10px] mt-4">
-                    ※ 사진은 서버에 저장되지 않으며 분석 후 즉시 삭제됩니다.
-                  </p>
-                </div>
-              )}
-            </div>
-            <input
-              ref={fileInputRef}
-              type="file"
-              accept="image/*"
-              onChange={handleImageUpload}
-              className="hidden"
-            />
-
-            {error && (
-              <div className="mt-4 p-3 bg-red-100/50 border-2 border-[#C41E3A]/30 rounded-2xl text-center">
-                <p className="text-[#C41E3A] text-sm font-medium">{error}</p>
-              </div>
-            )}
-
-            {image && (
-              <div className="flex gap-3 mt-4">
-                <button
-                  onClick={resetAll}
-                  className="flex-1 py-3 bg-white/50 border-2 border-[#5C4033]/20 rounded-2xl font-bold hover:bg-white/80 transition text-[#5C4033]"
-                >
-                  다시 선택
-                </button>
-                <button
-                  onClick={analyzeImage}
-                  disabled={loading}
-                  className="flex-1 py-3 bg-gradient-to-r from-[#C41E3A] to-[#FFD700] rounded-2xl font-bold hover:shadow-lg transition disabled:opacity-50 text-white"
-                >
-                  {loading ? (
-                    <span className="flex items-center justify-center gap-2">
-                      <span className="animate-spin">🐾</span> 분석 중...
-                    </span>
-                  ) : (
-                    "동물상 찾기 🔍"
-                  )}
-                </button>
-              </div>
-            )}
-          </div>
+        {!result && (
+          <TestStart
+            heading={"나는 어떤 동물을\n닮았을까?"}
+            desc="눈매와 얼굴형으로 강아지상, 고양이상, 여우상 중 가장 닮은 동물을 찾아요."
+            tips={["정면 사진이 좋아요", "밝은 곳에서"]}
+            analyzeLabel="동물상 찾기"
+            image={image}
+            gender={gender}
+            onGender={setGender}
+            onFile={handleImageUpload}
+            onAnalyze={analyzeImage}
+            onReset={resetAll}
+            loading={loading}
+            error={error}
+            preparing={modelsLoading}
+            imageRef={imageRef}
+          />
         )}
 
         {/* Result Section */}
         {result && (
-          <div className="space-y-4 animate-fade-in">
-            {/* 캡쳐 영역 시작 */}
-            <div ref={resultRef} className="space-y-4 bg-[#E8D4C4] p-4 -m-4">
-              {/* 기본 정보 + 사진 */}
-              <div className="bg-gradient-to-r from-white/80 to-white/60 backdrop-blur-sm rounded-3xl p-6 border-2 border-[#C41E3A]/30 shadow-lg">
-                <div className="flex gap-4 items-start">
-                  {image && (
-                    <div className="flex-shrink-0">
-                      <img
-                        src={image}
-                        alt="분석된 얼굴"
-                        className="w-24 h-24 object-cover rounded-2xl border-2 border-[#FFD700]/60"
-                      />
-                    </div>
-                  )}
-                  <div className="flex-1 text-center">
-                    <span className="text-5xl block mb-2">{result.data.emoji}</span>
-                    <h2 className="text-2xl font-bold mb-1 text-[#C41E3A]">{result.data.name}</h2>
-                    <p className="text-[#5C4033]/70 text-sm mb-2">매칭률 {result.matchScore}%</p>
-                    {result.secondaryType && (
-                      <p className="text-xs text-[#5C4033]/60">
-                        + {animalTypeDB[result.secondaryType].emoji} {animalTypeDB[result.secondaryType].name} 느낌도 있어요
-                      </p>
-                    )}
-                  </div>
-                </div>
-              </div>
-
-              {/* 동물상 설명 */}
-              <div className="bg-white/70 backdrop-blur-sm rounded-3xl p-6 border-2 border-[#FFD700]/30 shadow-md">
-                <h3 className="text-xl font-bold mb-3 text-[#C41E3A] text-center">{result.data.title}</h3>
-                <p className="text-[#5C4033]/80 text-sm leading-relaxed">{result.data.description}</p>
-              </div>
-
-              {/* 얼굴 특징 */}
-              <div className="bg-white/70 backdrop-blur-sm rounded-3xl p-6 border-2 border-[#FFD700]/30 shadow-md">
-                <h3 className="text-lg font-bold mb-3 text-[#C41E3A]">분석된 얼굴 특징</h3>
-                <div className="grid grid-cols-2 gap-2">
-                  {Object.entries(result.features).map(([부위, 설명]) => (
-                    <div key={부위} className="bg-white/50 rounded-xl p-2 border border-[#C41E3A]/20 text-center">
-                      <span className="text-xs text-[#5C4033]/60">{부위}</span>
-                      <p className="text-sm font-medium text-[#5C4033]">{설명}</p>
-                    </div>
-                  ))}
-                </div>
-              </div>
-
-              {/* 성격 특성 */}
-              <div className="bg-white/70 backdrop-blur-sm rounded-3xl p-6 border-2 border-[#FFD700]/30 shadow-md">
-                <h3 className="text-lg font-bold mb-4 text-[#C41E3A]">성격 특성</h3>
-                <div className="space-y-3">
-                  <div>
-                    <p className="text-xs text-green-600 mb-2 font-medium">긍정적인 면</p>
-                    <div className="flex flex-wrap gap-2">
-                      {result.data.personality.positive.map((trait, i) => (
-                        <span key={i} className="px-3 py-1 bg-green-100/50 text-green-700 rounded-full text-sm border border-green-300/50">
-                          {trait}
-                        </span>
-                      ))}
-                    </div>
-                  </div>
-                  <div>
-                    <p className="text-xs text-orange-600 mb-2 font-medium">주의할 점</p>
-                    <div className="flex flex-wrap gap-2">
-                      {result.data.personality.negative.map((trait, i) => (
-                        <span key={i} className="px-3 py-1 bg-orange-100/50 text-orange-700 rounded-full text-sm border border-orange-300/50">
-                          {trait}
-                        </span>
-                      ))}
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              {/* 매력 포인트 */}
-              <div className="bg-white/70 backdrop-blur-sm rounded-3xl p-6 border-2 border-[#FFD700]/30 shadow-md">
-                <h3 className="text-lg font-bold mb-3 text-[#C41E3A]">매력 포인트</h3>
-                <div className="bg-[#FFD700]/15 rounded-xl p-4 border border-[#FFD700]/40">
-                  <p className="text-[#5C4033] text-center font-medium">&quot;{result.data.charm}&quot;</p>
-                </div>
-              </div>
-
-              {/* 연애 스타일 */}
-              <div className="bg-white/70 backdrop-blur-sm rounded-3xl p-6 border-2 border-[#C41E3A]/30 shadow-md">
-                <h3 className="text-lg font-bold mb-3 text-[#C41E3A]">연애 스타일</h3>
-                <p className="text-[#5C4033]/80 text-sm leading-relaxed">{result.data.loveStyle}</p>
-              </div>
-
-              {/* 궁합 */}
-              <div className="bg-white/70 backdrop-blur-sm rounded-3xl p-6 border-2 border-[#FFD700]/30 shadow-md">
-                <h3 className="text-lg font-bold mb-4 text-[#C41E3A]">동물상 궁합</h3>
-                <div className="grid grid-cols-2 gap-3">
-                  <div className="bg-pink-50/50 rounded-xl p-3 border border-pink-300/50">
-                    <p className="text-xs text-pink-600 mb-2 text-center font-medium">최고의 궁합</p>
-                    <div className="flex justify-center gap-2">
-                      {result.data.compatibility.best.map((animal, i) => (
-                        <span key={i} className="text-xl" title={animal}>
-                          {animalTypeDB[animal.replace('상', '').toLowerCase()]?.emoji || animal}
-                        </span>
-                      ))}
-                    </div>
-                    <p className="text-xs text-[#5C4033]/60 text-center mt-1">
-                      {result.data.compatibility.best.join(', ')}
-                    </p>
-                  </div>
-                  <div className="bg-gray-50/50 rounded-xl p-3 border border-gray-300/50">
-                    <p className="text-xs text-gray-600 mb-2 text-center font-medium">주의할 궁합</p>
-                    <div className="flex justify-center gap-2">
-                      {result.data.compatibility.worst.map((animal, i) => (
-                        <span key={i} className="text-xl opacity-60" title={animal}>
-                          {animalTypeDB[animal.replace('상', '').toLowerCase()]?.emoji || animal}
-                        </span>
-                      ))}
-                    </div>
-                    <p className="text-xs text-[#5C4033]/60 text-center mt-1">
-                      {result.data.compatibility.worst.join(', ')}
-                    </p>
-                  </div>
-                </div>
-              </div>
-
-              {/* 닮은 연예인 */}
-              <div className="bg-white/70 backdrop-blur-sm rounded-3xl p-6 border-2 border-[#FFD700]/30 shadow-md">
-                <h3 className="text-lg font-bold mb-3 text-[#C41E3A]">같은 동물상 연예인</h3>
-                <div className="flex flex-wrap justify-center gap-2">
-                  {result.data.celebrities.map((celeb, i) => (
-                    <span key={i} className="px-3 py-1 bg-[#C41E3A]/10 text-[#C41E3A] rounded-full text-sm border border-[#C41E3A]/30">
-                      {celeb}
-                    </span>
-                  ))}
-                </div>
-              </div>
-
+          <div className="pb-6 animate-fade-in">
+            <ResultCard captureRef={resultRef} {...cardProps(result)} />
+            <ResultActions
+              onStory={() => shareStory(`동물상_${result.data.name}_스토리`)}
+              onSave={() => download(getShareOptions())}
+              onRetry={resetAll}
+              busy={busy || isCapturing}
+              notice={notice}
+            />
+            <div className="mt-2">
               <CoupangBanner subId="animal" />
             </div>
-            {/* 캡쳐 영역 끝 */}
 
-            {/* 공유 버튼 */}
-            <div className="flex gap-3">
-              <button
-                onClick={() => download(getShareOptions())}
-                disabled={isCapturing}
-                className="flex-1 py-3 bg-gradient-to-r from-green-600 to-green-500 rounded-2xl font-bold text-center hover:shadow-lg transition text-white disabled:opacity-50 flex items-center justify-center gap-2"
-              >
-                {isCapturing ? "캡쳐중..." : "이미지 저장"}
-              </button>
-              <button
-                onClick={() => share(getShareOptions())}
-                disabled={isCapturing}
-                className="flex-1 py-3 bg-gradient-to-r from-[#1E3A5F] to-blue-600 rounded-2xl font-bold text-center hover:shadow-lg transition text-white disabled:opacity-50 flex items-center justify-center gap-2"
-              >
-                {isCapturing ? "캡쳐중..." : "친구에게 공유"}
-              </button>
-            </div>
+            <details className="group mt-4 bg-white border border-line rounded-[22px] px-5 py-4">
+              <summary className="font-bold cursor-pointer list-none flex justify-between items-center">
+                풀이 자세히 보기
+                <Icon name="chevron" size={18} className="text-muted transition group-open:rotate-90" />
+              </summary>
+              <div className="mt-4 space-y-5 text-sm leading-relaxed">
+                <section>
+                  <h3 className="font-serif font-bold text-base mb-2">{result.data.title}</h3>
+                  <p>{result.data.description}</p>
+                  {result.secondaryType && (
+                    <p className="text-muted text-xs mt-2">{animalTypeDB[result.secondaryType].name} 느낌도 있어요</p>
+                  )}
+                </section>
+                <section>
+                  <h3 className="font-serif font-bold text-base mb-2">분석된 얼굴 특징</h3>
+                  <dl className="grid grid-cols-2 gap-2">
+                    {Object.entries(result.features).map(([부위, 설명]) => (
+                      <div key={부위} className="bg-card-2 rounded-[18px] p-3 text-center">
+                        <dt className="text-xs text-muted">{부위}</dt>
+                        <dd className="font-medium mt-0.5">{설명}</dd>
+                      </div>
+                    ))}
+                  </dl>
+                </section>
+                <section>
+                  <h3 className="font-serif font-bold text-base mb-2">성격</h3>
+                  <div className="flex flex-wrap gap-1.5">
+                    {result.data.personality.positive.map((t) => (
+                      <span key={t} className="px-3 py-1.5 bg-card-2 rounded-full text-[13px]">{t}</span>
+                    ))}
+                  </div>
+                  <p className="text-xs text-muted mt-3 mb-1.5">이런 면도 있어요</p>
+                  <div className="flex flex-wrap gap-1.5">
+                    {result.data.personality.negative.map((t) => (
+                      <span key={t} className="px-3 py-1.5 bg-white border border-line rounded-full text-[13px]">{t}</span>
+                    ))}
+                  </div>
+                </section>
+                <section>
+                  <h3 className="font-serif font-bold text-base mb-2">연애 스타일</h3>
+                  <p>{result.data.loveStyle}</p>
+                </section>
+                <section className="grid grid-cols-2 gap-2">
+                  <div className="bg-card-2 rounded-[18px] p-3">
+                    <p className="text-xs text-muted">잘 맞는 동물상</p>
+                    <p className="font-medium mt-0.5">{result.data.compatibility.best.join(", ")}</p>
+                  </div>
+                  <div className="bg-card-2 rounded-[18px] p-3">
+                    <p className="text-xs text-muted">맞춰 가면 좋은 동물상</p>
+                    <p className="font-medium mt-0.5">{result.data.compatibility.worst.join(", ")}</p>
+                  </div>
+                </section>
+                <section>
+                  <h3 className="font-serif font-bold text-base mb-2">같은 동물상 연예인</h3>
+                  <div className="flex flex-wrap gap-1.5">
+                    {result.data.celebrities.map((c) => (
+                      <span key={c} className="px-3 py-1.5 bg-card-2 rounded-full text-[13px]">{c}</span>
+                    ))}
+                  </div>
+                </section>
+              </div>
+            </details>
 
-            {/* 버튼 */}
-            <div className="flex gap-3">
-              <button
-                onClick={resetAll}
-                className="flex-1 py-3 bg-white/50 border-2 border-[#5C4033]/20 rounded-2xl font-bold hover:bg-white/80 transition text-[#5C4033]"
-              >
-                다시하기
-              </button>
-              <Link
-                href="/face2"
-                className="flex-1 py-3 bg-gradient-to-r from-[#C41E3A] to-[#FFD700] rounded-2xl font-bold text-center hover:shadow-lg transition text-white"
-              >
-                관상 분석 👤
-              </Link>
-            </div>
+            <Link href="/face2" className="mt-3 flex items-center gap-3 bg-card-2 rounded-[22px] p-4">
+              <span className="w-11 h-11 rounded-full bg-paper grid place-items-center"><Icon name="face" size={24} /></span>
+              <span className="flex-1">
+                <span className="block font-bold">AI 관상 테스트</span>
+                <span className="block text-xs text-muted mt-0.5">같은 사진으로 타고난 복과 연애운 보기</span>
+              </span>
+              <Icon name="chevron" size={18} className="text-muted" />
+            </Link>
+
+            <StoryFrame frameRef={frameRef} testName="동물상 테스트">
+              <ResultCard {...cardProps(result)} />
+            </StoryFrame>
           </div>
         )}
 
-        {/* Footer */}
-        <p className="text-center text-[#5C4033]/50 text-xs mt-8">
-          재미로만 봐주세요! 과학적 근거는 없습니다.
-        </p>
+        <p className="text-center text-muted text-xs mt-6 pb-4">재미로만 봐 주세요. 과학적 근거는 없어요.</p>
       </main>
     </div>
   );

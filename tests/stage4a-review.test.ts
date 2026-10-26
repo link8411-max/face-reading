@@ -1,10 +1,10 @@
 import { readFileSync } from 'node:fs'
 import { CATEGORIES } from '@/content/navigation'
 
-test('글꼴은 쓰는 굵기만: Sans 400·700, Serif 900', () => {
+test('글꼴은 쓰는 굵기만: Sans 400·700, Gowun Batang 400·700', () => {
   const layout = readFileSync('src/app/layout.tsx', 'utf8')
   expect(layout).toMatch(/Noto_Sans_KR\(\{[\s\S]*?weight: \["400", "700"\]/)
-  expect(layout).toMatch(/Noto_Serif_KR\(\{[\s\S]*?weight: \["900"\]/)
+  expect(layout).toMatch(/Gowun_Batang\(\{[\s\S]*?weight: \["400", "700"\]/)
 })
 
 test('globals.css의 body 규칙이 글꼴·배경·글자색을 덮어쓰지 않는다', () => {

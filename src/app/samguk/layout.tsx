@@ -15,11 +15,11 @@ export const metadata: Metadata = {
     locale: "ko_KR",
     siteName: "운명을 읽다",
     url: "https://unse-ai.com/samguk",
-    images: [{ url: "/api/og?title=삼국지%20닮은꼴&subtitle=나는%20어떤%20영웅?&icon=⚔️", width: 1200, height: 630 }],
+    images: [{ url: "/api/og?title=삼국지%20닮은꼴&subtitle=나는%20어떤%20영웅?", width: 1200, height: 630 }],
   },
   twitter: {
     card: "summary_large_image",
-    images: ["/api/og?title=삼국지%20닮은꼴&subtitle=나는%20어떤%20영웅?&icon=⚔️"],
+    images: ["/api/og?title=삼국지%20닮은꼴&subtitle=나는%20어떤%20영웅?"],
   },
 };
 

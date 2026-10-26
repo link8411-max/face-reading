@@ -3,6 +3,8 @@
 import { useState } from "react";
 import CoupangBanner from "@/components/CoupangBanner";
 import { useBackOrHome } from "@/hooks/useBackOrHome";
+import TestHeader from "@/components/test/TestHeader";
+import { Icon } from "@/components/icons";
 import BirthDateFields from "@/components/BirthDateFields";
 import { FORTUNE_YEAR } from "@/lib/fortuneYear";
 import { SLUG_BY_띠 } from "@/content/fortune2027Zodiac";
@@ -114,91 +116,53 @@ export default function FortuneClient() {
   };
 
   const 오행색상: Record<string, string> = {
-    목: "text-green-400",
-    화: "text-red-400",
-    토: "text-yellow-400",
-    금: "text-gray-300",
-    수: "text-blue-400",
+    목: "text-[#5F6B4E]",
+    화: "text-accent",
+    토: "text-[#8A6A3B]",
+    금: "text-muted",
+    수: "text-[#3F5468]",
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-[#F5E6D3] via-[#E8D4C4] to-[#F5E6D3] text-[#5C4033] relative overflow-hidden">
-      {/* 배경 장식 */}
-      <div className="absolute inset-0 opacity-20 pointer-events-none">
-        <div className="absolute top-20 left-10 w-3 h-3 bg-[#C41E3A] rounded-full" />
-        <div className="absolute top-40 right-16 w-2 h-2 bg-[#1E3A5F] rounded-full" />
-        <div className="absolute top-72 left-1/4 w-2.5 h-2.5 bg-[#FFD700] rounded-full" />
-        <div className="absolute bottom-60 right-1/3 w-3 h-3 bg-[#C41E3A] rounded-full" />
-        <div className="absolute bottom-32 left-1/3 w-2 h-2 bg-[#D4AF37] rounded-full" />
-      </div>
-
-      <main className="container mx-auto px-4 py-8 max-w-lg relative z-10">
-        {/* Header */}
-        <div className="flex items-center justify-between mb-6">
-          <button
-            onClick={() => result ? resetAll() : goBack()}
-            className="text-[#C41E3A]/70 hover:text-[#C41E3A] transition"
-          >
-            ← {result ? '다시하기' : '돌아가기'}
-          </button>
-          <span className="text-2xl">{FORTUNE_YEAR.띠이모지}</span>
-        </div>
-
-        <div className="text-center mb-8">
-          {/* 전통 장식 */}
-          <div className="flex justify-center items-center gap-2 mb-3">
-            <span className="text-[#C41E3A]/70">━━</span>
-            <span className="text-2xl">☯</span>
-            <span className="text-[#C41E3A]/70">━━</span>
+    <div className="min-h-screen bg-paper text-ink">
+      <main className="mx-auto px-[22px] max-w-lg pb-6">
+        <TestHeader title={`${FORTUNE_YEAR.year} 신년 운세`} onBack={() => (result ? resetAll() : goBack())} backLabel={result ? "다시하기" : "돌아가기"} />
+        {!result && (
+          <div className="mt-2.5 mb-6">
+            <h2 className="font-serif font-bold text-[27px] leading-[1.4] break-keep">생년월일로 보는<br />{FORTUNE_YEAR.year} 내 운세</h2>
+            <p className="mt-2.5 text-sm text-muted">{FORTUNE_YEAR.간지}년 · 사주와 오행으로 풀어 보는 새해 운세</p>
           </div>
-          <h1 className="text-3xl font-bold mb-2 text-[#C41E3A]" style={{ textShadow: "0 2px 8px rgba(196, 30, 58, 0.2)" }}>
-            {FORTUNE_YEAR.year} 신년 운세
-          </h1>
-          <p className="text-[#5C4033]/70 text-sm tracking-widest">
-            {FORTUNE_YEAR.간지}년 · 사주팔자로 보는 새해 운세
-          </p>
-          <div className="flex justify-center items-center gap-2 mt-3">
-            <span className="text-[#FFD700]/80 text-xs">◆</span>
-            <span className="text-[#C41E3A]/60 text-xs">━━━━━</span>
-            <span className="text-[#FFD700]/80 text-xs">◆</span>
-          </div>
-        </div>
+        )}
 
         {/* Input Section */}
         {!result && (
-          <div className="bg-white/60 backdrop-blur-sm rounded-3xl p-6 mb-6 border-2 border-[#C41E3A]/30 shadow-lg">
-            <h2 className="text-lg font-bold mb-4 text-center text-[#5C4033]">생년월일 입력</h2>
+          <div className="bg-white rounded-[28px] p-6 mb-6 border border-line">
+            <h3 className="font-serif font-bold text-lg mb-4 text-center">생년월일 입력</h3>
 
             {/* 음력/양력 선택 */}
             <div className="flex justify-center gap-2 mb-4">
               <button
                 onClick={() => setIsLunar(false)}
-                className={`px-4 py-2 rounded-full text-sm font-medium transition ${
-                  !isLunar
-                    ? "bg-[#FFD700] text-[#5C4033]"
-                    : "bg-white/50 text-[#5C4033]/50 hover:bg-white/70 border border-[#FFD700]/30"
-                }`}
+                aria-pressed={!isLunar}
+                className={`h-11 px-5 rounded-full text-sm font-medium border transition ${!isLunar ? "bg-ink text-paper border-ink" : "bg-white text-ink border-line"}`}
               >
-                ☀️ 양력
+                양력
               </button>
               <button
                 onClick={() => setIsLunar(true)}
-                className={`px-4 py-2 rounded-full text-sm font-medium transition ${
-                  isLunar
-                    ? "bg-[#C41E3A] text-white"
-                    : "bg-white/50 text-[#5C4033]/50 hover:bg-white/70 border border-[#C41E3A]/30"
-                }`}
+                aria-pressed={isLunar}
+                className={`h-11 px-5 rounded-full text-sm font-medium border transition ${isLunar ? "bg-ink text-paper border-ink" : "bg-white text-ink border-line"}`}
               >
-                🌙 음력
+                음력
               </button>
             </div>
             {isLunar && (
               <div className="mb-4 text-center">
-                <label className="inline-flex items-center gap-2 text-sm text-[#5C4033]/80 cursor-pointer">
-                  <input type="checkbox" checked={isLeapMonth} onChange={(e) => setIsLeapMonth(e.target.checked)} className="w-4 h-4 accent-[#C41E3A]" />
+                <label className="inline-flex items-center gap-2 text-sm text-muted cursor-pointer">
+                  <input type="checkbox" checked={isLeapMonth} onChange={(e) => setIsLeapMonth(e.target.checked)} className="w-4 h-4 accent-accent" />
                   윤달이에요
                 </label>
-                <p className="text-xs text-[#5C4033]/60 mt-1">음력 생일은 양력으로 바꿔서 사주를 계산해요</p>
+                <p className="text-xs text-muted mt-1">음력 생일은 양력으로 바꿔서 사주를 계산해요</p>
               </div>
             )}
 
@@ -206,11 +170,11 @@ export default function FortuneClient() {
 
             {/* 태어난 시간 */}
             <div className="mb-6">
-              <label className="block text-sm text-[#5C4033]/70 mb-1">태어난 시간 (시주)</label>
+              <label className="block text-sm text-muted mb-1">태어난 시간 (시주)</label>
               <select
                 value={birthHour}
                 onChange={(e) => setBirthHour(e.target.value)}
-                className="w-full px-4 py-3 bg-white/50 border border-[#C41E3A]/30 rounded-xl text-center text-lg text-[#5C4033] focus:outline-none focus:ring-2 focus:ring-[#C41E3A]/50 appearance-none cursor-pointer"
+                className="w-full px-4 py-3 bg-card-2 border border-line rounded-xl text-center text-lg text-ink focus:outline-none focus:ring-2 focus:ring-accent/40 appearance-none cursor-pointer"
               >
                 {hourOptions.map((option) => (
                   <option key={option.value} value={option.value} className="bg-white">
@@ -218,7 +182,7 @@ export default function FortuneClient() {
                   </option>
                 ))}
               </select>
-              <p className="text-xs text-[#5C4033]/50 mt-1 text-center">
+              <p className="text-xs text-muted mt-1 text-center">
                 모르면 &apos;모름&apos; 선택 (시주 제외하고 분석)
               </p>
             </div>
@@ -226,15 +190,9 @@ export default function FortuneClient() {
             <button
               onClick={handleSubmit}
               disabled={loading || !dateCheck.ok}
-              className="w-full py-3 bg-gradient-to-r from-[#C41E3A] to-[#FFD700] rounded-xl font-bold text-lg hover:shadow-xl transition disabled:opacity-50 text-white shadow-lg"
+              className="w-full h-[52px] bg-ink rounded-full font-medium text-[15px] disabled:opacity-45 text-paper"
             >
-              {loading ? (
-                <span className="flex items-center justify-center gap-2">
-                  <span className="animate-spin">☯</span> 사주 분석 중...
-                </span>
-              ) : (
-                "운세 보기 ☯"
-              )}
+              {loading ? "사주 분석 중…" : "운세 보기"}
             </button>
           </div>
         )}
@@ -243,223 +201,215 @@ export default function FortuneClient() {
         {result && (
           <div className="space-y-4 animate-fade-in">
             {/* 캡쳐 영역 시작 */}
-            <div ref={resultRef} className="space-y-4 bg-[#F5E6D3] p-4 -m-4">
+            <div ref={resultRef} className="space-y-3 bg-card rounded-[30px] p-4">
             {/* 기본 정보 */}
-            <div className="bg-white/60 backdrop-blur-sm rounded-3xl p-6 border-2 border-[#C41E3A]/30 shadow-lg">
+            <div className="bg-white rounded-[22px] p-5 border border-line">
               <div className="text-center mb-4">
-                <span className="text-6xl">{result.사주정보.띠이모지}</span>
-                <h2 className="text-2xl font-bold mt-2 text-[#C41E3A]">{result.사주정보.띠}띠</h2>
-                <p className="text-[#5C4033]/70 text-sm">
+                <p className="text-xs font-medium text-accent">{FORTUNE_YEAR.year} {FORTUNE_YEAR.간지}년 신년운세</p>
+                <h2 className="font-serif text-[25px] font-bold mt-1">{result.사주정보.띠}띠</h2>
+                <p className="text-muted text-sm">
                   {birthDate.year}년 {birthDate.month}월 {birthDate.day}일생
                   <span className={`ml-2 px-2 py-0.5 rounded-full text-xs ${
                     result.사주정보.역법.startsWith("음력")
-                      ? "bg-[#C41E3A]/15 text-[#C41E3A]"
-                      : "bg-[#FFD700]/15 text-[#D4AF37]"
+                      ? "bg-card-2 text-accent"
+                      : "bg-card-2 text-accent"
                   }`}>
-                    {result.사주정보.역법.startsWith("음력") ? `🌙 ${result.사주정보.역법}` : "☀️ 양력"}
+                    {result.사주정보.역법.startsWith("음력") ? result.사주정보.역법 : "양력"}
                   </span>
                 </p>
                 {result.사주정보.역법.startsWith("음력") && (
-                  <p className="text-xs text-[#5C4033]/60 mt-1">
+                  <p className="text-xs text-muted mt-1">
                     양력 {result.사주정보.양력.year}년 {result.사주정보.양력.month}월 {result.사주정보.양력.day}일로 계산했어요
                   </p>
                 )}
               </div>
 
               {/* 사주 정보 */}
-              <div className={`grid ${result.사주정보.시주 ? "grid-cols-4" : "grid-cols-3"} gap-2 text-center text-sm bg-white/50 rounded-xl p-3 mb-4 border border-[#C41E3A]/20`}>
+              <div className={`grid ${result.사주정보.시주 ? "grid-cols-4" : "grid-cols-3"} gap-2 text-center text-sm bg-card-2 rounded-xl p-3 mb-4 border border-line`}>
                 <div>
-                  <p className="text-[#5C4033]/50 text-xs">년주</p>
-                  <p className="font-bold text-[#5C4033]">{result.사주정보.사주.년주}</p>
+                  <p className="text-muted text-xs">년주</p>
+                  <p className="font-bold text-ink">{result.사주정보.사주.년주}</p>
                 </div>
                 <div>
-                  <p className="text-[#5C4033]/50 text-xs">월주</p>
-                  <p className="font-bold text-[#5C4033]">{result.사주정보.사주.월주}</p>
+                  <p className="text-muted text-xs">월주</p>
+                  <p className="font-bold text-ink">{result.사주정보.사주.월주}</p>
                 </div>
                 <div>
-                  <p className="text-[#5C4033]/50 text-xs">일주</p>
-                  <p className="font-bold text-[#5C4033]">{result.사주정보.사주.일주}</p>
+                  <p className="text-muted text-xs">일주</p>
+                  <p className="font-bold text-ink">{result.사주정보.사주.일주}</p>
                 </div>
                 {result.사주정보.시주 && (
                   <div>
-                    <p className="text-[#5C4033]/50 text-xs">시주</p>
-                    <p className="font-bold text-[#FFD700]">{result.사주정보.시주}</p>
+                    <p className="text-muted text-xs">시주</p>
+                    <p className="font-bold text-accent">{result.사주정보.시주}</p>
                   </div>
                 )}
               </div>
 
               {/* 오행 분포 */}
-              <div className="flex justify-between text-sm bg-white/50 rounded-xl p-3">
+              <div className="flex justify-between text-sm bg-card-2 rounded-xl p-3">
                 {Object.entries(result.사주정보.오행분포).map(([오행, 값]) => (
                   <div key={오행} className="text-center">
                     <p className={`text-lg font-bold ${오행색상[오행]}`}>{오행}</p>
-                    <p className="text-[#5C4033]/70">{값}</p>
+                    <p className="text-muted">{값}</p>
                   </div>
                 ))}
               </div>
             </div>
 
             {/* 총운 */}
-            <div className="bg-white/60 backdrop-blur-sm rounded-3xl p-6 border-2 border-[#FFD700]/40 shadow-lg">
+            <div className="bg-white rounded-[22px] p-5 border border-line">
               <div className="flex justify-between items-center mb-3">
-                <h3 className="text-xl font-bold text-[#C41E3A]">{FORTUNE_YEAR.year}년 총운</h3>
-                <span className="text-[#FFD700] text-xl tracking-wider">
+                <h3 className="font-serif font-bold text-lg">{FORTUNE_YEAR.year}년 총운</h3>
+                <span className="text-accent text-xl tracking-wider">
                   {renderStars(result.운세.총운.rating)}
                 </span>
               </div>
-              <div className="inline-block px-3 py-1 bg-gradient-to-r from-[#C41E3A] to-[#FFD700] text-white rounded-full text-sm font-bold mb-3">
+              <div className="inline-block px-3 py-1 bg-ink text-white rounded-full text-sm font-bold mb-3">
                 {result.운세.총운.keyword}
               </div>
-              <p className="text-[#5C4033]/80 leading-relaxed">{result.운세.총운.summary}</p>
+              <p className="text-muted leading-relaxed">{result.운세.총운.summary}</p>
+            </div>
+
+              <div className="flex justify-between items-center px-1 text-[11px] text-muted">
+                <span className="font-serif font-bold text-xs text-ink">운명을 읽다</span>
+                <span>unse-ai.com</span>
+              </div>
+            </div>
+            {/* 캡쳐 영역 끝: 요약(사주·총운) 한 장 */}
+
+            <div className="no-screenshot flex flex-col">
+              <button
+                onClick={() => share(getShareOptions())}
+                disabled={isCapturing}
+                className="h-[52px] rounded-full flex items-center justify-center gap-2 bg-ink text-paper text-[15px] font-medium disabled:opacity-50"
+              >
+                <Icon name="story" size={18} />
+                {isCapturing ? "이미지 만드는 중…" : `${FORTUNE_YEAR.year} 운세 공유하기`}
+              </button>
+              <div className="grid grid-cols-2 gap-2 mt-2">
+                <button onClick={() => download(getShareOptions())} disabled={isCapturing} className="h-12 rounded-full bg-white border border-line text-sm font-medium flex items-center justify-center gap-1.5 disabled:opacity-50">
+                  <Icon name="download" size={16} />
+                  이미지 저장
+                </button>
+                <button onClick={resetAll} className="h-12 rounded-full bg-white border border-line text-sm font-medium flex items-center justify-center gap-1.5">
+                  <Icon name="refresh" size={16} />
+                  다시하기
+                </button>
+              </div>
             </div>
 
             {/* 월별 운세 */}
-            <div className="bg-white/60 backdrop-blur-sm rounded-3xl p-6 border-2 border-[#C41E3A]/30 shadow-lg">
-              <h3 className="text-lg font-bold mb-4 text-[#C41E3A]">월별 운세</h3>
+            <div className="bg-white rounded-[22px] p-5 border border-line">
+              <h3 className="font-serif font-bold text-lg mb-3">월별 운세</h3>
               <div className="space-y-3">
-                <div className="bg-white/50 rounded-xl p-3 border border-[#FFD700]/30">
-                  <p className="text-sm text-[#D4AF37] font-medium">상반기 (1-6월)</p>
-                  <p className="text-sm text-[#5C4033]/80">{result.운세.월별운세.상반기}</p>
+                <div className="bg-card-2 rounded-xl p-3 border border-line">
+                  <p className="text-sm text-accent font-medium">상반기 (1-6월)</p>
+                  <p className="text-sm text-muted">{result.운세.월별운세.상반기}</p>
                 </div>
-                <div className="bg-white/50 rounded-xl p-3 border border-[#C41E3A]/30">
-                  <p className="text-sm text-[#C41E3A] font-medium">하반기 (7-12월)</p>
-                  <p className="text-sm text-[#5C4033]/80">{result.운세.월별운세.하반기}</p>
+                <div className="bg-card-2 rounded-xl p-3 border border-line">
+                  <p className="text-sm text-accent font-medium">하반기 (7-12월)</p>
+                  <p className="text-sm text-muted">{result.운세.월별운세.하반기}</p>
                 </div>
                 <div className="flex gap-3">
-                  <div className="flex-1 bg-green-700/15 rounded-xl p-3 text-center border border-green-700/30">
-                    <p className="text-xs text-[#5C4033]/60">최고의 달</p>
-                    <p className="text-lg font-bold text-green-700">{result.운세.월별운세.최고의달}</p>
+                  <div className="flex-1 bg-card-2 rounded-xl p-3 text-center border border-line">
+                    <p className="text-xs text-muted">최고의 달</p>
+                    <p className="text-lg font-bold text-ink">{result.운세.월별운세.최고의달}</p>
                   </div>
-                  <div className="flex-1 bg-[#C41E3A]/15 rounded-xl p-3 text-center border border-[#C41E3A]/30">
-                    <p className="text-xs text-[#5C4033]/60">주의할 달</p>
-                    <p className="text-lg font-bold text-[#C41E3A]">{result.운세.월별운세.주의할달}</p>
+                  <div className="flex-1 bg-card-2 rounded-xl p-3 text-center border border-line">
+                    <p className="text-xs text-muted">주의할 달</p>
+                    <p className="text-lg font-bold text-accent">{result.운세.월별운세.주의할달}</p>
                   </div>
                 </div>
               </div>
             </div>
 
             {/* 세부 운세 */}
-            <div className="bg-white/60 backdrop-blur-sm rounded-3xl p-6 border-2 border-[#C41E3A]/30 shadow-lg">
-              <h3 className="text-lg font-bold mb-4 text-[#C41E3A]">세부 운세</h3>
+            <div className="bg-white rounded-[22px] p-5 border border-line">
+              <h3 className="font-serif font-bold text-lg mb-3">세부 운세</h3>
               <div className="space-y-4">
                 {Object.entries(result.운세.세부운세).map(([항목, 데이터]) => (
-                  <div key={항목} className="bg-white/50 rounded-xl p-4 border border-[#FFD700]/30">
+                  <div key={항목} className="bg-card-2 rounded-xl p-4 border border-line">
                     <div className="flex justify-between items-center mb-2">
-                      <span className="font-medium text-[#5C4033]">
-                        {항목 === "재물운" && "💰 "}
-                        {항목 === "애정운" && "💕 "}
-                        {항목 === "직장운" && "💼 "}
-                        {항목 === "건강운" && "💪 "}
-                        {항목 === "학업운" && "📚 "}
+                      <span className="font-medium text-ink">
                         {항목}
                       </span>
-                      <span className="text-[#FFD700]">{renderStars(데이터.rating)}</span>
+                      <span className="text-accent">{renderStars(데이터.rating)}</span>
                     </div>
-                    <p className="text-sm text-[#5C4033]/80">{데이터.description}</p>
+                    <p className="text-sm text-muted">{데이터.description}</p>
                   </div>
                 ))}
               </div>
             </div>
 
             {/* 행운 요소 */}
-            <div className="bg-white/60 backdrop-blur-sm rounded-3xl p-6 border-2 border-[#FFD700]/40 shadow-lg">
-              <h3 className="text-lg font-bold mb-4 text-[#C41E3A]">행운 요소</h3>
+            <div className="bg-white rounded-[22px] p-5 border border-line">
+              <h3 className="font-serif font-bold text-lg mb-3">행운 요소</h3>
               <div className="grid grid-cols-2 gap-3">
-                <div className="bg-white/50 rounded-xl p-3 text-center border border-[#FFD700]/30">
-                  <p className="text-xs text-[#5C4033]/60">행운의 숫자</p>
-                  <p className="text-xl font-bold text-[#FFD700]">
+                <div className="bg-card-2 rounded-xl p-3 text-center border border-line">
+                  <p className="text-xs text-muted">행운의 숫자</p>
+                  <p className="text-xl font-bold text-accent">
                     {result.운세.행운요소.행운의숫자.join(", ")}
                   </p>
                 </div>
-                <div className="bg-white/50 rounded-xl p-3 text-center border border-[#FFD700]/30">
-                  <p className="text-xs text-[#5C4033]/60">행운의 색상</p>
-                  <p className="text-xl font-bold text-[#5C4033]">{result.운세.행운요소.행운의색상}</p>
+                <div className="bg-card-2 rounded-xl p-3 text-center border border-line">
+                  <p className="text-xs text-muted">행운의 색상</p>
+                  <p className="text-xl font-bold text-ink">{result.운세.행운요소.행운의색상}</p>
                 </div>
-                <div className="bg-white/50 rounded-xl p-3 text-center border border-[#FFD700]/30">
-                  <p className="text-xs text-[#5C4033]/60">행운의 방위</p>
-                  <p className="text-xl font-bold text-[#5C4033]">{result.운세.행운요소.행운의방위}</p>
+                <div className="bg-card-2 rounded-xl p-3 text-center border border-line">
+                  <p className="text-xs text-muted">행운의 방위</p>
+                  <p className="text-xl font-bold text-ink">{result.운세.행운요소.행운의방위}</p>
                 </div>
-                <div className="bg-white/50 rounded-xl p-3 text-center border border-[#FFD700]/30">
-                  <p className="text-xs text-[#5C4033]/60">행운의 계절</p>
-                  <p className="text-xl font-bold text-[#5C4033]">{result.운세.행운요소.행운의계절}</p>
+                <div className="bg-card-2 rounded-xl p-3 text-center border border-line">
+                  <p className="text-xs text-muted">행운의 계절</p>
+                  <p className="text-xl font-bold text-ink">{result.운세.행운요소.행운의계절}</p>
                 </div>
               </div>
             </div>
 
             {/* 조언 */}
-            <div className="bg-white/60 backdrop-blur-sm rounded-3xl p-6 border-2 border-[#C41E3A]/30 shadow-lg">
-              <h3 className="text-lg font-bold mb-4 text-[#C41E3A]">{FORTUNE_YEAR.year}년 조언</h3>
+            <div className="bg-white rounded-[22px] p-5 border border-line">
+              <h3 className="font-serif font-bold text-lg mb-3">{FORTUNE_YEAR.year}년 조언</h3>
               <div className="space-y-3">
                 <div className="flex gap-3">
-                  <span className="text-green-700">✓</span>
-                  <p className="text-sm text-[#5C4033]/80">{result.운세.조언.해야할것}</p>
+                  <span className="text-ink">✓</span>
+                  <p className="text-sm text-muted">{result.운세.조언.해야할것}</p>
                 </div>
                 <div className="flex gap-3">
-                  <span className="text-[#C41E3A]">✗</span>
-                  <p className="text-sm text-[#5C4033]/80">{result.운세.조언.피해야할것}</p>
+                  <span className="text-accent">✗</span>
+                  <p className="text-sm text-muted">{result.운세.조언.피해야할것}</p>
                 </div>
-                <div className="bg-white/50 rounded-xl p-4 text-center border border-[#FFD700]/40">
-                  <p className="text-xs text-[#5C4033]/50 mb-1">명심할 말</p>
-                  <p className="font-medium text-[#C41E3A]">"{result.운세.조언.명심할말}"</p>
+                <div className="bg-card-2 rounded-xl p-4 text-center border border-line">
+                  <p className="text-xs text-muted mb-1">명심할 말</p>
+                  <p className="font-medium text-accent">"{result.운세.조언.명심할말}"</p>
                 </div>
               </div>
             </div>
 
             <CoupangBanner subId="fortune" />
-            </div>
-            {/* 캡쳐 영역 끝 */}
-
-            {/* 공유 버튼 */}
-            <div className="flex gap-3">
-              <button
-                onClick={() => download(getShareOptions())}
-                disabled={isCapturing}
-                className="flex-1 py-3 bg-gradient-to-r from-green-700 to-green-600 rounded-xl font-bold text-center hover:shadow-xl transition text-white disabled:opacity-50 flex items-center justify-center gap-2"
-              >
-                {isCapturing ? "⏳ 캡쳐중..." : "📥 이미지 저장"}
-              </button>
-              <button
-                onClick={() => share(getShareOptions())}
-                disabled={isCapturing}
-                className="flex-1 py-3 bg-gradient-to-r from-[#1E3A5F] to-blue-600 rounded-xl font-bold text-center hover:shadow-xl transition text-white disabled:opacity-50 flex items-center justify-center gap-2"
-              >
-                {isCapturing ? "⏳ 캡쳐중..." : `📤 ${FORTUNE_YEAR.year} 운세 카톡으로 보내기`}
-              </button>
-            </div>
 
             {/* 버튼 */}
             <Link
               href={`/fortune/2027/${SLUG_BY_띠[result.사주정보.띠]}`}
-              className="block w-full mb-3 py-3 text-center bg-white/60 border-2 border-[#C41E3A]/30 rounded-xl font-bold text-[#C41E3A] hover:bg-white/80 transition"
+              className="block w-full mb-2 py-3 text-center bg-white border border-line rounded-full font-medium"
             >
-              {result.사주정보.띠이모지} {result.사주정보.띠}띠 {FORTUNE_YEAR.year} 운세 자세히 보기 →
+              {result.사주정보.띠}띠 {FORTUNE_YEAR.year} 운세 자세히 보기
             </Link>
             <Link
               href="/mbti/match"
-              className="block w-full mb-3 py-3 text-center bg-white/60 border-2 border-[#C41E3A]/30 rounded-xl font-bold text-[#C41E3A] hover:bg-white/80 transition"
+              className="block w-full mb-2 py-3 text-center bg-white border border-line rounded-full font-medium"
             >
-              🧩 MBTI 궁합도 보기 →
+              MBTI 궁합도 보기
             </Link>
-            <div className="flex gap-3">
-              <button
-                onClick={resetAll}
-                className="flex-1 py-3 bg-white/60 border-2 border-[#C41E3A]/30 rounded-xl font-bold hover:bg-white/80 transition text-[#5C4033]"
-              >
-                다시하기
-              </button>
-              <Link
-                href="/face2"
-                className="flex-1 py-3 bg-gradient-to-r from-[#C41E3A] to-[#FFD700] rounded-xl font-bold text-center hover:shadow-xl transition text-white"
-              >
-                관상 보기 👤
-              </Link>
-            </div>
+            <Link href="/face2" className="block w-full py-3 text-center bg-white border border-line rounded-full font-medium">
+              내 얼굴 관상도 보기
+            </Link>
           </div>
         )}
 
         {/* Footer */}
-        <p className="text-center text-[#5C4033]/50 text-xs mt-8">
-          ⚠️ 재미로만 봐주세요! 전통 사주명리학을 참고했습니다.
+        <p className="text-center text-muted text-xs mt-8">
+          재미로만 봐 주세요. 전통 사주명리학을 참고했어요.
         </p>
       </main>
     </div>

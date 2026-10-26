@@ -17,7 +17,7 @@ export const metadata: Metadata = {
     url: "https://unse-ai.com/face2",
     images: [
       {
-        url: "/api/og?title=무료%20관상%20분석&subtitle=얼굴로%20보는%20운세&icon=👤",
+        url: "/api/og?title=무료%20관상%20분석&subtitle=얼굴로%20보는%20운세",
         width: 1200,
         height: 630,
         alt: "무료 관상 분석",
@@ -28,7 +28,7 @@ export const metadata: Metadata = {
     card: "summary_large_image",
     title: "무료 AI 관상 테스트 | 운명을 읽다",
     description: "얼굴 사진으로 보는 무료 관상 분석!",
-    images: ["/api/og?title=무료%20관상%20분석&subtitle=얼굴로%20보는%20운세&icon=👤"],
+    images: ["/api/og?title=무료%20관상%20분석&subtitle=얼굴로%20보는%20운세"],
   },
 };
 

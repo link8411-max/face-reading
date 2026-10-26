@@ -28,37 +28,28 @@ npm run test:e2e     # E2E (next build 후 3200 포트): 전 페이지 로딩·�
 
 ---
 
-## 디자인 시스템 (민화 스타일)
+## 디자인 시스템 (4b 뉴트럴, 2026-10-26)
 
-전체 UI가 한국 전통 민화 스타일로 통일됨
+시안: 디자인 캔버스 `https://claude.ai/artifact/Psoi9fmSypmynmFNE2vBhR` (Main, TestStart, ResultCard, SamgukCard). 타깃 20~30대 여성, 무섭지 않고 너무 핑크하지 않은 뉴트럴.
 
-### 색상 팔레트 (오방색 기반)
-```
-배경 (한지):     #F5E6D3, #E8D4C4
-빨강 (오방색):   #C41E3A
-파랑:           #1E3A5F
-금색:           #FFD700, #D4AF37
-갈색 (텍스트):   #5C4033
-```
+### 토큰 (`globals.css` `@theme`)
+`bg-paper`(#FBF6F1) `bg-card`(#ECE5D9) `bg-card-2`(#F1EBE2) `border-line`(#E6DED2) `text-ink`(#2E2A27) `text-muted`(#6B6259) `text-accent`(#A4553A, 포인트는 이것 하나) `blush`(#E9BCA8, 얼굴 그림 볼 홍조만) · 삼국지 카드 전용 `bg-navy-game`(#23263A) `text-gold-game`(#E8B547)
+- 글꼴: 제목 `font-serif`(Gowun Batang 400/700), 본문 `font-sans`(Noto Sans KR 400/700), 삼국지 카드 픽셀 글씨 `font-pixel`(Silkscreen). 900 굵기 금지(테스트).
+- 모양: 카드 `rounded-[22px]`~`rounded-[30px]`, 버튼 pill(`rounded-full`), 주 버튼 `h-[52px] bg-ink text-paper`.
+- 옛 민화 색(#F5E6D3, #C41E3A 등)과 옛 토큰 이름(vermilion, gold, navy, paper-2)은 테스트로 막는다.
 
-### 공통 스타일
-```css
-/* 배경 */
-bg-gradient-to-b from-[#F5E6D3] via-[#E8D4C4] to-[#F5E6D3]
+### 아이콘·이모지
+- 이모지는 제목·버튼·링크·메뉴에 쓰지 않는다(E2E `chrome-emoji.spec.ts`). 아이콘은 `src/components/icons.tsx`의 `Icon`(선 굵기 1.6) 한 세트, 얼굴 그림은 `SmileFace`, 장식은 `MoonDeco`.
 
-/* 카드 */
-bg-white/60 backdrop-blur-sm rounded-3xl border-2 border-[#C41E3A]/30 shadow-lg
-
-/* 버튼 (주) */
-bg-gradient-to-r from-[#C41E3A] to-[#D4AF37] text-white
-
-/* 태그 */
-bg-[#C41E3A]/15 text-[#C41E3A] rounded-full border border-[#C41E3A]/30
-```
+### 공통 구성요소
+- 테스트 시작: `components/test/TestHeader`(h1 = 페이지 이름), `TestStart`(성별 pill 필수 → 큰 사진 영역 → 안내 → 분석 버튼. 사진·성별 없으면 버튼 비활성)
+- 결과: `components/result/ResultCard`(캡처 한 장 완결, 워터마크 "운명을 읽다 · unse-ai.com"), `ResultActions`(1순위 스토리에 올리기, 이미지 저장, 다시하기), `StoryFrame` + `hooks/useStoryShare`(9:16 1080×1920, 파일 공유 미지원이면 저장 후 안내 — `lib/storyShare.ts`)
+- 삼국지: `components/samguk/SamgukGameCard`(회사생활 STATUS), `lib/samguk/guardian.ts`(나를 지켜줄 장수: 같은 세력에서 funStats 빈틈을 가장 많이 메우는 장수, 80~98점)
+- 8단계 전까지 없는 기능(친구 얼굴 궁합, 우리 팀 삼국지) 버튼은 넣지 않는다.
 
 ### OG 이미지 API
 - 경로: `/api/og`
-- 파라미터: `?title=제목&subtitle=부제&icon=이모지`
+- 파라미터: `?title=제목&subtitle=부제` (뉴트럴 카드, `icon`은 선택이며 현재 쓰지 않음)
 - 각 페이지 layout.tsx에 OG 이미지 URL 설정됨
 
 ---
@@ -117,8 +108,9 @@ public/
 ## 메뉴·메인 (4a)
 - 메뉴와 묶음은 `src/content/navigation.ts` 한 곳에서 정의한다(TABS, CATEGORIES, tabForPath). 홈 묶음 탭·허브(`/face-tests`, `/unse`)·하단 탭바·푸터가 모두 이걸 쓴다. 새 테스트를 추가하면 CATEGORIES에 항목을 넣는다.
 - 하단 탭바 `BottomTabBar`(모든 페이지, no-screenshot). 본문은 탭바 높이만큼 아래 여백이 있다.
-- 메인 상단 히어로는 `src/content/season.ts`만 바꾸면 시즌 교체(수능 합격운 등). 홈 FAQ는 `src/content/homeFaq.ts`(화면·구조화 데이터 공용).
-- 디자인 토큰: `bg-paper`, `bg-paper-2`, `text-ink`, `text-muted`, `text-vermilion`, `text-gold`, `text-navy`, `border-line` / 글꼴 `font-sans`(Noto Sans KR), `font-serif`(Noto Serif KR)
+- 메인 순서(4b): 얼굴 히어로(`FaceHero`) → 친구랑 같이 해봐요(`PlayTogether`, 4번째 칸은 8단계 전까지 MBTI 궁합) → 띠 칩(`ZodiacPicker`) → 쿠팡 배너 → 시즌 카드(`SeasonCard`, `src/content/season.ts`만 바꾸면 교체) → 묶음 탭 → 2027 띠 → FAQ. 홈 FAQ는 `src/content/homeFaq.ts`(화면·구조화 데이터 공용).
+- 하단 탭: 홈 / 얼굴 / 운세 / 궁합(`/mbti`).
+- 디자인 토큰·글꼴은 위 "디자인 시스템 (4b 뉴트럴)" 참고.
 - 참여자 수·인기 순위 같은 숫자는 실제 집계 전까지 넣지 않는다(테스트로 막음).
 
 ## 신년운세 (연도별 갱신)

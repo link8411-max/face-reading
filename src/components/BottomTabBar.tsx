@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { TABS, tabForPath } from "@/content/navigation";
+import { Icon } from "@/components/icons";
 
 // 모든 페이지 공통 하단 탭바 (결과 이미지 캡처에서는 제외)
 export default function BottomTabBar() {
@@ -10,7 +11,7 @@ export default function BottomTabBar() {
   return (
     <nav
       aria-label="하단 메뉴"
-      className="no-screenshot fixed bottom-0 inset-x-0 z-50 bg-white/95 backdrop-blur border-t border-line pb-[env(safe-area-inset-bottom)]"
+      className="no-screenshot fixed bottom-0 inset-x-0 z-50 bg-white border-t border-line pb-[env(safe-area-inset-bottom)]"
     >
       <ul className="max-w-lg mx-auto grid grid-cols-4">
         {TABS.map((t) => {
@@ -20,9 +21,9 @@ export default function BottomTabBar() {
               <Link
                 href={t.href}
                 aria-current={active ? "page" : undefined}
-                className={`flex flex-col items-center justify-center gap-0.5 h-16 text-[11px] ${active ? "text-vermilion font-bold" : "text-muted"}`}
+                className={`flex flex-col items-center justify-center gap-1 h-16 text-[11px] font-medium ${active ? "text-accent" : "text-ink"}`}
               >
-                <span aria-hidden className="text-xl leading-none">{t.icon}</span>
+                <Icon name={t.icon} />
                 {t.label}
               </Link>
             </li>

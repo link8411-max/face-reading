@@ -26,7 +26,7 @@ export async function generateMetadata({ params }: { params: Promise<{ type: str
     alternates: { canonical: url },
     openGraph: {
       title, description, url, type: "article", locale: "ko_KR", siteName: "운명을 읽다",
-      images: [{ url: `/api/og?title=${encodeURIComponent(`${T} ${p.nickname}`)}&subtitle=${encodeURIComponent("MBTI 궁합·연애·직업")}&icon=${encodeURIComponent("🧩")}`, width: 1200, height: 630 }],
+      images: [{ url: `/api/og?title=${encodeURIComponent(`${T} ${p.nickname}`)}&subtitle=${encodeURIComponent("MBTI 궁합·연애·직업")}`, width: 1200, height: 630 }],
     },
   };
 }

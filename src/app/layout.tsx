@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Noto_Sans_KR, Noto_Serif_KR } from "next/font/google";
+import { Gowun_Batang, Noto_Sans_KR, Silkscreen } from "next/font/google";
 import { Analytics } from "@vercel/analytics/react";
 import Link from "next/link";
 import BottomTabBar from "@/components/BottomTabBar";
@@ -14,11 +14,20 @@ const notoSans = Noto_Sans_KR({
   display: "swap",
 });
 
-const notoSerif = Noto_Serif_KR({
-  variable: "--font-noto-serif-kr",
-  weight: ["900"],
+const gowunBatang = Gowun_Batang({
+  variable: "--font-gowun-batang",
+  weight: ["400", "700"],
   subsets: ["latin"],
   display: "swap",
+});
+
+// 삼국지 결과 카드의 픽셀 글씨 (영문·숫자만)
+const silkscreen = Silkscreen({
+  variable: "--font-silkscreen",
+  weight: ["400"],
+  subsets: ["latin"],
+  display: "swap",
+  preload: false,
 });
 
 export const metadata: Metadata = {
@@ -31,13 +40,13 @@ export const metadata: Metadata = {
     type: "website",
     locale: "ko_KR",
     siteName: "운명을 읽다",
-    images: [{ url: "/api/og?title=운명을%20읽다&subtitle=2027%20신년운세%20%26%20AI%20관상&icon=☯", width: 1200, height: 630 }],
+    images: [{ url: "/api/og?title=운명을%20읽다&subtitle=2027%20신년운세%20%26%20AI%20관상", width: 1200, height: 630 }],
   },
   twitter: {
     card: "summary_large_image",
     title: "운명을 읽다 | 2027 무료 신년운세 & AI 관상 테스트",
     description: "2027년 정미년 신년운세와 오늘의 운세, AI 관상·동물상·삼국지 닮은꼴 테스트를 지금 바로 무료로 확인하세요!",
-    images: ["/api/og?title=운명을%20읽다&subtitle=2027%20신년운세%20%26%20AI%20관상&icon=☯"],
+    images: ["/api/og?title=운명을%20읽다&subtitle=2027%20신년운세%20%26%20AI%20관상"],
   },
   robots: {
     index: true,
@@ -89,7 +98,7 @@ export default function RootLayout({
         <meta name="apple-mobile-web-app-status-bar-style" content="default" />
         <meta name="apple-mobile-web-app-title" content="운명을읽다" />
         <meta name="mobile-web-app-capable" content="yes" />
-        <meta name="theme-color" content="#C41E3A" />
+        <meta name="theme-color" content="#FBF6F1" />
         <link rel="apple-touch-icon" href="/icons/icon-192x192.svg" />
         <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-9670928093323234"
           crossOrigin="anonymous"></script>
@@ -120,7 +129,7 @@ export default function RootLayout({
         />
       </head>
       <body
-        className={`${notoSans.variable} ${notoSerif.variable} font-sans antialiased bg-paper text-ink`}
+        className={`${notoSans.variable} ${gowunBatang.variable} ${silkscreen.variable} font-sans antialiased bg-paper text-ink`}
       >
         {/* 하단 탭바(h-16)에 내용이 가리지 않도록 아래 여백 */}
         <div className="flex flex-col min-h-screen pb-[calc(4rem+env(safe-area-inset-bottom))]">
@@ -128,29 +137,29 @@ export default function RootLayout({
             {children}
           </main>
 
-          <footer className="bg-stone-100 border-t border-stone-200 py-8 px-4 no-screenshot">
+          <footer className="bg-card-2 border-t border-line py-8 px-4 no-screenshot">
             <div className="max-w-lg mx-auto">
               <div className="grid grid-cols-2 gap-6 mb-8">
                 {CATEGORIES.filter((c) => c.items.length > 0).map((c) => (
                   <div key={c.key} className="space-y-3">
-                    <p className="text-vermilion font-bold text-sm"><Link href={c.href}>{c.title}</Link></p>
-                    <ul className="text-sm space-y-2 text-stone-600">
+                    <p className="text-accent font-bold text-sm"><Link href={c.href}>{c.title}</Link></p>
+                    <ul className="text-sm space-y-2 text-muted">
                       {c.items.map((i) => (
-                        <li key={i.href}><Link href={i.href} className="hover:text-vermilion">{i.title}</Link></li>
+                        <li key={i.href}><Link href={i.href} className="hover:text-accent">{i.title}</Link></li>
                       ))}
                     </ul>
                   </div>
                 ))}
                 <div className="space-y-3 col-span-2 border-t pt-6">
-                  <p className="text-stone-400 font-bold text-sm">정보</p>
-                  <ul className="text-sm space-y-2 text-stone-500">
-                    <li><Link href="/about" className="hover:text-vermilion">서비스 소개</Link></li>
-                    <li><Link href="/privacy" className="hover:text-vermilion">개인정보처리방침</Link></li>
+                  <p className="text-muted font-bold text-sm">정보</p>
+                  <ul className="text-sm space-y-2 text-muted">
+                    <li><Link href="/about" className="hover:text-accent">서비스 소개</Link></li>
+                    <li><Link href="/privacy" className="hover:text-accent">개인정보처리방침</Link></li>
                   </ul>
                 </div>
               </div>
-              <div className="text-center pt-6 border-t border-stone-200">
-                <p className="text-xs text-stone-400">© 2026 운명을 읽다. All rights reserved.</p>
+              <div className="text-center pt-6 border-t border-line">
+                <p className="text-xs text-muted">© 2026 운명을 읽다. All rights reserved.</p>
               </div>
             </div>
           </footer>
