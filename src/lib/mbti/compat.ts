@@ -23,13 +23,30 @@ const WEIGHTS: Record<Context, { same: number[]; diff: number[] }> = {
   work: { same: [0, -2, -4, 10], diff: [3, 4, 8, -6] },
 }
 
-const clamp = (n: number) => Math.max(55, Math.min(98, Math.round(n)))
-
-export function compatScore(a: MbtiType, b: MbtiType, ctx: Context): number {
+function raw(a: MbtiType, b: MbtiType, ctx: Context): number {
   const w = WEIGHTS[ctx]
   let score = BASE
   for (let i = 0; i < 4; i++) score += a[i] === b[i] ? w.same[i] : w.diff[i]
-  return clamp(score)
+  return score
+}
+
+// 점수는 55~100으로 펼친다. 가장 잘 맞는 조합이 정확히 100점이 되게 해서 결과를 공유하고 싶게 만든다.
+const MIN_SCORE = 55
+const MAX_SCORE = 100
+const pairs = MBTI_TYPES.flatMap((a) => MBTI_TYPES.map((b) => [a, b] as const))
+const range = (values: number[]) => ({ min: Math.min(...values), max: Math.max(...values) })
+const CTX_RANGE: Record<Context, { min: number; max: number }> = {
+  love: range(pairs.map(([a, b]) => raw(a, b, 'love'))),
+  friend: range(pairs.map(([a, b]) => raw(a, b, 'friend'))),
+  work: range(pairs.map(([a, b]) => raw(a, b, 'work'))),
+}
+const totalRaw = (a: MbtiType, b: MbtiType) => raw(a, b, 'love') + raw(a, b, 'friend') + raw(a, b, 'work')
+const TOTAL_RANGE = range(pairs.map(([a, b]) => totalRaw(a, b)))
+const stretch = (v: number, r: { min: number; max: number }) =>
+  Math.round(MIN_SCORE + ((v - r.min) / (r.max - r.min)) * (MAX_SCORE - MIN_SCORE))
+
+export function compatScore(a: MbtiType, b: MbtiType, ctx: Context): number {
+  return stretch(raw(a, b, ctx), CTX_RANGE[ctx])
 }
 
 const LINES: { same: Record<string, string>; diff: string }[] = [
@@ -52,10 +69,10 @@ const LINES: { same: Record<string, string>; diff: string }[] = [
 ]
 
 function label(total: number): string {
-  if (total >= 90) return '천생연분'
-  if (total >= 82) return '찰떡궁합'
-  if (total >= 74) return '좋은 짝'
-  if (total >= 66) return '서로 배우는 사이'
+  if (total >= 95) return '천생연분'
+  if (total >= 85) return '찰떡궁합'
+  if (total >= 75) return '좋은 짝'
+  if (total >= 65) return '서로 배우는 사이'
   return '노력하면 빛나는 사이'
 }
 
@@ -63,7 +80,7 @@ export function compatSummary(a: MbtiType, b: MbtiType) {
   const love = compatScore(a, b, 'love')
   const friend = compatScore(a, b, 'friend')
   const work = compatScore(a, b, 'work')
-  const total = Math.round((love + friend + work) / 3)
+  const total = stretch(totalRaw(a, b), TOTAL_RANGE)
   const lines = LINES.map((l, i) => (a[i] === b[i] ? l.same[a[i]] : l.diff))
   return { love, friend, work, total, label: label(total), lines }
 }

@@ -13,19 +13,19 @@ test('대칭·범위·정수·결정성', () => {
     const s = compatScore(a, b, c)
     expect(Number.isInteger(s)).toBe(true)
     expect(s).toBeGreaterThanOrEqual(55)
-    expect(s).toBeLessThanOrEqual(98)
+    expect(s).toBeLessThanOrEqual(100)
     expect(s).toBe(compatScore(b, a, c))
     expect(s).toBe(compatScore(a, b, c))
   }
 })
 
-test('분포: 평균 70~85, 최소 < 65, 최대 > 90', () => {
+test('분포: 평균 70~85, 최소 < 65, 최고 조합은 정확히 100점(공유 심리)', () => {
   const totals = MBTI_TYPES.flatMap((a) => MBTI_TYPES.map((b) => compatSummary(a, b).total))
   const avg = totals.reduce((x, y) => x + y, 0) / totals.length
   expect(avg).toBeGreaterThanOrEqual(70)
   expect(avg).toBeLessThanOrEqual(85)
   expect(Math.min(...totals)).toBeLessThan(65)
-  expect(Math.max(...totals)).toBeGreaterThan(90)
+  expect(Math.max(...totals)).toBe(100)
 })
 
 test('같은 유형끼리는 그 유형의 최고점이 아니다', () => {
@@ -53,4 +53,8 @@ test('설명 문장 4개, 부정적 표현 없음, 라벨 있음', () => {
     expect(s.label.length).toBeGreaterThan(0)
     for (const l of s.lines) expect(l, `${a}-${b}`).not.toMatch(/나쁜|최악|안 맞|싫|문제가 많/)
   }
+})
+
+test('맥락별로도 100점 조합이 있다', () => {
+  for (const c of CTX) expect(Math.max(...MBTI_TYPES.flatMap((a) => MBTI_TYPES.map((b) => compatScore(a, b, c)))), c).toBe(100)
 })
