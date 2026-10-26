@@ -7,6 +7,15 @@ export const metadata: Metadata = {
   title: `${FORTUNE_YEAR.year} 띠별 운세 | ${FORTUNE_YEAR.간지}년 12띠 신년운세 - 운명을 읽다`,
   description: `${FORTUNE_YEAR.year}년 ${FORTUNE_YEAR.간지}년(${FORTUNE_YEAR.한자}) 쥐띠부터 돼지띠까지 12띠 신년운세. 총운, 재물운, 연애운, 분기별 흐름과 잘 맞는 띠를 확인하세요.`,
   alternates: { canonical: "https://unse-ai.com/fortune/2027" },
+  openGraph: {
+    title: `${FORTUNE_YEAR.year} 띠별 운세 | 운명을 읽다`,
+    description: `${FORTUNE_YEAR.간지}년 12띠 신년운세, 내 띠의 한 해 흐름을 확인하세요.`,
+    url: "https://unse-ai.com/fortune/2027",
+    type: "website",
+    locale: "ko_KR",
+    siteName: "운명을 읽다",
+    images: [{ url: `/api/og?title=${encodeURIComponent(`${FORTUNE_YEAR.year} 띠별 운세`)}&subtitle=${encodeURIComponent(`${FORTUNE_YEAR.간지}년 12띠 신년운세`)}&icon=${encodeURIComponent(FORTUNE_YEAR.띠이모지)}`, width: 1200, height: 630 }],
+  },
 };
 
 export default function Zodiac2027Hub() {

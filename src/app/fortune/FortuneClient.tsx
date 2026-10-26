@@ -89,6 +89,7 @@ export default function FortuneClient() {
     setBirthHour("모름");
     setIsLunar(false);
     setResult(null);
+    setIsLeapMonth(false);
   };
 
   // 시간 옵션 (12지지 시간)

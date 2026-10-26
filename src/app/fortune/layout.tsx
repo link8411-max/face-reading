@@ -2,14 +2,14 @@ import type { Metadata } from "next";
 
 export const metadata: Metadata = {
   title: "2027 신년운세 무료 사주 | 운명을 읽다",
-  description: "2027년 정미년 신년운세를 사주로 무료 확인하세요! 양력 생년월일로 총운, 재물운, 애정운, 직장운, 건강운을 상세하게 알려드리는 무료 운세 서비스입니다.",
+  description: "2027년 정미년 신년운세를 사주로 무료 확인하세요! 양력·음력 생년월일로 총운, 재물운, 애정운, 직장운, 건강운을 상세하게 알려드리는 무료 운세 서비스입니다.",
   keywords: "2027 운세, 2027년 운세, 신년운세, 정미년, 사주, 사주팔자, 무료 사주, 무료운세, 띠별운세, 2027년 무료운세",
   alternates: {
     canonical: "https://unse-ai.com/fortune",
   },
   openGraph: {
     title: "2027 신년운세 | 운명을 읽다",
-    description: "2027년 정미년 신년운세를 사주로 확인하세요! 양력 생년월일로 총운, 재물운, 애정운을 상세하게 알려드립니다.",
+    description: "2027년 정미년 신년운세를 사주로 확인하세요! 양력·음력 생년월일로 총운, 재물운, 애정운을 상세하게 알려드립니다.",
     type: "website",
     locale: "ko_KR",
     siteName: "운명을 읽다",

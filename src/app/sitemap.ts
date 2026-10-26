@@ -26,8 +26,8 @@ export const LAST_MODIFIED: Record<string, string> = {
     '/animal': '2026-10-26',
     '/about': '2026-10-26',
     '/privacy': '2026-10-26',
-    '/fortune/2027': '2026-10-27',
-    ...Object.fromEntries(ZODIAC_SLUGS.map((s) => [`/fortune/2027/${s}`, '2026-10-27'])),
+    '/fortune/2027': '2026-10-26',
+    ...Object.fromEntries(ZODIAC_SLUGS.map((s) => [`/fortune/2027/${s}`, '2026-10-26'])),
 }
 
 type ChangeFrequency = MetadataRoute.Sitemap[number]['changeFrequency']

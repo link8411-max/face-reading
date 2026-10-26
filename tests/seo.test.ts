@@ -9,11 +9,11 @@ function walk(dir: string): string[] {
   })
 }
 
-test('없는 기능(토정비결)이나 실제와 다른 입력 방식(음력)을 홍보하지 않는다', () => {
+test('없는 기능(토정비결)을 홍보하지 않는다', () => {
   for (const f of walk('src/app')) {
     const t = readFileSync(f, 'utf8')
     expect(t, f).not.toContain('토정비결')
-    expect(t, f).not.toContain('음력 생년월일로')
+    // '음력 생년월일로'는 3단계에서 음력→양력 변환을 구현해 사실이 되었으므로 더 막지 않는다
   }
 })
 
