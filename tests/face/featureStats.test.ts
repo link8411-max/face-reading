@@ -1,10 +1,11 @@
 import { FEATURE_STATS, toZ } from '@/lib/face/featureStats'
-import { extractFeatures, FEATURE_KEYS } from '@/lib/face/landmarkFeatures'
+import { extractFeatures, FEATURE_KEYS, type FeatureVector } from '@/lib/face/landmarkFeatures'
 import { makeFace } from './makeFace'
 
-test('기본 얼굴의 z는 모두 0 근처', () => {
-  const z = toZ(extractFeatures(makeFace()))
-  for (const k of FEATURE_KEYS) expect(Math.abs(z[k]), k).toBeLessThan(0.05)
+test('모집단 평균 얼굴의 z는 모두 0', () => {
+  const meanFace = Object.fromEntries(FEATURE_KEYS.map((k) => [k, FEATURE_STATS[k].mean])) as FeatureVector
+  const z = toZ(meanFace)
+  for (const k of FEATURE_KEYS) expect(Math.abs(z[k]), k).toBeLessThan(1e-9)
 })
 
 test('극단값은 ±3으로 잘린다', () => {

@@ -42,3 +42,6 @@ next-env.d.ts
 
 # superpowers 작업 공간
 /.superpowers/
+
+# 실사진 확인용 테스트 얼굴 (커밋 금지)
+/public/dev-faces/

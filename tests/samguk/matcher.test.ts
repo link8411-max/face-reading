@@ -23,15 +23,15 @@ test('성별 필터: 여 선택 시 여성 인물만', () => {
   for (const id of ['guanyu', 'zhangfei', 'lvbu']) expect(matchCharacter(zOf(id), '여').character.gender).toBe('여')
 })
 
-test('similarity는 정수이고 62~97', () => {
+test('similarity는 정수이고 70~98', () => {
   const cases: ZVector[] = [zeros(), zOf('guanyu'),
     Object.fromEntries(FEATURE_KEYS.map((k) => [k, 3])) as ZVector,
     Object.fromEntries(FEATURE_KEYS.map((k, i) => [k, i % 2 ? 3 : -3])) as ZVector]
   for (const z of cases) for (const g of ['남', '여'] as const) {
     const s = matchCharacter(z, g).similarity
     expect(Number.isInteger(s)).toBe(true)
-    expect(s).toBeGreaterThanOrEqual(62)
-    expect(s).toBeLessThanOrEqual(97)
+    expect(s).toBeGreaterThanOrEqual(70)
+    expect(s).toBeLessThanOrEqual(98)
   }
 })
 

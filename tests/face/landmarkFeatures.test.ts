@@ -29,11 +29,15 @@ test('checkFrontal: 정면 ok, 코끝이 한쪽으로 30% 치우치면 ok=false'
   expect(checkFrontal(makeFace()).ok).toBe(true)
   const turned = checkFrontal(makeFace({ edit: (p) => { p[1][0] += 0.3 * 140 } }))
   expect(turned.ok).toBe(false)
-  expect(turned.yawRatio).toBeGreaterThan(0.12)
+  expect(turned.yawRatio).toBeGreaterThan(0.18)
 })
 
 test('FEATURE_KEYS 15개 모두 유한한 숫자', () => {
   const f = extractFeatures(makeFace())
   expect(FEATURE_KEYS).toHaveLength(15)
   for (const k of FEATURE_KEYS) expect(Number.isFinite(f[k]), k).toBe(true)
+})
+
+test('살짝 돌린 얼굴(코끝 15% 치우침)은 정면으로 인정', () => {
+  expect(checkFrontal(makeFace({ edit: (p) => { p[1][0] += 0.15 * 140 } })).ok).toBe(true)
 })

@@ -8,7 +8,7 @@ export type Gender = '남' | '여'
 export interface MatchResult {
   name: string
   matchReason: string
-  similarity: number
+  similarity: number                    // 정수 70~98
   faceAnalysis: { 눈: string; 코: string; 입: string; 얼굴형: string; 인상: string }
   character: SamgukCharacter
 }
@@ -107,7 +107,8 @@ export function matchCharacter(z: ZVector, gender: Gender, bias: Record<string, 
   return {
     name: c.name,
     matchReason: buildReason(z, p, c),
-    similarity: Math.max(62, Math.min(97, Math.round(97 - 9 * d))),
+    // 실측 30장 기준 거리 d는 대략 2~4 → 중간값 약 80%, 70~98%로 표시
+    similarity: Math.max(70, Math.min(98, Math.round(99 - 7 * d))),
     faceAnalysis: buildAnalysis(z),
     character: c,
   }
