@@ -15,7 +15,7 @@ export default function PageGuide({ route }: { route: GuideRoute }) {
             <span className="text-xl">☯</span>
             <span className="text-[#C41E3A]/70">━━</span>
           </div>
-          <h2 className="text-2xl font-bold text-[#C41E3A]">{guide.heading}</h2>
+          <h2 className="text-2xl font-bold text-[#C41E3A] break-keep">{guide.heading}</h2>
         </div>
 
         <p className="leading-relaxed text-center">{guide.summary}</p>
