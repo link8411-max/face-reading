@@ -44,7 +44,10 @@ npm run test:e2e     # E2E (next build 후 3200 포트): 전 페이지 로딩·�
 ### 공통 구성요소
 - 테스트 시작: `components/test/TestHeader`(h1 = 페이지 이름), `TestStart`(성별 pill 필수 → 큰 사진 영역 → 안내 → 분석 버튼. 사진·성별 없으면 버튼 비활성)
 - 결과: `components/result/ResultCard`(캡처 한 장 완결, 워터마크 "운명을 읽다 · unse-ai.com"), `ResultActions`(1순위 공유하기, 이미지 저장, 다시하기)
-- 공유하기: `hooks/useResultShare`(결과가 나오면 카드 이미지를 미리 만들어 둠 — iOS 사용자 동작 시간 만료 방지) → `lib/share.ts` `shareResult`: 기본 공유창(이미지+문구+주소) → 링크만 → 링크 복사. 운세·MBTI는 `useScreenshot().share`가 같은 함수를 쓴다.
+- 공유하기: `hooks/useResultShare` → `lib/share.ts` `shareResult`: 결과 링크+1인칭 문구를 기본 공유창으로, 공유창이 없으면 링크 복사. 운세는 결과 링크가 없어 `useScreenshot().share`(이미지)를 쓴다.
+- 결과 공유 링크 (`lib/shareLinks.ts`): `/animal/r/[유형]?s=점수`, `/samguk/r/[장수id]?s=점수`, `/face2/r/[유형키]`, MBTI는 `/mbti/r/infp-entj` (계산기 `/mbti/match`는 정적·검색 노출 유지). 링크에는 유형 키·점수(50~99)·utm(source=share, medium=friend_link)만. 허용 목록 밖이면 테스트 시작 화면으로.
+  - 착지 페이지 `components/share/SharePage.tsx`: 서버 `generateMetadata`로 1인칭 문구 미리보기(카톡·인스타 봇은 JS를 실행하지 않음), noindex, canonical은 원래 테스트, 사이트맵 제외. GA `shared_landing`.
+  - 미리보기 이미지 `/api/og/result?kind=animal|samguk|face|mbti&…` (1200×630, 삼국지는 도트 초상화)
 - 이미지 저장: `lib/saveImage.ts`. iOS와 인앱 브라우저(카카오톡·인스타·네이버 등)는 다운로드 대신 길게 눌러 저장 화면(data 이미지), 카카오톡이면 "다른 브라우저로 열기"(`kakaotalk://web/openExternal`)
 - 삼국지: `components/samguk/SamgukGameCard`(회사생활 STATUS), `lib/samguk/guardian.ts`(나를 지켜줄 장수: 같은 세력에서 funStats 빈틈을 가장 많이 메우는 장수, 80~98점)
 - 8단계 전까지 없는 기능(친구 얼굴 궁합, 우리 팀 삼국지) 버튼은 넣지 않는다.
@@ -141,7 +144,7 @@ public/
 
 ## 방문 통계 (GA4)
 - 측정 ID `G-L99JPMPT9D` (`src/lib/analytics.ts`), `layout.tsx`의 `ga4-init` 스크립트. 로컬(localhost)에서는 gtag.js를 받지 않고 config도 안 해서 실제 통계에 안 섞인다(E2E는 `dataLayer`로 검사).
-- 이벤트는 `track()`만 쓴다: `photo_selected`, `test_start`, `result_view(result_id)`, `share_click(method)`, `fortune_submit` / `test_name`: face·animal·samguk·fortune·daily·mbti_match
+- 이벤트는 `track()`만 쓴다: `photo_selected`, `test_start`, `result_view(result_id)`, `share_click(method: link·save_image·share)`, `fortune_submit`, `shared_landing`. GA 준비 전 이벤트는 잠시 모았다가 보낸다. / `test_name`: face·animal·samguk·fortune·daily·mbti_match
 - **사진·생년월일·얼굴 수치는 보내지 않는다.** `track()`은 허용 키(test_name, result_id, method)와 유형 키 형식(한글·영문·숫자 24자 이내, 숫자 4자리 연속 금지)만 통과시킨다. 결과는 유형 키만(fox, caocao, 재물상, 띠, INFP_ENTJ).
 - 개인정보처리방침 5항에 GA 수집 안내.
 

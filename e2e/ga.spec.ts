@@ -36,6 +36,6 @@ test('동물상: 사진 선택·시작·결과·공유 이벤트, 사진 데이�
   await expect.poll(async () => (await events(page)).map((e) => e[0])).toEqual(expect.arrayContaining(['photo_selected', 'test_start', 'result_view', 'share_click']))
   const ev = await events(page)
   expect(ev.find((e) => e[0] === 'result_view')![1].result_id).toMatch(/^(dog|cat|fox|bear|rabbit|deer|tiger|eagle)$/)
-  expect(ev.find((e) => e[0] === 'share_click')![1]).toEqual({ test_name: 'animal', method: 'share' })
+  expect(ev.find((e) => e[0] === 'share_click')![1]).toEqual({ test_name: 'animal', method: 'link' })
   expect(JSON.stringify(ev)).not.toMatch(/data:image|base64/)
 })

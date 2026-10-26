@@ -1,6 +1,8 @@
 "use client";
 
 import { track } from "@/lib/analytics";
+import { useResultShare } from "@/hooks/useResultShare";
+import { mbtiShared } from "@/lib/shareLinks";
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { MBTI_TYPES, compatSummary, isMbti, type MbtiType } from "@/lib/mbti/compat";
@@ -34,26 +36,41 @@ function Bar({ label, score }: { label: string; score: number }) {
 }
 
 // MBTI 궁합 계산기: 두 유형을 고르면 궁합 결과 카드 (저장 이미지에 사이트 주소 포함)
-export default function MatchCalculator() {
-  const [a, setA] = useState<MbtiType | null>(null);
-  const [b, setB] = useState<MbtiType | null>(null);
-  const [shown, setShown] = useState(false);
-  const { ref, isCapturing, download, share, shareNotice } = useScreenshot();
+export default function MatchCalculator({ initial }: { initial?: { a: MbtiType; b: MbtiType; fromShare: boolean } } = {}) {
+  const [a, setA] = useState<MbtiType | null>(initial?.a ?? null);
+  const [b, setB] = useState<MbtiType | null>(initial?.b ?? null);
+  const [shown, setShown] = useState(!!initial);
+  const [fromShare, setFromShare] = useState(initial?.fromShare ?? false);
+  const { ref, isCapturing, download } = useScreenshot();
+  const link = shown && a && b ? mbtiShared(a, b) : null;
+  const { busy, notice, share } = useResultShare(link ? { title: "운명을 읽다 · MBTI 궁합", text: link.phrase, url: link.url } : null);
+
+  // 친구가 보낸 궁합 링크(/mbti/r/a-b)로 들어온 방문은 GA에서 구분한다
+  useEffect(() => {
+    if (initial?.fromShare) track("shared_landing", { test_name: "mbti_match", result_id: `${initial.a}_${initial.b}` });
+  }, [initial]);
 
   // 유형 페이지에서 ?a=INFP&b=ENFJ 로 들어오면 미리 골라 둔다
   useEffect(() => {
+    if (initial) return;
     const q = new URLSearchParams(window.location.search);
     const qa = q.get("a")?.toUpperCase() ?? "", qb = q.get("b")?.toUpperCase() ?? "";
     if (isMbti(qa)) setA(qa);
     if (isMbti(qb)) setB(qb);
     if (isMbti(qa) && isMbti(qb)) setShown(true);
-  }, []);
+  }, [initial]);
 
   if (shown && a && b) {
     const s = compatSummary(a, b);
-    const opts = { fileName: `MBTI궁합_${a}_${b}`, shareTitle: `${a} × ${b} 궁합 ${s.total}점`, shareText: `${a}와 ${b}의 궁합은 ${s.total}점, ${s.label}!` };
+    const opts = { fileName: `MBTI궁합_${a}_${b}` };
     return (
       <div className="space-y-4">
+        {fromShare && (
+          <div className="bg-card rounded-[22px] p-4 flex items-center justify-between gap-3">
+            <p className="text-sm font-medium">친구가 보낸 궁합이에요</p>
+            <button type="button" onClick={() => { setFromShare(false); setA(null); setB(null); setShown(false); }} className="h-10 px-4 rounded-full bg-ink text-paper text-sm font-medium flex-none">내 궁합 보기</button>
+          </div>
+        )}
         <section aria-label="궁합 결과" ref={ref} className="bg-white border-2 border-accent/30 rounded-3xl p-5 text-center">
           <p className="text-sm text-muted">MBTI 궁합</p>
           <p className="font-serif text-3xl font-bold mt-1"><span className="text-accent">{a}</span> × <span className="text-ink">{b}</span></p>
@@ -65,9 +82,9 @@ export default function MatchCalculator() {
         </section>
         <div className="grid grid-cols-2 gap-2">
           <button type="button" onClick={() => { track("share_click", { test_name: "mbti_match", method: "save_image" }); download(opts); }} disabled={isCapturing} className="py-3 rounded-full bg-white border border-line font-bold">{isCapturing ? "저장 중…" : "결과 저장"}</button>
-          <button type="button" onClick={() => { track("share_click", { test_name: "mbti_match", method: "share" }); share(opts); }} disabled={isCapturing} className="py-3 rounded-full bg-ink text-paper font-bold">공유하기</button>
+          <button type="button" onClick={() => { track("share_click", { test_name: "mbti_match", method: "link" }); share(); }} disabled={busy} className="py-3 rounded-full bg-ink text-paper font-bold">공유하기</button>
         </div>
-        {shareNotice && <p role="status" className="text-xs text-center text-muted">{shareNotice}</p>}
+        {notice && <p role="status" className="text-xs text-center text-muted">{notice}</p>}
         <div className="grid grid-cols-2 gap-2 text-sm">
           <Link href={`/mbti/${a.toLowerCase()}`} className="text-center py-2.5 rounded-xl bg-card-2 font-bold">{a}: {mbtiProfiles[a].nickname}</Link>
           <Link href={`/mbti/${b.toLowerCase()}`} className="text-center py-2.5 rounded-xl bg-card-2 font-bold">{b}: {mbtiProfiles[b].nickname}</Link>

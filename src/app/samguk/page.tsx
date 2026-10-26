@@ -9,6 +9,7 @@ import TestStart from "@/components/test/TestStart";
 import SamgukGameCard from "@/components/samguk/SamgukGameCard";
 import ResultActions from "@/components/result/ResultActions";
 import { useResultShare } from "@/hooks/useResultShare";
+import { faceSlug, parseShared, shareUrl, SITE } from "@/lib/shareLinks";
 import { guardianFor } from "@/lib/samguk/guardian";
 import { Icon } from "@/components/icons";
 import Link from "next/link";
@@ -59,7 +60,7 @@ export default function SamgukPage() {
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const { ref: resultRef, isCapturing, download } = useScreenshot<HTMLElement>();
-  const { busy, notice, share: shareCard } = useResultShare(resultRef, result ? { fileName: `삼국지_${result.character.name}`, title: `나는 삼국지 속 ${result.character.name}`, text: `나는 ${result.character.name}(${result.character.hanja})와 ${result.similarity}% 닮았대요. 나는 삼국지 속 누구?` } : null);
+  const { busy, notice, share: shareCard } = useResultShare(result ? { title: '운명을 읽다 · 나는 삼국지 속 누구?', text: parseShared('samguk', result.character.id, result.similarity)!.phrase, url: shareUrl('samguk', result.character.id, result.similarity) } : null);
 
   const loadingMessages = [
     "장수들의 명부를 훑어보는 중...",
@@ -229,7 +230,7 @@ export default function SamgukPage() {
               </section>
 
               <ResultActions
-                onShare={() => { track("share_click", { test_name: "samguk", method: "share" }); shareCard(); }}
+                onShare={() => { track("share_click", { test_name: "samguk", method: "link" }); shareCard(); }}
                 onSave={() => { track("share_click", { test_name: "samguk", method: "save_image" }); download(getShareOptions()); }}
                 onRetry={resetAll}
                 busy={busy || isCapturing}
