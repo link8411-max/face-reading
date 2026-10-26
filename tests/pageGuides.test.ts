@@ -54,3 +54,15 @@ test('/samguk 가이드는 브라우저 안에서만 분석함을 밝히고 Gemi
   expect(text).not.toContain('Gemini')
   expect(pageGuides['/samguk'].faqs.find((f) => f.q.includes('사진'))!.a).toContain('브라우저')
 })
+
+test('운세 가이드는 바뀐 계산 방식(음력 변환, 입춘 기준, 근사)을 사실대로 말한다', () => {
+  const fortune = JSON.stringify(pageGuides['/fortune'])
+  const daily = JSON.stringify(pageGuides['/fortune/daily'])
+  expect(fortune).not.toContain('바꿔 계산하지는 않아요')
+  expect(fortune).not.toContain('지금은 양력 생일을 기준으로 계산해요')
+  expect(fortune).toContain('입춘')
+  expect(fortune).toContain('윤달')
+  expect(fortune).toContain('하루 정도')
+  expect(daily).not.toContain('음력 설')
+  expect(daily).toContain('입춘')
+})

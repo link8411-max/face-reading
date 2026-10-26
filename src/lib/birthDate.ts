@@ -20,15 +20,16 @@ export function validateBirthYear(year: string, now: Date = new Date()): Validat
   return { ok: true, error: null };
 }
 
-export function validateBirthDate({ year, month, day }: BirthDateInput, now: Date = new Date()): Validation {
+export function validateBirthDate({ year, month, day }: BirthDateInput, now: Date = new Date(), opts: { lunar?: boolean } = {}): Validation {
   const yearCheck = validateBirthYear(year, now);
   if (yearCheck.error) return yearCheck;
   if (!yearCheck.ok || !month || !day) return { ok: false, error: null };
 
   const y = Number(year), m = Number(month), d = Number(day);
   if (m < 1 || m > 12) return { ok: false, error: "월은 1~12 사이로 입력해 주세요" };
-  const last = daysInMonth(y, m);
-  if (d < 1 || d > last) return { ok: false, error: `${m}월은 ${last}일까지 있어요` };
-  if (new Date(y, m - 1, d) > now) return { ok: false, error: "아직 오지 않은 날짜예요" };
+  // 음력은 한 달이 29일 또는 30일이다. 정확한 길이는 서버에서 변환할 때 확인한다.
+  const last = opts.lunar ? 30 : daysInMonth(y, m);
+  if (d < 1 || d > last) return { ok: false, error: opts.lunar ? "음력은 30일까지 있어요" : `${m}월은 ${last}일까지 있어요` };
+  if (!opts.lunar && new Date(y, m - 1, d) > now) return { ok: false, error: "아직 오지 않은 날짜예요" };
   return { ok: true, error: null };
 }

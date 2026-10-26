@@ -20,6 +20,7 @@ interface FortuneResult {
     강한오행: string;
     약한오행: string;
     역법: string;
+    양력: { year: number; month: number; day: number };
     시주: string | null;
   };
   운세: {
@@ -37,8 +38,9 @@ export default function FortuneClient() {
   const [birthDate, setBirthDate] = useState({ year: "", month: "", day: "" });
   const [birthHour, setBirthHour] = useState<string>("모름");
   const [isLunar, setIsLunar] = useState(false);
+  const [isLeapMonth, setIsLeapMonth] = useState(false);
   const [loading, setLoading] = useState(false);
-  const dateCheck = validateBirthDate(birthDate);
+  const dateCheck = validateBirthDate(birthDate, new Date(), { lunar: isLunar });
   const [result, setResult] = useState<FortuneResult | null>(null);
 
   const { ref: resultRef, isCapturing, download, share } = useScreenshot();
@@ -63,6 +65,7 @@ export default function FortuneClient() {
           day: parseInt(birthDate.day),
           hour: birthHour,
           isLunar,
+          isLeapMonth: isLunar && isLeapMonth,
         }),
       });
 
@@ -187,9 +190,13 @@ export default function FortuneClient() {
               </button>
             </div>
             {isLunar && (
-              <p className="text-xs text-center text-[#C41E3A] mb-4">
-                ✓ 전통 사주명리학은 음력 기준입니다
-              </p>
+              <div className="mb-4 text-center">
+                <label className="inline-flex items-center gap-2 text-sm text-[#5C4033]/80 cursor-pointer">
+                  <input type="checkbox" checked={isLeapMonth} onChange={(e) => setIsLeapMonth(e.target.checked)} className="w-4 h-4 accent-[#C41E3A]" />
+                  윤달이에요
+                </label>
+                <p className="text-xs text-[#5C4033]/60 mt-1">음력 생일은 양력으로 바꿔서 사주를 계산해요</p>
+              </div>
             )}
 
             <BirthDateFields value={birthDate} onChange={setBirthDate} error={dateCheck.error} />
@@ -242,13 +249,18 @@ export default function FortuneClient() {
                 <p className="text-[#5C4033]/70 text-sm">
                   {birthDate.year}년 {birthDate.month}월 {birthDate.day}일생
                   <span className={`ml-2 px-2 py-0.5 rounded-full text-xs ${
-                    result.사주정보.역법 === "음력"
+                    result.사주정보.역법.startsWith("음력")
                       ? "bg-[#C41E3A]/15 text-[#C41E3A]"
                       : "bg-[#FFD700]/15 text-[#D4AF37]"
                   }`}>
-                    {result.사주정보.역법 === "음력" ? "🌙 음력" : "☀️ 양력"}
+                    {result.사주정보.역법.startsWith("음력") ? `🌙 ${result.사주정보.역법}` : "☀️ 양력"}
                   </span>
                 </p>
+                {result.사주정보.역법.startsWith("음력") && (
+                  <p className="text-xs text-[#5C4033]/60 mt-1">
+                    양력 {result.사주정보.양력.year}년 {result.사주정보.양력.month}월 {result.사주정보.양력.day}일로 계산했어요
+                  </p>
+                )}
               </div>
 
               {/* 사주 정보 */}

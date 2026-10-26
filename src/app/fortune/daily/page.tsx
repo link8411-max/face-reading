@@ -4,17 +4,13 @@ import { useState } from "react";
 import CoupangBanner from "@/components/CoupangBanner";
 import { useBackOrHome } from "@/hooks/useBackOrHome";
 import { sanitizeDigits, validateBirthYear } from "@/lib/birthDate";
+import { 띠찾기 } from "@/lib/saju";
+
+const 요일목록 = ["일요일", "월요일", "화요일", "수요일", "목요일", "금요일", "토요일"];
 import Link from "next/link";
 import { fortuneDB } from "@/lib/fortuneDB";
 import { useScreenshot } from "@/hooks/useScreenshot";
 
-const 띠목록 = ["쥐", "소", "호랑이", "토끼", "용", "뱀", "말", "양", "원숭이", "닭", "개", "돼지"];
-const 요일목록 = ["일요일", "월요일", "화요일", "수요일", "목요일", "금요일", "토요일"];
-
-function 띠계산(year: number): string {
-  const index = (year - 4) % 12;
-  return 띠목록[index];
-}
 
 function 띠이모지(띠: string): string {
   const 이모지맵: Record<string, string> = {
@@ -51,9 +47,8 @@ export default function DailyFortunePage() {
     if (!yearCheck.ok) return;
     const year = Number(birthYear);
 
-    // 1-2월생이고 음력 설 전이면 전년도 띠 사용
-    const 계산년도 = isEarlyYear ? year - 1 : year;
-    const 띠 = 띠계산(계산년도);
+    // 사주의 해는 입춘(2월 4일)에 바뀐다
+    const 띠 = 띠찾기(year, isEarlyYear ? 1 : 3, 1);
     const 요일데이터 = fortuneDB.일간운세[오늘요일 as keyof typeof fortuneDB.일간운세];
     const 운세 = 요일데이터[띠 as keyof typeof 요일데이터];
 
@@ -131,7 +126,7 @@ export default function DailyFortunePage() {
             {yearCheck.error && <p role="alert" className="text-sm text-center text-[#C41E3A] mb-2">{yearCheck.error}</p>}
             <div className="mb-2" />
 
-            {/* 음력 설 전 체크박스 */}
+            {/* 입춘 전 출생 체크박스 */}
             <label className="flex items-center justify-center gap-2 mb-4 cursor-pointer">
               <input
                 type="checkbox"
@@ -140,11 +135,11 @@ export default function DailyFortunePage() {
                 className="w-5 h-5 rounded accent-[#C41E3A]"
               />
               <span className="text-sm text-[#5C4033]/70">
-                1~2월생이에요 (음력 설 전 출생)
+                1월 1일~2월 3일(입춘 전)에 태어났어요
               </span>
             </label>
             <p className="text-xs text-[#5C4033]/50 text-center mb-4">
-              * 음력 설(1월 말~2월 초) 전에 태어났다면 체크하세요
+              * 띠는 입춘(2월 4일 무렵)에 바뀌어요. 그 전에 태어났다면 체크하세요
             </p>
 
             <button
@@ -167,7 +162,7 @@ export default function DailyFortunePage() {
               <span className="text-6xl block mb-3 animate-bounce-in">{띠이모지(result.띠)}</span>
               <h2 className="text-2xl font-bold mb-1 text-[#C41E3A]">{result.띠}띠</h2>
               <p className="text-[#5C4033]/70 text-sm">
-                {birthYear}년생 {isEarlyYear && "(음력 설 전)"}
+                {birthYear}년생 {isEarlyYear && "(입춘 전)"}
               </p>
               <div className="flex justify-center gap-1 mt-3">
                 <span className="text-[#C41E3A]/60">─</span>
