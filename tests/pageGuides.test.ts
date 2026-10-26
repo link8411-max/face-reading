@@ -49,8 +49,8 @@ test('/fortune 가이드는 코드가 하지 않는 시주·음력 계산을 주
   expect(text).toContain('양력')
 })
 
-test('/samguk 가이드는 사진이 외부 AI(Gemini)로 전송됨을 밝힌다', () => {
-  const g = pageGuides['/samguk']
-  expect(g.faqs.find((f) => f.q.includes('사진'))!.a).toContain('Google Gemini')
-  expect(g.intro.join('')).toContain('Google Gemini')
+test('/samguk 가이드는 브라우저 안에서만 분석함을 밝히고 Gemini를 언급하지 않는다', () => {
+  const text = JSON.stringify(pageGuides['/samguk'])
+  expect(text).not.toContain('Gemini')
+  expect(pageGuides['/samguk'].faqs.find((f) => f.q.includes('사진'))!.a).toContain('브라우저')
 })

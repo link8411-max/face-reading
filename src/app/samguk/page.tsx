@@ -5,6 +5,10 @@ import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { SamgukCharacter } from "@/lib/samgukDB";
 import { useScreenshot } from "@/hooks/useScreenshot";
+import { extractFeatures, checkFrontal } from "@/lib/face/landmarkFeatures";
+import { toZ } from "@/lib/face/featureStats";
+import { matchCharacter, type Gender } from "@/lib/samguk/matcher";
+import calibration from "@/lib/samguk/calibration.json";
 
 interface AnalysisResult {
   name: string;
@@ -131,6 +135,7 @@ export default function SamgukPage() {
   const [loading, setLoading] = useState(false);
   const [loadingStep, setLoadingStep] = useState(0);
   const [result, setResult] = useState<AnalysisResult | null>(null);
+  const [gender, setGender] = useState<Gender | null>(null);
   const [selectedTab, setSelectedTab] = useState<string>("열전");
   const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -176,26 +181,38 @@ export default function SamgukPage() {
   };
 
   const analyzeImage = async () => {
-    if (!image) return;
+    if (!image || !gender) return;
 
     setLoading(true);
     try {
-      // 이미지 압축 (최대 1024px, 0.7 퀄리티)
+      // 이미지 축소 후 브라우저 안에서 얼굴 랜드마크 추출 (사진은 서버로 보내지 않음)
       const compressedImage = await compressImage(image);
-      const response = await fetch("/api/samguk", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ image: compressedImage }),
-      });
+      const img = new Image();
+      img.src = compressedImage;
+      await img.decode();
 
-      const data = await response.json();
-      if (data.error) {
-        alert(data.error);
-      } else {
-        setResult(data);
-        // 결과가 나오면 페이지 상단으로 스크롤하여 결과를 바로 볼 수 있게 함
-        window.scrollTo({ top: 0, behavior: "smooth" });
+      let landmarks;
+      try {
+        const { detectLandmarks } = await import("@/lib/face/mediapipe");
+        landmarks = await detectLandmarks(img);
+      } catch {
+        alert("분석 도구를 불러오지 못했어요. 새로고침해 주세요.");
+        return;
       }
+      if (!landmarks) {
+        alert("얼굴을 찾지 못했어요. 얼굴이 잘 보이는 사진을 올려 주세요.");
+        return;
+      }
+      if (!checkFrontal(landmarks).ok) {
+        alert("정면 사진을 올려 주세요. 고개를 돌린 사진은 닮은꼴을 찾기 어려워요.");
+        return;
+      }
+
+      const features = extractFeatures(landmarks);
+      if (process.env.NODE_ENV !== "production") console.info("[samguk] features", features);
+      setResult(matchCharacter(toZ(features), gender, calibration.bias));
+      // 결과가 나오면 페이지 상단으로 스크롤하여 결과를 바로 볼 수 있게 함
+      window.scrollTo({ top: 0, behavior: "smooth" });
     } catch {
       alert("분석 중 오류가 발생했습니다.");
     } finally {
@@ -311,7 +328,7 @@ export default function SamgukPage() {
                   <KoeiInsetBox className="text-[11px] text-stone-300/80 leading-relaxed font-medium">
                     <p>※ 정면 사진은 인식의 기개가 더욱 높습니다.</p>
                     <p>※ 안면의 랜드마크를 통해 52인의 장수와 대조합니다.</p>
-                    <p className="text-amber-500/80 mt-1">※ 사용자의 사진은 서버에 저장되지 않으며 분석 후 즉시 소멸됩니다.</p>
+                    <p className="text-amber-500/80 mt-1">※ 사진은 서버로 전송되지 않고 브라우저 안에서만 분석됩니다.</p>
                   </KoeiInsetBox>
                 </div>
 
@@ -323,6 +340,21 @@ export default function SamgukPage() {
                   className="hidden"
                 />
 
+                <div className="w-full mt-6">
+                  <p className="text-[11px] font-bold text-amber-100/70 mb-2 px-1">어느 장수들과 겨룰까요?</p>
+                  <div className="flex gap-3">
+                    {(["남", "여"] as const).map((g) => (
+                      <button
+                        key={g}
+                        onClick={() => setGender(g)}
+                        className={`flex-1 py-2 rounded border text-xs font-bold transition ${gender === g ? "bg-amber-700 border-amber-400 text-white" : "bg-stone-800/50 border-stone-600 text-amber-200/70"}`}
+                      >
+                        {g === "남" ? "남성 인물" : "여성 인물"}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
                 {image && (
                   <div className="w-full flex gap-3 mt-6">
                     <button
@@ -333,10 +365,10 @@ export default function SamgukPage() {
                     </button>
                     <button
                       onClick={analyzeImage}
-                      disabled={loading}
-                      className="flex-1 py-3 bg-gradient-to-r from-red-800 to-red-600 border border-red-500 rounded text-white text-xs font-bold hover:brightness-110 transition shadow-[0_0_15px_rgba(220,38,38,0.3)]"
+                      disabled={loading || !gender}
+                      className="flex-1 py-3 bg-gradient-to-r from-red-800 to-red-600 border border-red-500 rounded text-white text-xs font-bold hover:brightness-110 transition shadow-[0_0_15px_rgba(220,38,38,0.3)] disabled:opacity-40"
                     >
-                      영웅 탐색 시작 ⚔️
+                      {gender ? "영웅 탐색 시작 ⚔️" : "인물 성별을 먼저 골라 주세요"}
                     </button>
                   </div>
                 )}
