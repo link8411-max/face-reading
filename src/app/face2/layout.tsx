@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import PageGuide from "@/components/PageGuide";
 
 export const metadata: Metadata = {
   title: "무료 AI 관상 분석 | 얼굴로 보는 운세 - 운명을 읽다",
@@ -73,6 +74,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
         dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }}
       />
       {children}
+      <PageGuide route="/face2" />
     </>
   );
 }
