@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Noto_Sans_KR, Noto_Serif_KR } from "next/font/google";
+import { Gowun_Batang, Noto_Sans_KR, Silkscreen } from "next/font/google";
 import { Analytics } from "@vercel/analytics/react";
 import Link from "next/link";
 import BottomTabBar from "@/components/BottomTabBar";
@@ -14,11 +14,20 @@ const notoSans = Noto_Sans_KR({
   display: "swap",
 });
 
-const notoSerif = Noto_Serif_KR({
-  variable: "--font-noto-serif-kr",
-  weight: ["900"],
+const gowunBatang = Gowun_Batang({
+  variable: "--font-gowun-batang",
+  weight: ["400", "700"],
   subsets: ["latin"],
   display: "swap",
+});
+
+// 삼국지 결과 카드의 픽셀 글씨 (영문·숫자만)
+const silkscreen = Silkscreen({
+  variable: "--font-silkscreen",
+  weight: ["400"],
+  subsets: ["latin"],
+  display: "swap",
+  preload: false,
 });
 
 export const metadata: Metadata = {
@@ -120,7 +129,7 @@ export default function RootLayout({
         />
       </head>
       <body
-        className={`${notoSans.variable} ${notoSerif.variable} font-sans antialiased bg-paper text-ink`}
+        className={`${notoSans.variable} ${gowunBatang.variable} ${silkscreen.variable} font-sans antialiased bg-paper text-ink`}
       >
         {/* 하단 탭바(h-16)에 내용이 가리지 않도록 아래 여백 */}
         <div className="flex flex-col min-h-screen pb-[calc(4rem+env(safe-area-inset-bottom))]">

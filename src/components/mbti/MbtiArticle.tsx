@@ -5,7 +5,7 @@ import { mbtiProfiles, monthlyFor } from "@/content/mbtiTypes";
 import { MBTI_TYPES, bestMatches, compatSummary, type MbtiType } from "@/lib/mbti/compat";
 
 const card = "bg-white border border-line rounded-3xl p-5";
-const h2 = "font-black text-lg text-vermilion mb-2";
+const h2 = "font-bold text-lg text-vermilion mb-2";
 
 export function mbtiFaqs(type: MbtiType) {
   const p = mbtiProfiles[type];
@@ -39,7 +39,7 @@ export default function MbtiArticle({ type }: { type: MbtiType }) {
       <nav className="text-sm text-muted"><Link href="/">홈</Link> › <Link href="/mbti">MBTI</Link> › {type}</nav>
       <header className="text-center">
         <p className="text-sm font-bold text-gold">{p.nickname}</p>
-        <h1 className="font-serif text-4xl font-black text-vermilion mt-1">{type}</h1>
+        <h1 className="font-serif text-4xl font-bold text-vermilion mt-1">{type}</h1>
         <div className="flex flex-wrap justify-center gap-1.5 mt-3">
           {p.strengths.map((s) => <span key={s} className="text-xs font-bold px-2.5 py-1 rounded-full bg-vermilion/10 text-vermilion">{s}</span>)}
         </div>
@@ -112,7 +112,7 @@ export default function MbtiArticle({ type }: { type: MbtiType }) {
       </section>
 
       <section>
-        <h2 className="font-black text-base mb-2">다른 유형 보기</h2>
+        <h2 className="font-bold text-base mb-2">다른 유형 보기</h2>
         <div className="grid grid-cols-4 gap-2 text-center text-sm font-bold">
           {MBTI_TYPES.filter((t) => t !== type).map((t) => <Link key={t} href={`/mbti/${t.toLowerCase()}`} className="bg-white border border-line rounded-xl py-2">{t}</Link>)}
         </div>

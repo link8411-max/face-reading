@@ -16,7 +16,7 @@ export default function CategoryList({ items }: { items: CategoryItem[] }) {
               {item.thumb.image ? null : item.thumb.emoji}
             </span>
             <span className="flex-1 min-w-0">
-              <span className="block font-black text-[15px] text-ink">{item.title}</span>
+              <span className="block font-bold text-[15px] text-ink">{item.title}</span>
               <span className="block text-xs text-muted mt-0.5 mb-1.5">{item.desc}</span>
               {item.chip && <span className="inline-block text-[11px] font-bold px-2 py-0.5 rounded-full bg-vermilion/10 text-vermilion">{item.chip}</span>}
             </span>

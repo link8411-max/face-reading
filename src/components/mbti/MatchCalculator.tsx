@@ -55,8 +55,8 @@ export default function MatchCalculator() {
       <div className="space-y-4">
         <section aria-label="궁합 결과" ref={ref} className="bg-white border-2 border-vermilion/30 rounded-3xl p-5 text-center">
           <p className="text-sm text-muted">MBTI 궁합</p>
-          <p className="font-serif text-3xl font-black mt-1"><span className="text-vermilion">{a}</span> × <span className="text-navy">{b}</span></p>
-          <p className="mt-3"><span data-testid="total-score" className="text-5xl font-black text-vermilion">{s.total}</span><span className="text-lg font-bold">점</span></p>
+          <p className="font-serif text-3xl font-bold mt-1"><span className="text-vermilion">{a}</span> × <span className="text-navy">{b}</span></p>
+          <p className="mt-3"><span data-testid="total-score" className="text-5xl font-bold text-vermilion">{s.total}</span><span className="text-lg font-bold">점</span></p>
           <p className="inline-block mt-2 text-sm font-bold px-3 py-1 rounded-full bg-gold/15 text-[#9A7A10]">{s.label}</p>
           <div className="space-y-1.5 mt-4 text-left"><Bar label="연애" score={s.love} /><Bar label="친구" score={s.friend} /><Bar label="직장" score={s.work} /></div>
           <ul className="text-left text-sm leading-relaxed mt-4 space-y-1">{s.lines.map((l) => <li key={l}>· {l}</li>)}</ul>
@@ -80,7 +80,7 @@ export default function MatchCalculator() {
       <TypeGroup label="나의 MBTI" value={a} onChange={setA} />
       <TypeGroup label="상대의 MBTI" value={b} onChange={setB} />
       <button type="button" disabled={!a || !b} onClick={() => setShown(true)}
-        className="w-full py-4 rounded-2xl bg-vermilion text-white font-black text-lg disabled:opacity-40">
+        className="w-full py-4 rounded-2xl bg-vermilion text-white font-bold text-lg disabled:opacity-40">
         {a && b ? `${a} × ${b} 궁합 보기` : "두 유형을 골라 궁합 보기"}
       </button>
     </div>

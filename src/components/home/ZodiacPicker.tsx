@@ -24,7 +24,7 @@ export default function ZodiacPicker() {
 
   return (
     <section aria-label="띠 바로 고르기" className="bg-white border border-line rounded-[22px] p-4">
-      <h2 className="font-black text-[15px]">오늘, 내 띠의 하루는?</h2>
+      <h2 className="font-bold text-[15px]">오늘, 내 띠의 하루는?</h2>
       <p className="text-xs text-muted mt-0.5 mb-3">{today ? today.label : " "} · 띠를 눌러 보세요</p>
       <div className="grid grid-cols-6 gap-1.5">
         {ZODIAC_SLUGS.map((s) => (

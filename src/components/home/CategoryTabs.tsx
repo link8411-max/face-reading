@@ -33,7 +33,7 @@ export default function CategoryTabs() {
           </>
         ) : (
           <Link href={category.href} className="block bg-gradient-to-br from-[#6B3FA0] to-[#9466C9] text-white rounded-2xl p-4">
-            <span className="font-black">🧩 MBTI 궁합, 곧 열려요</span>
+            <span className="font-bold">🧩 MBTI 궁합, 곧 열려요</span>
             <span className="block text-xs opacity-85 mt-1">16유형 궁합·이달의 운세·여행지·직업</span>
           </Link>
         )}

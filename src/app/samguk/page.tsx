@@ -30,7 +30,7 @@ interface AnalysisResult {
 function KoeiStatLine({ label, value, max = 100 }: { label: string; value: number; max?: number }) {
   return (
     <div className="flex items-center gap-2 mb-3">
-      <div className="w-16 text-amber-200 text-[14.5px] font-black drop-shadow-sm italic tracking-tighter">{label}</div>
+      <div className="w-16 text-amber-200 text-[14.5px] font-bold drop-shadow-sm italic tracking-tighter">{label}</div>
       <div className="flex-1 relative h-5 bg-black/50 rounded shadow-[inset_0_2px_4px_rgba(0,0,0,0.8)] border border-stone-800">
         <div
           className="absolute inset-y-0.5 left-0.5 bg-gradient-to-r from-red-700 to-red-500 rounded-sm transition-all duration-1000 shadow-[0_0_10px_rgba(185,28,28,0.6)]"
@@ -39,7 +39,7 @@ function KoeiStatLine({ label, value, max = 100 }: { label: string; value: numbe
           <div className="absolute inset-0 bg-[linear-gradient(transparent_0%,rgba(255,255,255,0.2)_50%,transparent_100%)]"></div>
         </div>
       </div>
-      <div className="w-10 text-right text-white font-mono text-[14.5px] font-black italic">{value}</div>
+      <div className="w-10 text-right text-white font-mono text-[14.5px] font-bold italic">{value}</div>
     </div>
   );
 }
@@ -391,7 +391,7 @@ export default function SamgukPage() {
                     {loadingStep >= 1 && <p className="flex items-center gap-2 items-in text-emerald-400"><span className="text-emerald-500">●</span><span>&gt; 안면 특징점 데이터 수집 완료.</span></p>}
                     {loadingStep >= 2 && <p className="flex items-center gap-2"><span className="text-amber-600">●</span><span>&gt; 영웅 52인 페르소나 대조 시작...</span></p>}
                     {loadingStep >= 3 && <p className="flex items-center gap-2"><span className="text-amber-600">●</span><span>&gt; 기개(氣槪) 레벨 측정 중... 89.4%</span></p>}
-                    {loadingStep >= 4 && <p className="flex items-center gap-2 text-blue-300 font-black animate-pulse"><span className="text-blue-500">●</span><span>&gt; MATCHING CHARACTER ID: FOUND</span></p>}
+                    {loadingStep >= 4 && <p className="flex items-center gap-2 text-blue-300 font-bold animate-pulse"><span className="text-blue-500">●</span><span>&gt; MATCHING CHARACTER ID: FOUND</span></p>}
                     {loadingStep >= 5 && <p className="flex items-center gap-2 text-white"><span className="text-white animate-ping text-[4px]">●</span><span>&gt; 영웅의 자태를 렌더링합니다...</span></p>}
                   </div>
                   <div className="absolute inset-0 pointer-events-none bg-[linear-gradient(transparent_50%,rgba(0,0,0,0.1)_50%),linear-gradient(90deg,rgba(255,0,0,0.03),rgba(0,255,0,0.01),rgba(0,0,255,0.03))] bg-[length:100%_2px,3px_100%]"></div>
@@ -452,22 +452,22 @@ export default function SamgukPage() {
                     <div className="flex-1 space-y-2">
                       <div className="flex items-center justify-between mb-2 border-b-2 border-black/60 pb-1.5">
                         <div className="flex items-center gap-2">
-                          <span className="text-white text-xl font-black drop-shadow-lg leading-tight">{result.character.name}</span>
+                          <span className="text-white text-xl font-bold drop-shadow-lg leading-tight">{result.character.name}</span>
                           <span className="text-amber-300/50 text-[13px] font-medium">{result.character.hanja}</span>
                         </div>
                         <div className="flex items-center gap-1.5 bg-black/20 px-2 py-0.5 rounded border border-white/5">
-                          <span className="text-amber-500 font-black text-[11px] uppercase tracking-widest italic">Match:</span>
-                          <span className="text-white font-mono text-base font-black italic">{result.similarity}%</span>
+                          <span className="text-amber-500 font-bold text-[11px] uppercase tracking-widest italic">Match:</span>
+                          <span className="text-white font-mono text-base font-bold italic">{result.similarity}%</span>
                         </div>
                       </div>
 
                       <KoeiInsetBox className="p-4 space-y-4 bg-black/40">
                         <div className="flex flex-col gap-1.5">
-                          <span className="text-amber-300/60 font-black text-[11px] uppercase tracking-wider">영웅의 추천 현대 직무</span>
+                          <span className="text-amber-300/60 font-bold text-[11px] uppercase tracking-wider">영웅의 추천 현대 직무</span>
                           <span className="text-white font-bold text-[16px] leading-snug break-keep">{result.character.modernJob}</span>
                         </div>
                         <div className="border-t border-stone-800/80 pt-3">
-                          <span className="text-amber-300/60 font-black text-[11px] uppercase tracking-wider block mb-2">영웅 대변 특성</span>
+                          <span className="text-amber-300/60 font-bold text-[11px] uppercase tracking-wider block mb-2">영웅 대변 특성</span>
                           <div className="flex flex-wrap gap-2">
                             {result.character.traits.map((t, i) => (
                               <span key={i} className="bg-amber-900/50 text-amber-100 text-[11.5px] px-2.5 py-1 rounded border border-amber-500/20 font-bold shadow-sm">{t}</span>
@@ -477,7 +477,7 @@ export default function SamgukPage() {
                       </KoeiInsetBox>
 
                       <div className="space-y-2">
-                        <div className="text-[13px] text-amber-500 ml-1 font-black italic tracking-widest">◈ 닮은 점</div>
+                        <div className="text-[13px] text-amber-500 ml-1 font-bold italic tracking-widest">◈ 닮은 점</div>
                         <KoeiInsetBox className="text-[13px] text-amber-100 leading-relaxed font-bold bg-black/60 p-4">
                           <p className="leading-relaxed text-[13px] drop-shadow-sm">{result.matchReason}</p>
                         </KoeiInsetBox>
@@ -502,21 +502,21 @@ export default function SamgukPage() {
                   <div id="samguk-tabpanel" role="tabpanel" aria-label={selectedTab} className="min-h-[320px] scroll-mt-16">
                     {selectedTab === "열전" && (
                       <div className="space-y-5 animate-in fade-in slide-in-from-bottom-2 duration-500">
-                        <div className="text-stone-400 text-[13px] font-black italic tracking-[0.2em] flex items-center gap-2">
+                        <div className="text-stone-400 text-[13px] font-bold italic tracking-[0.2em] flex items-center gap-2">
                           <span className="w-2.5 h-2.5 bg-stone-600 rotate-45 shadow-[0_0_8px_rgba(0,0,0,1)]"></span>
                           HEROIC LEGEND & COMMENTARY
                         </div>
                         <div className="bg-black/50 border border-stone-800 p-5 rounded-sm space-y-5 shadow-2xl">
                           <div className="relative pl-8 py-3 border-l-4 border-amber-900/30">
                             <span className="absolute left-1 top-0 text-4xl text-amber-800 font-serif">&ldquo;</span>
-                            <p className="text-amber-200 text-lg sm:text-xl italic leading-relaxed font-black drop-shadow-md">&quot;{result.character.quote}&quot;</p>
+                            <p className="text-amber-200 text-lg sm:text-xl italic leading-relaxed font-bold drop-shadow-md">&quot;{result.character.quote}&quot;</p>
                             <span className="absolute right-2 bottom-0 text-4xl text-amber-800 font-serif rotate-180">&ldquo;</span>
                           </div>
                           <p className="text-stone-100 text-[15px] sm:text-[17px] leading-loose pt-5 border-t border-stone-800 font-bold tracking-tight">
                             {result.character.description}
                           </p>
                           <div className="bg-gradient-to-br from-stone-800 to-stone-900 p-4 rounded-md border border-stone-700 shadow-inner">
-                            <p className="text-amber-600 text-[13px] font-black mb-2 tracking-widest uppercase italic">[현대적 재구성] - {result.character.modernJob}</p>
+                            <p className="text-amber-600 text-[13px] font-bold mb-2 tracking-widest uppercase italic">[현대적 재구성] - {result.character.modernJob}</p>
                             <p className="text-amber-100 text-[14px] sm:text-[15.5px] font-bold leading-relaxed">{result.character.modernComment}</p>
                           </div>
                         </div>
@@ -525,7 +525,7 @@ export default function SamgukPage() {
 
                     {selectedTab === "능력" && (
                       <div className="space-y-4 animate-in fade-in slide-in-from-bottom-2 duration-500">
-                        <div className="text-emerald-400 text-[10px] font-black flex items-center gap-2 tracking-widest italic">
+                        <div className="text-emerald-400 text-[10px] font-bold flex items-center gap-2 tracking-widest italic">
                           <span className="w-2 h-0.5 bg-emerald-500"></span>
                           CLASSIC ABILITIES
                         </div>
@@ -544,7 +544,7 @@ export default function SamgukPage() {
 
                     {selectedTab === "현대" && (
                       <div className="space-y-4 animate-in fade-in slide-in-from-bottom-2 duration-500">
-                        <div className="text-blue-400 text-[10px] font-black flex items-center gap-2 tracking-widest italic">
+                        <div className="text-blue-400 text-[10px] font-bold flex items-center gap-2 tracking-widest italic">
                           <span className="w-2 h-0.5 bg-blue-500"></span>
                           MODERN SOCIAL STATS
                         </div>
@@ -564,7 +564,7 @@ export default function SamgukPage() {
 
                     {selectedTab === "특기" && (
                       <div className="space-y-4 animate-in fade-in slide-in-from-bottom-2 duration-500">
-                        <div className="text-purple-400 text-[10px] font-black flex items-center gap-2 tracking-widest italic">
+                        <div className="text-purple-400 text-[10px] font-bold flex items-center gap-2 tracking-widest italic">
                           <span className="w-2 h-0.5 bg-purple-500"></span>
                           SPECIAL TRAITS & LIFESTYLE
                         </div>

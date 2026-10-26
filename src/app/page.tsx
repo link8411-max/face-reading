@@ -21,7 +21,7 @@ export default function Home() {
 
       <header>
         <h1 className="flex flex-col">
-          <Link href="/" className="font-serif text-xl font-black text-vermilion">
+          <Link href="/" className="font-serif text-xl font-bold text-vermilion">
             운명을 <span className="text-gold">읽다</span>
           </Link>
           <span className="text-xs text-muted font-normal mt-0.5">무료 AI 관상·얼굴 테스트와 {FORTUNE_YEAR.year} 신년운세</span>
@@ -36,7 +36,7 @@ export default function Home() {
 
       <section aria-label={`${FORTUNE_YEAR.year} 띠별 운세`}>
         <div className="flex items-baseline justify-between mb-2">
-          <h2 className="font-black text-base">{FORTUNE_YEAR.year} 띠별 운세</h2>
+          <h2 className="font-bold text-base">{FORTUNE_YEAR.year} 띠별 운세</h2>
           <Link href="/fortune/2027" className="text-xs text-muted">전체 →</Link>
         </div>
         <div className="flex gap-2 overflow-x-auto pb-1 -mx-4 px-4 [scrollbar-width:none]">
@@ -50,7 +50,7 @@ export default function Home() {
       </section>
 
       <section aria-label="자주 묻는 질문">
-        <h2 className="font-black text-base mb-2">자주 묻는 질문</h2>
+        <h2 className="font-bold text-base mb-2">자주 묻는 질문</h2>
         <div className="space-y-2">
           {HOME_FAQS.map((f) => (
             <details key={f.q} className="bg-white border border-line rounded-2xl px-4 py-3">
