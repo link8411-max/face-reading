@@ -1,0 +1,56 @@
+import { MBTI_TYPES, isMbti, compatScore, compatSummary, bestMatches, type Context } from '@/lib/mbti/compat'
+
+const CTX: Context[] = ['love', 'friend', 'work']
+
+test('isMbti', () => {
+  expect(isMbti('INFP')).toBe(true)
+  expect(isMbti('infp')).toBe(false)
+  expect(isMbti('ABCD')).toBe(false)
+})
+
+test('대칭·범위·정수·결정성', () => {
+  for (const a of MBTI_TYPES) for (const b of MBTI_TYPES) for (const c of CTX) {
+    const s = compatScore(a, b, c)
+    expect(Number.isInteger(s)).toBe(true)
+    expect(s).toBeGreaterThanOrEqual(55)
+    expect(s).toBeLessThanOrEqual(98)
+    expect(s).toBe(compatScore(b, a, c))
+    expect(s).toBe(compatScore(a, b, c))
+  }
+})
+
+test('분포: 평균 70~85, 최소 < 65, 최대 > 90', () => {
+  const totals = MBTI_TYPES.flatMap((a) => MBTI_TYPES.map((b) => compatSummary(a, b).total))
+  const avg = totals.reduce((x, y) => x + y, 0) / totals.length
+  expect(avg).toBeGreaterThanOrEqual(70)
+  expect(avg).toBeLessThanOrEqual(85)
+  expect(Math.min(...totals)).toBeLessThan(65)
+  expect(Math.max(...totals)).toBeGreaterThan(90)
+})
+
+test('같은 유형끼리는 그 유형의 최고점이 아니다', () => {
+  for (const a of MBTI_TYPES) {
+    const self = compatSummary(a, a).total
+    const best = Math.max(...MBTI_TYPES.map((b) => compatSummary(a, b).total))
+    expect(self, a).toBeLessThan(best)
+  }
+})
+
+test('bestMatches: 3개, 자기 자신 제외, 점수 내림차순', () => {
+  for (const a of MBTI_TYPES) for (const c of CTX) {
+    const m = bestMatches(a, c)
+    expect(m).toHaveLength(3)
+    expect(m).not.toContain(a)
+    const scores = m.map((b) => compatScore(a, b, c))
+    expect([...scores].sort((x, y) => y - x)).toEqual(scores)
+  }
+})
+
+test('설명 문장 4개, 부정적 표현 없음, 라벨 있음', () => {
+  for (const a of MBTI_TYPES) for (const b of MBTI_TYPES) {
+    const s = compatSummary(a, b)
+    expect(s.lines).toHaveLength(4)
+    expect(s.label.length).toBeGreaterThan(0)
+    for (const l of s.lines) expect(l, `${a}-${b}`).not.toMatch(/나쁜|최악|안 맞|싫|문제가 많/)
+  }
+})
