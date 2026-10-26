@@ -14,12 +14,12 @@ export const SITEMAP_ROUTES = [
 
 // 페이지 내용을 바꾸면 해당 라우트 날짜도 갱신할 것 (new Date()를 쓰면 매 요청마다 바뀌어 검색엔진이 무시함)
 export const LAST_MODIFIED: Record<string, string> = {
-    '': '2026-01-15',
-    '/face2': '2026-01-15',
-    '/fortune': '2026-01-15',
-    '/fortune/daily': '2026-01-15',
-    '/samguk': '2026-01-15',
-    '/animal': '2026-01-15',
+    '': '2026-10-26',
+    '/face2': '2026-10-26',
+    '/fortune': '2026-10-26',
+    '/fortune/daily': '2026-10-26',
+    '/samguk': '2026-10-26',
+    '/animal': '2026-10-26',
     '/face': '2026-01-15',
 }
 

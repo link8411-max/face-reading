@@ -19,3 +19,8 @@ test('루트 layout에는 FAQPage가 없고 홈에만 있다', () => {
 test('삼국지 footer에 옛 이름이 없다', () => {
   expect(readFileSync('src/app/samguk/page.tsx', 'utf8')).not.toContain('Samguk Persona')
 })
+
+test('/fortune 가이드는 하위 라우트(/fortune/daily)에 중첩되지 않게 layout이 아닌 page에서 렌더한다', () => {
+  expect(readFileSync('src/app/fortune/layout.tsx', 'utf8')).not.toContain('PageGuide')
+  expect(readFileSync('src/app/fortune/page.tsx', 'utf8')).toContain('<PageGuide route="/fortune" />')
+})
