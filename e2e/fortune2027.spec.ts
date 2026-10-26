@@ -25,7 +25,7 @@ test('없는 띠 주소는 404', async ({ page }) => {
 
 test('홈 → 띠별 운세 → 양띠 → 사주로 자세히 보기', async ({ page }) => {
   await page.goto('/')
-  await page.locator('main a[href="/fortune/2027"]').click()
+  await page.locator('main a[href="/fortune/2027"]').first().click()
   await expect(page).toHaveURL(/\/fortune\/2027$/)
   await page.locator('a[href="/fortune/2027/sheep"]').click()
   await expect(page.locator('h1')).toHaveText('2027년 양띠 운세')

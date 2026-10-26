@@ -1,7 +1,11 @@
 import { test, expect } from '@playwright/test'
 import { trackErrors } from './helpers'
 
-test('시즌 히어로 → 신년운세', async ({ page }) => {
+test('얼굴 히어로 → 관상, 시즌 카드 → 신년운세', async ({ page }) => {
+  await page.goto('/')
+  await expect(page.getByRole('heading', { name: /내 얼굴에는/ })).toBeVisible()
+  await page.getByRole('link', { name: '내 얼굴 보러 가기' }).click()
+  await expect(page).toHaveURL(/\/face2$/)
   await page.goto('/')
   await page.getByRole('link', { name: /지금 확인하기/ }).click()
   await expect(page).toHaveURL(/\/fortune$/)
@@ -12,7 +16,7 @@ test('띠 바로 고르기: 양띠를 누르면 오늘의 운세가 메인에 �
   await page.goto('/')
   const picker = page.getByRole('region', { name: '띠 바로 고르기' })
   await picker.getByRole('button', { name: /양/ }).click()
-  await expect(picker.getByText(/★/)).toBeVisible()
+  await expect(picker.getByText(/양띠 오늘의 한마디/)).toBeVisible()
   await expect(picker.getByRole('link', { name: /오늘의 운세 자세히/ })).toHaveAttribute('href', '/fortune/daily')
   await expect(picker.getByRole('link', { name: /2027 양띠 운세/ })).toHaveAttribute('href', '/fortune/2027/sheep')
   expect(errors).toEqual([])
@@ -48,12 +52,14 @@ test('홈: hydration 오류 없음', async ({ page }) => {
   expect(errors.filter((e) => /hydrat/i.test(e))).toEqual([])
 })
 
-test('홈 쿠팡 배너는 띠 고르기 바로 다음, 묶음 탭보다 위', async ({ page }) => {
+test('홈 순서: 히어로 → 친구랑 같이 → 띠 고르기 → 쿠팡 배너 → 묶음 탭 (배너가 첫 흐름을 막지 않는다)', async ({ page }) => {
   await page.goto('/')
   const y = async (loc: import('@playwright/test').Locator) => (await loc.boundingBox())!.y
+  const together = await y(page.getByRole('region', { name: '친구랑 같이 해봐요' }))
   const picker = await y(page.getByRole('region', { name: '띠 바로 고르기' }))
   const banner = await y(page.locator('iframe[title="쿠팡 추천 상품"]'))
   const tabs = await y(page.getByRole('region', { name: '테스트 묶음' }))
+  expect(together).toBeLessThan(picker)
   expect(picker).toBeLessThan(banner)
   expect(banner).toBeLessThan(tabs)
 })
