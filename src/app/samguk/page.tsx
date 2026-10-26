@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useRef, useEffect } from "react";
-import { useRouter } from "next/navigation";
+import { useBackOrHome } from "@/hooks/useBackOrHome";
 import Link from "next/link";
 import { SamgukCharacter } from "@/lib/samgukDB";
 import { useScreenshot } from "@/hooks/useScreenshot";
@@ -108,7 +108,7 @@ function KoeiButton({ label, onClick, highlight = false }: { label: string; onCl
 }
 
 export default function SamgukPage() {
-  const router = useRouter();
+  const goBack = useBackOrHome();
   const [image, setImage] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const [loadingStep, setLoadingStep] = useState(0);
@@ -239,7 +239,7 @@ export default function SamgukPage() {
         {/* Header */}
         <div className="flex items-center justify-between mb-6">
           <button
-            onClick={() => result ? resetAll() : router.back()}
+            onClick={() => result ? resetAll() : goBack()}
             className="text-[#C41E3A]/70 hover:text-[#C41E3A] transition"
           >
             ← {result ? '다시하기' : '돌아가기'}

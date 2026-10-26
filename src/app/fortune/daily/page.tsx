@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { useRouter } from "next/navigation";
+import { useBackOrHome } from "@/hooks/useBackOrHome";
 import Link from "next/link";
 import { fortuneDB } from "@/lib/fortuneDB";
 import { useScreenshot } from "@/hooks/useScreenshot";
@@ -23,7 +23,7 @@ function 띠이모지(띠: string): string {
 }
 
 export default function DailyFortunePage() {
-  const router = useRouter();
+  const goBack = useBackOrHome();
   const [birthYear, setBirthYear] = useState("");
   const [isEarlyYear, setIsEarlyYear] = useState(false);
   const [result, setResult] = useState<{
@@ -84,7 +84,7 @@ export default function DailyFortunePage() {
         {/* Header */}
         <div className="flex items-center justify-between mb-6">
           <button
-            onClick={() => result ? resetAll() : router.back()}
+            onClick={() => result ? resetAll() : goBack()}
             className="text-[#C41E3A]/70 hover:text-[#C41E3A] transition"
           >
             ← {result ? '다시하기' : '돌아가기'}

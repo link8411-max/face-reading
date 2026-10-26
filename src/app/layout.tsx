@@ -3,6 +3,7 @@ import { Geist, Geist_Mono } from "next/font/google";
 import { Analytics } from "@vercel/analytics/react";
 import Link from "next/link";
 import "./globals.css";
+import NavTracker from "@/components/NavTracker";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -114,6 +115,7 @@ export default function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
+        <NavTracker />
         <div className="flex flex-col min-h-screen">
           <main className="flex-grow">
             {children}

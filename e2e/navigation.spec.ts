@@ -1,0 +1,45 @@
+import { test, expect } from '@playwright/test'
+import { PAGES, TEST_PAGES, trackErrors } from './helpers'
+
+for (const path of PAGES) {
+  test(`${path} 열림 + 오류 없음`, async ({ page }) => {
+    const errors = trackErrors(page)
+    const res = await page.goto(path)
+    expect(res?.status()).toBeLessThan(400)
+    await expect(page.locator('h1').first()).toBeVisible()
+    await page.waitForTimeout(500)
+    expect(errors).toEqual([])
+  })
+
+  test(`${path} 내부 링크가 모두 살아 있다`, async ({ page, request }) => {
+    await page.goto(path)
+    const hrefs = await page.locator('a[href^="/"]').evaluateAll((as) => [...new Set(as.map((a) => a.getAttribute('href')!))])
+    for (const href of hrefs) {
+      const r = await request.get(href)
+      expect(r.status(), href).toBeLessThan(400)
+    }
+  })
+}
+
+test('홈 → 각 테스트 → 돌아가기 → 홈', async ({ page }) => {
+  for (const path of TEST_PAGES) {
+    await page.goto('/')
+    await page.locator(`main a[href="${path}"]`).first().click()
+    await expect(page).toHaveURL(new RegExp(`${path}$`))
+    await page.getByRole('button', { name: /돌아가기/ }).click()
+    await expect(page).toHaveURL(/\/$/)
+  }
+})
+
+for (const path of TEST_PAGES) {
+  test(`${path}에 검색으로 바로 들어와도 돌아가기가 홈으로 간다`, async ({ page }) => {
+    await page.goto(path)
+    await page.getByRole('button', { name: /돌아가기/ }).click()
+    await expect(page).toHaveURL(/localhost:3200\/$/)
+  })
+}
+
+test('예전 /face 주소는 /face2로 이동', async ({ page }) => {
+  await page.goto('/face')
+  await expect(page).toHaveURL(/\/face2$/)
+})

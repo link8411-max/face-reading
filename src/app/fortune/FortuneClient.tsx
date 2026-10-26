@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { useRouter } from "next/navigation";
+import { useBackOrHome } from "@/hooks/useBackOrHome";
 import Link from "next/link";
 import { useScreenshot } from "@/hooks/useScreenshot";
 
@@ -30,7 +30,7 @@ interface FortuneResult {
 }
 
 export default function FortuneClient() {
-  const router = useRouter();
+  const goBack = useBackOrHome();
   const [birthDate, setBirthDate] = useState({ year: "", month: "", day: "" });
   const [birthHour, setBirthHour] = useState<string>("모름");
   const [isLunar, setIsLunar] = useState(false);
@@ -129,7 +129,7 @@ export default function FortuneClient() {
         {/* Header */}
         <div className="flex items-center justify-between mb-6">
           <button
-            onClick={() => result ? resetAll() : router.back()}
+            onClick={() => result ? resetAll() : goBack()}
             className="text-[#C41E3A]/70 hover:text-[#C41E3A] transition"
           >
             ← {result ? '다시하기' : '돌아가기'}

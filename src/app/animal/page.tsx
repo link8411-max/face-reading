@@ -1,14 +1,14 @@
 "use client";
 
 import { useState, useRef, useEffect } from "react";
-import { useRouter } from "next/navigation";
+import { useBackOrHome } from "@/hooks/useBackOrHome";
 import Link from "next/link";
 import { useScreenshot } from "@/hooks/useScreenshot";
 import type { AnimalTypeResult } from "@/lib/animalTypeAnalyzer";
 import { animalTypeDB } from "@/lib/animalTypeDB";
 
 export default function AnimalTypePage() {
-  const router = useRouter();
+  const goBack = useBackOrHome();
   const [image, setImage] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const [modelsLoading, setModelsLoading] = useState(true);
@@ -103,7 +103,7 @@ export default function AnimalTypePage() {
         {/* Header */}
         <div className="flex items-center justify-between mb-6">
           <button
-            onClick={() => result ? resetAll() : router.back()}
+            onClick={() => result ? resetAll() : goBack()}
             className="text-[#C41E3A]/80 hover:text-[#C41E3A] transition font-medium"
           >
             ← {result ? '다시하기' : '돌아가기'}
