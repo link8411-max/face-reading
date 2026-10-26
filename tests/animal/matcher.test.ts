@@ -53,3 +53,26 @@ test('동물상 페이지는 face-api를 쓰지 않고 MediaPipe·성별 기준�
   expect(src).toContain('checkFrontal')
   expect(src).toContain('toZ(features, gender)')
 })
+
+// 리뷰 Important: 특징 문장이 같은 화면의 동물상 설명(대표 인상)과 반대로 나오지 않는다
+import { toZ } from '@/lib/face/featureStats'
+import { sampleFeatures, mulberry32 } from '@/lib/face/sampleFeatures'
+
+const OPPOSITE: Record<string, (d: ReturnType<typeof describeFace>) => boolean> = {
+  dog: (d) => /가늘고|올라간/.test(d.눈) || /갸름하고/.test(d.얼굴형),
+  cat: (d) => /내려간/.test(d.눈) || /다부진/.test(d.턱),
+  fox: (d) => /동그란|내려간/.test(d.눈) || /동그란/.test(d.얼굴형) || /다부진/.test(d.턱),
+  bear: (d) => /갸름하고/.test(d.얼굴형) || /갸름한/.test(d.턱) || /오똑/.test(d.코),
+  rabbit: (d) => /가늘고/.test(d.눈),
+  deer: (d) => /가늘고/.test(d.눈) || /동그란 편/.test(d.얼굴형),
+  tiger: (d) => /동그란 눈/.test(d.눈) || /갸름한/.test(d.턱),
+  eagle: (d) => /복스러운/.test(d.코),
+}
+
+test.each(['여', '남'] as const)('%s: 매칭된 동물상의 대표 인상과 반대되는 특징 문장이 없다', (g) => {
+  const rng = mulberry32(9)
+  for (let i = 0; i < 3000; i++) {
+    const r = matchAnimal(toZ(sampleFeatures(rng, g), g))
+    expect(OPPOSITE[r.type](r.features), `${r.type}: ${JSON.stringify(r.features)}`).toBe(false)
+  }
+})

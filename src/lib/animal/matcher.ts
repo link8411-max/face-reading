@@ -3,6 +3,7 @@ import type { ZVector } from '@/lib/face/featureStats'
 import { distance } from '@/lib/samguk/matcher'
 import { animalTypeDB, type AnimalType } from '@/lib/animalTypeDB'
 import { animalProfiles } from './profiles'
+import type { CharacterProfile } from '@/lib/samguk/profiles'
 
 export const ANIMAL_KEYS = ['dog', 'cat', 'fox', 'bear', 'rabbit', 'deer', 'tiger', 'eagle'] as const
 export type AnimalKey = (typeof ANIMAL_KEYS)[number]
@@ -18,7 +19,15 @@ export interface AnimalTypeResult {
 const T = 0.5 // 이 정도 이상 벗어나야 특징으로 말한다
 
 // 특징 묘사: 한 특징의 한쪽 방향만 고르므로 '큰 가늘고 긴 눈' 같은 모순이 생기지 않는다. 표현은 모두 인상 위주로 쓴다.
-export function describe(z: ZVector): AnimalTypeResult['features'] {
+// profile을 주면, 매칭된 동물상의 대표 인상(같은 화면의 설명 글)과 반대 방향인 특징은 중립 표현으로 바꾼다.
+export function describe(zIn: ZVector, profile?: CharacterProfile): AnimalTypeResult['features'] {
+  const z = { ...zIn }
+  if (profile) {
+    for (const k of ['eyeAspect', 'eyeTilt', 'faceAspect', 'jawWidth', 'noseWidth'] as const) {
+      const pz = profile.z[k]
+      if (pz !== undefined && Math.abs(pz) >= T && z[k] * pz < 0) z[k] = 0
+    }
+  }
   const shape = z.eyeAspect >= T ? '동그란 눈' : z.eyeAspect <= -T ? '가늘고 긴 눈' : '균형 잡힌 눈'
   const tilt = z.eyeTilt >= T ? '눈꼬리가 올라간 ' : z.eyeTilt <= -T ? '눈꼬리가 순하게 내려간 ' : ''
   return {
@@ -40,6 +49,6 @@ export function matchAnimal(z: ZVector, bias: Record<string, number> = {}): Anim
     data: animalTypeDB[k],
     matchScore: Math.max(70, Math.min(98, Math.round(99 - 7 * d))),
     secondaryType: ranked[1].k,
-    features: describe(z),
+    features: describe(z, animalProfiles[k]),
   }
 }
