@@ -4,7 +4,8 @@ import { samgukCharacters, type SamgukCharacter } from '@/lib/samgukDB'
 import { characterProfiles, type CharacterProfile } from './profiles'
 import { characterVibes } from './vibes'
 
-export type Gender = '남' | '여'
+export type { Gender } from '@/lib/face/featureStats'
+import type { Gender } from '@/lib/face/featureStats'
 
 export interface MatchResult {
   name: string

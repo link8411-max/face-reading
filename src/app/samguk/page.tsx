@@ -132,7 +132,7 @@ export default function SamgukPage() {
 
       const features = extractFeatures(landmarks);
       if (process.env.NODE_ENV !== "production") console.info("[samguk] features", features);
-      setResult(matchCharacter(toZ(features), gender, calibration.bias));
+      setResult(matchCharacter(toZ(features, gender), gender, calibration.bias));
       // 결과가 나오면 페이지 상단으로 스크롤하여 결과를 바로 볼 수 있게 함
       window.scrollTo({ top: 0, behavior: "smooth" });
     } catch {

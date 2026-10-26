@@ -39,7 +39,7 @@ export default function FaceLab() {
         const lm = await detectLandmarks(img);
         if (!lm) { out.push({ ...job, detected: false }); continue; }
         const features = extractFeatures(lm);
-        const m = matchCharacter(toZ(features), job.gender, calibration.bias);
+        const m = matchCharacter(toZ(features, job.gender), job.gender, calibration.bias);
         out.push({ ...job, detected: true, frontal: checkFrontal(lm), features, matchedId: m.character.id, similarity: m.similarity });
         setRows([...out]);
       }
