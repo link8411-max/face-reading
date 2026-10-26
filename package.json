@@ -10,7 +10,6 @@
     "test": "vitest run"
   },
   "dependencies": {
-    "@google/generative-ai": "^0.24.1",
     "@mediapipe/tasks-vision": "^1.1.1",
     "@vercel/analytics": "^1.6.1",
     "@vercel/og": "^0.8.6",

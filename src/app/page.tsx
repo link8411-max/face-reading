@@ -20,7 +20,7 @@ const faqJsonLd = {
       "name": "AI가 어떻게 얼굴을 분석하나요?",
       "acceptedAnswer": {
         "@type": "Answer",
-        "text": "최신 AI 기술(Google Gemini)을 활용하여 업로드된 얼굴 사진의 이목구비를 분석합니다. 전통 관상학의 기준을 바탕으로 각 부위의 특징을 파악하고, 종합적인 관상 해석을 제공합니다."
+        "text": "사진 속 얼굴에서 눈, 코, 입, 턱선 등 수백 개의 기준점을 찾아 이목구비의 비율과 각도를 측정합니다. 측정한 특징을 전통 관상학의 해석과 짝지어 관상 풀이를 보여드리며, 모든 분석은 브라우저 안에서만 이뤄지고 사진은 서버로 전송되지 않습니다."
       }
     },
     {
@@ -28,15 +28,15 @@ const faqJsonLd = {
       "name": "2026년 병오년 운세는 어떻게 보나요?",
       "acceptedAnswer": {
         "@type": "Answer",
-        "text": "음력 생년월일시를 입력하면 사주팔자와 천간지지를 분석하여 2026년 병오년(丙午年) 운세를 확인할 수 있습니다. 총운, 재물운, 직장운, 건강운, 애정운을 상세하게 알려드립니다."
+        "text": "양력 생년월일을 입력하면 연주·월주·일주의 천간과 지지, 오행을 분석해 2026년 병오년(丙午年) 운세를 확인할 수 있습니다. 총운, 재물운, 직장운, 건강운, 애정운을 알려드립니다."
       }
     },
     {
       "@type": "Question",
-      "name": "AI 관상과 무료 관상의 차이는 무엇인가요?",
+      "name": "사진은 저장되나요?",
       "acceptedAnswer": {
         "@type": "Answer",
-        "text": "무료 관상은 얼굴 인식 라이브러리로 즉시 분석하여 빠른 결과를 제공하며 무제한 이용 가능합니다. AI 관상은 Google Gemini AI가 더 정밀하게 분석하여 개인화된 결과를 제공하며 하루 1회 무료입니다."
+        "text": "아니요. 관상, 동물상, 삼국지 닮은꼴 모두 사진을 브라우저 안에서만 분석하고, 서버로 전송하거나 저장하지 않습니다."
       }
     },
     {
@@ -44,7 +44,7 @@ const faqJsonLd = {
       "name": "무료인가요?",
       "acceptedAnswer": {
         "@type": "Answer",
-        "text": "네, 모든 서비스는 무료입니다. 무료 관상 분석은 무제한, AI 관상 분석은 하루 1회 무료로 이용하실 수 있습니다. 오늘의 운세, 신년운세도 무료입니다."
+        "text": "네, 모든 서비스는 횟수 제한 없이 무료입니다. 회원가입도 필요하지 않습니다."
       }
     }
   ]
@@ -299,8 +299,7 @@ export default function Home() {
                 AI가 어떻게 얼굴을 분석하나요?
               </summary>
               <p className="mt-2 text-[#5C4033]/80 pl-5 leading-relaxed">
-                최신 AI 기술(Google Gemini)을 활용하여 업로드된 얼굴 사진의 이목구비를 분석합니다.
-                전통 관상학의 기준을 바탕으로 각 부위의 특징을 파악하고, 종합적인 관상 해석을 제공합니다.
+                사진 속 얼굴에서 눈, 코, 입, 턱선 등 수백 개의 기준점을 찾아 이목구비의 비율과 각도를 측정합니다. 측정한 특징을 전통 관상학의 해석과 짝지어 관상 풀이를 보여드리며, 모든 분석은 브라우저 안에서만 이뤄지고 사진은 서버로 전송되지 않습니다.
               </p>
             </details>
             <details className="group">
@@ -309,18 +308,16 @@ export default function Home() {
                 2026년 병오년 운세는 어떻게 보나요?
               </summary>
               <p className="mt-2 text-[#5C4033]/80 pl-5 leading-relaxed">
-                음력 생년월일시를 입력하면 사주팔자와 천간지지를 분석하여 2026년 병오년(丙午年) 운세를 확인할 수 있습니다.
-                총운, 재물운, 직장운, 건강운, 애정운을 상세하게 알려드립니다.
+                양력 생년월일을 입력하면 연주·월주·일주의 천간과 지지, 오행을 분석해 2026년 병오년(丙午年) 운세를 확인할 수 있습니다. 총운, 재물운, 직장운, 건강운, 애정운을 알려드립니다.
               </p>
             </details>
             <details className="group">
               <summary className="cursor-pointer text-[#5C4033] hover:text-[#C41E3A] transition list-none flex items-center gap-2 font-medium">
                 <span className="text-[#FFD700] group-open:rotate-90 transition-transform">▶</span>
-                AI 관상과 무료 관상의 차이는?
+                사진은 저장되나요?
               </summary>
               <p className="mt-2 text-[#5C4033]/80 pl-5 leading-relaxed">
-                무료 관상은 얼굴 인식 라이브러리로 즉시 분석하여 빠른 결과를 제공하며 무제한 이용 가능합니다.
-                AI 관상은 Google Gemini AI가 더 정밀하게 분석하여 개인화된 결과를 제공하며 하루 1회 무료입니다.
+                아니요. 관상, 동물상, 삼국지 닮은꼴 모두 사진을 브라우저 안에서만 분석하고, 서버로 전송하거나 저장하지 않습니다.
               </p>
             </details>
             <details className="group">
@@ -329,7 +326,7 @@ export default function Home() {
                 무료인가요?
               </summary>
               <p className="mt-2 text-[#5C4033]/80 pl-5 leading-relaxed">
-                네, 모든 서비스는 무료입니다. 무료 관상 분석은 무제한, AI 관상 분석은 하루 1회 무료로 이용하실 수 있습니다.
+                네, 모든 서비스는 횟수 제한 없이 무료입니다. 회원가입도 필요하지 않습니다.
               </p>
             </details>
           </div>

@@ -11,8 +11,8 @@ git add . && git commit -m "메시지" && git push
 ## 기술 스택
 - **프레임워크**: Next.js 16 (App Router) + TypeScript
 - **스타일**: Tailwind CSS 4
-- **AI**: Google Gemini API
-- **얼굴인식**: @vladmandic/face-api (face-api.js 포크)
+- **AI 호출 없음**: 결과는 규칙 계산 + 미리 작성한 해석 데이터 (Gemini 제거됨)
+- **얼굴인식**: @mediapipe/tasks-vision FaceLandmarker 478점 (삼국지), @vladmandic/face-api 68점 (관상·동물상, 2b단계에서 MediaPipe로 이전 예정)
 - **OG 이미지**: @vercel/og (동적 생성)
 - **PWA**: manifest.ts + sw.js (홈화면 설치 가능)
 
@@ -61,7 +61,6 @@ src/
 │   ├── page.tsx              # 메인 페이지 (/)
 │   ├── layout.tsx            # 루트 레이아웃 + SEO + PWA
 │   ├── manifest.ts           # PWA 매니페스트
-│   ├── face/page.tsx         # AI 관상 분석 (/face) - 하루 1회
 │   ├── face2/page.tsx        # 무료 관상 분석 (/face2) - 무제한
 │   ├── animal/page.tsx       # 동물상 테스트 (/animal)
 │   ├── samguk/page.tsx       # 삼국지 닮은꼴 (/samguk)
@@ -69,11 +68,18 @@ src/
 │   │   ├── page.tsx          # 신년운세 (/fortune)
 │   │   └── daily/page.tsx    # 오늘의 운세 (/fortune/daily)
 │   └── api/
-│       ├── analyze/route.ts  # AI 관상 API (Gemini)
-│       ├── samguk/route.ts   # 삼국지 API (Gemini)
 │       ├── fortune/route.ts  # 운세 API
 │       └── og/route.tsx      # OG 이미지 동적 생성
 ├── lib/
+│   ├── face/
+│   │   ├── mediapipe.ts      # MediaPipe 랜드마크 추출 (브라우저 전용, dynamic import)
+│   │   ├── landmarkFeatures.ts # 랜드마크 → 연속 특징 15개 (크기·위치·기울기 불변)
+│   │   └── featureStats.ts   # 특징 평균·표준편차, z 점수
+│   ├── samguk/
+│   │   ├── profiles.ts       # 장수 52명 얼굴 프로필 (z값 + 가중치, 근거 주석)
+│   │   ├── matcher.ts        # 가중 거리 매칭 + 닮은 이유/얼굴 분석 문장
+│   │   ├── simulate.ts       # 분포 시뮬레이션 (시드 고정)
+│   │   └── calibration.json  # 쏠림 보정 bias (scripts/calibrate-samguk.ts로 생성)
 │   ├── faceDetection.ts      # face-api.js 얼굴 감지 (68 랜드마크)
 │   ├── faceReadingDB.ts      # 관상 해석 데이터베이스
 │   ├── faceAnalyzer.ts       # 특징 → 해석 변환
@@ -86,7 +92,7 @@ src/
     └── useScreenshot.ts      # 결과 캡쳐/공유 훅
 
 public/
-├── models/                   # face-api.js 모델 파일
+├── models/                   # face-api.js 모델 + face_landmarker.task (MediaPipe)
 │   ├── ssd_mobilenetv1_*     # 얼굴 감지 모델
 │   └── face_landmark_68_*    # 랜드마크 모델
 ├── icons/                    # PWA 아이콘
@@ -104,18 +110,15 @@ public/
 |------|------|------|-----------|
 | `/` | 메인 | - | - |
 | `/face2` | 무료 관상 | 무제한 | face-api.js + DB |
-| `/face` | AI 관상 | 하루 1회 | Gemini API |
 | `/animal` | 동물상 테스트 | 무제한 | face-api.js + DB |
-| `/samguk` | 삼국지 닮은꼴 | - | Gemini API |
+| `/samguk` | 삼국지 닮은꼴 | 무제한 | MediaPipe + 프로필 매칭 |
 | `/fortune` | 신년운세 | - | DB 기반 |
 | `/fortune/daily` | 오늘의 운세 | - | DB 기반 |
 
 ---
 
 ## API Keys
-```
-GEMINI_API_KEY=xxx  # .env.local에서 관리 (절대 커밋 금지!)
-```
+없음 (Gemini 제거됨). `/face`는 `next.config.ts`에서 `/face2`로 308 리디렉션.
 
 ---
 
@@ -128,12 +131,14 @@ GEMINI_API_KEY=xxx  # .env.local에서 관리 (절대 커밋 금지!)
 4. `faceReadingDB.ts` - 특징별 해석 텍스트 조회
 5. 결과 표시
 
-### AI 관상 (/face) 흐름
-1. 이미지 업로드
-2. localStorage로 하루 1회 체크 (`face_ai_last_used`)
-3. 제한 초과시 → `/face2`로 자동 리다이렉트
-4. `/api/analyze` → Gemini API 호출
-5. 결과 표시
+### 삼국지 닮은꼴 (/samguk) 흐름
+1. 성별 선택(남/여) + 이미지 업로드
+2. `face/mediapipe.ts` - MediaPipe로 478점 랜드마크 (픽셀 좌표로 변환)
+3. `checkFrontal` - 고개를 많이 돌렸으면 안내 / 얼굴 없으면 안내
+4. `extractFeatures` → `toZ` → `matchCharacter(z, gender, calibration.bias)`
+5. 결과 표시 (닮은 이유, 얼굴 분석, 인물 정보)
+
+**프로필이나 FEATURE_STATS를 바꾸면** `npx tsx --tsconfig tsconfig.json scripts/calibrate-samguk.ts`로 bias를 다시 만들고 `npm test`(분포 테스트: 전원 1회 이상, 균등의 3배 이하)를 통과시킬 것.
 
 ### 동물상 테스트 (/animal) 흐름
 1. 이미지 업로드
@@ -159,9 +164,8 @@ GEMINI_API_KEY=xxx  # .env.local에서 관리 (절대 커밋 금지!)
 | 작업 | 파일 |
 |------|------|
 | 관상 해석 텍스트 수정 | `src/lib/faceReadingDB.ts` |
-| AI 프롬프트 수정 | `src/app/api/analyze/route.ts` |
+| 삼국지 인물 얼굴 프로필 | `src/lib/samguk/profiles.ts` |
 | 무료 관상 UI | `src/app/face2/page.tsx` |
-| AI 관상 UI | `src/app/face/page.tsx` |
 | 메인 페이지 | `src/app/page.tsx` |
 | 페이지 설명 본문/FAQ | `src/content/pageGuides.ts` |
 | 홈 FAQ 구조화 데이터 | `src/app/page.tsx` |

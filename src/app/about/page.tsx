@@ -28,7 +28,7 @@ export default function AboutPage() {
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div className="p-4 bg-stone-50 rounded-lg">
                         <h3 className="font-bold text-[#C41E3A] mb-2">🔮 AI 정밀 관상</h3>
-                        <p className="text-sm">Google Gemini AI가 분석하는 정교한 얼굴 분석 리포트</p>
+                        <p className="text-sm">얼굴 기준점을 측정해 전통 관상학으로 풀이하는 얼굴 분석 리포트 (사진은 브라우저 안에서만 분석)</p>
                     </div>
                     <div className="p-4 bg-stone-50 rounded-lg">
                         <h3 className="font-bold text-[#C41E3A] mb-2">🐎 2026 신년운세</h3>

@@ -431,13 +431,13 @@ export default function Face2Page() {
               </button>
             </div>
 
-            {/* 신묘한 AI 버튼 */}
+            {/* 다른 얼굴 테스트로 이어가기 */}
             <Link
-              href="/face"
+              href="/samguk"
               className="block w-full py-4 bg-gradient-to-r from-purple-700 via-purple-600 to-purple-700 rounded-2xl font-bold text-center hover:shadow-lg transition text-white border-2 border-purple-400/30"
             >
-              <span className="text-lg">🔮 신묘한 AI로 더 깊이 보기</span>
-              <p className="text-xs text-purple-100/80 mt-1">하루 1회 무료</p>
+              <span className="text-lg">⚔️ 내 얼굴은 어떤 삼국지 영웅?</span>
+              <p className="text-xs text-purple-100/80 mt-1">같은 사진으로 닮은꼴 찾기</p>
             </Link>
 
             {/* 버튼 */}

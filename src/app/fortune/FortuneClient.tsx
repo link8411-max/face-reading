@@ -472,7 +472,7 @@ export default function FortuneClient() {
                 다시하기
               </button>
               <Link
-                href="/face"
+                href="/face2"
                 className="flex-1 py-3 bg-gradient-to-r from-[#C41E3A] to-[#FFD700] rounded-xl font-bold text-center hover:shadow-xl transition text-white"
               >
                 관상 보기 👤
