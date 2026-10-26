@@ -17,7 +17,8 @@ else {
   await b.close()
 }
 
-const pick = (ids) => ids.map((i) => rows.find((r) => r.src.endsWith(`/person${i}.jpg`))?.features).filter(Boolean)
+// 실제 앱은 정면이 아닌 사진(checkFrontal)을 분석하지 않으므로, 기준값도 정면 사진으로만 잰다
+const pick = (ids) => ids.map((i) => rows.find((r) => r.src.endsWith(`/person${i}.jpg`))).filter((r) => r?.frontal?.ok).map((r) => r.features)
 const F = pick(labels['여']), M = pick(labels['남'])
 const mean = (a) => a.reduce((s, x) => s + x, 0) / a.length
 const variance = (a) => { const u = mean(a); return a.reduce((s, x) => s + (x - u) ** 2, 0) / (a.length - 1) }

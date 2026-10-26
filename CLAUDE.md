@@ -22,7 +22,7 @@ npm run test:e2e     # E2E (next build 후 3200 포트): 전 페이지 로딩·�
 - **프레임워크**: Next.js 16 (App Router) + TypeScript
 - **스타일**: Tailwind CSS 4
 - **AI 호출 없음**: 결과는 규칙 계산 + 미리 작성한 해석 데이터 (Gemini 제거됨)
-- **얼굴인식**: @mediapipe/tasks-vision FaceLandmarker 478점 (삼국지), @vladmandic/face-api 68점 (관상·동물상, 2b단계에서 MediaPipe로 이전 예정)
+- **얼굴인식**: @mediapipe/tasks-vision FaceLandmarker 478점 (삼국지·동물상), @vladmandic/face-api 68점 (관상만, 추후 이전)
 - **OG 이미지**: @vercel/og (동적 생성)
 - **PWA**: manifest.ts + sw.js (홈화면 설치 가능)
 
@@ -85,7 +85,7 @@ src/
 │   ├── faceReadingDB.ts      # 관상 해석 데이터베이스
 │   ├── faceAnalyzer.ts       # 특징 → 해석 변환
 │   ├── animalTypeDB.ts       # 동물상 데이터 (8종)
-│   ├── animalTypeAnalyzer.ts # 얼굴특징 → 동물상 매핑
+│   ├── animal/               # 동물상 z 프로필·매칭·시뮬레이션·calibration.json
 │   ├── samgukDB.ts           # 삼국지 인물 데이터
 │   ├── fortuneDB.ts          # 운세 데이터
 │   └── saju.ts               # 사주 계산
@@ -158,14 +158,17 @@ public/
 4. `extractFeatures` → `toZ` → `matchCharacter(z, gender, calibration.bias)`
 5. 결과 표시 (닮은 이유, 얼굴 분석, 인물 정보)
 
-**프로필이나 FEATURE_STATS를 바꾸면** `npx tsx --tsconfig tsconfig.json scripts/calibrate-samguk.ts`로 bias를 다시 만들고 `npm test`(분포 테스트: 전원 1회 이상, 균등의 3배 이하)를 통과시킬 것.
+**성별별 기준값 (2b)**: `src/lib/face/featureStats.ts`의 `FEATURE_STATS_BY_GENDER`, z는 `toZ(f, gender)`로 사용자가 고른 성별 기준을 쓴다.
+- 재측정: 개발 서버(`npx next dev -p 3311`)를 띄우고 `node scripts/measure-face-stats.mjs` → 출력값을 붙여 넣는다. 성별 라벨은 `scripts/dev-face-genders.json`, 정면 사진만 쓴다. 표본이 작아 t 기반 축소 추정.
+- 시뮬레이션은 성별 분포에서 특징값을 뽑아 실제 경로(`toZ(f, gender)`)로 매칭한다 (`src/lib/face/sampleFeatures.ts`).
+
+**프로필이나 기준값을 바꾸면** `npx tsx --tsconfig tsconfig.json scripts/calibrate-samguk.ts`와 `scripts/calibrate-animal.ts`로 bias를 다시 만들고 `npm test`(분포 테스트: 전원 1회 이상, 균등의 3배 이하, 성별별)를 통과시킬 것.
 
 ### 동물상 테스트 (/animal) 흐름
-1. 이미지 업로드
-2. `faceDetection.ts` - face-api.js로 68개 랜드마크 감지
-3. `animalTypeAnalyzer.ts` - 눈/코/입/얼굴형 → 동물상 점수 계산
-4. `animalTypeDB.ts` - 8가지 동물상 데이터 조회
-5. 결과 표시 (매칭률, 성격, 연애스타일, 궁합 등)
+1. 성별 선택 + 이미지 업로드
+2. `face/mediapipe.ts` 랜드마크 → `checkFrontal` → `extractFeatures` → `toZ(f, gender)`
+3. `lib/animal/matcher.ts` `matchAnimal(z, calibration.bias)`: 8종 z 프로필(`lib/animal/profiles.ts`)과 가중 거리, 닮음 70~98%
+4. 특징 묘사(`describe`)는 같은 z에서 한 방향만 골라 모순이 없다. 해석 문구는 `animalTypeDB.ts`
 
 ### 결과 공유
 - `useScreenshot` 훅 사용
