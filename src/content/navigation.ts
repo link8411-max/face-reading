@@ -44,11 +44,11 @@ export const CATEGORIES: Category[] = [
     title: '운세·사주',
     tabLabel: '운세·사주',
     href: '/unse',
-    intro: '생년월일로 보는 사주 신년운세와 띠별 운세, 매일 바뀌는 오늘의 운세를 모았어요. 음력 생일도 양력으로 바꿔 계산하고, 띠는 입춘을 기준으로 봐요.',
+    intro: '생년월일로 보는 사주 신년운세와 띠별 운세, 요일마다 바뀌는 오늘의 운세를 모았어요. 음력 생일도 양력으로 바꿔 계산하고, 띠는 입춘을 기준으로 봐요.',
     items: [
       { title: '2027 신년운세', desc: '사주로 보는 정미년 한 해', href: '/fortune', thumb: { emoji: '🐑', bg: '#FDECEC' }, chip: '음력 지원' },
       { title: '2027 띠별 운세', desc: '쥐띠부터 돼지띠까지 12띠', href: '/fortune/2027', thumb: { emoji: '🐉', bg: '#FBF1D3' }, chip: '12띠' },
-      { title: '오늘의 운세', desc: '띠별 운세와 행운의 시간·색', href: '/fortune/daily', thumb: { emoji: '☯', bg: '#F3E9DA' }, chip: '매일' },
+      { title: '오늘의 운세', desc: '띠별 운세와 행운의 시간·색', href: '/fortune/daily', thumb: { emoji: '☯', bg: '#F3E9DA' }, chip: '요일별' },
     ],
   },
   {

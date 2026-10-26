@@ -9,14 +9,14 @@ import "./globals.css";
 // 한글 본문·제목 글꼴 (Korean 글리프는 unicode-range로 필요한 만큼만 받는다)
 const notoSans = Noto_Sans_KR({
   variable: "--font-noto-sans-kr",
-  weight: ["400", "500", "700", "900"],
+  weight: ["400", "700"],
   subsets: ["latin"],
   display: "swap",
 });
 
 const notoSerif = Noto_Serif_KR({
   variable: "--font-noto-serif-kr",
-  weight: ["700", "900"],
+  weight: ["900"],
   subsets: ["latin"],
   display: "swap",
 });
@@ -133,7 +133,7 @@ export default function RootLayout({
               <div className="grid grid-cols-2 gap-6 mb-8">
                 {CATEGORIES.filter((c) => c.items.length > 0).map((c) => (
                   <div key={c.key} className="space-y-3">
-                    <h4 className="text-vermilion font-bold text-sm"><Link href={c.href}>{c.title}</Link></h4>
+                    <p className="text-vermilion font-bold text-sm"><Link href={c.href}>{c.title}</Link></p>
                     <ul className="text-sm space-y-2 text-stone-600">
                       {c.items.map((i) => (
                         <li key={i.href}><Link href={i.href} className="hover:text-vermilion">{i.title}</Link></li>
@@ -142,7 +142,7 @@ export default function RootLayout({
                   </div>
                 ))}
                 <div className="space-y-3 col-span-2 border-t pt-6">
-                  <h4 className="text-stone-400 font-bold text-sm">정보</h4>
+                  <p className="text-stone-400 font-bold text-sm">정보</p>
                   <ul className="text-sm space-y-2 text-stone-500">
                     <li><Link href="/about" className="hover:text-vermilion">서비스 소개</Link></li>
                     <li><Link href="/privacy" className="hover:text-vermilion">개인정보처리방침</Link></li>

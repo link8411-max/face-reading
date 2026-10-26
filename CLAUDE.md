@@ -192,7 +192,7 @@ public/
 | 무료 관상 UI | `src/app/face2/page.tsx` |
 | 메인 페이지 | `src/app/page.tsx` |
 | 페이지 설명 본문/FAQ | `src/content/pageGuides.ts` |
-| 홈 FAQ 구조화 데이터 | `src/app/page.tsx` |
+| 홈 FAQ(화면·구조화 데이터) | `src/content/homeFaq.ts` |
 | sitemap | `src/app/sitemap.ts` (내용 바꾸면 `LAST_MODIFIED` 날짜 갱신) |
 
 ---

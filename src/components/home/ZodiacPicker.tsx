@@ -2,12 +2,12 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
-import { fortuneDB } from "@/lib/fortuneDB";
+import { 일간운세 } from "@/lib/dailyFortune";
 import { ZODIAC_SLUGS, zodiac2027, type ZodiacSlug } from "@/content/fortune2027Zodiac";
 import { FORTUNE_YEAR } from "@/lib/fortuneYear";
 
 const 요일목록 = ["일요일", "월요일", "화요일", "수요일", "목요일", "금요일", "토요일"] as const;
-type 요일 = keyof typeof fortuneDB.일간운세;
+type 요일 = keyof typeof 일간운세;
 
 // 메인에서 띠를 바로 골라 오늘의 운세를 보는 영역. 날짜는 브라우저에서 마운트 뒤에 계산한다(서버와 불일치 방지).
 export default function ZodiacPicker() {
@@ -20,7 +20,7 @@ export default function ZodiacPicker() {
   }, []);
 
   const z = selected ? zodiac2027[selected] : null;
-  const fortune = z && today ? fortuneDB.일간운세[today.요일][z.띠 as keyof (typeof fortuneDB.일간운세)[요일]] : null;
+  const fortune = z && today ? 일간운세[today.요일][z.띠 as keyof (typeof 일간운세)[요일]] : null;
 
   return (
     <section aria-label="띠 바로 고르기" className="bg-white border border-line rounded-[22px] p-4">
@@ -40,6 +40,7 @@ export default function ZodiacPicker() {
           </button>
         ))}
       </div>
+      <div aria-live="polite">
       {z && fortune && (
         <div className="mt-3 rounded-2xl bg-[#FFF6F2] p-3 text-[13px] leading-relaxed">
           <p>
@@ -54,6 +55,7 @@ export default function ZodiacPicker() {
           </div>
         </div>
       )}
+      </div>
     </section>
   );
 }

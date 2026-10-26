@@ -19,10 +19,13 @@ export default function Home() {
     <div className="max-w-lg mx-auto px-4 pt-4 pb-6 space-y-6">
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd).replace(/</g, "\\u003c") }} />
 
-      <header className="flex items-center justify-between">
-        <Link href="/" className="font-serif text-xl font-black text-vermilion">
-          운명을 <span className="text-gold">읽다</span>
-        </Link>
+      <header>
+        <h1 className="flex flex-col">
+          <Link href="/" className="font-serif text-xl font-black text-vermilion">
+            운명을 <span className="text-gold">읽다</span>
+          </Link>
+          <span className="text-xs text-muted font-normal mt-0.5">무료 AI 관상·얼굴 테스트와 {FORTUNE_YEAR.year} 신년운세</span>
+        </h1>
       </header>
 
       <SeasonHero />

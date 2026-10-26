@@ -14,10 +14,10 @@ export const metadata: Metadata = {
 
 export default function Page() {
   return (
-    <main className="max-w-lg mx-auto px-4 py-8">
+    <div className="max-w-lg mx-auto px-4 py-8">
       <h1 className="font-serif text-3xl font-black text-vermilion">{category.title}</h1>
       <p className="text-sm text-muted leading-relaxed mt-2 mb-6">{category.intro}</p>
       <CategoryList items={category.items} />
-    </main>
+    </div>
   );
 }
