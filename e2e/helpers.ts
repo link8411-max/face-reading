@@ -5,7 +5,8 @@ export const TEST_PAGES = ['/face2', '/animal', '/samguk', '/fortune', '/fortune
 
 // 외부 광고·분석 스크립트 오류는 우리 코드 문제가 아니므로 제외
 // MediaPipe(TFLite)는 정보 로그를 console.error로 찍는다
-const IGNORED = /googlesyndication|adsbygoogle|_vercel\/insights|vercel-scripts|Failed to load resource|TensorFlow Lite XNNPACK/i
+// 애드센스가 google.com을 프레임으로 띄울 때 남기는 report-only CSP 경고도 외부 광고 몫이다
+const IGNORED = /googlesyndication|adsbygoogle|_vercel\/insights|vercel-scripts|Failed to load resource|TensorFlow Lite XNNPACK|Framing 'https:\/\/www\.google\.com/i
 
 export function trackErrors(page: Page): string[] {
   const errors: string[] = []
