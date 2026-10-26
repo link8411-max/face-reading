@@ -57,6 +57,7 @@ export default function AnimalTypePage() {
   const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
+      import("@/lib/face/mediapipe").then((m) => m.prepareLandmarker()).catch(() => {});
       const reader = new FileReader();
       reader.onloadend = () => {
         setImage(reader.result as string);
@@ -75,15 +76,16 @@ export default function AnimalTypePage() {
     setError(null);
     try {
       await img.decode().catch(() => {});
-      let detectLandmarks: (typeof import("@/lib/face/mediapipe"))["detectLandmarks"];
+      const { extractFeatures, checkFrontal } = await import("@/lib/face/landmarkFeatures");
+      // 모델·WASM을 못 받은 경우(오프라인, CDN 차단)는 사진 문제가 아니라 도구 문제로 안내한다
+      let lm;
       try {
-        ({ detectLandmarks } = await import("@/lib/face/mediapipe"));
+        const { detectLandmarks } = await import("@/lib/face/mediapipe");
+        lm = await detectLandmarks(img);
       } catch {
-        setError("분석 도구를 불러오지 못했어요. 새로고침해 주세요.");
+        setError("분석 도구를 불러오지 못했어요. 인터넷 연결을 확인하고 새로고침해 주세요.");
         return;
       }
-      const { extractFeatures, checkFrontal } = await import("@/lib/face/landmarkFeatures");
-      const lm = await detectLandmarks(img);
       if (!lm) {
         setError("얼굴을 찾지 못했어요. 얼굴이 잘 보이는 사진을 올려 주세요.");
         return;

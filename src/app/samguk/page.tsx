@@ -91,6 +91,7 @@ export default function SamgukPage() {
   const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
+      import("@/lib/face/mediapipe").then((m) => m.prepareLandmarker()).catch(() => {});
       const reader = new FileReader();
       reader.onloadend = () => {
         setImage(reader.result as string);

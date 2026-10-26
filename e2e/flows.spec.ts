@@ -150,3 +150,21 @@ test('삼국지 결과: 게임 카드(회사생활 STATUS) → 닮은 점 → �
   await expect(page.getByText('통솔', { exact: true })).toBeVisible()
   expect(errors).toEqual([])
 })
+
+// 리뷰 Important: 분석 도구(MediaPipe WASM)를 못 받으면 '사진 문제'가 아니라 '도구를 못 불러옴'으로 안내
+// 서비스 워커가 캐시한 WASM을 주면 차단이 안 되므로 서비스 워커를 끈 채로 본다
+test.describe('분석 도구 차단', () => {
+test.use({ serviceWorkers: 'block' })
+for (const [path, btn] of [['/animal', '동물상 찾기'], ['/samguk', '닮은 장수 찾기']] as const) {
+  test(`${path}: 분석 도구를 못 불러오면 그 사실을 안내한다`, async ({ page }) => {
+    test.skip(!existsSync(FACE), '개발용 테스트 얼굴이 없으면 건너뜀')
+    test.setTimeout(90000)
+    await page.route('**/cdn.jsdelivr.net/**', (r) => r.abort())
+    await page.goto(path)
+    await page.locator('input[type=file]').setInputFiles(FACE)
+    await page.getByRole('radio', { name: '여자' }).click()
+    await page.getByRole('button', { name: btn }).click({ timeout: 30000 })
+    await expect(page.getByText(/분석 도구를 불러오지 못했어요/)).toBeVisible({ timeout: 60000 })
+  })
+}
+})
