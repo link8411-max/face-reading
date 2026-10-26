@@ -686,7 +686,7 @@ export default function SamgukPage() {
         <div className="mt-20 text-center pb-10">
           <div className="w-12 h-0.5 bg-stone-700 mx-auto mb-4 opacity-30"></div>
           <p className="text-stone-500 text-[10px] font-serif italic">
-            &copy; 2024 Samguk Persona. All rights reserved.
+            &copy; 2026 운명을 읽다 · 삼국지 닮은꼴
           </p>
         </div>
       </main>

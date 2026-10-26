@@ -93,7 +93,6 @@ public/
 │   ├── icon-192x192.svg
 │   └── icon-512x512.svg
 ├── sw.js                     # 서비스 워커
-├── sitemap.xml
 └── robots.txt
 ```
 
@@ -164,8 +163,9 @@ GEMINI_API_KEY=xxx  # .env.local에서 관리 (절대 커밋 금지!)
 | 무료 관상 UI | `src/app/face2/page.tsx` |
 | AI 관상 UI | `src/app/face/page.tsx` |
 | 메인 페이지 | `src/app/page.tsx` |
-| SEO/FAQ | `src/app/layout.tsx` |
-| sitemap | `public/sitemap.xml` |
+| 페이지 설명 본문/FAQ | `src/content/pageGuides.ts` |
+| 홈 FAQ 구조화 데이터 | `src/app/page.tsx` |
+| sitemap | `src/app/sitemap.ts` (내용 바꾸면 `LAST_MODIFIED` 날짜 갱신) |
 
 ---
 
@@ -179,10 +179,13 @@ GEMINI_API_KEY=xxx  # .env.local에서 관리 (절대 커밋 금지!)
 - `alternates.canonical` (정규 URL)
 - `JSON-LD` 구조화 데이터 (SoftwareApplication)
 
+### PageGuide (서버 렌더 본문)
+테스트 페이지는 `"use client"`라 서버 HTML에 글이 거의 없다. 그래서 각 layout이 `<PageGuide>`(서버 컴포넌트)를 렌더해 소개, 이용법, FAQ(+페이지별 FAQPage JSON-LD), 다른 테스트 링크를 HTML에 넣는다. 섹션에는 `no-screenshot` 클래스가 있어 결과 캡처에 섞이지 않는다. 테스트: `npm test`
+
 ### 새 페이지 추가 시 SEO 체크리스트
 1. `layout.tsx` 생성 (메타데이터 + JSON-LD)
-2. `public/sitemap.xml`에 URL 추가 (lastmod 포함)
-3. 루트 `layout.tsx`의 FAQ JSON-LD 업데이트 (필요시)
+2. `src/app/sitemap.ts`의 `SITEMAP_ROUTES`와 `LAST_MODIFIED`에 추가
+3. `src/content/pageGuides.ts`에 본문(소개/이용법/특징/FAQ/관련 테스트)을 넣고 layout.tsx의 `{children}` 아래에 `<PageGuide route="..." />` 추가
 
 ---
 
@@ -206,7 +209,7 @@ GEMINI_API_KEY=xxx  # .env.local에서 관리 (절대 커밋 금지!)
 2. **AI 제한**: localStorage 기반이라 브라우저별로 따로 카운트
 3. **이미지 캡쳐**: `modern-screenshot` 사용 (CSS lab() 호환)
 4. **모델 파일**: `/public/models/`에 있어야 face-api.js 작동
-5. **페이지 추가/삭제 시**: 반드시 `public/sitemap.xml` 업데이트!
+5. **페이지 추가/삭제 시**: 반드시 `src/app/sitemap.ts` 업데이트!
 6. **SEO**: 새 페이지는 layout.tsx + sitemap + canonical URL 필수
 
 ---

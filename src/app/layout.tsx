@@ -67,53 +67,6 @@ const jsonLd = {
   ]
 };
 
-const faqJsonLd = {
-  "@context": "https://schema.org",
-  "@type": "FAQPage",
-  "mainEntity": [
-    {
-      "@type": "Question",
-      "name": "관상이란 무엇인가요?",
-      "acceptedAnswer": {
-        "@type": "Answer",
-        "text": "관상(觀相)은 사람의 얼굴 생김새를 보고 성격, 운명, 건강 등을 판단하는 동양의 전통 학문입니다. 눈, 코, 입, 이마, 턱 등 각 부위의 특징을 분석하여 초년운, 중년운, 말년운을 예측합니다."
-      }
-    },
-    {
-      "@type": "Question",
-      "name": "AI가 어떻게 얼굴을 분석하나요?",
-      "acceptedAnswer": {
-        "@type": "Answer",
-        "text": "최신 AI 기술(Google Gemini)을 활용하여 업로드된 얼굴 사진의 이목구비를 분석합니다. 전통 관상학의 기준을 바탕으로 각 부위의 특징을 파악하고, 종합적인 관상 해석을 제공합니다."
-      }
-    },
-    {
-      "@type": "Question",
-      "name": "2026년 병오년 운세는 어떻게 보나요?",
-      "acceptedAnswer": {
-        "@type": "Answer",
-        "text": "음력 생년월일시를 입력하면 사주팔자와 천간지지를 분석하여 2026년 병오년(丙午年) 운세를 확인할 수 있습니다. 총운, 재물운, 직장운, 건강운, 애정운을 상세하게 알려드립니다."
-      }
-    },
-    {
-      "@type": "Question",
-      "name": "AI 관상과 무료 관상의 차이는 무엇인가요?",
-      "acceptedAnswer": {
-        "@type": "Answer",
-        "text": "무료 관상은 얼굴 인식 라이브러리로 즉시 분석하여 빠른 결과를 제공하며 무제한 이용 가능합니다. AI 관상은 Google Gemini AI가 더 정밀하게 분석하여 개인화된 결과를 제공하며 하루 1회 무료입니다."
-      }
-    },
-    {
-      "@type": "Question",
-      "name": "무료인가요?",
-      "acceptedAnswer": {
-        "@type": "Answer",
-        "text": "네, 모든 서비스는 무료입니다. 무료 관상 분석은 무제한, AI 관상 분석은 하루 1회 무료로 이용하실 수 있습니다. 오늘의 운세, 신년운세도 무료입니다."
-      }
-    }
-  ]
-};
-
 export default function RootLayout({
   children,
 }: Readonly<{
@@ -136,10 +89,6 @@ export default function RootLayout({
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
-        />
-        <script
-          type="application/ld+json"
-          dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd) }}
         />
 
         {/* 서비스 워커 등록 */}

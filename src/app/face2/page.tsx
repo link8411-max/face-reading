@@ -137,7 +137,7 @@ export default function Face2Page() {
             <span className="text-[#C41E3A]/70">━━</span>
           </div>
           <h1 className="text-3xl font-bold mb-2 text-[#C41E3A]" style={{ textShadow: "0 2px 8px rgba(196, 30, 58, 0.2)" }}>
-            관상 분석
+            AI 관상 테스트
           </h1>
           <p className="text-[#5C4033]/70 text-sm tracking-widest">
             전통 관상학 기반 얼굴 분석
