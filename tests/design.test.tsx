@@ -15,7 +15,7 @@ test('한글 글꼴: 제목 Gowun Batang, 본문 Noto Sans KR', () => {
 
 const TOKENS: [string, string][] = [
   ['paper', '#FBF6F1'], ['card', '#ECE5D9'], ['card-2', '#F1EBE2'], ['line', '#E6DED2'],
-  ['ink', '#2E2A27'], ['muted', '#6B6259'], ['accent', '#A4553A'], ['blush', '#E9BCA8'],
+  ['ink', '#2E2A27'], ['muted', '#6B6259'], ['accent', '#9A4F35'], ['blush', '#E9BCA8'],
   ['navy-game', '#23263A'], ['gold-game', '#E8B547'],
 ]
 
@@ -67,4 +67,9 @@ test('임시 별칭 토큰(vermilion·gold·navy·paper-2)이 없다', () => {
   const { readFileSync: read } = require('node:fs')
   const re = /\b(?:text|bg|border|from|to|via|ring|outline)-(?:vermilion|gold|navy|paper-2)(?![-\w])/
   expect(files.filter((f) => re.test(read(f, 'utf8')))).toEqual([])
+})
+
+test('포인트색 작은 글씨가 카드 위에서도 대비 4.5 이상 (리뷰)', () => {
+  expect(contrast(hex('accent'), hex('card'))).toBeGreaterThanOrEqual(4.5)
+  expect(contrast(hex('accent'), hex('card-2'))).toBeGreaterThanOrEqual(4.5)
 })

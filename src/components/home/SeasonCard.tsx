@@ -16,7 +16,7 @@ export default function SeasonCard() {
       <svg width="64" height="64" viewBox="0 0 64 64" fill="none" aria-hidden="true">
         <circle cx="24" cy="32" r="16" fill="#FBF6F1" />
         <circle cx="40" cy="32" r="16" fill="#CFD6C4" />
-        <path d="M32 22l2 5 5 2-5 2-2 5-2-5-5-2 5-2z" fill="#A4553A" />
+        <path d="M32 22l2 5 5 2-5 2-2 5-2-5-5-2 5-2z" fill="#9A4F35" />
       </svg>
     </section>
   );

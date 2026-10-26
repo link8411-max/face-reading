@@ -1,7 +1,8 @@
 "use client";
 
 import { useCallback, useRef, useState } from "react";
-import { downloadFile, shareOrSave, STORY_SAVED_NOTICE } from "@/lib/storyShare";
+import { shareOrSave, STORY_MODAL_NOTICE, STORY_SAVED_NOTICE } from "@/lib/storyShare";
+import { saveImage, type SaveMethod } from "@/lib/saveImage";
 
 // 9:16 스토리 이미지(1080×1920)를 만들어 공유하거나 저장한다. frameRef는 <StoryFrame>에 붙인다.
 export function useStoryShare() {
@@ -22,8 +23,9 @@ export function useStoryShare() {
       });
       if (!blob) throw new Error("이미지를 만들지 못했어요");
       const file = new File([blob], `${fileName}.png`, { type: "image/png" });
-      const outcome = await shareOrSave(file, downloadFile);
-      if (outcome === "saved") setNotice(STORY_SAVED_NOTICE);
+      const saved: { method: SaveMethod | null } = { method: null };
+      const outcome = await shareOrSave(file, (f) => { saved.method = saveImage(f, f.name); });
+      if (outcome === "saved") setNotice(saved.method === "modal" ? STORY_MODAL_NOTICE : STORY_SAVED_NOTICE);
     } catch (e) {
       console.error("스토리 이미지 실패:", e);
       setNotice("이미지를 만들지 못했어요. 이미지 저장을 눌러 주세요.");

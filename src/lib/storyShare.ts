@@ -4,6 +4,7 @@
 export type ShareOutcome = 'shared' | 'saved' | 'cancelled'
 
 export const STORY_SAVED_NOTICE = '이미지를 저장했어요. 인스타그램 스토리에서 불러와 올려 주세요.'
+export const STORY_MODAL_NOTICE = '이미지를 길게 눌러 사진에 저장한 뒤 스토리에서 불러와 주세요.'
 
 type ShareNav = { canShare?: (data: ShareData) => boolean; share?: (data: ShareData) => Promise<void> }
 
@@ -18,15 +19,4 @@ export async function shareOrSave(file: File, save: (f: File) => void, nav: Shar
   }
   save(file)
   return 'saved'
-}
-
-export function downloadFile(file: File) {
-  const url = URL.createObjectURL(file)
-  const a = document.createElement('a')
-  a.href = url
-  a.download = file.name
-  document.body.appendChild(a)
-  a.click()
-  a.remove()
-  setTimeout(() => URL.revokeObjectURL(url), 1000)
 }

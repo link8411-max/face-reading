@@ -1,6 +1,7 @@
 "use client";
 
 import { useRef, useState, useCallback } from "react";
+import { saveImage } from "@/lib/saveImage";
 
 interface UseScreenshotOptions {
   fileName?: string;
@@ -30,7 +31,7 @@ export function useScreenshot<T extends HTMLElement = HTMLDivElement>() {
       );
 
       const capturePromise = domToBlob(ref.current, {
-        backgroundColor: "#FBF6F1",
+        // 배경색을 주지 않는다: 캡처 대상(결과 카드)이 자기 배경을 가지고 있고, 지정하면 카드 배경을 덮어쓴다
         scale: isMobile ? 1.5 : 2, // 모바일은 낮은 해상도
         filter: (node) => {
           // iframe 제외 (쿠팡 배너 등)
@@ -58,36 +59,7 @@ export function useScreenshot<T extends HTMLElement = HTMLDivElement>() {
       return;
     }
 
-    const isIOS = /iPhone|iPad|iPod/i.test(navigator.userAgent);
-
-    if (isIOS) {
-      // iOS: 모달로 이미지 표시 (길게 눌러서 저장)
-      const url = URL.createObjectURL(blob);
-      const modal = document.createElement("div");
-      modal.id = "ios-save-modal";
-      modal.style.cssText = "position:fixed;inset:0;z-index:9999;background:rgba(0,0,0,0.95);display:flex;flex-direction:column;justify-content:center;align-items:center;padding:20px;";
-      modal.innerHTML = `
-        <p style="color:#fff;margin-bottom:15px;font-size:16px;">이미지를 길게 눌러 저장하세요</p>
-        <img src="${url}" style="max-width:100%;max-height:70vh;border-radius:8px;" />
-        <button id="ios-modal-close" style="margin-top:20px;padding:12px 30px;background:#f59e0b;color:#000;border:none;border-radius:8px;font-size:16px;font-weight:bold;">닫기</button>
-      `;
-      document.body.appendChild(modal);
-      document.getElementById("ios-modal-close")?.addEventListener("click", () => {
-        URL.revokeObjectURL(url);
-        modal.remove();
-      });
-      return;
-    } else {
-      // Android/PC: 일반 다운로드
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement("a");
-      a.href = url;
-      a.download = `${options?.fileName || "결과"}.png`;
-      document.body.appendChild(a);
-      a.click();
-      document.body.removeChild(a);
-      URL.revokeObjectURL(url);
-    }
+    saveImage(blob, options?.fileName || "결과");
   }, [capture]);
 
   const share = useCallback(async (options?: UseScreenshotOptions) => {

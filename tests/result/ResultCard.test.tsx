@@ -71,3 +71,11 @@ describe('shareOrSave: 스토리 공유는 지원되면 공유, 아니면 저장
     expect(STORY_SAVED_NOTICE).toContain('스토리')
   })
 })
+
+import { saveMethod } from '@/lib/saveImage'
+test('저장 방법: iOS(사파리·인앱)는 길게 눌러 저장 화면, 그 밖엔 다운로드 (리뷰)', () => {
+  expect(saveMethod('Mozilla/5.0 (iPhone; CPU iPhone OS 17_0 like Mac OS X) KAKAOTALK 10.0')).toBe('modal')
+  expect(saveMethod('Mozilla/5.0 (iPad; CPU OS 16_0 like Mac OS X) Safari')).toBe('modal')
+  expect(saveMethod('Mozilla/5.0 (Linux; Android 14) Chrome/120')).toBe('download')
+  expect(saveMethod('Mozilla/5.0 (Macintosh) Chrome/120')).toBe('download')
+})

@@ -66,3 +66,25 @@ test.describe('관상 결과: 요약 카드 먼저, 스토리에 올리기', () 
     await expect(page.getByRole('status')).toHaveCount(0)
   })
 })
+
+// 리뷰 Critical: 이미지 저장이 카드 자체 배경(남색 게임 카드)을 지우지 않는다
+test('삼국지 이미지 저장: 저장 PNG에 남색 카드 배경이 살아 있다', async ({ page }) => {
+  test.skip(!existsSync(FACE), '개발용 테스트 얼굴이 없으면 건너뜀')
+  await page.addInitScript(() => { Object.defineProperty(navigator, 'userAgent', { get: () => 'Mozilla/5.0 (Macintosh) Chrome/120' }) })
+  await page.goto('/samguk')
+  await page.locator('input[type=file]').setInputFiles(FACE)
+  await page.getByRole('radio', { name: '남자' }).click()
+  await page.getByRole('button', { name: '닮은 장수 찾기' }).click()
+  await expect(page.getByRole('button', { name: '이미지 저장' })).toBeVisible({ timeout: 30000 })
+  const dl = page.waitForEvent('download', { timeout: 20000 })
+  await page.getByRole('button', { name: '이미지 저장' }).click()
+  const buf = await (await dl).createReadStream().then(async (s) => { const c: Buffer[] = []; for await (const x of s!) c.push(x as Buffer); return Buffer.concat(c) })
+  const px = await page.evaluate(async (b64) => {
+    const img = new Image(); img.src = `data:image/png;base64,${b64}`; await img.decode()
+    const c = document.createElement('canvas'); c.width = img.width; c.height = img.height
+    const ctx = c.getContext('2d')!; ctx.drawImage(img, 0, 0)
+    // 회사생활 STATUS 아래 왼쪽 여백 쯤 (카드 안쪽)
+    return Array.from(ctx.getImageData(Math.round(img.width * 0.04), Math.round(img.height * 0.5), 1, 1).data)
+  }, buf.toString('base64'))
+  expect(px[0] + px[1] + px[2], `pixel ${px}`).toBeLessThan(250) // 남색(#23263A ≈ 35+38+58)
+})

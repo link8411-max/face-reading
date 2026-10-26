@@ -112,8 +112,8 @@ export function MoonDeco({ bg = "#ECE5D9", size = 150 }: { bg?: string; size?: n
     <svg width={size} height={size} viewBox="0 0 150 150" fill="none" aria-hidden="true">
       <circle cx="88" cy="62" r="44" fill="#FBF6F1" />
       <circle cx="108" cy="50" r="40" fill={bg} />
-      <path d="M30 30l3 7 7 3-7 3-3 7-3-7-7-3 7-3z" fill="#A4553A" />
-      <circle cx="132" cy="118" r="3" fill="#A4553A" />
+      <path d="M30 30l3 7 7 3-7 3-3 7-3-7-7-3 7-3z" fill="#9A4F35" />
+      <circle cx="132" cy="118" r="3" fill="#9A4F35" />
       <circle cx="52" cy="112" r="2" fill="#2E2A27" />
     </svg>
   );

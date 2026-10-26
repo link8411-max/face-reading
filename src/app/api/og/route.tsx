@@ -31,9 +31,9 @@ export async function GET(request: NextRequest) {
             {/* 초승달·별 장식 */}
             <div style={{ position: 'absolute', right: '60px', top: '40px', width: '220px', height: '220px', borderRadius: '50%', backgroundColor: '#FBF6F1', display: 'flex' }} />
             <div style={{ position: 'absolute', right: '20px', top: '10px', width: '200px', height: '200px', borderRadius: '50%', backgroundColor: '#ECE5D9', display: 'flex' }} />
-            <div style={{ position: 'absolute', right: '330px', top: '70px', width: '22px', height: '22px', borderRadius: '50%', backgroundColor: '#A4553A', display: 'flex' }} />
+            <div style={{ position: 'absolute', right: '330px', top: '70px', width: '22px', height: '22px', borderRadius: '50%', backgroundColor: '#9A4F35', display: 'flex' }} />
 
-            <div style={{ display: 'flex', fontSize: '30px', color: '#A4553A', fontWeight: 700 }}>운명을 읽다</div>
+            <div style={{ display: 'flex', fontSize: '30px', color: '#9A4F35', fontWeight: 700 }}>운명을 읽다</div>
             <div style={{ display: 'flex', alignItems: 'center', gap: '24px', marginTop: '24px' }}>
               {icon && <span style={{ fontSize: '84px' }}>{icon}</span>}
               <span style={{ fontSize: '84px', fontWeight: 700, color: '#2E2A27', lineHeight: 1.2 }}>{title}</span>
