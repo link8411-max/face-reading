@@ -123,3 +123,22 @@ test('삼국지 결과 화면 버튼(탭·저장·공유)을 모두 눌러도 �
   await clickResultButtons(page)
   expect(errors).toEqual([])
 })
+
+test('삼국지 결과: 탭 바가 내용 위에 있고, 탭을 누르면 바뀐 내용이 화면에 보인다', async ({ page }) => {
+  test.skip(!existsSync(FACE), '개발용 테스트 얼굴이 없으면 건너뜀')
+  await page.goto('/samguk')
+  await page.locator('input[type=file]').setInputFiles(FACE)
+  await page.getByRole('button', { name: '남성 인물' }).click()
+  await page.getByRole('button', { name: /영웅 탐색 시작/ }).click()
+  await expect(page.getByRole('button', { name: /다시하기/ })).toBeVisible({ timeout: 30000 })
+  await expect(page.getByText(/처럼 .+ 닮았어요/)).toBeVisible()
+  const tabBar = page.getByRole('tablist', { name: '장수 정보' })
+  const panel = page.getByRole('tabpanel')
+  expect((await tabBar.boundingBox())!.y).toBeLessThan((await panel.boundingBox())!.y)
+  for (const name of ['능력', '현대', '특기', '열전']) {
+    await page.getByRole('tab', { name }).click()
+    await expect(page.getByRole('tab', { name })).toHaveAttribute('aria-selected', 'true')
+    await expect(panel).toBeInViewport()
+  }
+  await expect(page.getByRole('tab', { name: '분석' })).toHaveCount(0)
+})

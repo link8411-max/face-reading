@@ -87,7 +87,7 @@ function KoeiInsetBox({ children, className = "" }: { children: React.ReactNode;
 // 하단 버튼 그룹
 function KoeiButtonGroup({ children }: { children: React.ReactNode }) {
   return (
-    <div className="flex gap-1.5 mt-4 p-1 bg-black/30 rounded border border-black/50">
+    <div role="tablist" aria-label="장수 정보" className="flex gap-1.5 p-1 bg-[#203a36] rounded border border-black/50">
       {children}
     </div>
   );
@@ -96,8 +96,10 @@ function KoeiButtonGroup({ children }: { children: React.ReactNode }) {
 function KoeiButton({ label, onClick, highlight = false }: { label: string; onClick?: () => void; highlight?: boolean }) {
   return (
     <button
+      role="tab"
+      aria-selected={highlight}
       onClick={onClick}
-      className={`flex-1 py-1 px-2 text-[10px] font-bold border-2 rounded shadow-sm hover:brightness-110 active:scale-95 transition-all
+      className={`flex-1 py-2 px-2 text-xs font-bold border-2 rounded shadow-sm hover:brightness-110 active:scale-95 transition-all
         ${highlight
           ? "bg-[#C41E3A] border-[#D4AF37] text-white"
           : "bg-stone-700 border-stone-500 text-amber-100 shadow-[inset_0_1px_4px_rgba(255,255,255,0.2)]"}`}
@@ -474,25 +476,29 @@ export default function SamgukPage() {
                       </KoeiInsetBox>
 
                       <div className="space-y-2">
-                        <div className="text-[13px] text-amber-500 ml-1 font-black italic tracking-widest">◈ 나의 인상 풀이</div>
-                        <KoeiInsetBox className="text-[13px] text-amber-100 leading-relaxed font-bold min-h-[120px] bg-black/60 p-4">
-                          <div className="space-y-4">
-                            <div>
-                              <p className="text-amber-600 mb-1.5 text-[11.5px] uppercase tracking-[0.2em] underline decoration-amber-900/50 underline-offset-4 font-black">돋보이는 이목구비</p>
-                              <p className="leading-relaxed text-[13px] drop-shadow-sm">{result.faceAnalysis.눈}, {result.faceAnalysis.코}, {result.faceAnalysis.입}</p>
-                            </div>
-                            <div className="border-t border-amber-900/30 pt-3">
-                              <p className="text-amber-600 mb-1.5 text-[11.5px] uppercase tracking-[0.2em] underline decoration-amber-900/50 underline-offset-4 font-black">첫인상</p>
-                              <p className="leading-relaxed text-[13px] drop-shadow-sm">{result.faceAnalysis.인상}</p>
-                            </div>
-                          </div>
+                        <div className="text-[13px] text-amber-500 ml-1 font-black italic tracking-widest">◈ 닮은 점</div>
+                        <KoeiInsetBox className="text-[13px] text-amber-100 leading-relaxed font-bold bg-black/60 p-4">
+                          <p className="leading-relaxed text-[13px] drop-shadow-sm">{result.matchReason}</p>
                         </KoeiInsetBox>
                       </div>
                     </div>
                   </div>
 
+                  {/* 탭: 내용 바로 위, 스크롤해도 화면 위에 붙어 있음 */}
+                  <div className="sticky top-0 z-20 -mx-1 px-1 py-2 bg-[#203a36]/95 backdrop-blur-sm no-screenshot">
+                    <KoeiButtonGroup>
+                      {(["열전", "능력", "현대", "특기"] as const).map((tab) => (
+                        <KoeiButton key={tab} label={tab} highlight={selectedTab === tab} onClick={() => {
+                          setSelectedTab(tab);
+                          // 탭 바만 보이고 내용이 화면 밖이면 내용 시작 위치로 이동
+                          requestAnimationFrame(() => document.getElementById("samguk-tabpanel")?.scrollIntoView({ block: "nearest", behavior: "smooth" }));
+                        }} />
+                      ))}
+                    </KoeiButtonGroup>
+                  </div>
+
                   {/* 탭 콘텐츠 영역 */}
-                  <div className="min-h-[320px]">
+                  <div id="samguk-tabpanel" role="tabpanel" aria-label={selectedTab} className="min-h-[320px] scroll-mt-16">
                     {selectedTab === "열전" && (
                       <div className="space-y-5 animate-in fade-in slide-in-from-bottom-2 duration-500">
                         <div className="text-stone-400 text-[13px] font-black italic tracking-[0.2em] flex items-center gap-2">
@@ -588,39 +594,6 @@ export default function SamgukPage() {
                       </div>
                     )}
 
-                    {selectedTab === "분석" && (
-                      <div className="space-y-4 animate-in fade-in slide-in-from-bottom-2 duration-500">
-                        <div className="text-amber-500 text-[10px] font-black flex items-center gap-2 tracking-widest italic">
-                          <span className="w-2 h-0.5 bg-amber-600"></span>
-                          NEURAL FACE ANALYSIS
-                        </div>
-                        <div className="space-y-4">
-                          <KoeiInsetBox className="space-y-3 bg-black/40 p-4">
-                            <div className="grid grid-cols-2 gap-4">
-                              <div>
-                                <p className="text-amber-600/60 text-[8px] uppercase tracking-tighter mb-1 border-b border-amber-900/30">이목구비</p>
-                                <p className="text-white text-[11px] leading-snug">{result.faceAnalysis.눈}, {result.faceAnalysis.코}, {result.faceAnalysis.입}</p>
-                              </div>
-                              <div>
-                                <p className="text-amber-600/60 text-[8px] uppercase tracking-tighter mb-1 border-b border-amber-900/30">첫인상</p>
-                                <p className="text-white text-[11px] leading-snug">{result.faceAnalysis.인상}</p>
-                              </div>
-                            </div>
-                          </KoeiInsetBox>
-
-                          <div className="bg-amber-900/10 border border-amber-600/30 p-4 rounded relative overflow-hidden">
-                            <div className="absolute top-0 right-0 p-1 opacity-10 text-4xl italic font-black text-amber-500">MATCH</div>
-                            <p className="text-amber-500 text-[10px] font-bold mb-2 flex items-center gap-1">
-                              <span className="w-1 h-1 bg-amber-500 rounded-full"></span>
-                              유사 영웅 식별 사유
-                            </p>
-                            <p className="text-amber-100/90 text-xs leading-relaxed font-medium">
-                              {result.matchReason}
-                            </p>
-                          </div>
-                        </div>
-                      </div>
-                    )}
                   </div>
 
                   {/* 하단 버튼 인터페이스 */}
@@ -633,13 +606,6 @@ export default function SamgukPage() {
                         <div className="w-1 h-1 rounded-full bg-blue-500"></div>
                       </div>
                     </div>
-                    <KoeiButtonGroup>
-                      <KoeiButton label="열전" onClick={() => setSelectedTab("열전")} highlight={selectedTab === "열전"} />
-                      <KoeiButton label="능력" onClick={() => setSelectedTab("능력")} highlight={selectedTab === "능력"} />
-                      <KoeiButton label="현대" onClick={() => setSelectedTab("현대")} highlight={selectedTab === "현대"} />
-                      <KoeiButton label="특기" onClick={() => setSelectedTab("특기")} highlight={selectedTab === "특기"} />
-                      <KoeiButton label="분석" onClick={() => setSelectedTab("분석")} highlight={selectedTab === "분석"} />
-                    </KoeiButtonGroup>
                   </div>
 
                 </div>
