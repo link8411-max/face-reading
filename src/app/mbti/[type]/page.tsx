@@ -5,6 +5,8 @@ import { mbtiProfiles, MBTI_SLUGS } from "@/content/mbtiTypes";
 import { isMbti } from "@/lib/mbti/compat";
 
 export const dynamicParams = false;
+// 이달의 운세가 달이 바뀐 뒤에도 서버 HTML에 맞게 나오도록 하루마다 다시 만든다
+export const revalidate = 86400;
 
 export function generateStaticParams() {
   return MBTI_SLUGS.map((type) => ({ type }));

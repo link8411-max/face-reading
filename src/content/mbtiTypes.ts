@@ -447,11 +447,17 @@ export const mbtiProfiles: Record<MbtiType, MbtiProfile> = {
   },
 }
 
+// 한국 시간 기준 'YYYY-MM' (빌드 서버는 UTC라 1일 0~9시에 전달로 계산되는 것을 막는다)
+export function seoulMonth(now: Date): string {
+  const parts = new Intl.DateTimeFormat('en-CA', { timeZone: 'Asia/Seoul', year: 'numeric', month: '2-digit' }).formatToParts(now)
+  const get = (t: string) => parts.find((p) => p.type === t)!.value
+  return `${get('year')}-${get('month')}`
+}
+
 // 이달의 운세: 데이터의 달과 현재 달이 같을 때만 보여 준다 (지난달 운세 노출 방지)
 export function monthlyFor(type: MbtiType, now: Date): MbtiProfile['monthly'] | null {
   const m = mbtiProfiles[type].monthly
-  const current = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`
-  return m.month === current ? m : null
+  return m.month === seoulMonth(now) ? m : null
 }
 
 // 유형 페이지에 실제로 보이는 본문 전체 (분량 기준 검사용, 궁합 섹션 문장 포함)

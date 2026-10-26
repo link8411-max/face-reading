@@ -107,6 +107,10 @@ export default function Zodiac2027Article({ slug }: { slug: ZodiacSlug }) {
           내 생년월일 사주로 {FORTUNE_YEAR.year} 운세 자세히 보기 →
         </Link>
 
+        <Link href="/mbti/match" className="block text-center py-3 bg-white/60 border-2 border-[#C41E3A]/30 rounded-2xl font-bold text-[#C41E3A] hover:bg-white/80">
+          🧩 MBTI 궁합도 보기 →
+        </Link>
+
         <section className={card}>
           <h2 className={h2}>자주 묻는 질문</h2>
           <div className="space-y-2">
