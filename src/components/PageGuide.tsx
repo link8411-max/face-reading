@@ -18,29 +18,26 @@ export default function PageGuide({ route }: { route: GuideRoute }) {
           <h2 className="text-2xl font-bold text-[#C41E3A]">{guide.heading}</h2>
         </div>
 
-        <div className="space-y-3 leading-relaxed">
-          {guide.intro.map((p) => (
-            <p key={p}>{p}</p>
-          ))}
-        </div>
+        <p className="leading-relaxed text-center">{guide.summary}</p>
 
-        <div className="bg-white/60 backdrop-blur-sm rounded-3xl border-2 border-[#C41E3A]/30 shadow-lg p-5">
-          <h3 className="font-bold text-lg mb-3 text-[#C41E3A]">이렇게 해요</h3>
-          <ol className="list-decimal pl-5 space-y-2">
-            {guide.howTo.map((step) => (
-              <li key={step}>{step}</li>
+        {/* 본문은 접어 두되 HTML에는 남겨 검색엔진이 읽게 한다 */}
+        <details className="group bg-white/60 rounded-3xl border-2 border-[#C41E3A]/30 px-5 py-4">
+          <summary className="font-bold text-[#C41E3A] cursor-pointer list-none flex justify-between items-center">
+            자세히 보기
+            <span className="transition group-open:rotate-180" aria-hidden>▾</span>
+          </summary>
+          <div className="mt-4 space-y-3 leading-relaxed">
+            {guide.intro.map((p) => (
+              <p key={p}>{p}</p>
             ))}
-          </ol>
-        </div>
-
-        <div className="space-y-3">
-          {guide.highlights.map((h) => (
-            <div key={h.title} className="bg-white/60 rounded-3xl border-2 border-[#C41E3A]/30 p-5">
-              <h3 className="font-bold mb-1 text-[#C41E3A]">{h.title}</h3>
-              <p className="leading-relaxed">{h.body}</p>
-            </div>
-          ))}
-        </div>
+            {guide.highlights.map((h) => (
+              <div key={h.title}>
+                <h3 className="font-bold mb-1 text-[#C41E3A]">{h.title}</h3>
+                <p>{h.body}</p>
+              </div>
+            ))}
+          </div>
+        </details>
 
         <div>
           <h3 className="font-bold text-lg mb-3 text-[#C41E3A]">자주 묻는 질문</h3>

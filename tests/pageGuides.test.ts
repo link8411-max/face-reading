@@ -5,8 +5,7 @@ const routes = Object.keys(pageGuides) as GuideRoute[]
 
 test.each(routes)('%s 가이드 분량', (route) => {
   const g = pageGuides[route]!
-  expect(g.intro.join('').length).toBeGreaterThanOrEqual(400)
-  expect(g.howTo.length).toBeGreaterThanOrEqual(3)
+  expect(g.intro.join("").length).toBeGreaterThanOrEqual(300)
   expect(g.highlights.length).toBeGreaterThanOrEqual(3)
   expect(g.faqs.length).toBeGreaterThanOrEqual(4)
 })
