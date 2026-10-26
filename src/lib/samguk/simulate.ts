@@ -1,38 +1,15 @@
-import { FEATURE_KEYS } from '@/lib/face/landmarkFeatures'
-import { STD_INFLATION } from '@/lib/face/featureStats'
-import type { ZVector } from '@/lib/face/featureStats'
+import { toZ } from '@/lib/face/featureStats'
+import { sampleFeatures, mulberry32 } from '@/lib/face/sampleFeatures'
 import { matchCharacter, type Gender } from './matcher'
 
-// 시드 고정 난수 (같은 시드면 같은 수열)
-export function mulberry32(seed: number): () => number {
-  let a = seed >>> 0
-  return () => {
-    a = (a + 0x6d2b79f5) >>> 0
-    let t = a
-    t = Math.imul(t ^ (t >>> 15), t | 1)
-    t ^= t + Math.imul(t ^ (t >>> 7), t | 61)
-    return ((t ^ (t >>> 14)) >>> 0) / 4294967296
-  }
-}
+export { mulberry32 }
 
-// 가상 얼굴: 특징마다 독립 정규분포(±3에서 자름).
-// toZ가 표본 편차를 STD_INFLATION배 넓혀 쓰므로, 실제 사용자의 z 폭은 약 1/STD_INFLATION이다. 같은 폭으로 뽑아야 보정이 맞는다.
-// 실제 얼굴은 특징끼리 상관이 있지만 여기선 무시한 근사다. 실사진 통계가 쌓이면 바꿀 것.
-export function sampleZ(rng: () => number): ZVector {
-  const z = {} as ZVector
-  for (const k of FEATURE_KEYS) {
-    const u = Math.max(rng(), 1e-12), v = rng()
-    const n = Math.sqrt(-2 * Math.log(u)) * Math.cos(2 * Math.PI * v)
-    z[k] = Math.max(-3, Math.min(3, n / STD_INFLATION))
-  }
-  return z
-}
-
+// 가상 사용자 n명을 성별 분포에서 뽑아 실제 경로(toZ(f, gender) → matchCharacter)로 매칭한 인물별 횟수
 export function simulate(n: number, gender: Gender, bias: Record<string, number>, seed: number): Record<string, number> {
   const rng = mulberry32(seed)
   const counts: Record<string, number> = {}
   for (let i = 0; i < n; i++) {
-    const id = matchCharacter(sampleZ(rng), gender, bias).character.id
+    const id = matchCharacter(toZ(sampleFeatures(rng, gender), gender), gender, bias).character.id
     counts[id] = (counts[id] ?? 0) + 1
   }
   return counts
