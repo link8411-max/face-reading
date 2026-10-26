@@ -15,7 +15,7 @@ test.each([
   ['/', 'home'], ['/about', 'home'], ['/privacy', 'home'],
   ['/face2', 'face'], ['/animal', 'face'], ['/samguk', 'face'], ['/face-tests', 'face'],
   ['/fortune', 'unse'], ['/fortune/daily', 'unse'], ['/fortune/2027', 'unse'], ['/fortune/2027/sheep', 'unse'], ['/unse', 'unse'],
-  ['/mbti', 'mbti'],
+  ['/mbti', 'mbti'], ['/face-match', 'mbti'], ['/face-match/r/cat-fox', 'mbti'], ['/samguk/team', 'face'],
 ])('tabForPath(%s) = %s', (path, key) => {
   expect(tabForPath(path)).toBe(key)
 })

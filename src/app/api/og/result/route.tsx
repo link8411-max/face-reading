@@ -1,7 +1,8 @@
 import { ImageResponse } from '@vercel/og';
 import { NextRequest } from 'next/server';
 import { parseShared, type ShareKind } from '@/lib/shareLinks';
-import { mbtiShared } from '@/lib/shareLinks';
+import { mbtiShared, parseFaceMatch, parseInvite } from '@/lib/shareLinks';
+import { REL_NAME } from '@/lib/faceMatch/compat';
 
 export const runtime = 'edge';
 
@@ -17,6 +18,14 @@ export async function GET(request: NextRequest) {
     const m = mbtiShared(q.get('a') ?? '', q.get('b') ?? '');
     if (!m) return new Response('bad request', { status: 400 });
     big = `${m.a} × ${m.b}`; score = `궁합 ${m.score}점`; phrase = m.phrase; label = 'MBTI 궁합';
+  } else if (kind === 'face-match') {
+    const m = parseFaceMatch(`${q.get('a') ?? ''}-${q.get('b') ?? ''}`, q.get('rel') ?? '');
+    if (!m) return new Response('bad request', { status: 400 });
+    big = `${m.aName} × ${m.bName}`; score = m.result.headline; phrase = m.phrase; label = `얼굴 궁합 · ${REL_NAME[m.rel]}`;
+  } else if (kind === 'invite') {
+    const inv = parseInvite(q.get('key') ?? '', q.get('rel') ?? '');
+    if (!inv) return new Response('bad request', { status: 400 });
+    big = `${REL_NAME[inv.rel]} 궁합 신청`; score = `친구는 ${inv.name}`; phrase = '내 사진을 올리면 바로 궁합이 나와요'; label = '얼굴 궁합';
   } else if ((KINDS as string[]).includes(kind)) {
     const r = parseShared(kind as ShareKind, q.get('key') ?? '', q.get('s') ?? undefined);
     if (!r) return new Response('bad request', { status: 400 });

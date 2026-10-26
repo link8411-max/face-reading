@@ -68,6 +68,6 @@ export const CATEGORIES: Category[] = [
 export function tabForPath(pathname: string): TabKey {
   if (pathname === '/face-tests' || ['/face2', '/animal', '/samguk'].some((p) => pathname.startsWith(p))) return 'face'
   if (pathname === '/unse' || pathname.startsWith('/fortune')) return 'unse'
-  if (pathname.startsWith('/mbti')) return 'mbti'
+  if (pathname.startsWith('/mbti') || pathname.startsWith('/face-match')) return 'mbti'
   return 'home'
 }
