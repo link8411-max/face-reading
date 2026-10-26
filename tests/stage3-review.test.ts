@@ -6,7 +6,7 @@ import { 띠이모지, 월주계산 } from '@/lib/saju'
 import { computeFortune } from '@/lib/fortuneService'
 
 test('홈 FAQ 한자는 丁未年', () => {
-  const home = readFileSync('src/app/page.tsx', 'utf8')
+  const home = readFileSync('src/content/homeFaq.ts', 'utf8') // 4a에서 홈 FAQ가 데이터 파일로 옮겨감
   expect(home).not.toContain('丙午')
   expect(home).toContain('丁未年')
 })
