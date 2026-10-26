@@ -72,3 +72,9 @@ export function mbtiShared(aIn: string, bIn: string): { a: string; b: string; sc
   const path = `/mbti/r/${a.toLowerCase()}-${b.toLowerCase()}`
   return { a, b, score, phrase: `${a}랑 ${b} 궁합 ${score}점이래. 우리도 해볼까?`, path, url: `${SITE}${path}?${UTM('mbti_match')}` }
 }
+
+// 결과 미리보기 이미지 주소 (카톡·인스타 미리보기, 카카오톡 공유 카드)
+export function ogImageUrl(kind: ShareKind | 'mbti', key: string, score?: number | null, b?: string): string {
+  if (kind === 'mbti') return `${SITE}/api/og/result?kind=mbti&a=${key}&b=${b}`
+  return `${SITE}/api/og/result?kind=${kind}&key=${encodeURIComponent(key)}${score !== undefined && score !== null ? `&s=${score}` : ''}`
+}

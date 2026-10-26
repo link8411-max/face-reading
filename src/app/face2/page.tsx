@@ -14,7 +14,7 @@ import type { AnalysisResult } from "@/lib/faceAnalyzer";
 import ResultCard, { type ResultCardProps } from "@/components/result/ResultCard";
 import ResultActions from "@/components/result/ResultActions";
 import { useResultShare } from "@/hooks/useResultShare";
-import { faceSlug, parseShared, shareUrl, SITE } from "@/lib/shareLinks";
+import { faceSlug, ogImageUrl, parseShared, shareUrl, SITE } from "@/lib/shareLinks";
 import { Icon } from "@/components/icons";
 
 const firstSentence = (t: string) => (t.match(/^.*?[.!?요다](?=\s|$)/)?.[0] ?? t).trim();
@@ -50,7 +50,7 @@ export default function Face2Page() {
   const imageRef = useRef<HTMLImageElement>(null);
 
   const { ref: resultRef, isCapturing, download } = useScreenshot<HTMLElement>();
-  const { busy, notice, share: shareCard } = useResultShare(result ? { title: '운명을 읽다 · AI 관상 테스트', text: parseShared('face', faceSlug(result.type) ?? '')?.phrase ?? `나는 ${result.type}래. 너 관상도 봐줄까?`, url: faceSlug(result.type) ? shareUrl('face', faceSlug(result.type)!) : `${SITE}/face2` } : null);
+  const { busy, notice, share: shareCard } = useResultShare(result ? { testName: 'face', title: '운명을 읽다 · AI 관상 테스트', text: parseShared('face', faceSlug(result.type) ?? '')?.phrase ?? `나는 ${result.type}이래. 너 관상도 봐줄까?`, url: faceSlug(result.type) ? shareUrl('face', faceSlug(result.type)!) : `${SITE}/face2`, imageUrl: faceSlug(result.type) ? ogImageUrl('face', faceSlug(result.type)!) : `${SITE}/api/og` } : null);
 
   // 모델 사전 로딩
   useEffect(() => {
@@ -161,7 +161,7 @@ export default function Face2Page() {
           <div className="pb-6 animate-fade-in">
             <ResultCard captureRef={resultRef} {...cardProps(result)} />
             <ResultActions
-              onShare={() => { track("share_click", { test_name: "face", method: "link" }); shareCard(); }}
+              onShare={shareCard}
               onSave={() => { track("share_click", { test_name: "face", method: "save_image" }); download(getShareOptions()); }}
               onRetry={resetAll}
               busy={busy || isCapturing}

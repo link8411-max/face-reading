@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { redirect } from "next/navigation";
 import MatchCalculator from "@/components/mbti/MatchCalculator";
-import { mbtiShared, SITE } from "@/lib/shareLinks";
+import { mbtiShared, ogImageUrl, SITE } from "@/lib/shareLinks";
 import type { MbtiType } from "@/lib/mbti/compat";
 
 type Props = { params: Promise<{ pair: string }> };
@@ -15,7 +15,7 @@ const parse = (pair: string) => {
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const m = parse((await params).pair);
   if (!m) return {};
-  const image = `${SITE}/api/og/result?kind=mbti&a=${m.a}&b=${m.b}`;
+  const image = ogImageUrl("mbti", m.a, null, m.b);
   const description = "두 MBTI를 고르면 연애·친구·직장 궁합 점수를 알려 드려요.";
   return {
     title: `${m.phrase} | 운명을 읽다`,
