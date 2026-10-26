@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import PageGuide from "@/components/PageGuide";
 
 export const metadata: Metadata = {
   title: "2026 신년운세 & 토정비결 | 운명을 읽다",
@@ -64,6 +65,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
         dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }}
       />
       {children}
+      <PageGuide route="/fortune" />
     </>
   );
 }

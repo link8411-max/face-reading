@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import PageGuide from "@/components/PageGuide";
 
 export const metadata: Metadata = {
   title: "동물상 테스트 | 나는 어떤 동물을 닮았을까? - 운명을 읽다",
@@ -69,6 +70,7 @@ export default function AnimalLayout({
         dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }}
       />
       {children}
+      <PageGuide route="/animal" />
     </>
   );
 }

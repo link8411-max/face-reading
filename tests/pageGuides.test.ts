@@ -33,3 +33,8 @@ test('faqJsonLd는 < 를 이스케이프한다', () => {
     faqs.pop()
   }
 })
+
+test('모든 GuideRoute에 가이드가 있다', () => {
+  const all: GuideRoute[] = ['/face2', '/animal', '/samguk', '/fortune', '/fortune/daily']
+  for (const r of all) expect(pageGuides[r], r).toBeDefined()
+})

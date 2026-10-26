@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import PageGuide from "@/components/PageGuide";
 
 export const metadata: Metadata = {
   title: "삼국지 닮은꼴 찾기 | 나는 어떤 영웅을 닮았을까? - 운명을 읽다",
@@ -64,6 +65,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
         dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }}
       />
       {children}
+      <PageGuide route="/samguk" />
     </>
   );
 }

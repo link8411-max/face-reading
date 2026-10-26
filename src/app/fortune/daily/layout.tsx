@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import PageGuide from "@/components/PageGuide";
 
 export const metadata: Metadata = {
   title: "오늘의 운세 | 운명을 읽다",
@@ -41,6 +42,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
       />
       {children}
+      <PageGuide route="/fortune/daily" />
     </>
   );
 }
