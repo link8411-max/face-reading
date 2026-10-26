@@ -4,7 +4,7 @@ import type { ReactNode } from "react";
 
 export const ICON_NAMES = [
   "home", "face", "moon", "rings", "cat", "fan", "heart", "shield",
-  "back", "spark", "story", "download", "refresh", "chevron", "users",
+  "back", "spark", "story", "download", "refresh", "chevron", "users", "sun",
 ] as const;
 export type IconName = (typeof ICON_NAMES)[number];
 
@@ -59,6 +59,12 @@ const PATHS: Record<IconName, ReactNode> = {
   download: <path d="M12 4v11M7.5 10.5L12 15l4.5-4.5M5 19.5h14" />,
   refresh: <path d="M19.5 12a7.5 7.5 0 1 1-2.2-5.3M19.5 4.5v4h-4" />,
   chevron: <path d="M9 6l6 6-6 6" />,
+  sun: (
+    <>
+      <circle cx="12" cy="12" r="4" />
+      <path d="M12 3v2M12 19v2M3 12h2M19 12h2M5.6 5.6l1.4 1.4M17 17l1.4 1.4M5.6 18.4L7 17M17 7l1.4-1.4" />
+    </>
+  ),
   users: (
     <>
       <circle cx="9" cy="9" r="3.5" />

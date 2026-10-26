@@ -7,7 +7,7 @@ test('MBTI 허브와 16유형 페이지: 200, FAQ 구조화 데이터 1개, MBTI
   const errors = trackErrors(page)
   await page.goto('/mbti')
   await expect(page.locator('h1')).toContainText('MBTI')
-  await expect(page.getByRole('navigation', { name: '하단 메뉴' }).getByRole('link', { name: 'MBTI' })).toHaveAttribute('aria-current', 'page')
+  await expect(page.getByRole('navigation', { name: '하단 메뉴' }).getByRole('link', { name: '궁합' })).toHaveAttribute('aria-current', 'page')
   for (const s of SLUGS) {
     const res = await page.goto(`/mbti/${s}`)
     expect(res?.status(), s).toBe(200)
