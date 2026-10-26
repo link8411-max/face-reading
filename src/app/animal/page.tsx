@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef } from "react";
 import CoupangBanner from "@/components/CoupangBanner";
 import { useBackOrHome } from "@/hooks/useBackOrHome";
 import TestHeader from "@/components/test/TestHeader";
@@ -8,7 +8,9 @@ import TestStart from "@/components/test/TestStart";
 import type { Gender } from "@/components/test/GenderPills";
 import Link from "next/link";
 import { useScreenshot } from "@/hooks/useScreenshot";
-import type { AnimalTypeResult } from "@/lib/animalTypeAnalyzer";
+import { matchAnimal, type AnimalTypeResult } from "@/lib/animal/matcher";
+import animalCalibration from "@/lib/animal/calibration.json";
+import { toZ } from "@/lib/face/featureStats";
 import { animalTypeDB } from "@/lib/animalTypeDB";
 import ResultCard, { type ResultCardProps } from "@/components/result/ResultCard";
 import ResultActions from "@/components/result/ResultActions";
@@ -36,32 +38,15 @@ export default function AnimalTypePage() {
   const goBack = useBackOrHome();
   const [image, setImage] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
-  const [modelsLoading, setModelsLoading] = useState(true);
   const [result, setResult] = useState<AnimalTypeResult | null>(null);
   const [error, setError] = useState<string | null>(null);
-  // 성별: 2b단계부터 성별별 얼굴 기준값에 쓴다
+  // 성별: 성별별 얼굴 기준값으로 z 점수를 낸다
   const [gender, setGender] = useState<Gender | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const imageRef = useRef<HTMLImageElement>(null);
 
   const { ref: resultRef, isCapturing, download } = useScreenshot<HTMLElement>();
   const { frameRef, busy, notice, shareStory } = useStoryShare();
-
-  // 모델 사전 로딩
-  useEffect(() => {
-    const loadFaceModels = async () => {
-      try {
-        const { loadModels } = await import("@/lib/faceDetection");
-        await loadModels();
-        setModelsLoading(false);
-      } catch (err) {
-        console.error("Model loading failed:", err);
-        setError("모델 로딩에 실패했습니다. 페이지를 새로고침해주세요.");
-        setModelsLoading(false);
-      }
-    };
-    loadFaceModels();
-  }, []);
 
   const getShareOptions = () => ({
     fileName: `동물상_${result?.data.name || "결과"}`,
@@ -83,27 +68,35 @@ export default function AnimalTypePage() {
   };
 
   const analyzeImage = async () => {
-    if (!image || !gender || !imageRef.current) return;
+    const img = imageRef.current;
+    if (!image || !gender || !img) return;
 
     setLoading(true);
     setError(null);
-    let faceNotDetected = "";
-
     try {
-      const { detectFaceFeatures, FACE_NOT_DETECTED } = await import("@/lib/faceDetection");
-      faceNotDetected = FACE_NOT_DETECTED;
-      const { analyzeAnimalType } = await import("@/lib/animalTypeAnalyzer");
-
-      const features = await detectFaceFeatures(imageRef.current);
-      const analysisResult = analyzeAnimalType(features);
-      setResult(analysisResult);
-    } catch (err) {
-      if (err instanceof Error && err.message === faceNotDetected) {
-        setError("얼굴을 감지할 수 없습니다. 정면 얼굴 사진을 사용해주세요.");
-      } else {
-        console.error("Analysis error:", err);
-        setError("분석 중 오류가 발생했습니다. 다른 사진으로 시도해주세요.");
+      await img.decode().catch(() => {});
+      let detectLandmarks: (typeof import("@/lib/face/mediapipe"))["detectLandmarks"];
+      try {
+        ({ detectLandmarks } = await import("@/lib/face/mediapipe"));
+      } catch {
+        setError("분석 도구를 불러오지 못했어요. 새로고침해 주세요.");
+        return;
       }
+      const { extractFeatures, checkFrontal } = await import("@/lib/face/landmarkFeatures");
+      const lm = await detectLandmarks(img);
+      if (!lm) {
+        setError("얼굴을 찾지 못했어요. 얼굴이 잘 보이는 사진을 올려 주세요.");
+        return;
+      }
+      if (!checkFrontal(lm).ok) {
+        setError("정면 사진을 올려 주세요. 고개를 돌린 사진은 동물상을 찾기 어려워요.");
+        return;
+      }
+      const features = extractFeatures(lm);
+      setResult(matchAnimal(toZ(features, gender), animalCalibration.bias));
+    } catch (err) {
+      console.error("Analysis error:", err);
+      setError("사진을 읽지 못했어요. JPG나 PNG 사진으로 다시 올려 주세요.");
     } finally {
       setLoading(false);
     }
@@ -138,7 +131,6 @@ export default function AnimalTypePage() {
             onReset={resetAll}
             loading={loading}
             error={error}
-            preparing={modelsLoading}
             imageRef={imageRef}
           />
         )}

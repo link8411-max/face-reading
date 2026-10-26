@@ -71,7 +71,7 @@ for (const path of ['/face2', '/animal']) {
     await expect(page.getByRole('button', { name: /성별을 먼저/ })).toBeDisabled()
     await page.getByRole('radio', { name: '여자' }).click()
     await page.getByRole('button', { name: /관상 보기|동물상 찾기/ }).click({ timeout: 30000 })
-    await expect(page.getByText('얼굴을 감지할 수 없습니다')).toBeVisible({ timeout: 30000 })
+    await expect(page.getByText(path === '/animal' ? /얼굴을 찾지 못했어요/ : /얼굴을 감지할 수 없습니다/)).toBeVisible({ timeout: 30000 })
     expect(errors).toEqual([])
   })
 }
