@@ -3,6 +3,8 @@
 import { useState, useRef, useEffect } from "react";
 import CoupangBanner from "@/components/CoupangBanner";
 import { useBackOrHome } from "@/hooks/useBackOrHome";
+import TestHeader from "@/components/test/TestHeader";
+import TestStart from "@/components/test/TestStart";
 import Link from "next/link";
 import { SamgukCharacter } from "@/lib/samgukDB";
 import { useScreenshot } from "@/hooks/useScreenshot";
@@ -117,6 +119,7 @@ export default function SamgukPage() {
   const [loadingStep, setLoadingStep] = useState(0);
   const [result, setResult] = useState<AnalysisResult | null>(null);
   const [gender, setGender] = useState<Gender | null>(null);
+  const [error, setError] = useState<string | null>(null);
   const [selectedTab, setSelectedTab] = useState<string>("열전");
   const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -156,6 +159,7 @@ export default function SamgukPage() {
       reader.onloadend = () => {
         setImage(reader.result as string);
         setResult(null);
+        setError(null);
       };
       reader.readAsDataURL(file);
     }
@@ -165,6 +169,7 @@ export default function SamgukPage() {
     if (!image || !gender) return;
 
     setLoading(true);
+    setError(null);
     try {
       // 이미지 축소 후 브라우저 안에서 얼굴 랜드마크 추출 (사진은 서버로 보내지 않음)
       const compressedImage = await compressImage(image);
@@ -177,15 +182,15 @@ export default function SamgukPage() {
         const { detectLandmarks } = await import("@/lib/face/mediapipe");
         landmarks = await detectLandmarks(img);
       } catch {
-        alert("분석 도구를 불러오지 못했어요. 새로고침해 주세요.");
+        setError("분석 도구를 불러오지 못했어요. 새로고침해 주세요.");
         return;
       }
       if (!landmarks) {
-        alert("얼굴을 찾지 못했어요. 얼굴이 잘 보이는 사진을 올려 주세요.");
+        setError("얼굴을 찾지 못했어요. 얼굴이 잘 보이는 사진을 올려 주세요.");
         return;
       }
       if (!checkFrontal(landmarks).ok) {
-        alert("정면 사진을 올려 주세요. 고개를 돌린 사진은 닮은꼴을 찾기 어려워요.");
+        setError("정면 사진을 올려 주세요. 고개를 돌린 사진은 닮은꼴을 찾기 어려워요.");
         return;
       }
 
@@ -195,7 +200,7 @@ export default function SamgukPage() {
       // 결과가 나오면 페이지 상단으로 스크롤하여 결과를 바로 볼 수 있게 함
       window.scrollTo({ top: 0, behavior: "smooth" });
     } catch {
-      alert("사진을 읽지 못했어요. JPG나 PNG 사진으로 다시 올려 주세요.");
+      setError("사진을 읽지 못했어요. JPG나 PNG 사진으로 다시 올려 주세요.");
     } finally {
       setLoading(false);
     }
@@ -204,6 +209,7 @@ export default function SamgukPage() {
   const resetAll = () => {
     setImage(null);
     setResult(null);
+    setError(null);
     if (fileInputRef.current) {
       fileInputRef.current.value = "";
     }
@@ -228,134 +234,26 @@ export default function SamgukPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-[#F5E6D3] via-[#E8D4C4] to-[#F5E6D3] text-[#5C4033] relative">
-      {/* 민화 배경 - 고서/두루마리 느낌 */}
-      <div className="absolute inset-0 opacity-10 pointer-events-none">
-        <div className="absolute top-10 left-10 text-6xl text-[#1E3A5F]">魏</div>
-        <div className="absolute top-20 right-20 text-6xl text-green-700">蜀</div>
-        <div className="absolute bottom-40 left-20 text-6xl text-[#C41E3A]">吳</div>
-        <div className="absolute bottom-20 right-10 text-4xl text-[#D4AF37]">三國志</div>
-        <div className="absolute top-1/2 left-1/3 text-3xl text-[#FFD700]/60">天下</div>
-      </div>
+    <div className="min-h-screen bg-paper text-ink">
 
-      <main className="container mx-auto px-4 py-8 max-w-lg relative z-10">
-        {/* Header */}
-        <div className="flex items-center justify-between mb-6">
-          <button
-            onClick={() => result ? resetAll() : goBack()}
-            className="text-[#C41E3A]/70 hover:text-[#C41E3A] transition"
-          >
-            ← {result ? '다시하기' : '돌아가기'}
-          </button>
-          <span className="text-2xl">⚔️</span>
-        </div>
+      <main className="mx-auto px-[22px] max-w-lg">
+        <TestHeader title="삼국지 닮은꼴" onBack={() => (result ? resetAll() : goBack())} backLabel={result ? "다시하기" : "돌아가기"} />
 
-        <div className="text-center mb-8">
-          <div className="flex justify-center items-center gap-2 mb-3">
-            <span className="text-[#C41E3A]/70">━━</span>
-            <span className="text-2xl">🏯</span>
-            <span className="text-[#C41E3A]/70">━━</span>
-          </div>
-          <h1 className="text-3xl font-bold mb-2 text-[#C41E3A]" style={{ textShadow: "0 2px 8px rgba(196, 30, 58, 0.2)" }}>
-            삼국지 닮은꼴
-          </h1>
-          <p className="text-[#5C4033]/60 text-sm tracking-widest">
-            나는 어떤 삼국지 인물일까?
-          </p>
-          <div className="flex justify-center items-center gap-2 mt-3">
-            <span className="text-[#FFD700]/80 text-xs">◆</span>
-            <span className="text-[#C41E3A]/60 text-xs">━━━━━</span>
-            <span className="text-[#FFD700]/80 text-xs">◆</span>
-          </div>
-        </div>
-
-        {/* Upload Section (Koei Style) */}
-        {!result && !loading && (
-          <div className="animate-fade-in no-screenshot">
-            <KoeiFrame title="장수 탐색">
-              <div className="flex flex-col items-center">
-                <div
-                  className="w-full aspect-square max-w-[280px] bg-black/40 border-2 border-dashed border-stone-600 rounded-lg flex flex-col items-center justify-center cursor-pointer hover:border-amber-500/50 transition-colors group relative overflow-hidden"
-                  onClick={() => fileInputRef.current?.click()}
-                >
-                  <div className="absolute inset-0 bg-grid-animate opacity-5 pointer-events-none"></div>
-                  {image ? (
-                    <img
-                      src={image}
-                      alt="업로드된 이미지"
-                      className="w-full h-full object-cover rounded opacity-80"
-                    />
-                  ) : (
-                    <div className="text-center p-6 space-y-4">
-                      <div className="text-6xl group-hover:scale-110 transition-transform duration-500 opacity-60">📸</div>
-                      <div className="space-y-1">
-                        <p className="text-amber-200 font-bold text-lg tracking-widest drop-shadow-md uppercase">인상 심사 (印象 審査)</p>
-                        <p className="text-stone-400 text-[10px] uppercase tracking-[0.2em]">
-                          초상화를 올려 영웅의 기개를 측정하세요
-                        </p>
-                      </div>
-                      <div className="mt-4 inline-block px-3 py-1 bg-amber-900/30 border border-amber-600/30 rounded text-[10px] text-amber-500/80 animate-pulse">
-                        WANTED: 천하의 영웅
-                      </div>
-                    </div>
-                  )}
-                </div>
-
-                <div className="w-full mt-6 space-y-4">
-                  <div className="flex items-center gap-2 px-1">
-                    <div className="w-2 h-2 rounded-full bg-red-600 animate-pulse"></div>
-                    <p className="text-[10px] font-bold text-amber-100/60 uppercase tracking-widest">기개 측정 지침</p>
-                  </div>
-                  <KoeiInsetBox className="text-[11px] text-stone-300/80 leading-relaxed font-medium">
-                    <p>※ 정면 사진은 인식의 기개가 더욱 높습니다.</p>
-                    <p>※ 안면의 랜드마크를 통해 52인의 장수와 대조합니다.</p>
-                    <p className="text-amber-500/80 mt-1">※ 사진은 서버로 전송되지 않고 브라우저 안에서만 분석됩니다.</p>
-                  </KoeiInsetBox>
-                </div>
-
-                <input
-                  ref={fileInputRef}
-                  type="file"
-                  accept="image/*"
-                  onChange={handleImageUpload}
-                  className="hidden"
-                />
-
-                <div className="w-full mt-6">
-                  <p className="text-[11px] font-bold text-amber-100/70 mb-2 px-1">어느 장수들과 겨룰까요?</p>
-                  <div className="flex gap-3">
-                    {(["남", "여"] as const).map((g) => (
-                      <button
-                        key={g}
-                        onClick={() => setGender(g)}
-                        className={`flex-1 py-2 rounded border text-xs font-bold transition ${gender === g ? "bg-amber-700 border-amber-400 text-white" : "bg-stone-800/50 border-stone-600 text-amber-200/70"}`}
-                      >
-                        {g === "남" ? "남성 인물" : "여성 인물"}
-                      </button>
-                    ))}
-                  </div>
-                </div>
-
-                {image && (
-                  <div className="w-full flex gap-3 mt-6">
-                    <button
-                      onClick={resetAll}
-                      className="flex-1 py-3 bg-stone-700/50 border border-stone-500 rounded text-amber-200 text-xs font-bold hover:bg-stone-700 transition"
-                    >
-                      초기화
-                    </button>
-                    <button
-                      onClick={analyzeImage}
-                      disabled={loading || !gender}
-                      className="flex-1 py-3 bg-gradient-to-r from-red-800 to-red-600 border border-red-500 rounded text-white text-xs font-bold hover:brightness-110 transition shadow-[0_0_15px_rgba(220,38,38,0.3)] disabled:opacity-40"
-                    >
-                      {gender ? "영웅 탐색 시작 ⚔️" : "인물 성별을 먼저 골라 주세요"}
-                    </button>
-                  </div>
-                )}
-              </div>
-            </KoeiFrame>
-          </div>
+        {!result && (
+          <TestStart
+            heading={"나는 삼국지 속\n누구?"}
+            desc="얼굴 특징을 삼국지 영웅 52명의 전해 오는 인상과 비교해 가장 닮은 장수를 찾아요."
+            tips={["정면 사진이 좋아요", "밝은 곳에서"]}
+            analyzeLabel="닮은 장수 찾기"
+            image={image}
+            gender={gender}
+            onGender={setGender}
+            onFile={handleImageUpload}
+            onAnalyze={analyzeImage}
+            onReset={resetAll}
+            loading={loading}
+            error={error}
+          />
         )}
 
         {/* Loading Overlay (Same as before but with minor fixes) */}

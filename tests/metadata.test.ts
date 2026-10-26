@@ -7,8 +7,9 @@ test('/face2 title에 주력 키워드가 있다', () => {
   expect(title).toContain('무료')
 })
 
-test('/face2 H1이 AI 관상 테스트다', () => {
-  expect(readFileSync('src/app/face2/page.tsx', 'utf8')).toMatch(/<h1[^>]*>\s*AI 관상 테스트\s*</)
+test('/face2 H1이 AI 관상 테스트다 (TestHeader가 title을 h1로 렌더)', () => {
+  expect(readFileSync('src/app/face2/page.tsx', 'utf8')).toContain('<TestHeader title="AI 관상 테스트"')
+  expect(readFileSync('src/components/test/TestHeader.tsx', 'utf8')).toMatch(/<h1[^>]*>\{title\}<\/h1>/)
 })
 
 test('루트 layout에는 FAQPage가 없고 홈에만 있다', () => {

@@ -3,6 +3,9 @@
 import { useState, useRef, useEffect } from "react";
 import CoupangBanner from "@/components/CoupangBanner";
 import { useBackOrHome } from "@/hooks/useBackOrHome";
+import TestHeader from "@/components/test/TestHeader";
+import TestStart from "@/components/test/TestStart";
+import type { Gender } from "@/components/test/GenderPills";
 import Link from "next/link";
 import { useScreenshot } from "@/hooks/useScreenshot";
 import type { AnimalTypeResult } from "@/lib/animalTypeAnalyzer";
@@ -15,6 +18,8 @@ export default function AnimalTypePage() {
   const [modelsLoading, setModelsLoading] = useState(true);
   const [result, setResult] = useState<AnimalTypeResult | null>(null);
   const [error, setError] = useState<string | null>(null);
+  // 성별: 2b단계부터 성별별 얼굴 기준값에 쓴다
+  const [gender, setGender] = useState<Gender | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const imageRef = useRef<HTMLImageElement>(null);
 
@@ -56,7 +61,7 @@ export default function AnimalTypePage() {
   };
 
   const analyzeImage = async () => {
-    if (!image || !imageRef.current) return;
+    if (!image || !gender || !imageRef.current) return;
 
     setLoading(true);
     setError(null);
@@ -92,125 +97,28 @@ export default function AnimalTypePage() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-[#F5E6D3] via-[#E8D4C4] to-[#F5E6D3] text-[#5C4033] relative overflow-hidden">
-      {/* 배경 장식 */}
-      <div className="absolute inset-0 opacity-20 pointer-events-none">
-        <div className="absolute top-20 left-10 w-3 h-3 bg-[#C41E3A] rounded-full" />
-        <div className="absolute top-40 right-16 w-2 h-2 bg-[#1E3A5F] rounded-full" />
-        <div className="absolute top-72 left-1/4 w-2.5 h-2.5 bg-[#FFD700] rounded-full" />
-        <div className="absolute bottom-60 right-1/3 w-3 h-3 bg-[#C41E3A] rounded-full" />
-        <div className="absolute bottom-32 left-1/3 w-2 h-2 bg-[#D4AF37] rounded-full" />
-      </div>
+    <div className="min-h-screen bg-paper text-ink">
 
-      <main className="container mx-auto px-4 py-8 max-w-lg relative z-10">
-        {/* Header */}
-        <div className="flex items-center justify-between mb-6">
-          <button
-            onClick={() => result ? resetAll() : goBack()}
-            className="text-[#C41E3A]/80 hover:text-[#C41E3A] transition font-medium"
-          >
-            ← {result ? '다시하기' : '돌아가기'}
-          </button>
-          <span className="text-2xl">🐾</span>
-        </div>
+      <main className="mx-auto px-[22px] max-w-lg">
+        <TestHeader title="동물상 테스트" onBack={() => (result ? resetAll() : goBack())} backLabel={result ? "다시하기" : "돌아가기"} />
 
-        <div className="text-center mb-8">
-          <div className="flex justify-center items-center gap-2 mb-3">
-            <span className="text-[#C41E3A]/70">━━</span>
-            <span className="text-2xl">🦊</span>
-            <span className="text-[#C41E3A]/70">━━</span>
-          </div>
-          <h1 className="text-3xl font-bold mb-2 text-[#C41E3A]" style={{ textShadow: "0 2px 8px rgba(196, 30, 58, 0.2)" }}>
-            동물상 테스트
-          </h1>
-          <p className="text-[#5C4033]/70 text-sm tracking-widest">
-            나는 어떤 동물을 닮았을까?
-          </p>
-          <p className="text-[#1E3A5F]/70 text-xs mt-1">
-            AI가 분석하는 나의 동물상
-          </p>
-          <div className="flex justify-center items-center gap-2 mt-3">
-            <span className="text-[#FFD700]/80 text-xs">◆</span>
-            <span className="text-[#C41E3A]/60 text-xs">━━━━━</span>
-            <span className="text-[#FFD700]/80 text-xs">◆</span>
-          </div>
-        </div>
-
-        {/* 모델 로딩 상태 */}
-        {modelsLoading && (
-          <div className="bg-white/60 backdrop-blur-sm rounded-3xl p-6 mb-6 border-2 border-[#FFD700]/40 text-center shadow-md">
-            <div className="animate-spin text-3xl mb-3">🐾</div>
-            <p className="text-[#5C4033] font-medium">분석 모델 로딩 중...</p>
-            <p className="text-[#5C4033]/60 text-sm mt-1">첫 방문 시 약간의 시간이 걸립니다</p>
-          </div>
-        )}
-
-        {/* Upload Section */}
-        {!result && !modelsLoading && (
-          <div className="bg-white/60 backdrop-blur-sm rounded-3xl p-6 mb-6 border-2 border-[#C41E3A]/30 shadow-lg">
-            <div
-              className="border-2 border-dashed border-[#C41E3A]/40 rounded-2xl p-8 text-center cursor-pointer hover:border-[#C41E3A]/60 hover:bg-[#F5E6D3]/50 transition"
-              onClick={() => fileInputRef.current?.click()}
-            >
-              {image ? (
-                <img
-                  ref={imageRef}
-                  src={image}
-                  alt="업로드된 이미지"
-                  className="max-h-64 mx-auto rounded-2xl border-2 border-[#FFD700]/50"
-                  crossOrigin="anonymous"
-                />
-              ) : (
-                <div>
-                  <span className="text-5xl mb-4 block">📷</span>
-                  <p className="text-[#5C4033] font-medium">얼굴 사진을 업로드하세요</p>
-                  <p className="text-[#5C4033]/60 text-sm mt-2">
-                    정면 얼굴이 잘 보이는 사진이 좋아요
-                  </p>
-                  <p className="text-[#C41E3A]/60 text-[10px] mt-4">
-                    ※ 사진은 서버에 저장되지 않으며 분석 후 즉시 삭제됩니다.
-                  </p>
-                </div>
-              )}
-            </div>
-            <input
-              ref={fileInputRef}
-              type="file"
-              accept="image/*"
-              onChange={handleImageUpload}
-              className="hidden"
-            />
-
-            {error && (
-              <div className="mt-4 p-3 bg-red-100/50 border-2 border-[#C41E3A]/30 rounded-2xl text-center">
-                <p className="text-[#C41E3A] text-sm font-medium">{error}</p>
-              </div>
-            )}
-
-            {image && (
-              <div className="flex gap-3 mt-4">
-                <button
-                  onClick={resetAll}
-                  className="flex-1 py-3 bg-white/50 border-2 border-[#5C4033]/20 rounded-2xl font-bold hover:bg-white/80 transition text-[#5C4033]"
-                >
-                  다시 선택
-                </button>
-                <button
-                  onClick={analyzeImage}
-                  disabled={loading}
-                  className="flex-1 py-3 bg-gradient-to-r from-[#C41E3A] to-[#FFD700] rounded-2xl font-bold hover:shadow-lg transition disabled:opacity-50 text-white"
-                >
-                  {loading ? (
-                    <span className="flex items-center justify-center gap-2">
-                      <span className="animate-spin">🐾</span> 분석 중...
-                    </span>
-                  ) : (
-                    "동물상 찾기 🔍"
-                  )}
-                </button>
-              </div>
-            )}
-          </div>
+        {!result && (
+          <TestStart
+            heading={"나는 어떤 동물을\n닮았을까?"}
+            desc="눈매와 얼굴형으로 강아지상, 고양이상, 여우상 중 가장 닮은 동물을 찾아요."
+            tips={["정면 사진이 좋아요", "밝은 곳에서"]}
+            analyzeLabel="동물상 찾기"
+            image={image}
+            gender={gender}
+            onGender={setGender}
+            onFile={handleImageUpload}
+            onAnalyze={analyzeImage}
+            onReset={resetAll}
+            loading={loading}
+            error={error}
+            preparing={modelsLoading}
+            imageRef={imageRef}
+          />
         )}
 
         {/* Result Section */}
