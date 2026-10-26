@@ -43,7 +43,9 @@ npm run test:e2e     # E2E (next build 후 3200 포트): 전 페이지 로딩·�
 
 ### 공통 구성요소
 - 테스트 시작: `components/test/TestHeader`(h1 = 페이지 이름), `TestStart`(성별 pill 필수 → 큰 사진 영역 → 안내 → 분석 버튼. 사진·성별 없으면 버튼 비활성)
-- 결과: `components/result/ResultCard`(캡처 한 장 완결, 워터마크 "운명을 읽다 · unse-ai.com"), `ResultActions`(1순위 스토리에 올리기, 이미지 저장, 다시하기), `StoryFrame` + `hooks/useStoryShare`(9:16 1080×1920, 파일 공유 미지원이면 저장 후 안내 — `lib/storyShare.ts`)
+- 결과: `components/result/ResultCard`(캡처 한 장 완결, 워터마크 "운명을 읽다 · unse-ai.com"), `ResultActions`(1순위 공유하기, 이미지 저장, 다시하기)
+- 공유하기: `hooks/useResultShare`(결과가 나오면 카드 이미지를 미리 만들어 둠 — iOS 사용자 동작 시간 만료 방지) → `lib/share.ts` `shareResult`: 기본 공유창(이미지+문구+주소) → 링크만 → 링크 복사. 운세·MBTI는 `useScreenshot().share`가 같은 함수를 쓴다.
+- 이미지 저장: `lib/saveImage.ts`. iOS와 인앱 브라우저(카카오톡·인스타·네이버 등)는 다운로드 대신 길게 눌러 저장 화면(data 이미지), 카카오톡이면 "다른 브라우저로 열기"(`kakaotalk://web/openExternal`)
 - 삼국지: `components/samguk/SamgukGameCard`(회사생활 STATUS), `lib/samguk/guardian.ts`(나를 지켜줄 장수: 같은 세력에서 funStats 빈틈을 가장 많이 메우는 장수, 80~98점)
 - 8단계 전까지 없는 기능(친구 얼굴 궁합, 우리 팀 삼국지) 버튼은 넣지 않는다.
 

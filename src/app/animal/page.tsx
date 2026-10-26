@@ -15,8 +15,7 @@ import { toZ } from "@/lib/face/featureStats";
 import { animalTypeDB } from "@/lib/animalTypeDB";
 import ResultCard, { type ResultCardProps } from "@/components/result/ResultCard";
 import ResultActions from "@/components/result/ResultActions";
-import StoryFrame from "@/components/result/StoryFrame";
-import { useStoryShare } from "@/hooks/useStoryShare";
+import { useResultShare } from "@/hooks/useResultShare";
 import { Icon } from "@/components/icons";
 
 const firstSentence = (t: string) => (t.match(/^.*?[.!?요다](?=\s|$)/)?.[0] ?? t).trim();
@@ -47,7 +46,7 @@ export default function AnimalTypePage() {
   const imageRef = useRef<HTMLImageElement>(null);
 
   const { ref: resultRef, isCapturing, download } = useScreenshot<HTMLElement>();
-  const { frameRef, busy, notice, shareStory } = useStoryShare();
+  const { busy, notice, share: shareCard } = useResultShare(resultRef, result ? { fileName: `동물상_${result.data.name}`, title: `나의 동물상: ${result.data.name}`, text: `나는 ${result.data.name}이래요 (닮음 ${result.matchScore}%). 무료 동물상 테스트` } : null);
 
   const getShareOptions = () => ({
     fileName: `동물상_${result?.data.name || "결과"}`,
@@ -147,7 +146,7 @@ export default function AnimalTypePage() {
           <div className="pb-6 animate-fade-in">
             <ResultCard captureRef={resultRef} {...cardProps(result)} />
             <ResultActions
-              onStory={() => { track("share_click", { test_name: "animal", method: "story" }); shareStory(`동물상_${result.data.name}_스토리`); }}
+              onShare={() => { track("share_click", { test_name: "animal", method: "share" }); shareCard(); }}
               onSave={() => { track("share_click", { test_name: "animal", method: "save_image" }); download(getShareOptions()); }}
               onRetry={resetAll}
               busy={busy || isCapturing}
@@ -229,9 +228,6 @@ export default function AnimalTypePage() {
               <Icon name="chevron" size={18} className="text-muted" />
             </Link>
 
-            <StoryFrame frameRef={frameRef} testName="동물상 테스트">
-              <ResultCard {...cardProps(result)} />
-            </StoryFrame>
           </div>
         )}
 

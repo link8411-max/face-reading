@@ -115,7 +115,7 @@ test('오늘의 운세 결과 화면 버튼을 모두 눌러도 오류가 없다
   expect(errors).toEqual([])
 })
 
-test('삼국지 결과 화면 버튼(스토리·저장)을 모두 눌러도 오류가 없다', async ({ page }) => {
+test('삼국지 결과 화면 버튼(공유·저장)을 모두 눌러도 오류가 없다', async ({ page }) => {
   test.skip(!existsSync(FACE), '개발용 테스트 얼굴이 없으면 건너뜀')
   const errors = trackErrors(page)
   await page.goto('/samguk')
@@ -134,7 +134,7 @@ test('삼국지 결과: 게임 카드(회사생활 STATUS) → 닮은 점 → �
   await page.locator('input[type=file]').setInputFiles(FACE)
   await page.getByRole('radio', { name: '남자' }).click()
   await page.getByRole('button', { name: /닮은 장수 찾기/ }).click()
-  await expect(page.getByRole('button', { name: '스토리에 올리기' })).toBeVisible({ timeout: 30000 })
+  await expect(page.getByRole('button', { name: '공유하기' })).toBeVisible({ timeout: 30000 })
   const card = page.locator('article').first()
   await expect(card).toContainText('회사생활 STATUS')
   await expect(card.getByRole('meter')).toHaveCount(5)
@@ -144,7 +144,7 @@ test('삼국지 결과: 게임 카드(회사생활 STATUS) → 닮은 점 → �
   await expect(guardian).toContainText(/궁합 \d{2}점/)
   const y = async (l: import('@playwright/test').Locator) => (await l.boundingBox())!.y
   expect(await y(card)).toBeLessThan(await y(guardian))
-  expect(await y(guardian)).toBeLessThan(await y(page.getByRole('button', { name: '스토리에 올리기' })))
+  expect(await y(guardian)).toBeLessThan(await y(page.getByRole('button', { name: '공유하기' })))
   await page.getByText('코에이 능력치 보기').click()
   await expect(page.getByRole('heading', { name: '능력치', exact: true })).toBeVisible()
   await expect(page.getByText('통솔', { exact: true })).toBeVisible()

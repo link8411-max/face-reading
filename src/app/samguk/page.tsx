@@ -8,8 +8,7 @@ import TestHeader from "@/components/test/TestHeader";
 import TestStart from "@/components/test/TestStart";
 import SamgukGameCard from "@/components/samguk/SamgukGameCard";
 import ResultActions from "@/components/result/ResultActions";
-import StoryFrame from "@/components/result/StoryFrame";
-import { useStoryShare } from "@/hooks/useStoryShare";
+import { useResultShare } from "@/hooks/useResultShare";
 import { guardianFor } from "@/lib/samguk/guardian";
 import { Icon } from "@/components/icons";
 import Link from "next/link";
@@ -60,7 +59,7 @@ export default function SamgukPage() {
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const { ref: resultRef, isCapturing, download } = useScreenshot<HTMLElement>();
-  const { frameRef, busy, notice, shareStory } = useStoryShare();
+  const { busy, notice, share: shareCard } = useResultShare(resultRef, result ? { fileName: `삼국지_${result.character.name}`, title: `나는 삼국지 속 ${result.character.name}`, text: `나는 ${result.character.name}(${result.character.hanja})와 ${result.similarity}% 닮았대요. 나는 삼국지 속 누구?` } : null);
 
   const loadingMessages = [
     "장수들의 명부를 훑어보는 중...",
@@ -230,7 +229,7 @@ export default function SamgukPage() {
               </section>
 
               <ResultActions
-                onStory={() => { track("share_click", { test_name: "samguk", method: "story" }); shareStory(`삼국지_${result.character.name}_스토리`); }}
+                onShare={() => { track("share_click", { test_name: "samguk", method: "share" }); shareCard(); }}
                 onSave={() => { track("share_click", { test_name: "samguk", method: "save_image" }); download(getShareOptions()); }}
                 onRetry={resetAll}
                 busy={busy || isCapturing}
@@ -277,9 +276,6 @@ export default function SamgukPage() {
                 </div>
               </details>
 
-              <StoryFrame frameRef={frameRef} testName="나는 삼국지 속 누구?">
-                <SamgukGameCard character={result.character} similarity={result.similarity} />
-              </StoryFrame>
             </div>
           );
         })()}

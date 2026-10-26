@@ -38,7 +38,7 @@ export default function MatchCalculator() {
   const [a, setA] = useState<MbtiType | null>(null);
   const [b, setB] = useState<MbtiType | null>(null);
   const [shown, setShown] = useState(false);
-  const { ref, isCapturing, download, share } = useScreenshot();
+  const { ref, isCapturing, download, share, shareNotice } = useScreenshot();
 
   // 유형 페이지에서 ?a=INFP&b=ENFJ 로 들어오면 미리 골라 둔다
   useEffect(() => {
@@ -67,6 +67,7 @@ export default function MatchCalculator() {
           <button type="button" onClick={() => { track("share_click", { test_name: "mbti_match", method: "save_image" }); download(opts); }} disabled={isCapturing} className="py-3 rounded-full bg-white border border-line font-bold">{isCapturing ? "저장 중…" : "결과 저장"}</button>
           <button type="button" onClick={() => { track("share_click", { test_name: "mbti_match", method: "share" }); share(opts); }} disabled={isCapturing} className="py-3 rounded-full bg-ink text-paper font-bold">공유하기</button>
         </div>
+        {shareNotice && <p role="status" className="text-xs text-center text-muted">{shareNotice}</p>}
         <div className="grid grid-cols-2 gap-2 text-sm">
           <Link href={`/mbti/${a.toLowerCase()}`} className="text-center py-2.5 rounded-xl bg-card-2 font-bold">{a}: {mbtiProfiles[a].nickname}</Link>
           <Link href={`/mbti/${b.toLowerCase()}`} className="text-center py-2.5 rounded-xl bg-card-2 font-bold">{b}: {mbtiProfiles[b].nickname}</Link>

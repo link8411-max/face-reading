@@ -48,7 +48,7 @@ export default function FortuneClient() {
   const dateCheck = validateBirthDate(birthDate, new Date(), { lunar: isLunar });
   const [result, setResult] = useState<FortuneResult | null>(null);
 
-  const { ref: resultRef, isCapturing, download, share } = useScreenshot();
+  const { ref: resultRef, isCapturing, download, share, shareNotice } = useScreenshot();
 
   const getShareOptions = () => ({
     fileName: `${FORTUNE_YEAR.year}년운세_${result?.사주정보.띠}띠`,
@@ -287,9 +287,10 @@ export default function FortuneClient() {
                 disabled={isCapturing}
                 className="h-[52px] rounded-full flex items-center justify-center gap-2 bg-ink text-paper text-[15px] font-medium disabled:opacity-50"
               >
-                <Icon name="story" size={18} />
+                <Icon name="share" size={18} />
                 {isCapturing ? "이미지 만드는 중…" : `${FORTUNE_YEAR.year} 운세 공유하기`}
               </button>
+              {shareNotice && <p role="status" className="mt-2 text-xs text-center text-muted">{shareNotice}</p>}
               <div className="grid grid-cols-2 gap-2 mt-2">
                 <button onClick={() => { track("share_click", { test_name: "fortune", method: "save_image" }); download(getShareOptions()); }} disabled={isCapturing} className="h-12 rounded-full bg-white border border-line text-sm font-medium flex items-center justify-center gap-1.5 disabled:opacity-50">
                   <Icon name="download" size={16} />

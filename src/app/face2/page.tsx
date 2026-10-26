@@ -13,8 +13,7 @@ import { useScreenshot } from "@/hooks/useScreenshot";
 import type { AnalysisResult } from "@/lib/faceAnalyzer";
 import ResultCard, { type ResultCardProps } from "@/components/result/ResultCard";
 import ResultActions from "@/components/result/ResultActions";
-import StoryFrame from "@/components/result/StoryFrame";
-import { useStoryShare } from "@/hooks/useStoryShare";
+import { useResultShare } from "@/hooks/useResultShare";
 import { Icon } from "@/components/icons";
 
 const firstSentence = (t: string) => (t.match(/^.*?[.!?요다](?=\s|$)/)?.[0] ?? t).trim();
@@ -50,7 +49,7 @@ export default function Face2Page() {
   const imageRef = useRef<HTMLImageElement>(null);
 
   const { ref: resultRef, isCapturing, download } = useScreenshot<HTMLElement>();
-  const { frameRef, busy, notice, shareStory } = useStoryShare();
+  const { busy, notice, share: shareCard } = useResultShare(resultRef, result ? { fileName: `관상_${result.type}`, title: `나의 관상: ${result.type}`, text: `나는 ${result.title}래요. 무료 AI 관상 테스트` } : null);
 
   // 모델 사전 로딩
   useEffect(() => {
@@ -161,7 +160,7 @@ export default function Face2Page() {
           <div className="pb-6 animate-fade-in">
             <ResultCard captureRef={resultRef} {...cardProps(result)} />
             <ResultActions
-              onStory={() => { track("share_click", { test_name: "face", method: "story" }); shareStory(`관상_${result.type}_스토리`); }}
+              onShare={() => { track("share_click", { test_name: "face", method: "share" }); shareCard(); }}
               onSave={() => { track("share_click", { test_name: "face", method: "save_image" }); download(getShareOptions()); }}
               onRetry={resetAll}
               busy={busy || isCapturing}
@@ -254,9 +253,6 @@ export default function Face2Page() {
               <Icon name="chevron" size={18} className="text-muted" />
             </Link>
 
-            <StoryFrame frameRef={frameRef} testName="AI 관상 테스트">
-              <ResultCard {...cardProps(result)} />
-            </StoryFrame>
           </div>
         )}
 

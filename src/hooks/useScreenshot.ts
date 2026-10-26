@@ -2,6 +2,7 @@
 
 import { useRef, useState, useCallback } from "react";
 import { saveImage } from "@/lib/saveImage";
+import { shareResult, SHARE_NOTICE } from "@/lib/share";
 
 interface UseScreenshotOptions {
   fileName?: string;
@@ -12,6 +13,7 @@ interface UseScreenshotOptions {
 export function useScreenshot<T extends HTMLElement = HTMLDivElement>() {
   const ref = useRef<T>(null);
   const [isCapturing, setIsCapturing] = useState(false);
+  const [shareNotice, setShareNotice] = useState<string | null>(null);
 
   const capture = useCallback(async (): Promise<Blob | null> => {
     if (!ref.current) {
@@ -62,40 +64,27 @@ export function useScreenshot<T extends HTMLElement = HTMLDivElement>() {
     saveImage(blob, options?.fileName || "결과");
   }, [capture]);
 
+  // 공유하기: 기본 공유창(이미지+문구+주소) → 링크만 → 링크 복사 (lib/share.ts)
   const share = useCallback(async (options?: UseScreenshotOptions) => {
+    setShareNotice(null);
     setIsCapturing(true);
     const blob = await capture();
     setIsCapturing(false);
-
-    if (!blob) return;
-
-    if (navigator.share && navigator.canShare) {
-      const file = new File([blob], `${options?.fileName || "결과"}.png`, { type: "image/png" });
-
-      if (navigator.canShare({ files: [file] })) {
-        try {
-          await navigator.share({
-            title: options?.shareTitle || "결과 공유",
-            text: options?.shareText || "",
-            files: [file],
-          });
-          return;
-        } catch (error) {
-          if ((error as Error).name !== "AbortError") {
-            console.error("공유 실패:", error);
-          }
-          return;
-        }
-      }
-    }
-
-    // Web Share API 미지원시 다운로드로 대체
-    await download(options);
-  }, [capture, download]);
+    const file = blob ? new File([blob], `${options?.fileName || "결과"}.png`, { type: "image/png" }) : null;
+    const out = await shareResult({
+      file,
+      title: options?.shareTitle || "운명을 읽다",
+      text: options?.shareText || "",
+      url: location.href.split("#")[0],
+    });
+    if (out === "copied") setShareNotice(SHARE_NOTICE.copied);
+    if (out === "failed") setShareNotice(SHARE_NOTICE.failed);
+  }, [capture]);
 
   return {
     ref,
     isCapturing,
+    shareNotice,
     download,
     share,
   };
