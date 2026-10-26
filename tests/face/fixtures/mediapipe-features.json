@@ -1,0 +1,422 @@
+[
+ {
+  "src": "/dev-faces/person1.jpg",
+  "gender": "여",
+  "features": {
+   "eyeAspect": 0.31901588881870035,
+   "eyeTilt": 3.5619529509499595,
+   "eyeWidth": 0.43830735715425007,
+   "eyeSpacing": 0.24745715771982155,
+   "browGap": 0.31315401988745795,
+   "browTilt": -10.042322647738729,
+   "noseLength": 0.26871218592708396,
+   "noseWidth": 0.6993837692156374,
+   "mouthWidth": 0.9062652906354074,
+   "lipFullness": 0.30412099669744624,
+   "mouthCornerLift": 0.021111770315841508,
+   "faceAspect": 1.1658576491575485,
+   "jawWidth": 0.8040986417012979,
+   "chinLength": 0.2120949122047167,
+   "midfaceRatio": 0.38734509886458074
+  }
+ },
+ {
+  "src": "/dev-faces/person2.jpg",
+  "gender": "여",
+  "features": {
+   "eyeAspect": 0.3009979814577781,
+   "eyeTilt": 6.967618063827804,
+   "eyeWidth": 0.45732343783892426,
+   "eyeSpacing": 0.2445075180571513,
+   "browGap": 0.29483896904107876,
+   "browTilt": -1.5753025784226526,
+   "noseLength": 0.28767092929424165,
+   "noseWidth": 0.7094716911223978,
+   "mouthWidth": 1.0975545710897814,
+   "lipFullness": 0.2118192247227545,
+   "mouthCornerLift": 0.18635519125405728,
+   "faceAspect": 1.202796927838744,
+   "jawWidth": 0.7673975744152236,
+   "chinLength": 0.172328482502745,
+   "midfaceRatio": 0.4096995783340967
+  }
+ },
+ {
+  "src": "/dev-faces/person5.jpg",
+  "gender": "여",
+  "features": {
+   "eyeAspect": 0.30441884695179994,
+   "eyeTilt": 0.14334690821678037,
+   "eyeWidth": 0.4298833928198044,
+   "eyeSpacing": 0.24748362310099103,
+   "browGap": 0.353673132956587,
+   "browTilt": -14.6354387883056,
+   "noseLength": 0.2501918198214451,
+   "noseWidth": 0.6423604036306069,
+   "mouthWidth": 0.8790800647782335,
+   "lipFullness": 0.2816408480130542,
+   "mouthCornerLift": -0.05713494851118079,
+   "faceAspect": 1.1107479282234143,
+   "jawWidth": 0.8122624283338817,
+   "chinLength": 0.2369144044284323,
+   "midfaceRatio": 0.37554715106791514
+  }
+ },
+ {
+  "src": "/dev-faces/person9.jpg",
+  "gender": "여",
+  "features": {
+   "eyeAspect": 0.3097325570988556,
+   "eyeTilt": 4.722676956784349,
+   "eyeWidth": 0.46010674449219724,
+   "eyeSpacing": 0.23487174106827982,
+   "browGap": 0.3843161791809999,
+   "browTilt": -8.610047069420208,
+   "noseLength": 0.26034828120057507,
+   "noseWidth": 0.7552818725601232,
+   "mouthWidth": 1.1282641476056405,
+   "lipFullness": 0.2393086976706174,
+   "mouthCornerLift": 0.10903676670593256,
+   "faceAspect": 1.1998484086048153,
+   "jawWidth": 0.782163618672265,
+   "chinLength": 0.17967707959899984,
+   "midfaceRatio": 0.3910055821295003
+  }
+ },
+ {
+  "src": "/dev-faces/person12.jpg",
+  "gender": "여",
+  "features": {
+   "eyeAspect": 0.29743696104870415,
+   "eyeTilt": 4.905780083856412,
+   "eyeWidth": 0.4573714737653314,
+   "eyeSpacing": 0.23141042649646762,
+   "browGap": 0.30700941566828593,
+   "browTilt": -7.83591903547282,
+   "noseLength": 0.2649385197319572,
+   "noseWidth": 0.6624522070036956,
+   "mouthWidth": 0.9885345726223232,
+   "lipFullness": 0.21071754746714486,
+   "mouthCornerLift": 0.08490632496308682,
+   "faceAspect": 1.1245570781401182,
+   "jawWidth": 0.8163559562602466,
+   "chinLength": 0.2006633478818088,
+   "midfaceRatio": 0.3897943427737519
+  }
+ },
+ {
+  "src": "/dev-faces/person19.jpg",
+  "gender": "여",
+  "features": {
+   "eyeAspect": 0.23913235991945533,
+   "eyeTilt": 0.6368989543614556,
+   "eyeWidth": 0.45579808871765726,
+   "eyeSpacing": 0.2296704026091886,
+   "browGap": 0.3742247419016544,
+   "browTilt": -12.685856827747227,
+   "noseLength": 0.254301048135355,
+   "noseWidth": 0.7582908974584498,
+   "mouthWidth": 1.1144820011166936,
+   "lipFullness": 0.18274840616970045,
+   "mouthCornerLift": 0.054958087018101585,
+   "faceAspect": 1.109519480437692,
+   "jawWidth": 0.8520302514619965,
+   "chinLength": 0.23843065866183102,
+   "midfaceRatio": 0.37900302303477873
+  }
+ },
+ {
+  "src": "/dev-faces/person23.jpg",
+  "gender": "여",
+  "features": {
+   "eyeAspect": 0.3087165298106471,
+   "eyeTilt": 3.6963170815421083,
+   "eyeWidth": 0.4362750366343873,
+   "eyeSpacing": 0.245401401521468,
+   "browGap": 0.3186534577874672,
+   "browTilt": -8.732255756381127,
+   "noseLength": 0.25222509189203174,
+   "noseWidth": 0.7239700132763909,
+   "mouthWidth": 1.0167689565594282,
+   "lipFullness": 0.2346329916768238,
+   "mouthCornerLift": 0.09646721342004685,
+   "faceAspect": 1.1785218372240678,
+   "jawWidth": 0.7884500874337829,
+   "chinLength": 0.1868076985229973,
+   "midfaceRatio": 0.379307548576453
+  }
+ },
+ {
+  "src": "/dev-faces/person28.jpg",
+  "gender": "여",
+  "features": {
+   "eyeAspect": 0.30628078867609854,
+   "eyeTilt": 3.6325306030982656,
+   "eyeWidth": 0.4761172905727337,
+   "eyeSpacing": 0.21570319813827632,
+   "browGap": 0.3849934291682612,
+   "browTilt": -6.8957947528507075,
+   "noseLength": 0.24639280755564033,
+   "noseWidth": 0.7175400123486225,
+   "mouthWidth": 1.0046915856101306,
+   "lipFullness": 0.24633598339045798,
+   "mouthCornerLift": 0.08831529624817779,
+   "faceAspect": 1.180299164863185,
+   "jawWidth": 0.8155213561956081,
+   "chinLength": 0.1979367606630523,
+   "midfaceRatio": 0.40959992085799185
+  }
+ },
+ {
+  "src": "/dev-faces/person3.jpg",
+  "gender": "남",
+  "features": {
+   "eyeAspect": 0.29668317000324723,
+   "eyeTilt": 3.3615711924684426,
+   "eyeWidth": 0.45261199529439156,
+   "eyeSpacing": 0.24602853504024194,
+   "browGap": 0.3673973638203357,
+   "browTilt": -8.09898201435821,
+   "noseLength": 0.2658720673780357,
+   "noseWidth": 0.6966473282355903,
+   "mouthWidth": 0.8750907849262866,
+   "lipFullness": 0.3043546641745283,
+   "mouthCornerLift": 0.04700163634495016,
+   "faceAspect": 1.2680561401712156,
+   "jawWidth": 0.7937662384160418,
+   "chinLength": 0.20922949127307328,
+   "midfaceRatio": 0.41017712452342037
+  }
+ },
+ {
+  "src": "/dev-faces/person4.jpg",
+  "gender": "남",
+  "features": {
+   "eyeAspect": 0.28408227403094083,
+   "eyeTilt": 2.5841599146131244,
+   "eyeWidth": 0.42877110014763786,
+   "eyeSpacing": 0.23356139312331547,
+   "browGap": 0.28566473312474766,
+   "browTilt": -8.570178856833815,
+   "noseLength": 0.2725170751034207,
+   "noseWidth": 0.7512164441401599,
+   "mouthWidth": 1.0010351382885576,
+   "lipFullness": 0.2144243880187584,
+   "mouthCornerLift": 0.055823408586079544,
+   "faceAspect": 1.1550414499727437,
+   "jawWidth": 0.8103717029180892,
+   "chinLength": 0.22914001604570516,
+   "midfaceRatio": 0.37940920088446173
+  }
+ },
+ {
+  "src": "/dev-faces/person6.jpg",
+  "gender": "남",
+  "features": {
+   "eyeAspect": 0.293767461934853,
+   "eyeTilt": 5.6610189239362665,
+   "eyeWidth": 0.45042379403327465,
+   "eyeSpacing": 0.23642197304130422,
+   "browGap": 0.2760737178728173,
+   "browTilt": -5.877952221131444,
+   "noseLength": 0.27814288353878636,
+   "noseWidth": 0.7376521137757491,
+   "mouthWidth": 1.1052633646958345,
+   "lipFullness": 0.20712671374994823,
+   "mouthCornerLift": 0.13682704234636725,
+   "faceAspect": 1.224171162270813,
+   "jawWidth": 0.7974038038076545,
+   "chinLength": 0.20550088177124798,
+   "midfaceRatio": 0.38824311892479124
+  }
+ },
+ {
+  "src": "/dev-faces/person7.jpg",
+  "gender": "남",
+  "features": {
+   "eyeAspect": 0.25690935692587563,
+   "eyeTilt": 0.13577055661577023,
+   "eyeWidth": 0.4617218637536128,
+   "eyeSpacing": 0.2131751921565661,
+   "browGap": 0.23010741930929499,
+   "browTilt": -8.755025247878592,
+   "noseLength": 0.25244287899366924,
+   "noseWidth": 0.7261407295371859,
+   "mouthWidth": 0.9900294399176068,
+   "lipFullness": 0.24076934998820532,
+   "mouthCornerLift": 0.05324637276114108,
+   "faceAspect": 1.1562982099632269,
+   "jawWidth": 0.8307526078947722,
+   "chinLength": 0.22094306704846625,
+   "midfaceRatio": 0.3444379869993865
+  }
+ },
+ {
+  "src": "/dev-faces/person8.jpg",
+  "gender": "남",
+  "features": {
+   "eyeAspect": 0.3493463843063399,
+   "eyeTilt": 6.257283676938614,
+   "eyeWidth": 0.45891708564003464,
+   "eyeSpacing": 0.22719029299219864,
+   "browGap": 0.2732949568257242,
+   "browTilt": -3.1524494030285375,
+   "noseLength": 0.26416120369830276,
+   "noseWidth": 0.664112052645133,
+   "mouthWidth": 0.8438414434388761,
+   "lipFullness": 0.2770837875785012,
+   "mouthCornerLift": 0.06880207171094802,
+   "faceAspect": 1.2414705901342697,
+   "jawWidth": 0.8204118835486199,
+   "chinLength": 0.2123561228348932,
+   "midfaceRatio": 0.38275081898091146
+  }
+ },
+ {
+  "src": "/dev-faces/person11.jpg",
+  "gender": "남",
+  "features": {
+   "eyeAspect": 0.2783079857472083,
+   "eyeTilt": 2.1885175296102837,
+   "eyeWidth": 0.46452067090453786,
+   "eyeSpacing": 0.2256901717562163,
+   "browGap": 0.34380368180880555,
+   "browTilt": -11.045942609527422,
+   "noseLength": 0.2509204716623944,
+   "noseWidth": 0.7825045813147286,
+   "mouthWidth": 1.0886706674979945,
+   "lipFullness": 0.2037870483390495,
+   "mouthCornerLift": 0.07710501607616552,
+   "faceAspect": 1.2561580271281352,
+   "jawWidth": 0.8280936034943757,
+   "chinLength": 0.2263280305706826,
+   "midfaceRatio": 0.3635399414717094
+  }
+ },
+ {
+  "src": "/dev-faces/person13.jpg",
+  "gender": "남",
+  "features": {
+   "eyeAspect": 0.2793162683678896,
+   "eyeTilt": 1.9085028571403573,
+   "eyeWidth": 0.4285951068957561,
+   "eyeSpacing": 0.2433218532849918,
+   "browGap": 0.30908782583047467,
+   "browTilt": -10.60543470116879,
+   "noseLength": 0.2622930956505197,
+   "noseWidth": 0.7469843788590221,
+   "mouthWidth": 0.956217686857485,
+   "lipFullness": 0.24918190593656667,
+   "mouthCornerLift": 0.04322648030443341,
+   "faceAspect": 1.1611807385101907,
+   "jawWidth": 0.8487477230016506,
+   "chinLength": 0.2504285484979603,
+   "midfaceRatio": 0.37482693475443035
+  }
+ },
+ {
+  "src": "/dev-faces/person15.jpg",
+  "gender": "남",
+  "features": {
+   "eyeAspect": 0.2813511352007881,
+   "eyeTilt": 3.06289237191836,
+   "eyeWidth": 0.4688782235730301,
+   "eyeSpacing": 0.22305016817044937,
+   "browGap": 0.33238447870747867,
+   "browTilt": -8.155654382240156,
+   "noseLength": 0.24324938205561009,
+   "noseWidth": 0.6926134269244597,
+   "mouthWidth": 0.9136533812931553,
+   "lipFullness": 0.30179849397961905,
+   "mouthCornerLift": 0.059619886497695604,
+   "faceAspect": 1.1799696179531958,
+   "jawWidth": 0.7979105690946835,
+   "chinLength": 0.21505212990588274,
+   "midfaceRatio": 0.36896616325279347
+  }
+ },
+ {
+  "src": "/dev-faces/person17.jpg",
+  "gender": "남",
+  "features": {
+   "eyeAspect": 0.1715004292906333,
+   "eyeTilt": 2.1874362629918043,
+   "eyeWidth": 0.400859970148946,
+   "eyeSpacing": 0.2534438199019221,
+   "browGap": 0.2821684685313775,
+   "browTilt": -6.187061124131453,
+   "noseLength": 0.26684658694985686,
+   "noseWidth": 0.7721894502336223,
+   "mouthWidth": 1.1286063555414727,
+   "lipFullness": 0.1580092474972783,
+   "mouthCornerLift": 0.1400898516195267,
+   "faceAspect": 1.1624639343069696,
+   "jawWidth": 0.8209803321555889,
+   "chinLength": 0.23025572873209213,
+   "midfaceRatio": 0.3656764324156867
+  }
+ },
+ {
+  "src": "/dev-faces/person18.jpg",
+  "gender": "남",
+  "features": {
+   "eyeAspect": 0.2797750091108595,
+   "eyeTilt": 0.7850315742225438,
+   "eyeWidth": 0.4520512966919667,
+   "eyeSpacing": 0.23616955354196428,
+   "browGap": 0.32449790769380554,
+   "browTilt": -8.960569578503527,
+   "noseLength": 0.2315123065667087,
+   "noseWidth": 0.7138319993781029,
+   "mouthWidth": 0.9342638686822046,
+   "lipFullness": 0.2650960154417457,
+   "mouthCornerLift": 0.05014464912452929,
+   "faceAspect": 1.2081133859754216,
+   "jawWidth": 0.7823391502828476,
+   "chinLength": 0.2156975417860978,
+   "midfaceRatio": 0.3513993977066016
+  }
+ },
+ {
+  "src": "/dev-faces/person24.jpg",
+  "gender": "남",
+  "features": {
+   "eyeAspect": 0.281234404930906,
+   "eyeTilt": 2.712081297655516,
+   "eyeWidth": 0.42960983596742747,
+   "eyeSpacing": 0.2574907058180395,
+   "browGap": 0.3630339241819366,
+   "browTilt": -7.781874962168827,
+   "noseLength": 0.2717055583794366,
+   "noseWidth": 0.7242049785876226,
+   "mouthWidth": 0.8607873715314723,
+   "lipFullness": 0.25575654253930497,
+   "mouthCornerLift": 0.016416633637627746,
+   "faceAspect": 1.2099494828611383,
+   "jawWidth": 0.8112282075755531,
+   "chinLength": 0.21041903663597256,
+   "midfaceRatio": 0.3973947346320928
+  }
+ },
+ {
+  "src": "/dev-faces/person29.jpg",
+  "gender": "남",
+  "features": {
+   "eyeAspect": 0.2540574776501149,
+   "eyeTilt": 2.8669783176853194,
+   "eyeWidth": 0.41448284975828925,
+   "eyeSpacing": 0.24247814473077928,
+   "browGap": 0.3672963183969259,
+   "browTilt": -8.035523298231281,
+   "noseLength": 0.25403951566273203,
+   "noseWidth": 0.7271516960790042,
+   "mouthWidth": 0.9922628577615012,
+   "lipFullness": 0.22113976860055506,
+   "mouthCornerLift": 0.07229787562110811,
+   "faceAspect": 1.1635735654868544,
+   "jawWidth": 0.8252815888638113,
+   "chinLength": 0.2176048703884909,
+   "midfaceRatio": 0.37616518131866
+  }
+ }
+]

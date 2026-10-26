@@ -29,8 +29,10 @@ for (const k of Object.keys(F[0])) {
   const a = F.map((x) => x[k]), b = M.map((x) => x[k])
   const sp = Math.sqrt(((a.length - 1) * variance(a) + (b.length - 1) * variance(b)) / (a.length + b.length - 2))
   const t = (mean(a) - mean(b)) / (sp * Math.sqrt(1 / a.length + 1 / b.length))
-  const w = t * t / (1 + t * t) // 차이가 뚜렷할수록 성별 평균을 그대로, 애매하면 공통 평균 쪽으로
-  const pooled = mean([...a, ...b])
+  // 차이가 뚜렷할수록 성별 평균을 그대로, 애매하면 두 성별 평균의 한가운데 쪽으로 당긴다.
+  // w = t²/(1+t²)는 경험적 규칙이다(James-Stein·경험적 베이즈가 아님). 표본 수로 가중한 평균을 쓰면 많은 쪽 성별로 기운다.
+  const w = t * t / (1 + t * t)
+  const pooled = (mean(a) + mean(b)) / 2
   out['여'][k] = { mean: r4(pooled + w * (mean(a) - pooled)), std: r4(sp) }
   out['남'][k] = { mean: r4(pooled + w * (mean(b) - pooled)), std: r4(sp) }
   notes.push(`${k}: t=${t.toFixed(2)} w=${w.toFixed(2)}`)

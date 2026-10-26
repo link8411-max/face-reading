@@ -14,7 +14,8 @@ export function mulberry32(seed: number): () => number {
 }
 
 // 가상 얼굴의 특징값: 그 성별의 측정 평균·편차로 특징마다 독립 정규분포(±3σ에서 자름).
-// 시뮬레이션은 이 값을 실제와 같은 toZ(f, gender)에 넣는다. 성별 기준이 섞이면 여기서 쏠림이 드러난다.
+// 시뮬레이션은 이 값을 실제와 같은 toZ(f, gender)에 넣는다. 같은 기준으로 뽑고 재므로 z 분포는 성별과 무관하다
+// (매칭 쏠림 보정용). 성별 기준이 섞이는 버그는 tests/face/genderBaseline.test.ts의 실측 고정 데이터 검사가 잡는다.
 // 실제 얼굴은 특징끼리 상관이 있지만 여기선 무시한 근사다. 실사진 통계가 쌓이면 바꿀 것.
 export function sampleFeatures(rng: () => number, gender: Gender): FeatureVector {
   const stats = FEATURE_STATS_BY_GENDER[gender]
