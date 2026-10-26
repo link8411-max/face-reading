@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { redirect } from "next/navigation";
-import { josa, parseShared, SITE, TEST_NAME, type ShareKind, type SharedResult } from "@/lib/shareLinks";
+import { josa, ogImageUrl, parseShared, SITE, TEST_NAME, type ShareKind, type SharedResult } from "@/lib/shareLinks";
 import { animalTypeDB } from "@/lib/animalTypeDB";
 import { samgukCharacters } from "@/lib/samgukDB";
 import { MoonDeco, SmileFace } from "@/components/icons";
@@ -18,7 +18,7 @@ export async function shareMetadata(kind: ShareKind, params: P, searchParams: S)
   const { key } = await params;
   const r = parseShared(kind, key, one((await searchParams).s));
   if (!r) return {};
-  const image = `${SITE}/api/og/result?kind=${kind}&key=${encodeURIComponent(r.key)}${r.score !== null ? `&s=${r.score}` : ""}`;
+  const image = ogImageUrl(kind, r.key, r.score);
   const description = `${TEST_NAME[kind]}로 나도 확인해 보세요. 사진은 저장되지 않아요.`;
   return {
     title: `${r.phrase} | 운명을 읽다`,

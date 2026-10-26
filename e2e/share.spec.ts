@@ -89,6 +89,8 @@ test('삼국지 이미지 저장: 저장 PNG에 남색 카드 배경이 살아 �
 
 // 카카오톡(안드로이드) 인앱: blob 다운로드가 "지원하지 않는 파일 형식"으로 실패하던 문제
 test.describe('카카오톡 인앱 브라우저', () => {
+  // 서비스 워커가 외부 스크립트를 대신 받으면 차단·가짜 SDK가 적용되지 않으므로 끈다
+  test.use({ serviceWorkers: 'block' })
   test.use({ userAgent: 'Mozilla/5.0 (Linux; Android 14; SM-S918N; wv) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/129.0 Mobile Safari/537.36 KAKAOTALK/10.9.0' })
 
   test('이미지 저장: 다운로드 대신 길게 눌러 저장 화면(data 이미지)과 다른 브라우저로 열기', async ({ page }) => {
@@ -107,5 +109,35 @@ test.describe('카카오톡 인앱 브라우저', () => {
       await expect(dialog).toHaveCount(0)
     }
     expect(downloads).toEqual([])
+  })
+
+  test('공유하기: 카카오톡 공유 화면으로 결과 링크·1인칭 문구·미리보기 이미지를 보낸다', async ({ page }) => {
+    test.skip(!existsSync(FACE), '개발용 테스트 얼굴이 없으면 건너뜀')
+    await page.addInitScript(() => {
+      const w = window as unknown as { __kakao: unknown[]; Kakao: unknown }
+      w.__kakao = []
+      let inited = false
+      w.Kakao = { isInitialized: () => inited, init: () => { inited = true }, Share: { sendDefault: (t: unknown) => w.__kakao.push(t) } }
+      Object.assign(navigator, { canShare: undefined, share: undefined })
+    })
+    await faceResult(page)
+    await page.getByRole('button', { name: '공유하기' }).click()
+    await expect.poll(() => page.evaluate(() => (window as unknown as { __kakao: unknown[] }).__kakao.length), { timeout: 15000 }).toBe(1)
+    const t = await page.evaluate(() => (window as unknown as { __kakao: { content: { title: string; imageUrl: string; link: { mobileWebUrl: string } }; buttons: { title: string }[] }[] }).__kakao[0])
+    expect(t.content.title).toMatch(/^나는 .+이래\. 너 관상도 봐줄까\?$/)
+    expect(t.content.link.mobileWebUrl).toMatch(/^https:\/\/unse-ai\.com\/face2\/r\/[a-z]+\?utm_source=share/)
+    expect(t.content.imageUrl).toMatch(/\/api\/og\/result\?kind=face&key=[a-z]+$/)
+    expect(t.buttons[0].title).toBe('나도 해보기')
+    await expect(page.getByRole('status')).toHaveCount(0)
+  })
+
+  test('공유하기: 카카오 SDK를 못 불러오면 링크 복사로 넘어간다', async ({ page, context }) => {
+    test.skip(!existsSync(FACE), '개발용 테스트 얼굴이 없으면 건너뜀')
+    await context.grantPermissions(['clipboard-read', 'clipboard-write'])
+    await page.route('**/t1.kakaocdn.net/**', (r) => r.abort())
+    await page.addInitScript(() => { Object.assign(navigator, { canShare: undefined, share: undefined }) })
+    await faceResult(page)
+    await page.getByRole('button', { name: '공유하기' }).click()
+    await expect(page.getByRole('status')).toContainText('링크를 복사했어요', { timeout: 15000 })
   })
 })

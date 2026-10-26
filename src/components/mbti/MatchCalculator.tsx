@@ -2,7 +2,7 @@
 
 import { track } from "@/lib/analytics";
 import { useResultShare } from "@/hooks/useResultShare";
-import { mbtiShared } from "@/lib/shareLinks";
+import { mbtiShared, ogImageUrl } from "@/lib/shareLinks";
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { MBTI_TYPES, compatSummary, isMbti, type MbtiType } from "@/lib/mbti/compat";
@@ -43,7 +43,7 @@ export default function MatchCalculator({ initial }: { initial?: { a: MbtiType; 
   const [fromShare, setFromShare] = useState(initial?.fromShare ?? false);
   const { ref, isCapturing, download } = useScreenshot();
   const link = shown && a && b ? mbtiShared(a, b) : null;
-  const { busy, notice, share } = useResultShare(link ? { title: "운명을 읽다 · MBTI 궁합", text: link.phrase, url: link.url } : null);
+  const { busy, notice, share } = useResultShare(link ? { testName: "mbti_match", title: "운명을 읽다 · MBTI 궁합", text: link.phrase, url: link.url, imageUrl: ogImageUrl("mbti", link.a, null, link.b) } : null);
 
   // 친구가 보낸 궁합 링크(/mbti/r/a-b)로 들어온 방문은 GA에서 구분한다
   useEffect(() => {
@@ -82,7 +82,7 @@ export default function MatchCalculator({ initial }: { initial?: { a: MbtiType; 
         </section>
         <div className="grid grid-cols-2 gap-2">
           <button type="button" onClick={() => { track("share_click", { test_name: "mbti_match", method: "save_image" }); download(opts); }} disabled={isCapturing} className="py-3 rounded-full bg-white border border-line font-bold">{isCapturing ? "저장 중…" : "결과 저장"}</button>
-          <button type="button" onClick={() => { track("share_click", { test_name: "mbti_match", method: "link" }); share(); }} disabled={busy} className="py-3 rounded-full bg-ink text-paper font-bold">공유하기</button>
+          <button type="button" onClick={share} disabled={busy} className="py-3 rounded-full bg-ink text-paper font-bold">공유하기</button>
         </div>
         {notice && <p role="status" className="text-xs text-center text-muted">{notice}</p>}
         <div className="grid grid-cols-2 gap-2 text-sm">

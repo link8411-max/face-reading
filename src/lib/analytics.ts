@@ -3,7 +3,7 @@
 export const GA_ID = 'G-L99JPMPT9D'
 
 export type TestName = 'face' | 'animal' | 'samguk' | 'fortune' | 'daily' | 'mbti_match'
-export type ShareMethod = 'save_image' | 'share' | 'link'
+export type ShareMethod = 'save_image' | 'share' | 'link' | 'kakao'
 
 type Events = {
   test_start: { test_name: TestName }
