@@ -58,3 +58,8 @@ test('설명 문장 4개, 부정적 표현 없음, 라벨 있음', () => {
 test('맥락별로도 100점 조합이 있다', () => {
   for (const c of CTX) expect(Math.max(...MBTI_TYPES.flatMap((a) => MBTI_TYPES.map((b) => compatScore(a, b, c)))), c).toBe(100)
 })
+
+test('널리 알려진 궁합표와 맞는다: E/I·J/P 반대 + S/N 같은 조합이 최상위', () => {
+  for (const [a, b] of [['INFP', 'ENFJ'], ['ENFP', 'INTJ'], ['ISFJ', 'ESFP'], ['ESTJ', 'ISTP'], ['INFJ', 'ENTP']] as const)
+    expect(compatSummary(a, b).total, `${a}-${b}`).toBeGreaterThanOrEqual(95)
+})

@@ -1,8 +1,8 @@
 // MBTI 궁합 계산 (재미로 보는 궁합)
 // 네 축(E/I, S/N, T/F, J/P)이 같은지 다른지에 따라 맥락별 가중치를 더하고 뺀다. 결정적이고 대칭이다.
-// 통설: 연애는 세상을 보는 방식(S/N)이 같고 판단 방식(T/F)이 다르면 서로 보완된다.
-//       친구는 에너지 방향(E/I)과 관심사(S/N)가 같을수록 편하다.
-//       직장은 일하는 방식(J/P)이 같고 판단 방식(T/F)이 다르면 손발이 잘 맞는다.
+// 한국에서 널리 쓰이는 MBTI 궁합표의 경향을 따른다: 에너지 방향(E/I)과 생활 방식(J/P)은 반대로 끌리고,
+// 세상을 보는 방식(S/N)은 같을 때 대화가 잘 통한다 (예: INFP–ENFJ, ENFP–INTJ, ISFJ–ESFP).
+// 직장은 판단 방식(T/F)이 다르면 서로 보완된다.
 
 export const MBTI_TYPES = [
   'INTJ', 'INTP', 'ENTJ', 'ENTP', 'INFJ', 'INFP', 'ENFJ', 'ENFP',
@@ -18,9 +18,9 @@ export function isMbti(s: string): s is MbtiType {
 const BASE = 70
 // [E/I, S/N, T/F, J/P] 축별 가감: same = 같을 때, diff = 다를 때
 const WEIGHTS: Record<Context, { same: number[]; diff: number[] }> = {
-  love: { same: [2, 12, -5, -3], diff: [3, -10, 10, 4] },
-  friend: { same: [10, 10, 3, 2], diff: [-3, -9, 3, 0] },
-  work: { same: [0, -2, -4, 10], diff: [3, 4, 8, -6] },
+  love: { same: [-3, 10, 2, -4], diff: [10, -9, 3, 10] },
+  friend: { same: [4, 10, 3, 1], diff: [5, -8, 2, 4] },
+  work: { same: [0, 3, -2, 2], diff: [5, -3, 6, 6] },
 }
 
 function raw(a: MbtiType, b: MbtiType, ctx: Context): number {
