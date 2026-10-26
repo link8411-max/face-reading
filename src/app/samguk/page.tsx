@@ -9,6 +9,7 @@ import { extractFeatures, checkFrontal } from "@/lib/face/landmarkFeatures";
 import { toZ } from "@/lib/face/featureStats";
 import { matchCharacter, type Gender } from "@/lib/samguk/matcher";
 import calibration from "@/lib/samguk/calibration.json";
+import { compressImage } from "@/lib/compressImage";
 
 interface AnalysisResult {
   name: string;
@@ -106,29 +107,6 @@ function KoeiButton({ label, onClick, highlight = false }: { label: string; onCl
   );
 }
 
-const compressImage = (base64Str: string, maxWidth = 1024): Promise<string> => {
-  return new Promise((resolve) => {
-    const img = new Image();
-    img.src = base64Str;
-    img.onload = () => {
-      const canvas = document.createElement("canvas");
-      let width = img.width;
-      let height = img.height;
-
-      if (width > maxWidth) {
-        height = (height * maxWidth) / width;
-        width = maxWidth;
-      }
-
-      canvas.width = width;
-      canvas.height = height;
-      const ctx = canvas.getContext("2d");
-      ctx?.drawImage(img, 0, 0, width, height);
-      resolve(canvas.toDataURL("image/jpeg", 0.7));
-    };
-  });
-};
-
 export default function SamgukPage() {
   const router = useRouter();
   const [image, setImage] = useState<string | null>(null);
@@ -214,7 +192,7 @@ export default function SamgukPage() {
       // 결과가 나오면 페이지 상단으로 스크롤하여 결과를 바로 볼 수 있게 함
       window.scrollTo({ top: 0, behavior: "smooth" });
     } catch {
-      alert("분석 중 오류가 발생했습니다.");
+      alert("사진을 읽지 못했어요. JPG나 PNG 사진으로 다시 올려 주세요.");
     } finally {
       setLoading(false);
     }

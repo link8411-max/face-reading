@@ -72,9 +72,12 @@ function buildReason(z: ZVector, p: CharacterProfile, c: SamgukCharacter): strin
     (a, b) => (p.weight[b] ?? 1) - (p.weight[a] ?? 1) || Math.abs(p.z[b]!) - Math.abs(p.z[a]!),
   )
   const shared = ranked.filter((k) => Math.sign(z[k]) === Math.sign(p.z[k]!) && Math.abs(z[k]) >= 0.3).slice(0, 2)
-  const keys = shared.length > 0 ? shared : ranked.slice(0, 1)
-  const traits = keys.map((k) => phrase(k, p.z[k]!)).join('·')
   const firstLook = c.appearance.split(',')[0].trim()
+  // 공유하는 대표 특징이 없으면 특정 특징을 단정하지 않는다 (얼굴 분석 문장과 모순 방지)
+  if (shared.length === 0) {
+    return `전체적인 얼굴 비율이 ${josa(c.name, '과', '와')} 가장 가까워요. ${josa(firstLook, '을', '를')} 떠올리게 해요.`
+  }
+  const traits = shared.map((k) => phrase(k, p.z[k]!)).join('·')
   return `${traits} 인상이 ${josa(c.name, '과', '와')} 닮았어요. ${josa(firstLook, '을', '를')} 떠올리게 해요.`
 }
 
