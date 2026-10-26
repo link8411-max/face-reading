@@ -38,3 +38,19 @@ test('모든 GuideRoute에 가이드가 있다', () => {
   const all: GuideRoute[] = ['/face2', '/animal', '/samguk', '/fortune', '/fortune/daily']
   for (const r of all) expect(pageGuides[r], r).toBeDefined()
 })
+
+test('/fortune 가이드는 코드가 하지 않는 시주·음력 계산을 주장하지 않는다', () => {
+  const text = JSON.stringify(pageGuides['/fortune'])
+  // 사주팔자 일반 정의(여덟 글자)는 허용, 우리 계산이 여덟 글자/네 기둥이라는 주장만 금지
+  expect(text).not.toContain('여덟 글자를 보여')
+  expect(text).not.toContain('네 기둥의 천간')
+  expect(text).not.toContain('더 자세한 풀이')
+  expect(text).toContain('여섯 글자')
+  expect(text).toContain('양력')
+})
+
+test('/samguk 가이드는 사진이 외부 AI(Gemini)로 전송됨을 밝힌다', () => {
+  const g = pageGuides['/samguk']
+  expect(g.faqs.find((f) => f.q.includes('사진'))!.a).toContain('Google Gemini')
+  expect(g.intro.join('')).toContain('Google Gemini')
+})
