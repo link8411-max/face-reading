@@ -1,5 +1,6 @@
 "use client";
 
+import { track } from "@/lib/analytics";
 import { useState, useRef, useEffect } from "react";
 import CoupangBanner from "@/components/CoupangBanner";
 import { useBackOrHome } from "@/hooks/useBackOrHome";
@@ -98,6 +99,7 @@ export default function SamgukPage() {
         setResult(null);
         setError(null);
       };
+      track("photo_selected", { test_name: "samguk" });
       reader.readAsDataURL(file);
     }
   };
@@ -106,6 +108,7 @@ export default function SamgukPage() {
     if (!image || !gender) return;
 
     setLoading(true);
+    track("test_start", { test_name: "samguk" });
     setError(null);
     try {
       // 이미지 축소 후 브라우저 안에서 얼굴 랜드마크 추출 (사진은 서버로 보내지 않음)
@@ -133,7 +136,9 @@ export default function SamgukPage() {
 
       const features = extractFeatures(landmarks);
       if (process.env.NODE_ENV !== "production") console.info("[samguk] features", features);
-      setResult(matchCharacter(toZ(features, gender), gender, calibration.bias));
+      const matched = matchCharacter(toZ(features, gender), gender, calibration.bias);
+      setResult(matched);
+      track("result_view", { test_name: "samguk", result_id: matched.character.id });
       // 결과가 나오면 페이지 상단으로 스크롤하여 결과를 바로 볼 수 있게 함
       window.scrollTo({ top: 0, behavior: "smooth" });
     } catch {
@@ -225,8 +230,8 @@ export default function SamgukPage() {
               </section>
 
               <ResultActions
-                onStory={() => shareStory(`삼국지_${result.character.name}_스토리`)}
-                onSave={() => download(getShareOptions())}
+                onStory={() => { track("share_click", { test_name: "samguk", method: "story" }); shareStory(`삼국지_${result.character.name}_스토리`); }}
+                onSave={() => { track("share_click", { test_name: "samguk", method: "save_image" }); download(getShareOptions()); }}
                 onRetry={resetAll}
                 busy={busy || isCapturing}
                 notice={notice}

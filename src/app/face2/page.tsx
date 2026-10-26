@@ -1,5 +1,6 @@
 "use client";
 
+import { track } from "@/lib/analytics";
 import { useState, useRef, useEffect, useCallback } from "react";
 import CoupangBanner from "@/components/CoupangBanner";
 import { useBackOrHome } from "@/hooks/useBackOrHome";
@@ -83,6 +84,7 @@ export default function Face2Page() {
         setResult(null);
         setError(null);
       };
+      track("photo_selected", { test_name: "face" });
       reader.readAsDataURL(file);
     }
   };
@@ -91,6 +93,7 @@ export default function Face2Page() {
     if (!image || !gender || !imageRef.current) return;
 
     setLoading(true);
+    track("test_start", { test_name: "face" });
     setError(null);
     let faceNotDetected = "";
 
@@ -106,6 +109,7 @@ export default function Face2Page() {
       // 관상 분석
       const analysisResult = analyzeFace(features);
       setResult(analysisResult);
+      track("result_view", { test_name: "face", result_id: analysisResult.type });
     } catch (err) {
       if (err instanceof Error && err.message === faceNotDetected) {
         setError("얼굴을 감지할 수 없습니다. 정면 얼굴 사진을 사용해주세요.");
@@ -157,8 +161,8 @@ export default function Face2Page() {
           <div className="pb-6 animate-fade-in">
             <ResultCard captureRef={resultRef} {...cardProps(result)} />
             <ResultActions
-              onStory={() => shareStory(`관상_${result.type}_스토리`)}
-              onSave={() => download(getShareOptions())}
+              onStory={() => { track("share_click", { test_name: "face", method: "story" }); shareStory(`관상_${result.type}_스토리`); }}
+              onSave={() => { track("share_click", { test_name: "face", method: "save_image" }); download(getShareOptions()); }}
               onRetry={resetAll}
               busy={busy || isCapturing}
               notice={notice}

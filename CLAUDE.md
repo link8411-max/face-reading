@@ -137,6 +137,12 @@ public/
 
 ---
 
+## 방문 통계 (GA4)
+- 측정 ID `G-L99JPMPT9D` (`src/lib/analytics.ts`), `layout.tsx`의 `ga4-init` 스크립트. 로컬(localhost)에서는 gtag.js를 받지 않고 config도 안 해서 실제 통계에 안 섞인다(E2E는 `dataLayer`로 검사).
+- 이벤트는 `track()`만 쓴다: `photo_selected`, `test_start`, `result_view(result_id)`, `share_click(method)`, `fortune_submit` / `test_name`: face·animal·samguk·fortune·daily·mbti_match
+- **사진·생년월일·얼굴 수치는 보내지 않는다.** `track()`은 허용 키(test_name, result_id, method)와 유형 키 형식(한글·영문·숫자 24자 이내, 숫자 4자리 연속 금지)만 통과시킨다. 결과는 유형 키만(fox, caocao, 재물상, 띠, INFP_ENTJ).
+- 개인정보처리방침 5항에 GA 수집 안내.
+
 ## API Keys
 없음 (Gemini 제거됨). `/face`는 `next.config.ts`에서 `/face2`로 308 리디렉션.
 

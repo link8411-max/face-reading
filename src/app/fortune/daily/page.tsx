@@ -1,5 +1,6 @@
 "use client";
 
+import { track } from "@/lib/analytics";
 import { useState } from "react";
 import CoupangBanner from "@/components/CoupangBanner";
 import { useBackOrHome } from "@/hooks/useBackOrHome";
@@ -48,6 +49,8 @@ export default function DailyFortunePage() {
     const 운세 = 요일데이터[띠 as keyof typeof 요일데이터];
 
     setResult({ 띠, 운세 });
+    track("fortune_submit", { test_name: "daily" });
+    track("result_view", { test_name: "daily", result_id: 띠 });
   };
 
   const renderStars = (rating: number) => {
@@ -182,12 +185,12 @@ export default function DailyFortunePage() {
             {/* 캡쳐 영역 끝 */}
 
             <div className="no-screenshot flex flex-col">
-              <button onClick={() => share(getShareOptions())} disabled={isCapturing} className="h-[52px] rounded-full flex items-center justify-center gap-2 bg-ink text-paper text-[15px] font-medium disabled:opacity-50">
+              <button onClick={() => { track("share_click", { test_name: "daily", method: "share" }); share(getShareOptions()); }} disabled={isCapturing} className="h-[52px] rounded-full flex items-center justify-center gap-2 bg-ink text-paper text-[15px] font-medium disabled:opacity-50">
                 <Icon name="story" size={18} />
                 {isCapturing ? "이미지 만드는 중…" : "오늘 운세 공유하기"}
               </button>
               <div className="grid grid-cols-2 gap-2 mt-2">
-                <button onClick={() => download(getShareOptions())} disabled={isCapturing} className="h-12 rounded-full bg-white border border-line text-sm font-medium flex items-center justify-center gap-1.5 disabled:opacity-50">
+                <button onClick={() => { track("share_click", { test_name: "daily", method: "save_image" }); download(getShareOptions()); }} disabled={isCapturing} className="h-12 rounded-full bg-white border border-line text-sm font-medium flex items-center justify-center gap-1.5 disabled:opacity-50">
                   <Icon name="download" size={16} />
                   이미지 저장
                 </button>

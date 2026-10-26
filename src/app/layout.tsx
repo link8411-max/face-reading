@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
 import { Gowun_Batang, Noto_Sans_KR, Silkscreen } from "next/font/google";
 import { Analytics } from "@vercel/analytics/react";
+import Script from "next/script";
+import { GA_ID } from "@/lib/analytics";
 import Link from "next/link";
 import BottomTabBar from "@/components/BottomTabBar";
 import { CATEGORIES } from "@/content/navigation";
@@ -166,6 +168,12 @@ export default function RootLayout({
         </div>
         <BottomTabBar />
         <Analytics />
+        {/* Google 애널리틱스(GA4): 채널별 유입·완료율. 페이지 이동은 GA4 향상된 측정(브라우저 기록 변경)으로 잡힌다.
+            로컬(개발·E2E)에서는 gtag.js를 받지 않고 config도 하지 않아 실제 통계로 보내지 않는다(이벤트는 dataLayer에만 쌓임) */}
+        <Script id="ga4-init" strategy="afterInteractive">
+          {`window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}window.gtag=gtag;gtag('js',new Date());
+if(!/^(localhost|127\\.0\\.0\\.1)$/.test(location.hostname)){var s=document.createElement('script');s.async=true;s.src='https://www.googletagmanager.com/gtag/js?id=${GA_ID}';document.head.appendChild(s);gtag('config','${GA_ID}');}`}
+        </Script>
       </body>
     </html>
   );
