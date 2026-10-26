@@ -1,0 +1,69 @@
+// 사이트 메뉴(하단 탭)와 묶음별 항목 — 홈, 허브 페이지, 하단 탭바, 푸터가 모두 이 데이터를 쓴다.
+
+export type TabKey = 'home' | 'face' | 'unse' | 'mbti'
+
+export const TABS: { key: TabKey; label: string; href: string; icon: string }[] = [
+  { key: 'home', label: '홈', href: '/', icon: '🏠' },
+  { key: 'face', label: '얼굴', href: '/face-tests', icon: '👤' },
+  { key: 'unse', label: '운세', href: '/unse', icon: '☯' },
+  { key: 'mbti', label: 'MBTI', href: '/mbti', icon: '🧩' },
+]
+
+export interface CategoryItem {
+  title: string
+  desc: string
+  href: string
+  thumb: { image?: string; emoji?: string; bg?: string }
+  chip?: string
+}
+
+export interface Category {
+  key: Exclude<TabKey, 'home'>
+  title: string
+  tabLabel: string
+  href: string
+  intro: string
+  items: CategoryItem[]
+}
+
+export const CATEGORIES: Category[] = [
+  {
+    key: 'face',
+    title: '얼굴 테스트',
+    tabLabel: '얼굴 테스트',
+    href: '/face-tests',
+    intro: '사진 한 장으로 해 보는 얼굴 테스트예요. 얼굴의 기준점을 측정해 관상을 풀이하고, 닮은 동물상과 삼국지 영웅을 찾아 드려요. 사진은 브라우저 안에서만 분석되고 서버로 전송되지 않아요.',
+    items: [
+      { title: '삼국지 닮은꼴', desc: '나는 52명 중 어떤 영웅일까?', href: '/samguk', thumb: { image: '/images/samguk/관우.jpg' }, chip: '52명 영웅' },
+      { title: '동물상 테스트', desc: '강아지상? 고양이상? 8가지 중 하나', href: '/animal', thumb: { emoji: '🦊', bg: '#FDE7DA' }, chip: '친구랑 비교' },
+      { title: 'AI 관상 테스트', desc: '초년·중년·말년운과 재물운', href: '/face2', thumb: { emoji: '👤', bg: '#E7EDF6' }, chip: '무제한 무료' },
+    ],
+  },
+  {
+    key: 'unse',
+    title: '운세·사주',
+    tabLabel: '운세·사주',
+    href: '/unse',
+    intro: '생년월일로 보는 사주 신년운세와 띠별 운세, 매일 바뀌는 오늘의 운세를 모았어요. 음력 생일도 양력으로 바꿔 계산하고, 띠는 입춘을 기준으로 봐요.',
+    items: [
+      { title: '2027 신년운세', desc: '사주로 보는 정미년 한 해', href: '/fortune', thumb: { emoji: '🐑', bg: '#FDECEC' }, chip: '음력 지원' },
+      { title: '2027 띠별 운세', desc: '쥐띠부터 돼지띠까지 12띠', href: '/fortune/2027', thumb: { emoji: '🐉', bg: '#FBF1D3' }, chip: '12띠' },
+      { title: '오늘의 운세', desc: '띠별 운세와 행운의 시간·색', href: '/fortune/daily', thumb: { emoji: '☯', bg: '#F3E9DA' }, chip: '매일' },
+    ],
+  },
+  {
+    key: 'mbti',
+    title: 'MBTI',
+    tabLabel: 'MBTI',
+    href: '/mbti',
+    intro: 'MBTI 궁합과 16유형별 운세·여행지·직업을 준비하고 있어요.',
+    items: [],
+  },
+]
+
+export function tabForPath(pathname: string): TabKey {
+  if (pathname === '/face-tests' || ['/face2', '/animal', '/samguk'].some((p) => pathname.startsWith(p))) return 'face'
+  if (pathname === '/unse' || pathname.startsWith('/fortune')) return 'unse'
+  if (pathname.startsWith('/mbti')) return 'mbti'
+  return 'home'
+}

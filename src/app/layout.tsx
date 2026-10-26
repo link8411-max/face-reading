@@ -2,6 +2,8 @@ import type { Metadata } from "next";
 import { Noto_Sans_KR, Noto_Serif_KR } from "next/font/google";
 import { Analytics } from "@vercel/analytics/react";
 import Link from "next/link";
+import BottomTabBar from "@/components/BottomTabBar";
+import { CATEGORIES } from "@/content/navigation";
 import "./globals.css";
 
 // 한글 본문·제목 글꼴 (Korean 글리프는 unicode-range로 필요한 만큼만 받는다)
@@ -120,7 +122,8 @@ export default function RootLayout({
       <body
         className={`${notoSans.variable} ${notoSerif.variable} font-sans antialiased bg-paper text-ink`}
       >
-        <div className="flex flex-col min-h-screen">
+        {/* 하단 탭바(h-16)에 내용이 가리지 않도록 아래 여백 */}
+        <div className="flex flex-col min-h-screen pb-[calc(4rem+env(safe-area-inset-bottom))]">
           <main className="flex-grow">
             {children}
           </main>
@@ -128,26 +131,21 @@ export default function RootLayout({
           <footer className="bg-stone-100 border-t border-stone-200 py-8 px-4 no-screenshot">
             <div className="max-w-lg mx-auto">
               <div className="grid grid-cols-2 gap-6 mb-8">
-                <div className="space-y-3">
-                  <h4 className="text-[#C41E3A] font-bold text-sm">관상/운세</h4>
-                  <ul className="text-sm space-y-2 text-stone-600">
-                    <li><Link href="/face2" className="hover:text-[#C41E3A]">무료 관상 분석</Link></li>
-                    <li><Link href="/fortune" className="hover:text-[#C41E3A]">2027 신년운세</Link></li>
-                    <li><Link href="/fortune/daily" className="hover:text-[#C41E3A]">오늘의 운세</Link></li>
-                  </ul>
-                </div>
-                <div className="space-y-3">
-                  <h4 className="text-[#C41E3A] font-bold text-sm">이색 테스트</h4>
-                  <ul className="text-sm space-y-2 text-stone-600">
-                    <li><Link href="/samguk" className="hover:text-[#C41E3A]">삼국지 닮은꼴</Link></li>
-                    <li><Link href="/animal" className="hover:text-[#C41E3A]">동물상 테스트</Link></li>
-                  </ul>
-                </div>
-                <div className="space-y-3 col-span-2 md:col-span-1 border-t pt-6 md:border-0 md:pt-0">
-                  <h4 className="text-stone-400 font-bold text-sm uppercase">Info</h4>
+                {CATEGORIES.filter((c) => c.items.length > 0).map((c) => (
+                  <div key={c.key} className="space-y-3">
+                    <h4 className="text-vermilion font-bold text-sm"><Link href={c.href}>{c.title}</Link></h4>
+                    <ul className="text-sm space-y-2 text-stone-600">
+                      {c.items.map((i) => (
+                        <li key={i.href}><Link href={i.href} className="hover:text-vermilion">{i.title}</Link></li>
+                      ))}
+                    </ul>
+                  </div>
+                ))}
+                <div className="space-y-3 col-span-2 border-t pt-6">
+                  <h4 className="text-stone-400 font-bold text-sm">정보</h4>
                   <ul className="text-sm space-y-2 text-stone-500">
-                    <li><Link href="/about" className="hover:text-[#C41E3A]">서비스 소개</Link></li>
-                    <li><Link href="/privacy" className="hover:text-[#C41E3A]">개인정보처리방침</Link></li>
+                    <li><Link href="/about" className="hover:text-vermilion">서비스 소개</Link></li>
+                    <li><Link href="/privacy" className="hover:text-vermilion">개인정보처리방침</Link></li>
                   </ul>
                 </div>
               </div>
@@ -157,6 +155,7 @@ export default function RootLayout({
             </div>
           </footer>
         </div>
+        <BottomTabBar />
         <Analytics />
       </body>
     </html>
