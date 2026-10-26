@@ -1,4 +1,5 @@
 // 사주팔자 계산 유틸리티
+import KoreanLunarCalendar from "korean-lunar-calendar";
 
 // 천간 (10개)
 export const 천간 = ['갑', '을', '병', '정', '무', '기', '경', '신', '임', '계'] as const;
@@ -42,46 +43,60 @@ export const 천간음양: Record<string, '양' | '음'> = {
   '임': '양', '계': '음',
 };
 
-// 년주 계산 (1900년 기준)
-export function 년주계산(year: number): { 천간: string; 지지: string; 띠: string; 띠이모지: string } {
-  const 천간인덱스 = (year - 4) % 10;
-  const 지지인덱스 = (year - 4) % 12;
+// ---- 년주·월주·일주 ----
+// 년주·월주는 절기 기준이다. 절기 날짜는 해마다 하루 정도 달라지지만 여기서는 매년 같은 근사 날짜를 쓴다.
+// (입춘 2/4, 경칩 3/6 …) 경계 하루 전후 생일은 실제 만세력과 다를 수 있다.
+// 일주는 한국천문연구원 데이터 기반 korean-lunar-calendar로 계산한다.
 
-  return {
-    천간: 천간[천간인덱스],
-    지지: 지지[지지인덱스],
-    띠: 띠동물[지지인덱스],
-    띠이모지: 띠이모지[지지인덱스],
-  };
+// [월, 일, 이 날부터 시작하는 월지 인덱스(지지 배열 기준)]
+const 절기경계: [number, number, number][] = [
+  [1, 6, 1],   // 소한 → 축
+  [2, 4, 2],   // 입춘 → 인
+  [3, 6, 3],   // 경칩 → 묘
+  [4, 5, 4],   // 청명 → 진
+  [5, 6, 5],   // 입하 → 사
+  [6, 6, 6],   // 망종 → 오
+  [7, 7, 7],   // 소서 → 미
+  [8, 8, 8],   // 입추 → 신
+  [9, 8, 9],   // 백로 → 유
+  [10, 8, 10], // 한로 → 술
+  [11, 7, 11], // 입동 → 해
+  [12, 7, 0],  // 대설 → 자
+];
+
+const 입춘전 = (month: number, day: number) => month === 1 || (month === 2 && day < 4);
+
+// 사주의 해는 입춘에 바뀐다
+const 사주년도 = (year: number, month: number, day: number) => (입춘전(month, day) ? year - 1 : year);
+
+export function 년주계산(year: number, month: number, day: number): { 천간: string; 지지: string; 띠: string; 띠이모지: string } {
+  const y = 사주년도(year, month, day);
+  const 천간인덱스 = (((y - 4) % 10) + 10) % 10;
+  const 지지인덱스 = (((y - 4) % 12) + 12) % 12;
+  return { 천간: 천간[천간인덱스], 지지: 지지[지지인덱스], 띠: 띠동물[지지인덱스], 띠이모지: 띠이모지[지지인덱스] };
 }
 
-// 월주 계산 (음력 기준 간소화)
-export function 월주계산(year: number, month: number): { 천간: string; 지지: string } {
-  const 년천간인덱스 = (year - 4) % 10;
-  const 월천간시작 = (년천간인덱스 % 5) * 2;
-  const 월천간인덱스 = (월천간시작 + month - 1) % 10;
-  const 월지지인덱스 = (month + 1) % 12;
-
-  return {
-    천간: 천간[월천간인덱스],
-    지지: 지지[월지지인덱스],
-  };
+export function 띠찾기(year: number, month: number, day: number): string {
+  return 년주계산(year, month, day).띠;
 }
 
-// 일주 계산 (간소화 - 정확한 계산은 만세력 필요)
+// 오호둔법: 년간에 따라 인월(寅月)의 천간이 정해진다 (갑기→병, 을경→무, 병신→경, 정임→임, 무계→갑)
+const 인월천간시작 = [2, 4, 6, 8, 0];
+
+export function 월주계산(year: number, month: number, day: number): { 천간: string; 지지: string } {
+  // 해당 날짜 직전의 절기 경계를 찾는다 (1/1~1/5는 전년 12/7 대설 이후라 자월)
+  let 월지 = 0;
+  for (const [m, d, 지지인덱스] of 절기경계) if (month > m || (month === m && day >= d)) 월지 = 지지인덱스;
+  const 년간인덱스 = 천간.indexOf(년주계산(year, month, day).천간 as (typeof 천간)[number]);
+  const 인월부터 = (월지 - 2 + 12) % 12; // 인월=0, 묘월=1 … 축월=11
+  return { 천간: 천간[(인월천간시작[년간인덱스 % 5] + 인월부터) % 10], 지지: 지지[월지] };
+}
+
 export function 일주계산(year: number, month: number, day: number): { 천간: string; 지지: string } {
-  // 간소화된 계산 (정확도 낮음, 실제로는 만세력 데이터 필요)
-  const baseDate = new Date(1900, 0, 1);
-  const targetDate = new Date(year, month - 1, day);
-  const diffDays = Math.floor((targetDate.getTime() - baseDate.getTime()) / (1000 * 60 * 60 * 24));
-
-  const 천간인덱스 = (diffDays + 6) % 10;
-  const 지지인덱스 = (diffDays + 10) % 12;
-
-  return {
-    천간: 천간[천간인덱스 < 0 ? 천간인덱스 + 10 : 천간인덱스],
-    지지: 지지[지지인덱스 < 0 ? 지지인덱스 + 12 : 지지인덱스],
-  };
+  const cal = new KoreanLunarCalendar();
+  if (!cal.setSolarDate(year, month, day)) throw new Error(`지원하지 않는 날짜: ${year}-${month}-${day}`);
+  const 일 = cal.getKoreanGapja().day; // 예: "경진일"
+  return { 천간: 일[0], 지지: 일[1] };
 }
 
 // 오행 분포 계산
@@ -129,8 +144,8 @@ export const 띠별운세2026: Record<string, { 총운: number; 키워드: strin
 
 // 전체 사주 분석
 export function 사주분석(year: number, month: number, day: number) {
-  const 년 = 년주계산(year);
-  const 월 = 월주계산(year, month);
+  const 년 = 년주계산(year, month, day);
+  const 월 = 월주계산(year, month, day);
   const 일 = 일주계산(year, month, day);
 
   const 사주 = { 년: { 천간: 년.천간, 지지: 년.지지 }, 월, 일 };
