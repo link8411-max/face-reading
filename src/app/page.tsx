@@ -26,10 +26,10 @@ const faqJsonLd = {
     },
     {
       "@type": "Question",
-      "name": "2026년 병오년 운세는 어떻게 보나요?",
+      "name": "2027년 정미년 운세는 어떻게 보나요?",
       "acceptedAnswer": {
         "@type": "Answer",
-        "text": "양력 생년월일을 입력하면 연주·월주·일주의 천간과 지지, 오행을 분석해 2026년 병오년(丙午年) 운세를 확인할 수 있습니다. 총운, 재물운, 직장운, 건강운, 애정운을 알려드립니다."
+        "text": "양력·음력 생년월일을 입력하면 절기 기준 연주·월주·일주의 천간과 지지, 오행을 분석해 2027년 정미년(丙午年) 운세를 확인할 수 있습니다. 총운, 재물운, 직장운, 건강운, 애정운을 알려드립니다."
       }
     },
     {
@@ -84,7 +84,7 @@ export default function Home() {
               운명을 읽다
             </span>
             <span className="block text-lg text-[#5C4033]/80 mt-2">
-              무료 AI 관상 & 2026 신년운세
+              무료 AI 관상 & 2027 신년운세
             </span>
           </h1>
           <p className="text-[#5C4033]/60 tracking-widest text-sm">
@@ -152,16 +152,16 @@ export default function Home() {
           <Link href="/fortune" className="block">
             <div className="bg-white/60 backdrop-blur-sm rounded-3xl p-6 hover:bg-white/80 transition group relative overflow-hidden border-2 border-[#C41E3A]/30 shadow-lg hover:shadow-xl">
               <div className="absolute top-2 right-2 bg-gradient-to-r from-[#FFD700] to-[#D4AF37] text-[#5C4033] text-xs font-bold px-3 py-1 rounded-full">
-                2026 🐎
+                2027 🐑
               </div>
               <div className="flex items-center gap-4">
                 <div className="text-5xl">🔮</div>
                 <div className="flex-1">
                   <h2 className="text-xl font-bold mb-1 text-[#5C4033] group-hover:text-[#C41E3A] transition">
-                    2026 신년 운세
+                    2027 신년 운세
                   </h2>
                   <p className="text-[#5C4033]/70 text-sm">
-                    사주팔자로 보는 병오년 운세
+                    사주팔자로 보는 정미년 운세
                   </p>
                 </div>
                 <div className="text-[#C41E3A]/60 group-hover:text-[#C41E3A] transition text-2xl">→</div>
@@ -289,10 +289,10 @@ export default function Home() {
             <details className="group">
               <summary className="cursor-pointer text-[#5C4033] hover:text-[#C41E3A] transition list-none flex items-center gap-2 font-medium">
                 <span className="text-[#FFD700] group-open:rotate-90 transition-transform">▶</span>
-                2026년 병오년 운세는 어떻게 보나요?
+                2027년 정미년 운세는 어떻게 보나요?
               </summary>
               <p className="mt-2 text-[#5C4033]/80 pl-5 leading-relaxed">
-                양력 생년월일을 입력하면 연주·월주·일주의 천간과 지지, 오행을 분석해 2026년 병오년(丙午年) 운세를 확인할 수 있습니다. 총운, 재물운, 직장운, 건강운, 애정운을 알려드립니다.
+                양력·음력 생년월일을 입력하면 절기 기준 연주·월주·일주의 천간과 지지, 오행을 분석해 2027년 정미년(丙午年) 운세를 확인할 수 있습니다. 총운, 재물운, 직장운, 건강운, 애정운을 알려드립니다.
               </p>
             </details>
             <details className="group">

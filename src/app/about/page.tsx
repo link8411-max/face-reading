@@ -31,8 +31,8 @@ export default function AboutPage() {
                         <p className="text-sm">얼굴 기준점을 측정해 전통 관상학으로 풀이하는 얼굴 분석 리포트 (사진은 브라우저 안에서만 분석)</p>
                     </div>
                     <div className="p-4 bg-stone-50 rounded-lg">
-                        <h3 className="font-bold text-[#C41E3A] mb-2">🐎 2026 신년운세</h3>
-                        <p className="text-sm">생년월일로 보는 사주 기반 병오년 신년운세</p>
+                        <h3 className="font-bold text-[#C41E3A] mb-2">🐑 2027 신년운세</h3>
+                        <p className="text-sm">생년월일로 보는 사주 기반 정미년 신년운세</p>
                     </div>
                     <div className="p-4 bg-stone-50 rounded-lg">
                         <h3 className="font-bold text-[#C41E3A] mb-2">✨ 매일의 행운</h3>

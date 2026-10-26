@@ -4,6 +4,7 @@ import { useState } from "react";
 import CoupangBanner from "@/components/CoupangBanner";
 import { useBackOrHome } from "@/hooks/useBackOrHome";
 import BirthDateFields from "@/components/BirthDateFields";
+import { FORTUNE_YEAR } from "@/lib/fortuneYear";
 import { validateBirthDate } from "@/lib/birthDate";
 import Link from "next/link";
 import { useScreenshot } from "@/hooks/useScreenshot";
@@ -27,7 +28,7 @@ interface FortuneResult {
     총운: { rating: number; keyword: string; summary: string };
     월별운세: { 상반기: string; 하반기: string; 최고의달: string; 주의할달: string };
     세부운세: Record<string, { rating: number; description: string }>;
-    사주분석: { 오행조화: string; "2026년궁합": string };
+    사주분석: { 오행조화: string; 올해궁합: string };
     행운요소: { 행운의숫자: number[]; 행운의색상: string; 행운의방위: string; 행운의계절: string };
     조언: { 해야할것: string; 피해야할것: string; 명심할말: string };
   };
@@ -46,8 +47,8 @@ export default function FortuneClient() {
   const { ref: resultRef, isCapturing, download, share } = useScreenshot();
 
   const getShareOptions = () => ({
-    fileName: `2026년운세_${result?.사주정보.띠}띠`,
-    shareTitle: `2026년 ${result?.사주정보.띠}띠 운세`,
+    fileName: `${FORTUNE_YEAR.year}년운세_${result?.사주정보.띠}띠`,
+    shareTitle: `${FORTUNE_YEAR.year}년 ${result?.사주정보.띠}띠 운세`,
     shareText: `${result?.운세.총운.keyword} - ${result?.운세.총운.summary}`,
   });
 
@@ -138,7 +139,7 @@ export default function FortuneClient() {
           >
             ← {result ? '다시하기' : '돌아가기'}
           </button>
-          <span className="text-2xl">🐎</span>
+          <span className="text-2xl">{FORTUNE_YEAR.띠이모지}</span>
         </div>
 
         <div className="text-center mb-8">
@@ -149,10 +150,10 @@ export default function FortuneClient() {
             <span className="text-[#C41E3A]/70">━━</span>
           </div>
           <h1 className="text-3xl font-bold mb-2 text-[#C41E3A]" style={{ textShadow: "0 2px 8px rgba(196, 30, 58, 0.2)" }}>
-            2026 신년 운세
+            {FORTUNE_YEAR.year} 신년 운세
           </h1>
           <p className="text-[#5C4033]/70 text-sm tracking-widest">
-            병오년 · 사주팔자로 보는 새해 운세
+            {FORTUNE_YEAR.간지}년 · 사주팔자로 보는 새해 운세
           </p>
           <div className="flex justify-center items-center gap-2 mt-3">
             <span className="text-[#FFD700]/80 text-xs">◆</span>
@@ -299,7 +300,7 @@ export default function FortuneClient() {
             {/* 총운 */}
             <div className="bg-white/60 backdrop-blur-sm rounded-3xl p-6 border-2 border-[#FFD700]/40 shadow-lg">
               <div className="flex justify-between items-center mb-3">
-                <h3 className="text-xl font-bold text-[#C41E3A]">2026년 총운</h3>
+                <h3 className="text-xl font-bold text-[#C41E3A]">{FORTUNE_YEAR.year}년 총운</h3>
                 <span className="text-[#FFD700] text-xl tracking-wider">
                   {renderStars(result.운세.총운.rating)}
                 </span>
@@ -385,7 +386,7 @@ export default function FortuneClient() {
 
             {/* 조언 */}
             <div className="bg-white/60 backdrop-blur-sm rounded-3xl p-6 border-2 border-[#C41E3A]/30 shadow-lg">
-              <h3 className="text-lg font-bold mb-4 text-[#C41E3A]">2026년 조언</h3>
+              <h3 className="text-lg font-bold mb-4 text-[#C41E3A]">{FORTUNE_YEAR.year}년 조언</h3>
               <div className="space-y-3">
                 <div className="flex gap-3">
                   <span className="text-green-700">✓</span>
@@ -420,7 +421,7 @@ export default function FortuneClient() {
                 disabled={isCapturing}
                 className="flex-1 py-3 bg-gradient-to-r from-[#1E3A5F] to-blue-600 rounded-xl font-bold text-center hover:shadow-xl transition text-white disabled:opacity-50 flex items-center justify-center gap-2"
               >
-                {isCapturing ? "⏳ 캡쳐중..." : "📤 2026 운세 카톡으로 보내기"}
+                {isCapturing ? "⏳ 캡쳐중..." : `📤 ${FORTUNE_YEAR.year} 운세 카톡으로 보내기`}
               </button>
             </div>
 

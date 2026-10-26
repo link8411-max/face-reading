@@ -15,22 +15,22 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "운명을 읽다 | 2026 무료 신년운세 & AI 관상 테스트",
-  description: "2026 무료 신년운세와 오늘의 운세, AI 관상·동물상·삼국지 닮은꼴 테스트로 나의 운명을 확인해 보세요. 사진은 브라우저 안에서만 분석해요.",
-  keywords: "2026 신년운세, 오늘의 운세, 띠별 운세, 사주팔자, AI 관상, 관상 테스트, 동물상 테스트, 얼굴 테스트, 무료 운세, 병오년 운세, 삼국지 닮은꼴, 관상 분석",
+  title: "운명을 읽다 | 2027 무료 신년운세 & AI 관상 테스트",
+  description: "2027 무료 신년운세와 오늘의 운세, AI 관상·동물상·삼국지 닮은꼴 테스트로 나의 운명을 확인해 보세요. 사진은 브라우저 안에서만 분석해요.",
+  keywords: "2027 신년운세, 오늘의 운세, 띠별 운세, 사주팔자, AI 관상, 관상 테스트, 동물상 테스트, 얼굴 테스트, 무료 운세, 정미년 운세, 삼국지 닮은꼴, 관상 분석",
   openGraph: {
-    title: "운명을 읽다 | 2026 무료 신년운세 & AI 관상 테스트",
-    description: "2026년 병오년 신년운세와 오늘의 운세, AI 관상·동물상·삼국지 닮은꼴 테스트를 지금 바로 무료로 확인하세요!",
+    title: "운명을 읽다 | 2027 무료 신년운세 & AI 관상 테스트",
+    description: "2027년 정미년 신년운세와 오늘의 운세, AI 관상·동물상·삼국지 닮은꼴 테스트를 지금 바로 무료로 확인하세요!",
     type: "website",
     locale: "ko_KR",
     siteName: "운명을 읽다",
-    images: [{ url: "/api/og?title=운명을%20읽다&subtitle=2026%20신년운세%20%26%20AI%20관상&icon=☯", width: 1200, height: 630 }],
+    images: [{ url: "/api/og?title=운명을%20읽다&subtitle=2027%20신년운세%20%26%20AI%20관상&icon=☯", width: 1200, height: 630 }],
   },
   twitter: {
     card: "summary_large_image",
-    title: "운명을 읽다 | 2026 무료 신년운세 & AI 관상 테스트",
-    description: "2026년 병오년 신년운세와 오늘의 운세, AI 관상·동물상·삼국지 닮은꼴 테스트를 지금 바로 무료로 확인하세요!",
-    images: ["/api/og?title=운명을%20읽다&subtitle=2026%20신년운세%20%26%20AI%20관상&icon=☯"],
+    title: "운명을 읽다 | 2027 무료 신년운세 & AI 관상 테스트",
+    description: "2027년 정미년 신년운세와 오늘의 운세, AI 관상·동물상·삼국지 닮은꼴 테스트를 지금 바로 무료로 확인하세요!",
+    images: ["/api/og?title=운명을%20읽다&subtitle=2027%20신년운세%20%26%20AI%20관상&icon=☯"],
   },
   robots: {
     index: true,
@@ -50,7 +50,7 @@ const jsonLd = {
   "@context": "https://schema.org",
   "@type": "WebApplication",
   "name": "운명을 읽다",
-  "description": "무료 AI 관상 분석과 사주팔자 기반 2026년 병오년 신년운세 서비스",
+  "description": "무료 AI 관상 분석과 사주팔자 기반 2027년 정미년 신년운세 서비스",
   "url": "https://unse-ai.com",
   "applicationCategory": "EntertainmentApplication",
   "operatingSystem": "Web",
@@ -63,7 +63,7 @@ const jsonLd = {
     "AI 관상 분석",
     "동물상 테스트",
     "삼국지 닮은꼴 테스트",
-    "2026년 신년운세",
+    "2027년 신년운세",
     "띠별 오늘의 운세"
   ]
 };
@@ -127,7 +127,7 @@ export default function RootLayout({
                   <h4 className="text-[#C41E3A] font-bold text-sm">관상/운세</h4>
                   <ul className="text-sm space-y-2 text-stone-600">
                     <li><Link href="/face2" className="hover:text-[#C41E3A]">무료 관상 분석</Link></li>
-                    <li><Link href="/fortune" className="hover:text-[#C41E3A]">2026 신년운세</Link></li>
+                    <li><Link href="/fortune" className="hover:text-[#C41E3A]">2027 신년운세</Link></li>
                     <li><Link href="/fortune/daily" className="hover:text-[#C41E3A]">오늘의 운세</Link></li>
                   </ul>
                 </div>
