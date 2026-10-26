@@ -43,3 +43,23 @@ test('예전 /face 주소는 /face2로 이동', async ({ page }) => {
   await page.goto('/face')
   await expect(page).toHaveURL(/\/face2$/)
 })
+
+test('검색으로 들어와 다른 페이지를 갔다가 브라우저 뒤로 돌아온 뒤에도 돌아가기는 사이트 안에 머문다', async ({ page }) => {
+  await page.goto('/fortune')
+  await page.locator('section a[href="/face2"]').first().click()
+  await expect(page).toHaveURL(/\/face2$/)
+  await page.goBack()
+  await expect(page).toHaveURL(/\/fortune$/)
+  await page.getByRole('button', { name: /돌아가기/ }).click()
+  await expect(page).toHaveURL(/localhost:3200\/$/)
+})
+
+test('사이트 자체 파일(이미지·모델 등)에서 404가 나지 않는다', async ({ page }) => {
+  const bad: string[] = []
+  page.on('response', (r) => { if (r.url().startsWith('http://localhost:3200') && !r.url().includes('/_vercel/') && r.status() >= 400) bad.push(`${r.status()} ${r.url()}`) })
+  for (const path of ['/', '/face2', '/animal', '/samguk', '/fortune', '/fortune/daily']) {
+    await page.goto(path)
+    await page.waitForLoadState('networkidle')
+  }
+  expect(bad).toEqual([])
+})

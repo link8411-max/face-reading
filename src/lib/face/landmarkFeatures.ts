@@ -80,7 +80,7 @@ export function extractFeatures(lm: Landmark[]): FeatureVector {
   }
 }
 
-export const FRONTAL_YAW_LIMIT = 0.18
+export const FRONTAL_YAW_LIMIT = 0.15
 
 // 코끝이 좌우 얼굴 가장자리 사이 어디에 있는지로 고개 돌림(yaw)을 근사
 export function checkFrontal(lm: Landmark[]): { ok: boolean; yawRatio: number } {
@@ -88,6 +88,6 @@ export function checkFrontal(lm: Landmark[]): { ok: boolean; yawRatio: number } 
   const l = p(IDX.faceEdgeL)[0], r = p(IDX.faceEdgeR)[0]
   const ratio = (p(IDX.noseTip)[0] - l) / (r - l)
   const yawRatio = Math.abs(ratio - 0.5)
-  // 0.18: 실측 30장 중 고개를 확실히 돌린 사진(0.2 이상)만 거른다. 0.12는 평범한 셀카도 1/3을 거부했다.
+  // 0.15: 실측 30장에서 고개를 확실히 돌린 사진(0.2 이상)만 거르고, 돌린 각도가 클수록 커지는 비율 왜곡은 줄인다. 0.12는 평범한 셀카도 1/3을 거부했다.
   return { ok: yawRatio <= FRONTAL_YAW_LIMIT, yawRatio }
 }

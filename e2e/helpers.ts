@@ -10,6 +10,11 @@ const IGNORED = /googlesyndication|adsbygoogle|_vercel\/insights|vercel-scripts|
 export function trackErrors(page: Page): string[] {
   const errors: string[] = []
   page.on('pageerror', (e) => errors.push(`pageerror: ${e.message}`))
+  // 우리 사이트 파일(이미지·모델·청크)이 실패하면 오류로 센다 (콘솔의 'Failed to load resource'는 외부 광고 때문에 무시하므로)
+  page.on('response', (r) => {
+    // /_vercel/* 는 Vercel 배포 환경에서만 존재하므로 로컬 검사에서 제외
+    if (r.url().startsWith('http://localhost:3200') && !r.url().includes('/_vercel/') && r.status() >= 400) errors.push(`http ${r.status()}: ${r.url()}`)
+  })
   page.on('console', (m) => {
     if (m.type() === 'error' && !IGNORED.test(m.text())) errors.push(`console: ${m.text()}`)
   })

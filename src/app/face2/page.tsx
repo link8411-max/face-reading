@@ -60,10 +60,12 @@ export default function Face2Page() {
 
     setLoading(true);
     setError(null);
+    let faceNotDetected = "";
 
     try {
       // Dynamic import로 face-api.js 로드
-      const { detectFaceFeatures } = await import("@/lib/faceDetection");
+      const { detectFaceFeatures, FACE_NOT_DETECTED } = await import("@/lib/faceDetection");
+      faceNotDetected = FACE_NOT_DETECTED;
       const { analyzeFace } = await import("@/lib/faceAnalyzer");
 
       // face-api.js로 얼굴 특징 감지
@@ -73,10 +75,10 @@ export default function Face2Page() {
       const analysisResult = analyzeFace(features);
       setResult(analysisResult);
     } catch (err) {
-      console.error("Analysis error:", err);
-      if (err instanceof Error && err.message.includes("No face detected")) {
+      if (err instanceof Error && err.message === faceNotDetected) {
         setError("얼굴을 감지할 수 없습니다. 정면 얼굴 사진을 사용해주세요.");
       } else {
+        console.error("Analysis error:", err);
         setError("분석 중 오류가 발생했습니다. 다른 사진으로 시도해주세요.");
       }
     } finally {

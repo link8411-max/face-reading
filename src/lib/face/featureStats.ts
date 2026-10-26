@@ -25,11 +25,15 @@ export type ZVector = Record<FeatureKey, number>
 
 const Z_LIMIT = 3
 
+// 표본(AI 생성 정면 얼굴 30장)은 실제 셀카보다 고르게 정렬돼 있어 편차가 작게 잡힌다.
+// 그대로 쓰면 비율이 1~2%만 달라도 z가 크게 튀어 특정 인물로 쏠릴 수 있으니 1.5배로 넓혀 쓴다.
+export const STD_INFLATION = 1.5
+
 export function toZ(f: FeatureVector): ZVector {
   const z = {} as ZVector
   for (const k of FEATURE_KEYS) {
     const { mean, std } = FEATURE_STATS[k]
-    z[k] = Math.max(-Z_LIMIT, Math.min(Z_LIMIT, (f[k] - mean) / std))
+    z[k] = Math.max(-Z_LIMIT, Math.min(Z_LIMIT, (f[k] - mean) / (std * STD_INFLATION)))
   }
   return z
 }

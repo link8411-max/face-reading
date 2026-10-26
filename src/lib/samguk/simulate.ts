@@ -1,4 +1,5 @@
 import { FEATURE_KEYS } from '@/lib/face/landmarkFeatures'
+import { STD_INFLATION } from '@/lib/face/featureStats'
 import type { ZVector } from '@/lib/face/featureStats'
 import { matchCharacter, type Gender } from './matcher'
 
@@ -14,14 +15,15 @@ export function mulberry32(seed: number): () => number {
   }
 }
 
-// 가상 얼굴: 특징마다 독립 표준정규분포(±3에서 자름).
+// 가상 얼굴: 특징마다 독립 정규분포(±3에서 자름).
+// toZ가 표본 편차를 STD_INFLATION배 넓혀 쓰므로, 실제 사용자의 z 폭은 약 1/STD_INFLATION이다. 같은 폭으로 뽑아야 보정이 맞는다.
 // 실제 얼굴은 특징끼리 상관이 있지만 여기선 무시한 근사다. 실사진 통계가 쌓이면 바꿀 것.
 export function sampleZ(rng: () => number): ZVector {
   const z = {} as ZVector
   for (const k of FEATURE_KEYS) {
     const u = Math.max(rng(), 1e-12), v = rng()
     const n = Math.sqrt(-2 * Math.log(u)) * Math.cos(2 * Math.PI * v)
-    z[k] = Math.max(-3, Math.min(3, n))
+    z[k] = Math.max(-3, Math.min(3, n / STD_INFLATION))
   }
   return z
 }

@@ -99,6 +99,9 @@ export async function loadModels(): Promise<void> {
  * @param imageElement - HTMLImageElement, HTMLVideoElement, 또는 HTMLCanvasElement
  * @returns 감지된 얼굴 특징
  */
+// 얼굴이 없을 때 던지는 에러 메시지 (페이지에서 이 값으로 안내 문구를 고른다)
+export const FACE_NOT_DETECTED = 'Face not detected';
+
 export async function detectFaceFeatures(
   imageElement: HTMLImageElement | HTMLVideoElement | HTMLCanvasElement
 ): Promise<FaceFeatures> {
@@ -109,7 +112,7 @@ export async function detectFaceFeatures(
     .withFaceLandmarks();
 
   if (!detection) {
-    throw new Error('Face not detected');
+    throw new Error(FACE_NOT_DETECTED);
   }
 
   return calculateFaceFeatures(detection.landmarks.positions);

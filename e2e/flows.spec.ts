@@ -67,9 +67,8 @@ for (const path of ['/face2', '/animal']) {
     page.on('dialog', (d) => d.dismiss())
     await page.goto(path)
     await page.locator('input[type=file]').setInputFiles({ name: 'blank.png', mimeType: 'image/png', buffer: await blankPng(page) })
-    const start = page.getByRole('button', { name: /분석|시작|확인/ }).last()
-    if (await start.isVisible()) await start.click()
-    await expect(page.getByText(/얼굴|감지|다시/).first()).toBeVisible({ timeout: 30000 })
+    await page.getByRole('button', { name: /분석하기|찾기/ }).last().click()
+    await expect(page.getByText('얼굴을 감지할 수 없습니다')).toBeVisible({ timeout: 30000 })
     expect(errors).toEqual([])
   })
 }
