@@ -32,7 +32,7 @@ export default function AboutPage() {
                     </div>
                     <div className="p-4 bg-stone-50 rounded-lg">
                         <h3 className="font-bold text-[#C41E3A] mb-2">🐎 2026 신년운세</h3>
-                        <p className="text-sm">사주팔자 기반의 병오년 토정비결 전문 분석</p>
+                        <p className="text-sm">생년월일로 보는 사주 기반 병오년 신년운세</p>
                     </div>
                     <div className="p-4 bg-stone-50 rounded-lg">
                         <h3 className="font-bold text-[#C41E3A] mb-2">✨ 매일의 행운</h3>

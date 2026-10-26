@@ -16,11 +16,11 @@ const geistMono = Geist_Mono({
 
 export const metadata: Metadata = {
   title: "운명을 읽다 | 2026 무료 신년운세 & AI 관상 테스트",
-  description: "2026 무료 신년운세와 토정비결! AI 관상 및 삼국지 닮은꼴 테스트로 나의 운명을 확인해 보세요.",
-  keywords: "2026 신년운세, 무료 토정비결, 사주팔자, AI 관상, 관상 테스트, 얼굴 테스트, 무료 운세, 병오년 운세, 삼국지 닮은꼴, 관상 분석",
+  description: "2026 무료 신년운세와 오늘의 운세, AI 관상·동물상·삼국지 닮은꼴 테스트로 나의 운명을 확인해 보세요. 사진은 브라우저 안에서만 분석해요.",
+  keywords: "2026 신년운세, 오늘의 운세, 띠별 운세, 사주팔자, AI 관상, 관상 테스트, 동물상 테스트, 얼굴 테스트, 무료 운세, 병오년 운세, 삼국지 닮은꼴, 관상 분석",
   openGraph: {
     title: "운명을 읽다 | 2026 무료 신년운세 & AI 관상 테스트",
-    description: "2026년 병오년 신년운세와 토정비결, AI 관상 테스트를 지금 바로 무료로 확인하세요!",
+    description: "2026년 병오년 신년운세와 오늘의 운세, AI 관상·동물상·삼국지 닮은꼴 테스트를 지금 바로 무료로 확인하세요!",
     type: "website",
     locale: "ko_KR",
     siteName: "운명을 읽다",
@@ -29,7 +29,7 @@ export const metadata: Metadata = {
   twitter: {
     card: "summary_large_image",
     title: "운명을 읽다 | 2026 무료 신년운세 & AI 관상 테스트",
-    description: "2026년 병오년 신년운세와 토정비결, AI 관상 테스트를 지금 바로 무료로 확인하세요!",
+    description: "2026년 병오년 신년운세와 오늘의 운세, AI 관상·동물상·삼국지 닮은꼴 테스트를 지금 바로 무료로 확인하세요!",
     images: ["/api/og?title=운명을%20읽다&subtitle=2026%20신년운세%20%26%20AI%20관상&icon=☯"],
   },
   robots: {
@@ -61,9 +61,10 @@ const jsonLd = {
   },
   "featureList": [
     "AI 관상 분석",
+    "동물상 테스트",
+    "삼국지 닮은꼴 테스트",
     "2026년 신년운세",
-    "오늘의 운세",
-    "삼국지 닮은꼴 테스트"
+    "띠별 오늘의 운세"
   ]
 };
 

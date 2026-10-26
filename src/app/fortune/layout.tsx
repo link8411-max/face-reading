@@ -1,15 +1,15 @@
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "2026 신년운세 & 토정비결 | 운명을 읽다",
-  description: "2026년 병오년 신년운세를 사주팔자와 토정비결로 확인하세요! 음력 생년월일로 총운, 재물운, 애정운, 직장운, 건강운을 상세하게 알려드리는 무료 운세 서비스입니다.",
-  keywords: "2026 운세, 2026년 운세, 신년운세, 병오년, 사주, 사주팔자, 토정비결, 무료운세, 띠별운세, 2026년 무료운세",
+  title: "2026 신년운세 무료 사주 | 운명을 읽다",
+  description: "2026년 병오년 신년운세를 사주로 무료 확인하세요! 양력 생년월일로 총운, 재물운, 애정운, 직장운, 건강운을 상세하게 알려드리는 무료 운세 서비스입니다.",
+  keywords: "2026 운세, 2026년 운세, 신년운세, 병오년, 사주, 사주팔자, 무료 사주, 무료운세, 띠별운세, 2026년 무료운세",
   alternates: {
     canonical: "https://unse-ai.com/fortune",
   },
   openGraph: {
     title: "2026 신년운세 | 운명을 읽다",
-    description: "2026년 병오년 신년운세를 사주팔자로 확인하세요! 음력 생년월일로 총운, 재물운, 애정운을 상세하게 알려드립니다.",
+    description: "2026년 병오년 신년운세를 사주로 확인하세요! 양력 생년월일로 총운, 재물운, 애정운을 상세하게 알려드립니다.",
     type: "website",
     locale: "ko_KR",
     siteName: "운명을 읽다",
@@ -26,7 +26,7 @@ const jsonLd = {
   "@context": "https://schema.org",
   "@type": "SoftwareApplication",
   "name": "2026 무료 신년운세",
-  "description": "2026년 병오년 신년운세와 토정비결 무료 분석",
+  "description": "2026년 병오년 신년운세 무료 사주 분석",
   "url": "https://unse-ai.com/fortune",
   "applicationCategory": "EntertainmentApplication",
   "operatingSystem": "Web",
