@@ -27,6 +27,8 @@ export default function Home() {
 
       <SeasonHero />
       <ZodiacPicker />
+      {/* 쿠팡 배너: 첫 화면(히어로·띠 고르기) 바로 다음 */}
+      <CoupangBanner subId="home" />
       <CategoryTabs />
 
       <section aria-label={`${FORTUNE_YEAR.year} 띠별 운세`}>
@@ -43,8 +45,6 @@ export default function Home() {
           ))}
         </div>
       </section>
-
-      <CoupangBanner subId="home" />
 
       <section aria-label="자주 묻는 질문">
         <h2 className="font-black text-base mb-2">자주 묻는 질문</h2>

@@ -47,3 +47,13 @@ test('홈: hydration 오류 없음', async ({ page }) => {
   await page.waitForTimeout(800)
   expect(errors.filter((e) => /hydrat/i.test(e))).toEqual([])
 })
+
+test('홈 쿠팡 배너는 띠 고르기 바로 다음, 묶음 탭보다 위', async ({ page }) => {
+  await page.goto('/')
+  const y = async (loc: import('@playwright/test').Locator) => (await loc.boundingBox())!.y
+  const picker = await y(page.getByRole('region', { name: '띠 바로 고르기' }))
+  const banner = await y(page.locator('iframe[title="쿠팡 추천 상품"]'))
+  const tabs = await y(page.getByRole('region', { name: '테스트 묶음' }))
+  expect(picker).toBeLessThan(banner)
+  expect(banner).toBeLessThan(tabs)
+})
