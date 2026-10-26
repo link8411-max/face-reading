@@ -30,7 +30,7 @@ export default function TestStart({
   loading: boolean;
   error: string | null;
   preparing?: boolean;
-  imageRef?: RefObject<HTMLImageElement | null>; // face-api가 이 이미지 요소를 직접 읽는다 (관상·동물상)
+  imageRef?: RefObject<HTMLImageElement | null>; // 분석이 이 이미지 요소를 직접 읽는다 (관상: face-api, 동물상: MediaPipe)
 }) {
   const fileRef = useRef<HTMLInputElement>(null);
   const label = analyzeButtonLabel({ hasImage: !!image, gender, loading, preparing, label: analyzeLabel });
