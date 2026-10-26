@@ -30,7 +30,7 @@ export function useScreenshot<T extends HTMLElement = HTMLDivElement>() {
       );
 
       const capturePromise = domToBlob(ref.current, {
-        backgroundColor: "#1c1917",
+        backgroundColor: "#FBF6F1",
         scale: isMobile ? 1.5 : 2, // 모바일은 낮은 해상도
         filter: (node) => {
           // iframe 제외 (쿠팡 배너 등)
