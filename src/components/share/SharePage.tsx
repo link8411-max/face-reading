@@ -25,7 +25,7 @@ export async function shareMetadata(kind: ShareKind, params: P, searchParams: S)
     description,
     robots: { index: false, follow: true },
     alternates: { canonical: `${SITE}${r.testPath}` },
-    openGraph: { title: r.phrase, description, url: `${SITE}${r.testPath}/r/${r.key}`, siteName: "운명을 읽다", locale: "ko_KR", type: "website", images: [{ url: image, width: 1200, height: 630, alt: r.phrase }] },
+    openGraph: { title: r.phrase, description, url: `${SITE}${r.testPath}/r/${r.key}${r.score !== null ? `?s=${r.score}` : ""}`, siteName: "운명을 읽다", locale: "ko_KR", type: "website", images: [{ url: image, width: 1200, height: 630, alt: r.phrase }] },
     twitter: { card: "summary_large_image", title: r.phrase, description, images: [image] },
   };
 }

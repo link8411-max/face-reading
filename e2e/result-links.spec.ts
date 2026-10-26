@@ -23,7 +23,11 @@ test('친구 결과 링크(삼국지·관상) 착지 문구', async ({ page }) =
   await expect(page.getByRole('heading', { name: '친구는 재물상이 나왔어요' })).toBeVisible()
 })
 
-test('잘못된 결과 링크는 테스트 시작 화면으로 보낸다', async ({ page }) => {
+test('잘못된 결과 링크는 테스트 시작 화면으로 보낸다 (예약 키 포함, 500 없음)', async ({ page, request }) => {
+  expect((await request.get('/face2/r/constructor', { maxRedirects: 0 })).status()).toBe(307)
+  expect((await request.get('/api/og/result?kind=face&key=constructor')).status()).toBe(400)
+  await page.goto('/mbti/r/infp-xxxx')
+  await expect(page).toHaveURL(/\/mbti\/match$/)
   await page.goto('/animal/r/unicorn?s=87')
   await expect(page).toHaveURL(/\/animal$/)
   await page.goto('/samguk/r/zhaoyun?s=abc')
@@ -31,7 +35,7 @@ test('잘못된 결과 링크는 테스트 시작 화면으로 보낸다', async
 })
 
 test('MBTI 궁합 링크: 결과 미리보기 메타와 친구가 보낸 궁합 안내', async ({ page }) => {
-  await page.goto('/mbti/match?a=INFP&b=ENTJ&utm_source=share&utm_medium=friend_link&utm_campaign=mbti_match')
+  await page.goto('/mbti/r/infp-entj?utm_source=share&utm_medium=friend_link&utm_campaign=mbti_match')
   expect(await meta(page, 'meta[property="og:title"]')).toBe('INFP랑 ENTJ 궁합 100점이래. 우리도 해볼까?')
   await expect(page.getByText('친구가 보낸 궁합이에요')).toBeVisible()
   await page.getByRole('button', { name: '내 궁합 보기' }).click()

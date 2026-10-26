@@ -26,17 +26,25 @@ test('결과 공유 페이지는 사이트맵에 없다', () => {
   expect((SITEMAP_ROUTES as readonly string[]).some((r) => r.includes('/r/'))).toBe(false)
 })
 
-import { generateMetadata as matchMeta } from '@/app/mbti/match/page'
+import * as matchPage from '@/app/mbti/match/page'
+import { generateMetadata as mbtiShareMeta } from '@/app/mbti/r/[pair]/page'
 
-test('MBTI 궁합 공유 링크(?a=&b=): 결과 문구·미리보기 이미지·검색 제외, 없으면 기본 계산기 메타', async () => {
-  const m = await matchMeta({ searchParams: Promise.resolve({ a: 'INFP', b: 'ENTJ' }) })
+test('계산기(/mbti/match)는 정적 메타 그대로 (공유 링크 때문에 동적 페이지가 되지 않는다)', () => {
+  expect('generateMetadata' in matchPage).toBe(false)
+  expect(matchPage.metadata.title).toContain('MBTI 궁합 계산기')
+})
+
+test('MBTI 궁합 공유 링크(/mbti/r/infp-entj): 결과 문구·미리보기·검색 제외, 잘못된 값은 빈 메타', async () => {
+  const m = await mbtiShareMeta({ params: Promise.resolve({ pair: 'infp-entj' }) })
   expect(m.openGraph?.title).toBe('INFP랑 ENTJ 궁합 100점이래. 우리도 해볼까?')
   expect(JSON.stringify(m.openGraph?.images)).toContain('/api/og/result?kind=mbti&a=INFP&b=ENTJ')
   expect(m.robots).toEqual({ index: false, follow: true })
-  expect(m.alternates?.canonical).toBe('https://unse-ai.com/mbti/match')
-  const base = await matchMeta({ searchParams: Promise.resolve({}) })
-  expect(base.robots).toBeUndefined()
-  expect(base.title).toContain('MBTI 궁합 계산기')
-  const bad = await matchMeta({ searchParams: Promise.resolve({ a: 'INFP', b: '<script>' }) })
-  expect(bad.robots).toBeUndefined()
+  expect((m.openGraph as { url?: string }).url).toBe('https://unse-ai.com/mbti/r/infp-entj')
+  expect((await mbtiShareMeta({ params: Promise.resolve({ pair: 'infp-xxxx' }) })).openGraph).toBeUndefined()
+})
+
+// 리뷰 Important: og:url로 다시 열어도 같은 결과가 나오게 점수를 담는다
+test('결과 링크 og:url에 점수가 있다(utm은 없음)', async () => {
+  const m = await run('animal', 'cat', '87')
+  expect((m.openGraph as { url?: string }).url).toBe('https://unse-ai.com/animal/r/cat?s=87')
 })

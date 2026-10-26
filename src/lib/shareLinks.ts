@@ -41,7 +41,8 @@ export interface SharedResult {
 export function parseShared(kind: ShareKind, key: string, s?: unknown): SharedResult | null {
   const base = { kind, key, testPath: TEST_PATH[kind] }
   if (kind === 'face') {
-    const name = FACE_TYPES[key]
+    // 객체 프로토타입 키(constructor 등)를 막으려 자기 키만 본다
+    const name = Object.hasOwn(FACE_TYPES, key) ? FACE_TYPES[key] : undefined
     return name ? { ...base, score: null, name, phrase: `나는 ${josa(name, '이래', '래')}. 너 관상도 봐줄까?` } : null
   }
   const score = clampScore(s)
@@ -63,8 +64,11 @@ export function shareUrl(kind: ShareKind, key: string, score?: number): string {
   return `${SITE}${TEST_PATH[kind]}/r/${encodeURIComponent(key)}?${s !== null ? `s=${s}&` : ''}${UTM(kind)}`
 }
 
-export function mbtiShared(a: string, b: string): { a: string; b: string; score: number; phrase: string; url: string } | null {
+// MBTI 궁합 공유 링크는 계산기(/mbti/match, 검색 노출·정적)와 다른 주소 /mbti/r/infp-entj (검색 제외)
+export function mbtiShared(aIn: string, bIn: string): { a: string; b: string; score: number; phrase: string; url: string; path: string } | null {
+  const a = aIn.toUpperCase(), b = bIn.toUpperCase()
   if (!isMbti(a) || !isMbti(b)) return null
   const score = compatSummary(a, b).total
-  return { a, b, score, phrase: `${a}랑 ${b} 궁합 ${score}점이래. 우리도 해볼까?`, url: `${SITE}/mbti/match?a=${a}&b=${b}&${UTM('mbti_match')}` }
+  const path = `/mbti/r/${a.toLowerCase()}-${b.toLowerCase()}`
+  return { a, b, score, phrase: `${a}랑 ${b} 궁합 ${score}점이래. 우리도 해볼까?`, path, url: `${SITE}${path}?${UTM('mbti_match')}` }
 }

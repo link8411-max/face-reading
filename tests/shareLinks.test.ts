@@ -44,3 +44,15 @@ test('공유 주소: 유형 키와 점수, 유입 구분용 utm만 담는다', (
   expect(Object.fromEntries(u.searchParams)).toEqual({ s: '87', utm_source: 'share', utm_medium: 'friend_link', utm_campaign: 'animal' })
   expect(new URL(shareUrl('face', 'wealth')).searchParams.has('s')).toBe(false)
 })
+
+// 리뷰 Important: 객체 프로토타입 키(constructor 등)로 500이 나지 않는다
+test.each(['constructor', '__proto__', 'toString', 'hasOwnProperty'])('관상 링크 키 %s는 허용 목록 밖이다', (k) => {
+  expect(parseShared('face', k)).toBeNull()
+  expect(parseShared('animal', k, '80')).toBeNull()
+  expect(parseShared('samguk', k, '80')).toBeNull()
+})
+
+test('MBTI 공유 링크는 계산기와 다른 주소(/mbti/r/a-b)로, 대소문자 무관', () => {
+  expect(new URL(mbtiShared('INFP', 'ENTJ')!.url).pathname).toBe('/mbti/r/infp-entj')
+  expect(mbtiShared('infp', 'entj')?.a).toBe('INFP')
+})

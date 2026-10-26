@@ -36,30 +36,29 @@ function Bar({ label, score }: { label: string; score: number }) {
 }
 
 // MBTI 궁합 계산기: 두 유형을 고르면 궁합 결과 카드 (저장 이미지에 사이트 주소 포함)
-export default function MatchCalculator() {
-  const [a, setA] = useState<MbtiType | null>(null);
-  const [b, setB] = useState<MbtiType | null>(null);
-  const [shown, setShown] = useState(false);
-  const [fromShare, setFromShare] = useState(false);
+export default function MatchCalculator({ initial }: { initial?: { a: MbtiType; b: MbtiType; fromShare: boolean } } = {}) {
+  const [a, setA] = useState<MbtiType | null>(initial?.a ?? null);
+  const [b, setB] = useState<MbtiType | null>(initial?.b ?? null);
+  const [shown, setShown] = useState(!!initial);
+  const [fromShare, setFromShare] = useState(initial?.fromShare ?? false);
   const { ref, isCapturing, download } = useScreenshot();
   const link = shown && a && b ? mbtiShared(a, b) : null;
   const { busy, notice, share } = useResultShare(link ? { title: "운명을 읽다 · MBTI 궁합", text: link.phrase, url: link.url } : null);
 
+  // 친구가 보낸 궁합 링크(/mbti/r/a-b)로 들어온 방문은 GA에서 구분한다
+  useEffect(() => {
+    if (initial?.fromShare) track("shared_landing", { test_name: "mbti_match", result_id: `${initial.a}_${initial.b}` });
+  }, [initial]);
+
   // 유형 페이지에서 ?a=INFP&b=ENFJ 로 들어오면 미리 골라 둔다
   useEffect(() => {
+    if (initial) return;
     const q = new URLSearchParams(window.location.search);
     const qa = q.get("a")?.toUpperCase() ?? "", qb = q.get("b")?.toUpperCase() ?? "";
     if (isMbti(qa)) setA(qa);
     if (isMbti(qb)) setB(qb);
-    if (isMbti(qa) && isMbti(qb)) {
-      setShown(true);
-      // 친구가 보낸 궁합 링크로 들어온 방문 (GA에서 구분)
-      if (q.get("utm_medium") === "friend_link") {
-        setFromShare(true);
-        track("shared_landing", { test_name: "mbti_match", result_id: `${qa}_${qb}` });
-      }
-    }
-  }, []);
+    if (isMbti(qa) && isMbti(qb)) setShown(true);
+  }, [initial]);
 
   if (shown && a && b) {
     const s = compatSummary(a, b);

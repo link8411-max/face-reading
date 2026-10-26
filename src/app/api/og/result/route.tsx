@@ -11,7 +11,8 @@ const KINDS: ShareKind[] = ['animal', 'samguk', 'face'];
 export async function GET(request: NextRequest) {
   const q = new URL(request.url).searchParams;
   const kind = q.get('kind') ?? '';
-  let big = '', score = '', phrase = '', label = '', image: string | undefined;
+  let big = '', score = '', phrase = '', label = '';
+  let image: ArrayBuffer | undefined;
   if (kind === 'mbti') {
     const m = mbtiShared(q.get('a') ?? '', q.get('b') ?? '');
     if (!m) return new Response('bad request', { status: 400 });
@@ -21,7 +22,15 @@ export async function GET(request: NextRequest) {
     if (!r) return new Response('bad request', { status: 400 });
     big = r.name; score = r.score !== null ? `닮음 ${r.score}%` : ''; phrase = r.phrase;
     label = kind === 'animal' ? '동물상 테스트' : kind === 'samguk' ? '나는 삼국지 속 누구?' : 'AI 관상 테스트';
-    if (r.image) image = new URL(encodeURI(r.image), request.url).toString();
+    if (r.image) {
+      // 초상화를 먼저 받아 둔다. 실패하면 초상화 없이 그린다(그리는 도중 실패하면 깨진 이미지가 오래 캐시될 수 있음)
+      try {
+        const res = await fetch(new URL(encodeURI(r.image), request.url));
+        if (res.ok) image = await res.arrayBuffer();
+      } catch {
+        image = undefined;
+      }
+    }
   } else {
     return new Response('bad request', { status: 400 });
   }
@@ -38,7 +47,8 @@ export async function GET(request: NextRequest) {
           </div>
           {image ? (
             // eslint-disable-next-line @next/next/no-img-element
-            <img src={image} width={300} height={360} style={{ objectFit: 'cover', borderRadius: '24px', border: '8px solid #23263A' }} alt="" />
+            // @vercel/og는 img src로 ArrayBuffer를 받는다 (엣지 런타임에서 Buffer 없이)
+            <img src={image as unknown as string} width={300} height={360} style={{ objectFit: 'cover', borderRadius: '24px', border: '8px solid #23263A' }} alt="" />
           ) : (
             <div style={{ display: 'flex', position: 'absolute', right: '40px', top: '40px', width: '220px', height: '220px' }}>
               <div style={{ position: 'absolute', right: '40px', top: '30px', width: '180px', height: '180px', borderRadius: '50%', backgroundColor: '#FBF6F1', display: 'flex' }} />
