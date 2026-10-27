@@ -8,6 +8,7 @@ export const SITEMAP_ROUTES = [
     '',
     '/face2',
     '/fortune',
+    '/fortune/mbti',
     '/fortune/daily',
     '/samguk',
     '/animal',
@@ -29,6 +30,7 @@ export const LAST_MODIFIED: Record<string, string> = {
     '': '2026-10-26',
     '/face2': '2026-10-26',
     '/fortune': '2026-10-26',
+    '/fortune/mbti': '2026-10-27',
     '/fortune/daily': '2026-10-26',
     '/samguk': '2026-10-26',
     '/animal': '2026-10-26',
@@ -51,7 +53,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
     return SITEMAP_ROUTES.map((route) => ({
         url: `${baseUrl}${route}`,
         lastModified: LAST_MODIFIED[route],
-        changeFrequency: (route === '/fortune/daily' ? 'daily' : route === '/about' || route === '/privacy' ? 'yearly' : 'weekly') as ChangeFrequency,
+        changeFrequency: (route === '/fortune/daily' || route === '/fortune/mbti' ? 'daily' : route === '/about' || route === '/privacy' ? 'yearly' : 'weekly') as ChangeFrequency,
         priority: route === '' ? 1 : route === '/about' || route === '/privacy' ? 0.3 : 0.8,
     }))
 }

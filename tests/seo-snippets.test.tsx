@@ -9,6 +9,7 @@ import { metadata as face2 } from '@/app/face2/layout'
 import { metadata as animal } from '@/app/animal/layout'
 import { metadata as samguk } from '@/app/samguk/layout'
 import { metadata as fortune } from '@/app/fortune/layout'
+import { metadata as mbtiDaily } from '@/app/fortune/mbti/layout'
 import { generateMetadata as zodiacMeta } from '@/app/fortune/2027/[zodiac]/page'
 import { generateMetadata as mbtiMeta } from '@/app/mbti/[type]/page'
 import Zodiac2027Article from '@/components/Zodiac2027Article'
@@ -21,7 +22,7 @@ const BANNED = [/2026/, /토정비결/, /하루 1회/, /Gemini/i, /AI가 당신�
 const BRAND = ' – 운명을 읽다'
 
 async function pages(): Promise<[string, Metadata][]> {
-  const list: [string, Metadata][] = [['/', root], ['/face2', face2], ['/animal', animal], ['/samguk', samguk], ['/fortune', fortune]]
+  const list: [string, Metadata][] = [['/', root], ['/face2', face2], ['/animal', animal], ['/samguk', samguk], ['/fortune', fortune], ['/fortune/mbti', mbtiDaily]]
   for (const z of ZODIAC_SLUGS) list.push([`/fortune/2027/${z}`, await zodiacMeta({ params: Promise.resolve({ zodiac: z }) })])
   for (const t of MBTI_TYPES) list.push([`/mbti/${t.toLowerCase()}`, await mbtiMeta({ params: Promise.resolve({ type: t.toLowerCase() }) })])
   return list
@@ -84,4 +85,10 @@ test('띠별 제목: 출생연도(두 자리)와 날삼재(돼지·토끼·양) 
       expect(body, z).not.toContain('삼재')
     }
   }
+})
+
+test('오늘의 MBTI 운세: 제목 앞에 핵심어, 설명에 가입 없이·MBTI만 고르면', () => {
+  expect(String(mbtiDaily.title).startsWith('오늘의 MBTI 운세')).toBe(true)
+  expect(String(mbtiDaily.description)).toContain('가입 없이')
+  expect(String(mbtiDaily.description)).toContain('MBTI만 고르면')
 })

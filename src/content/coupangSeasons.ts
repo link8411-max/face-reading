@@ -1,4 +1,5 @@
 // 기간 한정 시즌 추천(쿠팡 파트너스). 날짜·링크는 이 파일에서만 관리한다 — 시즌이 바뀌면 항목을 추가한다.
+import { kstDate } from '@/lib/kst'
 // 날짜는 한국 시간 기준, start~end 포함. 끝나면 자동으로 숨는다(다음 시즌 링크가 없으면 슬롯을 비워 둔다).
 // 링크: 쿠팡 파트너스 회원 AF6497036, 각 링크는 쿠팡 검색 결과로 이동 (2026-10-27 생성)
 
@@ -27,7 +28,6 @@ export const SEASONS: CoupangSeason[] = [
   },
 ]
 
-const kstDate = (now: Date) => new Intl.DateTimeFormat('en-CA', { timeZone: 'Asia/Seoul', year: 'numeric', month: '2-digit', day: '2-digit' }).format(now)
 
 export function activeSeason(now: Date): CoupangSeason | null {
   const today = kstDate(now)

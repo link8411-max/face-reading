@@ -4,7 +4,7 @@
 import { animalTypeDB } from '@/lib/animalTypeDB'
 import { ANIMAL_KEYS } from '@/lib/animal/matcher'
 import { samgukCharacters } from '@/lib/samgukDB'
-import { compatSummary, isMbti } from '@/lib/mbti/compat'
+import { compatSummary, isMbti, type MbtiType } from '@/lib/mbti/compat'
 import { faceMatch, REL, REL_NAME, type Rel } from '@/lib/faceMatch/compat'
 import type { AnimalKey } from '@/lib/animal/matcher'
 
@@ -124,3 +124,16 @@ export function parseTeam(path: string) {
   if (members.some((m) => !m)) return null
   return { ids, members: members as NonNullable<(typeof members)[number]>[] }
 }
+
+// ===== 오늘의 MBTI 운세 =====
+// 링크에는 유형(소문자)과 utm만, 날짜는 넣지 않는다 (받은 사람이 연 날의 오늘 운세를 본다)
+export function mbtiDailyUrl(t: MbtiType): string {
+  return `${SITE}/fortune/mbti/r/${t.toLowerCase()}?${UTM('mbti_daily')}`
+}
+
+export function parseMbtiDailyKey(key: string): MbtiType | null {
+  const up = key.toUpperCase()
+  return key === key.toLowerCase() && isMbti(up) ? up : null
+}
+
+export const mbtiDailyPhrase = (t: MbtiType, headline: string) => `오늘 ${t} 운세는 '${headline}'래. 너는 무슨 유형이야?`

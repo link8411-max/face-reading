@@ -2,7 +2,7 @@
 // 개인정보 원칙: 사진·생년월일 원값·얼굴 수치는 절대 보내지 않는다. 결과는 유형 키(fox, caocao, 재물상, INFP_ENTJ 등)만.
 export const GA_ID = 'G-L99JPMPT9D'
 
-export type TestName = 'face' | 'animal' | 'samguk' | 'fortune' | 'daily' | 'mbti_match' | 'face_match' | 'team_samguk'
+export type TestName = 'face' | 'animal' | 'samguk' | 'fortune' | 'daily' | 'mbti_match' | 'face_match' | 'team_samguk' | 'mbti_daily'
 export type ShareMethod = 'save_image' | 'share' | 'link' | 'kakao'
 
 type Events = {

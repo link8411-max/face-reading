@@ -5,7 +5,8 @@ import { Icon } from "@/components/icons";
 
 // 결과 버튼: 1순위 공유하기(휴대폰 기본 공유창), 2순위 이미지 저장·다시하기.
 // lead: 공유하기보다 앞에 두는 링크(삼국지 → 우리 팀 삼국지), companion: 이미지 저장 옆 짝 기능(동물상 → 얼굴 궁합)
-export default function ResultActions({ onShare, onSave, onRetry, busy, notice, lead, companion }: {
+export default function ResultActions({ onShare, onSave, onRetry, busy, notice, lead, companion, retryLabel = "다시하기" }: {
+  retryLabel?: string;
   lead?: { label: string; href: string };
   companion?: { label: string; href: string };
   onShare: () => void;
@@ -41,14 +42,14 @@ export default function ResultActions({ onShare, onSave, onRetry, busy, notice, 
         {!companion && (
           <button type="button" onClick={onRetry} className="h-12 rounded-full bg-white text-ink border border-line text-sm font-medium flex items-center justify-center gap-1.5">
             <Icon name="refresh" size={16} />
-            다시하기
+            {retryLabel}
           </button>
         )}
       </div>
       {companion && (
         <button type="button" onClick={onRetry} className="mt-2 h-11 rounded-full text-sm text-muted flex items-center justify-center gap-1.5">
           <Icon name="refresh" size={16} />
-          다시하기
+          {retryLabel}
         </button>
       )}
       <Link href="/" className="mt-2.5 text-center text-[13px] text-muted py-3">다른 테스트 보기</Link>

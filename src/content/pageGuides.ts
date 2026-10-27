@@ -4,7 +4,7 @@
 import { animalTypeDB, animalTypeList } from '@/lib/animalTypeDB'
 import { samgukCharacters } from '@/lib/samgukDB'
 
-export type GuideRoute = '/face2' | '/animal' | '/samguk' | '/fortune' | '/fortune/daily'
+export type GuideRoute = '/face2' | '/animal' | '/samguk' | '/fortune' | '/fortune/daily' | '/fortune/mbti'
 
 export interface PageGuideData {
   heading: string
@@ -21,9 +21,33 @@ export const TEST_LINKS: Record<GuideRoute, { label: string }> = {
   '/samguk': { label: '나는 삼국지 속 누구?' },
   '/fortune': { label: '사주 신년운세' },
   '/fortune/daily': { label: '띠별 오늘의 운세' },
+  '/fortune/mbti': { label: '오늘의 MBTI 운세' },
 }
 
 export const pageGuides: Record<GuideRoute, PageGuideData> = {
+  '/fortune/mbti': {
+    heading: '오늘의 MBTI 운세, 이렇게 봐요',
+    summary: 'MBTI만 고르면 생년월일 없이 오늘 하루의 한마디와 일·연애·관계 운, 행운의 색과 시간을 알려드려요.',
+    intro: [
+      'MBTI는 에너지의 방향(E·I), 정보를 받아들이는 방식(S·N), 판단의 기준(T·F), 생활 방식(J·P) 네 가지로 성향을 나눈 16가지 유형이에요. 같은 하루라도 유형마다 힘이 나는 순간과 쉬어 가면 좋은 순간이 달라서, 성향에 맞춘 한마디가 하루를 보내는 데 작은 길잡이가 돼요.',
+      '운명을 읽다의 오늘의 MBTI 운세는 유형별로 미리 써 둔 한마디와 네 가지 성향에 맞춘 일·연애·관계 문장 가운데에서 오늘 날짜에 맞는 것을 골라 보여드려요. 같은 날 같은 유형이면 누가 봐도 같은 운세가 나오고, 날짜는 한국 시간 자정에 바뀌어요.',
+      '생년월일을 입력하지 않아도 되니 친구에게 링크를 보내 서로의 오늘 운세를 비교해 보세요. 띠로 보는 오늘의 운세나 사주로 보는 신년운세도 함께 확인할 수 있어요.',
+    ],
+    highlights: [
+      { title: '오늘의 한마디', body: '16유형마다 성향에 맞춘 한마디를 준비했어요. 같은 한마디가 2주 안에 다시 나오지 않도록 돌아가요.' },
+      { title: '일·연애·관계 세 줄', body: 'E·I, S·N, T·F, J·P 네 가지 성향에 맞춘 문장으로 오늘의 일과 연애, 사람 사이의 흐름을 짧게 알려드려요.' },
+      { title: '행운 요소와 잘 맞는 유형', body: '행운의 색과 시간, 오늘 해 보면 좋은 작은 행동, 그리고 오늘 잘 맞는 MBTI 유형을 함께 보여드려요.' },
+    ],
+    faqs: [
+      { q: '생년월일을 입력해야 하나요?', a: '아니요. MBTI 유형만 고르면 돼요. 고른 유형은 다음에 바로 볼 수 있도록 지금 쓰는 기기에만 기억하고, 서버로 보내지 않아요.' },
+      { q: '운세는 언제 바뀌나요?', a: '한국 시간 자정에 하루가 바뀌면 새 운세가 나와요. 같은 날 같은 유형이면 누가 봐도 같은 운세예요.' },
+      { q: '내 MBTI를 모르면 어떻게 하나요?', a: 'MBTI 16유형 풀이 페이지에서 각 유형의 성격과 연애 스타일을 읽어 보고 가장 가까운 유형을 골라 보세요.' },
+      { q: '무료인가요?', a: '네, 횟수 제한 없이 무료이고 회원가입도 필요 없어요.' },
+      { q: 'MBTI 운세를 믿어도 되나요?', a: 'MBTI 운세는 성향에 맞춘 재미있는 하루 길잡이예요. 정해진 미래가 아니니 가볍게 즐기면서 오늘을 돌아보는 계기로 삼아 주세요.' },
+    ],
+    related: ['/fortune/daily', '/fortune', '/animal'],
+  },
+
   '/face2': {
     heading: '무료 AI 관상 테스트, 이렇게 봐요',
     summary: '사진 한 장으로 눈·코·입·얼굴형을 측정해 전통 관상학으로 성격과 초년·중년·말년운, 분야별 운을 풀이해요.',

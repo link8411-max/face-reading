@@ -5,6 +5,8 @@ import { mbtiShared, parseFaceMatch, parseInvite, parseTeam } from '@/lib/shareL
 import { buildTeam } from '@/lib/samguk/team';
 import { REL_NAME } from '@/lib/faceMatch/compat';
 import { ogQueryOk, OG_CACHE_CONTROL } from '@/lib/ogQuery';
+import { parseMbtiDailyKey } from '@/lib/shareLinks';
+import { mbtiProfiles } from '@/content/mbtiTypes';
 
 export const runtime = 'edge';
 
@@ -31,6 +33,11 @@ export async function GET(request: NextRequest) {
     if (!p) return new Response('bad request', { status: 400 });
     const team = buildTeam(p.members.map((character) => ({ character })));
     big = `우리 팀은 ${team.spirit}`; score = team.members.map((m) => m.character.name).join(' · '); phrase = '너희 팀은 삼국지 속 누구야?'; label = '우리 팀 삼국지';
+  } else if (kind === 'mbti-daily') {
+    // 날짜를 넣지 않아 오래 캐시해도 맞는 내용만 그린다
+    const t = parseMbtiDailyKey(q.get('type') ?? '');
+    if (!t) return new Response('bad request', { status: 400 });
+    big = `${t} 오늘의 운세`; score = mbtiProfiles[t].nickname; phrase = '너는 무슨 유형이야?'; label = '오늘의 MBTI 운세';
   } else if (kind === 'invite') {
     const inv = parseInvite(q.get('key') ?? '', q.get('rel') ?? '');
     if (!inv) return new Response('bad request', { status: 400 });
