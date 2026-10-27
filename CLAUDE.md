@@ -157,6 +157,7 @@ public/
 - 위치: 메인 시즌 카드 아래, 오늘의 운세 결과, 띠별 운세 페이지, 신년운세 결과(세부 운세 옆). **사진 테스트 흐름에는 넣지 않는다**(테스트로 막음).
 - 링크는 새 창·`rel="sponsored noopener"`, 대가성 문구 필수. GA `coupang_click(slot, keyword)`.
 - 다음 시즌(신년·설 선물)은 링크를 만들면 항목만 추가.
+- 다이나믹 배너(`CoupangBanner`, 방문자 관심 기반)는 시즌 카드와 별개로 유지한다. GA: 화면에 보이면 `coupang_banner_view(slot)`, 배너로 초점이 옮겨 가면 `coupang_click(slot, keyword=banner)`. slot은 subId의 하이픈을 밑줄로 바꾼 값(mbti-infp → mbti_infp). 구매 실적은 쿠팡 파트너스 리포트의 subId로 본다.
 
 ## 방문 통계 (GA4)
 - 측정 ID `G-L99JPMPT9D` (`src/lib/analytics.ts`), `layout.tsx`의 `ga4-init` 스크립트. 로컬(localhost)에서는 gtag.js를 받지 않고 config도 안 해서 실제 통계에 안 섞인다(E2E는 `dataLayer`로 검사).

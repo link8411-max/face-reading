@@ -13,6 +13,7 @@ type Events = {
   fortune_submit: { test_name: TestName }
   shared_landing: { test_name: TestName; result_id?: string }
   coupang_click: { slot: string; keyword: string }
+  coupang_banner_view: { slot: string }
 }
 
 const ALLOWED_KEYS = new Set(['test_name', 'result_id', 'method', 'slot', 'keyword'])

@@ -27,3 +27,10 @@ test.each([
 ])('%s 에 배너가 있다', (file, subId) => {
   expect(readFileSync(file, 'utf8')).toContain(`<CoupangBanner subId="${subId}"`)
 })
+
+import { gaSlot } from '@/components/CoupangBanner'
+test('GA 위치 값: subId의 하이픈을 밑줄로 (GA 개인정보 필터 통과)', () => {
+  expect(gaSlot('mbti-infp')).toBe('mbti_infp')
+  expect(gaSlot('face-match')).toBe('face_match')
+  expect(gaSlot('home')).toBe('home')
+})
