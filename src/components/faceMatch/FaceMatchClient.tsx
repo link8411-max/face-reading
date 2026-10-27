@@ -17,6 +17,7 @@ import { faceMatch, REL, REL_NAME, type Rel } from "@/lib/faceMatch/compat";
 import { faceMatchInviteUrl, faceMatchUrl, josa, SITE } from "@/lib/shareLinks";
 import { animalTypeDB } from "@/lib/animalTypeDB";
 import { track } from "@/lib/analytics";
+import { withGender, withPhoto } from "@/lib/faceMatch/slot";
 
 interface Slot { gender: Gender | null; image: string | null; animal: AnimalKey | null; error: string | null }
 const empty: Slot = { gender: null, image: null, animal: null, error: null };
@@ -62,7 +63,7 @@ export default function FaceMatchClient({ invite }: { invite?: { key: AnimalKey;
   const ready = !!rel && (me.animal || (me.image && me.gender)) && (other.animal || (other.image && other.gender));
 
   const analyze = async () => {
-    if (!rel || !ready) return;
+    if (!rel || !ready || busy) return;
     setBusy(true);
     track("test_start", { test_name: "face_match" });
     const run = async (s: Slot): Promise<Slot> => {
@@ -107,7 +108,7 @@ export default function FaceMatchClient({ invite }: { invite?: { key: AnimalKey;
     <div className="flex flex-col gap-4 pb-7 no-screenshot">
       {invite ? (
         <p className="bg-card rounded-[22px] p-4 text-sm leading-relaxed">
-          <b>{josa(OTHER_LABEL[invite.rel], "이", "가")} {REL_NAME[invite.rel]} 궁합을 신청했어요.</b> 친구는 {animalTypeDB[invite.key].name}이에요. 내 사진을 올리면 바로 궁합이 나와요.
+          <b>{invite.rel === "lover" ? "내 사람이 연인 궁합을 보자고 해요." : "친구가 궁합을 보자고 해요."}</b> {josa(OTHER_LABEL[invite.rel], "은", "는")} {animalTypeDB[invite.key].name}이에요. 내 사진을 올리면 바로 궁합이 나와요.
         </p>
       ) : (
         <fieldset>
@@ -122,20 +123,20 @@ export default function FaceMatchClient({ invite }: { invite?: { key: AnimalKey;
         </fieldset>
       )}
 
-      <PhotoSlot label="나" gender={me.gender} onGender={(g) => setMe({ ...me, gender: g })} image={me.image} onFile={(d) => { setMe({ ...me, image: d, error: null }); track("photo_selected", { test_name: "face_match" }); }} error={me.error} fixed={meFixed ? me.animal ?? undefined : undefined} />
+      <PhotoSlot label="나" gender={me.gender} onGender={(g) => setMe(withGender(me, g))} image={me.image} onFile={(d) => { setMe(withPhoto(me, d)); track("photo_selected", { test_name: "face_match" }); }} error={me.error} fixed={meFixed ? me.animal ?? undefined : undefined} />
 
       {inviteUrl && (
         <div className="bg-white border border-line rounded-[22px] p-4 flex flex-col gap-2">
           <p className="text-sm">{OTHER_LABEL[rel!]}도 자기 사진으로 해 보게 할까요?</p>
           <button type="button" onClick={inviteShare.share} disabled={inviteShare.busy} className="h-12 rounded-full bg-ink text-paper text-sm font-medium flex items-center justify-center gap-1.5 disabled:opacity-50">
-            <Icon name="share" size={16} /> 친구에게 초대 링크 보내기
+            <Icon name="share" size={16} /> {OTHER_LABEL[rel!]}에게 초대 링크 보내기
           </button>
           {inviteShare.notice && <p role="status" className="text-xs text-muted text-center">{inviteShare.notice}</p>}
           <p className="text-xs text-muted text-center">또는 아래에 {OTHER_LABEL[rel!]} 사진을 올려도 돼요</p>
         </div>
       )}
 
-      <PhotoSlot label={otherLabel} gender={other.gender} onGender={(g) => setOther({ ...other, gender: g })} image={other.image} onFile={(d) => { setOther({ ...other, image: d, error: null }); track("photo_selected", { test_name: "face_match" }); }} error={other.error} fixed={invite ? invite.key : undefined} />
+      <PhotoSlot label={otherLabel} gender={other.gender} onGender={(g) => setOther(withGender(other, g))} image={other.image} onFile={(d) => { setOther(withPhoto(other, d)); track("photo_selected", { test_name: "face_match" }); }} error={other.error} fixed={invite ? invite.key : undefined} />
 
       <div className="flex items-center gap-2.5 bg-white rounded-[18px] px-3.5 py-3">
         <Icon name="shield" size={20} className="text-accent flex-none" />

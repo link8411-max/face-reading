@@ -17,6 +17,7 @@ import { buildTeam } from "@/lib/samguk/team";
 import type { SamgukCharacter } from "@/lib/samgukDB";
 import { SITE, teamUrl } from "@/lib/shareLinks";
 import { track } from "@/lib/analytics";
+import { withGender, withPhoto } from "@/lib/faceMatch/slot";
 
 interface Slot { nickname: string; gender: Gender | null; image: string | null; character: SamgukCharacter | null; error: string | null }
 const empty = (): Slot => ({ nickname: "", gender: null, image: null, character: null, error: null });
@@ -43,7 +44,7 @@ export default function TeamClient() {
   } : null);
 
   const analyze = async () => {
-    if (!ready) return;
+    if (!ready || busy) return;
     setBusy(true);
     track("test_start", { test_name: "team_samguk" });
     const next: Slot[] = [];
@@ -81,7 +82,7 @@ export default function TeamClient() {
   return (
     <div className="flex flex-col gap-4 pb-7 no-screenshot">
       {slots.map((s, i) => (
-        <PhotoSlot key={i} label={`${i + 1}번 팀원`} gender={s.gender} onGender={(g) => set(i, { gender: g })} image={s.image} onFile={(d) => { set(i, { image: d, error: null, character: null }); track("photo_selected", { test_name: "team_samguk" }); }} error={s.error}>
+        <PhotoSlot key={i} label={`${i + 1}번 팀원`} gender={s.gender} onGender={(g) => setSlots((all) => all.map((x, j) => (j === i ? withGender(x, g) : x)))} image={s.image} onFile={(d) => { setSlots((all) => all.map((x, j) => (j === i ? withPhoto(x, d) : x))); track("photo_selected", { test_name: "team_samguk" }); }} error={s.error}>
           <input value={s.nickname} onChange={(e) => set(i, { nickname: e.target.value.slice(0, 8) })} maxLength={8} placeholder="별칭 (선택, 예: 김대리)" aria-label={`${i + 1}번 팀원 별칭`} className="h-11 rounded-full border border-line bg-white px-4 text-sm" />
         </PhotoSlot>
       ))}

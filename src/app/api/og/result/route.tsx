@@ -31,7 +31,7 @@ export async function GET(request: NextRequest) {
   } else if (kind === 'invite') {
     const inv = parseInvite(q.get('key') ?? '', q.get('rel') ?? '');
     if (!inv) return new Response('bad request', { status: 400 });
-    big = `${REL_NAME[inv.rel]} 궁합 신청`; score = `친구는 ${inv.name}`; phrase = '내 사진을 올리면 바로 궁합이 나와요'; label = '얼굴 궁합';
+    big = `${REL_NAME[inv.rel]} 궁합 신청`; score = `${inv.who === '친구' ? '친구는' : '내 사람은'} ${inv.name}`; phrase = '내 사진을 올리면 바로 궁합이 나와요'; label = '얼굴 궁합';
   } else if ((KINDS as string[]).includes(kind)) {
     const r = parseShared(kind as ShareKind, q.get('key') ?? '', q.get('s') ?? undefined);
     if (!r) return new Response('bad request', { status: 400 });

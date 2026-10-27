@@ -13,7 +13,7 @@ export async function generateMetadata({ params, searchParams }: Props): Promise
   const inv = parseInvite((await params).key, one((await searchParams).rel));
   if (!inv) return {};
   const image = `${SITE}/api/og/result?kind=invite&key=${inv.key}&rel=${inv.rel}`;
-  const description = "내 사진을 올리면 친구와의 얼굴 궁합이 바로 나와요. 사진은 저장되지 않아요.";
+  const description = `내 사진을 올리면 ${inv.who}와의 얼굴 궁합이 바로 나와요. 사진은 저장되지 않아요.`;
   return {
     title: `${inv.phrase} | 운명을 읽다`,
     description,

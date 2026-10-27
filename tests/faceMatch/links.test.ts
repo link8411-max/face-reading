@@ -23,3 +23,8 @@ test('초대 링크: 친구·연인만, 짝사랑은 만들지 않는다', () =>
   expect(parseInvite('cat', 'crush')).toBeNull()
   expect(parseInvite('unicorn', 'friend')).toBeNull()
 })
+
+test('결과 링크는 정확히 두 조각만 받는다 (뒤에 붙은 조각 거절)', () => {
+  expect(parseFaceMatch('cat-dog-xxx', 'friend')).toBeNull()
+  expect(parseFaceMatch('cat', 'friend')).toBeNull()
+})

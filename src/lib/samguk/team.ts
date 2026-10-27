@@ -45,6 +45,9 @@ export function buildTeam(input: { character: SamgukCharacter; nickname?: string
   return { members: input.map((m, i) => ({ ...m, role: roles[i] })), spirit, funStats, comment: commentFor(funStats, spirit) }
 }
 
+// 한줄평 앞머리의 팀 이름
+const SHORT: Record<string, string> = { '위나라 기운': '위나라', '촉나라 기운': '촉나라', '오나라 기운': '오나라', '군웅할거의 기운': '군웅할거', 천하삼분: '천하를 셋으로 나눈 다채로운' }
+
 // 한줄평: 팀 평균이 가장 높은 회사생활 스탯으로 고른다 (긍정형)
 const COMMENT: Record<FunKey, string> = {
   칼퇴력: '퇴근 시간만 되면 한마음으로 사라지는 칼퇴 원정대예요.',
@@ -56,5 +59,5 @@ const COMMENT: Record<FunKey, string> = {
 
 function commentFor(f: Record<FunKey, number>, spirit: string): string {
   const k = FUN_KEYS.reduce((best, x) => (f[x] > f[best] ? x : best), FUN_KEYS[0])
-  return `${spirit === '천하삼분' ? '천하를 셋으로 나눈 다채로운' : spirit.replace(' 기운', '').replace('의', '')} 팀! ${COMMENT[k]}`
+  return `${SHORT[spirit] ?? spirit} 팀! ${COMMENT[k]}`
 }

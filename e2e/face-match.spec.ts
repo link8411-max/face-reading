@@ -49,7 +49,7 @@ test('짝사랑: 칸 이름 "그 사람", 상대에게 알림 없음 안내, 초
 test('초대 링크: 친구가 신청한 궁합에 내 사진만 올려 결과', async ({ page }) => {
   test.skip(!has, '개발용 얼굴 없음')
   await page.goto('/face-match/i/cat?rel=friend&utm_source=share&utm_medium=friend_link')
-  await expect(page.getByText('친구가 친구 궁합을 신청했어요.')).toBeVisible()
+  await expect(page.getByText('친구가 궁합을 보자고 해요.')).toBeVisible()
   await expect(page.getByRole('region', { name: '친구' })).toContainText('고양이상 결과로 볼게요')
   await fill(page, '나', '남자', M)
   await page.getByRole('button', { name: '궁합 보기' }).click()

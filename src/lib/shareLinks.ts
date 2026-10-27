@@ -96,7 +96,9 @@ export function faceMatchInviteUrl(key: AnimalKey, rel: Rel): string | null {
 }
 
 export function parseFaceMatch(pair: string, rel: string) {
-  const [a = '', b = ''] = pair.split('-')
+  const parts = pair.split('-')
+  if (parts.length !== 2) return null
+  const [a, b] = parts
   if (!isAnimal(a) || !isAnimal(b) || !isRel(rel)) return null
   const r = faceMatch(a, b, rel)
   const phrase = rel === 'crush' ? `나 짝사랑 성공 가능성 ${r.score}% 나왔어. 너도 해볼래?` : `우리 ${REL_NAME[rel]} 궁합 ${r.score}점이래. 너희도 해볼래?`
@@ -106,7 +108,7 @@ export function parseFaceMatch(pair: string, rel: string) {
 export function parseInvite(key: string, rel: string) {
   if (!isAnimal(key) || !isRel(rel) || rel === 'crush') return null
   const name = animalTypeDB[key].name
-  return { key, rel, name, phrase: `나는 ${name}이야. 우리 ${REL_NAME[rel]} 궁합 볼래?` }
+  return { key, rel, name, who: rel === 'lover' ? '내 사람' : '친구', phrase: `나는 ${name}이야. 우리 ${REL_NAME[rel]} 궁합 볼래?` }
 }
 
 // ===== 우리 팀 삼국지 (8단계) =====

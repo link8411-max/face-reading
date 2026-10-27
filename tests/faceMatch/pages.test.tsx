@@ -40,3 +40,9 @@ test('궁합 카드: 두 동물상, 큰 점수 문구, 다른 관계 점수, 워
   expect(html).toContain('unse-ai.com')
   expect(html).not.toMatch(/\p{Extended_Pictographic}/u)
 })
+
+test('연인 초대 메타는 "친구"가 아니라 "내 사람"', async () => {
+  const m = await inviteMeta({ params: P({ key: 'cat' }), searchParams: P({ rel: 'lover' }) })
+  expect(m.description).toContain('내 사람')
+  expect(m.description).not.toContain('친구')
+})

@@ -56,3 +56,9 @@ test('GA 결과 키(군주 id_인원)는 모든 장수에서 24자 이하', () =
   const longest = Math.max(...samgukCharacters.map((x) => x.id.length))
   expect(longest + 2).toBeLessThanOrEqual(24)
 })
+
+test('한줄평의 팀 이름: 세력별 짧은 이름 표', () => {
+  const g = byFaction('기타')
+  expect(buildTeam([g[0], g[1]].map((character) => ({ character }))).comment).toMatch(/^군웅할거 팀!/)
+  expect(buildTeam([byFaction('오')[0], byFaction('오')[1]].map((character) => ({ character }))).comment).toMatch(/^오나라 팀!/)
+})

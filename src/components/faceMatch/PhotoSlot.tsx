@@ -36,8 +36,8 @@ export default function PhotoSlot({ label, gender, onGender, image, onFile, erro
         </p>
       ) : (
         <>
-          <GenderPills value={gender} onChange={onGender} />
-          <button type="button" onClick={() => fileRef.current?.click()} className="min-h-[150px] rounded-[18px] border-[1.5px] border-dashed border-[#D6C8B4] bg-paper flex flex-col items-center justify-center gap-2 p-3 overflow-hidden">
+          <GenderPills value={gender} onChange={onGender} label={`${label} 성별`} />
+          <button type="button" aria-label={`${label} 사진 고르기`} onClick={() => fileRef.current?.click()} className="min-h-[150px] rounded-[18px] border-[1.5px] border-dashed border-[#D6C8B4] bg-paper flex flex-col items-center justify-center gap-2 p-3 overflow-hidden">
             {image ? (
               // eslint-disable-next-line @next/next/no-img-element
               <img src={image} alt={`${label} 사진`} className="max-h-40 rounded-[14px] object-contain" />
@@ -51,7 +51,7 @@ export default function PhotoSlot({ label, gender, onGender, image, onFile, erro
           <input ref={fileRef} type="file" accept="image/*" onChange={pick} className="hidden" aria-label={`${label} 사진 파일`} />
         </>
       )}
-      {error && <p role="alert" className="text-sm text-accent">{error}</p>}
+      {error && <p role="alert" id={`${label}-error`} className="text-sm text-accent">{error}</p>}
     </section>
   );
 }
