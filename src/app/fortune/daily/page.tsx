@@ -15,6 +15,7 @@ const 요일목록 = ["일요일", "월요일", "화요일", "수요일", "목�
 import Link from "next/link";
 import { fortuneDB } from "@/lib/fortuneDB";
 import { useScreenshot } from "@/hooks/useScreenshot";
+import { SITE } from "@/lib/shareLinks";
 
 
 export default function DailyFortunePage() {
@@ -36,6 +37,14 @@ export default function DailyFortunePage() {
     fileName: `오늘의운세_${result?.띠}띠`,
     shareTitle: `오늘의 ${result?.띠}띠 운세`,
     shareText: `${오늘날짜} - ${result?.운세.한마디}`,
+    testName: "daily" as const,
+    // 카카오톡 카드는 출생 연도 없이 오늘의 운세 페이지로 보낸다
+    kakao: result ? {
+      title: `오늘의 ${result.띠}띠 운세`,
+      text: `오늘 ${result.띠}띠 운세는 '${result.운세.한마디}'래. 너도 봐줄까?`,
+      url: `${SITE}/fortune/daily?utm_source=share&utm_medium=friend_link&utm_campaign=daily`,
+      imageUrl: `${SITE}/api/og?title=${encodeURIComponent("오늘의 운세")}&subtitle=${encodeURIComponent(`${오늘날짜} ${result.띠}띠 운세`)}`,
+    } : undefined,
   });
 
   const yearCheck = validateBirthYear(birthYear);
@@ -187,7 +196,7 @@ export default function DailyFortunePage() {
             {/* 캡쳐 영역 끝 */}
 
             <div className="no-screenshot flex flex-col">
-              <button onClick={() => { track("share_click", { test_name: "daily", method: "share" }); share(getShareOptions()); }} disabled={isCapturing} className="h-[52px] rounded-full flex items-center justify-center gap-2 bg-ink text-paper text-[15px] font-medium disabled:opacity-50">
+              <button onClick={() => share(getShareOptions())} disabled={isCapturing} className="h-[52px] rounded-full flex items-center justify-center gap-2 bg-ink text-paper text-[15px] font-medium disabled:opacity-50">
                 <Icon name="share" size={18} />
                 {isCapturing ? "이미지 만드는 중…" : "오늘 운세 공유하기"}
               </button>

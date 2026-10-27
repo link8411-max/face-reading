@@ -4,11 +4,16 @@ import { useRef, useState, useCallback, useEffect } from "react";
 import { saveImage } from "@/lib/saveImage";
 import { shareResult, SHARE_NOTICE } from "@/lib/share";
 import { captureFilter } from "@/lib/capture";
+import { isKakaoInApp, loadKakao, shareKakao, type KakaoShareMeta } from "@/lib/kakao";
+import { track, type TestName } from "@/lib/analytics";
 
 interface UseScreenshotOptions {
   fileName?: string;
   shareTitle?: string;
   shareText?: string;
+  // 공유하기: 카카오톡 안에서는 이 카드(링크·미리보기 이미지)로 카카오톡 공유를 연다. GA share_click에 쓴다
+  testName?: TestName;
+  kakao?: KakaoShareMeta;
 }
 
 // prepareFor: 결과가 바뀔 때마다(값이 있으면) 공유용 이미지를 미리 만들어 둔다.
@@ -69,6 +74,8 @@ export function useScreenshot<T extends HTMLElement = HTMLDivElement>(prepareFor
   useEffect(() => {
     ready.current = null;
     if (!prepareFor) return;
+    // 카톡 안에서는 결과가 나오면 SDK를 미리 불러 둔다 (누른 뒤 기다림 줄이기)
+    if (isKakaoInApp(navigator.userAgent)) void loadKakao();
     let alive = true;
     const t = setTimeout(async () => {
       const blob = await capture(true);
@@ -77,10 +84,15 @@ export function useScreenshot<T extends HTMLElement = HTMLDivElement>(prepareFor
     return () => { alive = false; clearTimeout(t); };
   }, [prepareFor, capture]);
 
-  // 공유하기: 기본 공유창(이미지+문구+주소) → 링크만 → 링크 복사 (lib/share.ts)
+  // 공유하기: 카카오톡 인앱이면 카카오톡 공유 카드 → 기본 공유창(이미지+문구+주소) → 링크만 → 링크 복사 (lib/share.ts)
   // 누른 순간 바로 공유창을 연다. 미리 만든 이미지가 아직 없으면 링크·문구만 보낸다.
   const share = useCallback(async (options?: UseScreenshotOptions) => {
     setShareNotice(null);
+    if (options?.kakao && isKakaoInApp(navigator.userAgent) && (await shareKakao(options.kakao))) {
+      if (options.testName) track("share_click", { test_name: options.testName, method: "kakao" });
+      return;
+    }
+    if (options?.testName) track("share_click", { test_name: options.testName, method: "share" });
     const blob = ready.current;
     const file = blob ? new File([blob], `${options?.fileName || "결과"}.png`, { type: "image/png" }) : null;
     const out = await shareResult({

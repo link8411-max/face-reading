@@ -13,6 +13,7 @@ import { SLUG_BY_띠 } from "@/content/fortune2027Zodiac";
 import { validateBirthDate } from "@/lib/birthDate";
 import Link from "next/link";
 import { useScreenshot } from "@/hooks/useScreenshot";
+import { SITE } from "@/lib/shareLinks";
 
 interface FortuneResult {
   사주정보: {
@@ -55,6 +56,14 @@ export default function FortuneClient() {
     fileName: `${FORTUNE_YEAR.year}년운세_${result?.사주정보.띠}띠`,
     shareTitle: `${FORTUNE_YEAR.year}년 ${result?.사주정보.띠}띠 운세`,
     shareText: `${result?.운세.총운.keyword} - ${result?.운세.총운.summary}`,
+    testName: "fortune" as const,
+    // 카카오톡 카드는 생년월일 없이 그 띠의 2027 띠별 운세 페이지로 보낸다
+    kakao: result ? {
+      title: `${FORTUNE_YEAR.year}년 ${result.사주정보.띠}띠 운세`,
+      text: `${FORTUNE_YEAR.year}년 ${result.사주정보.띠}띠 운세는 '${result.운세.총운.keyword}'래. 너도 봐줄까?`,
+      url: `${SITE}/fortune/2027/${SLUG_BY_띠[result.사주정보.띠]}?utm_source=share&utm_medium=friend_link&utm_campaign=fortune`,
+      imageUrl: `${SITE}/api/og?title=${encodeURIComponent(`${FORTUNE_YEAR.year}년 ${result.사주정보.띠}띠 운세`)}&subtitle=${encodeURIComponent(`${FORTUNE_YEAR.간지}년 띠별 신년운세`)}`,
+    } : undefined,
   });
 
   const handleSubmit = async () => {
@@ -285,7 +294,7 @@ export default function FortuneClient() {
 
             <div className="no-screenshot flex flex-col">
               <button
-                onClick={() => { track("share_click", { test_name: "fortune", method: "share" }); share(getShareOptions()); }}
+                onClick={() => share(getShareOptions())}
                 disabled={isCapturing}
                 className="h-[52px] rounded-full flex items-center justify-center gap-2 bg-ink text-paper text-[15px] font-medium disabled:opacity-50"
               >
