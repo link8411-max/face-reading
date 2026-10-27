@@ -19,7 +19,12 @@ type Events = {
 const ALLOWED_KEYS = new Set(['test_name', 'result_id', 'method', 'slot', 'keyword'])
 // 유형 키만 통과: 영문·숫자·밑줄·한글 1~24자, 숫자 4자리 이상 연속(연도·날짜)은 막는다
 const SAFE_VALUE = /^[A-Za-z0-9_가-힣]{1,24}$/
-const safe = (v: unknown) => typeof v === 'string' && SAFE_VALUE.test(v) && !/\d{4,}/.test(v)
+export const isSafeValue = (v: unknown) => typeof v === 'string' && SAFE_VALUE.test(v) && !/\d{4,}/.test(v)
+const safe = isSafeValue
+
+// 실제 통계는 운영 주소에서만 보낸다 (로컬·Vercel 미리보기 배포는 dataLayer에만 쌓임). layout.tsx의 ga4-init 스크립트가 이 식을 쓴다
+export const PROD_HOST_SOURCE = '^(www\\.)?unse-ai\\.com$'
+export const isProdHost = (host: string) => new RegExp(PROD_HOST_SOURCE).test(host)
 
 type Gtag = (...a: unknown[]) => void
 const getGtag = () => (globalThis as { window?: { gtag?: Gtag } }).window?.gtag

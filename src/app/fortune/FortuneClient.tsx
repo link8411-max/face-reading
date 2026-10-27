@@ -211,7 +211,8 @@ export default function FortuneClient() {
               <div className="text-center mb-4">
                 <p className="text-xs font-medium text-accent">{FORTUNE_YEAR.year} {FORTUNE_YEAR.간지}년 신년운세</p>
                 <h2 className="font-serif text-[25px] font-bold mt-1">{result.사주정보.띠}띠</h2>
-                <p className="text-muted text-sm">
+                {/* 생년월일은 화면에만, 저장·공유 이미지에는 넣지 않는다 */}
+                <p className="text-muted text-sm no-screenshot">
                   {birthDate.year}년 {birthDate.month}월 {birthDate.day}일생
                   <span className={`ml-2 px-2 py-0.5 rounded-full text-xs ${
                     result.사주정보.역법.startsWith("음력")

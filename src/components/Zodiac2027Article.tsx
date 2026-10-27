@@ -103,7 +103,7 @@ export default function Zodiac2027Article({ slug }: { slug: ZodiacSlug }) {
           <p className="leading-relaxed">{z.조언}</p>
         </section>
 
-        <SeasonPicks slot="zodiac2027" />
+        <SeasonPicks slot={`zodiac_${slug}`} />
 
         <Link href="/fortune" className="block text-center h-[52px] leading-[52px] bg-ink rounded-full font-medium text-paper">
           내 생년월일 사주로 {FORTUNE_YEAR.year} 운세 자세히 보기

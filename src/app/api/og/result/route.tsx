@@ -4,6 +4,7 @@ import { parseShared, type ShareKind } from '@/lib/shareLinks';
 import { mbtiShared, parseFaceMatch, parseInvite, parseTeam } from '@/lib/shareLinks';
 import { buildTeam } from '@/lib/samguk/team';
 import { REL_NAME } from '@/lib/faceMatch/compat';
+import { ogQueryOk, OG_CACHE_CONTROL } from '@/lib/ogQuery';
 
 export const runtime = 'edge';
 
@@ -12,9 +13,11 @@ const KINDS: ShareKind[] = ['animal', 'samguk', 'face'];
 // 결과 공유 미리보기 이미지 (1200×630, 카카오 권장 비율). 값은 허용 목록·점수 범위로 검증한 것만 그린다.
 export async function GET(request: NextRequest) {
   const q = new URL(request.url).searchParams;
+  if (!ogQueryOk(q)) return new Response('bad request', { status: 400 });
   const kind = q.get('kind') ?? '';
   let big = '', score = '', phrase = '', label = '';
   let image: ArrayBuffer | undefined;
+  let portraitMissing = false; // 초상화를 못 받았으면 잠깐만 캐시해 다음 요청에 다시 그린다
   if (kind === 'mbti') {
     const m = mbtiShared(q.get('a') ?? '', q.get('b') ?? '');
     if (!m) return new Response('bad request', { status: 400 });
@@ -40,11 +43,12 @@ export async function GET(request: NextRequest) {
     if (r.image) {
       // 초상화를 먼저 받아 둔다. 실패하면 초상화 없이 그린다(그리는 도중 실패하면 깨진 이미지가 오래 캐시될 수 있음)
       try {
-        const res = await fetch(new URL(encodeURI(r.image), request.url));
+        const res = await fetch(new URL(encodeURI(r.image), request.url), { signal: AbortSignal.timeout(1500) });
         if (res.ok) image = await res.arrayBuffer();
       } catch {
         image = undefined;
       }
+      portraitMissing = !image;
     }
   } else {
     return new Response('bad request', { status: 400 });
@@ -73,6 +77,6 @@ export async function GET(request: NextRequest) {
         </div>
       </div>
     ),
-    { width: 1200, height: 630 },
+    { width: 1200, height: 630, headers: { 'Cache-Control': portraitMissing ? 'public, max-age=60, s-maxage=300' : OG_CACHE_CONTROL } },
   );
 }

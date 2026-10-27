@@ -3,6 +3,7 @@
 import { useRef, useState, useCallback } from "react";
 import { saveImage } from "@/lib/saveImage";
 import { shareResult, SHARE_NOTICE } from "@/lib/share";
+import { captureFilter } from "@/lib/capture";
 
 interface UseScreenshotOptions {
   fileName?: string;
@@ -35,11 +36,7 @@ export function useScreenshot<T extends HTMLElement = HTMLDivElement>() {
       const capturePromise = domToBlob(ref.current, {
         // 배경색을 주지 않는다: 캡처 대상(결과 카드)이 자기 배경을 가지고 있고, 지정하면 카드 배경을 덮어쓴다
         scale: isMobile ? 1.5 : 2, // 모바일은 낮은 해상도
-        filter: (node) => {
-          // iframe 제외 (쿠팡 배너 등)
-          if (node instanceof HTMLIFrameElement) return false;
-          return true;
-        },
+        filter: captureFilter, // 쿠팡 배너 iframe·no-screenshot(생년월일 등) 제외
       });
 
       const blob = await Promise.race([capturePromise, timeoutPromise]);

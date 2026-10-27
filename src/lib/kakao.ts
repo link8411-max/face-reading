@@ -43,7 +43,8 @@ export function loadKakao(): Promise<KakaoSDK | null> {
       s.onload = () => resolve(w.window!.Kakao ? init(w.window!.Kakao) : null)
       s.onerror = () => { loading = null; resolve(null) }
       document.head.appendChild(s)
-      setTimeout(() => resolve(null), 8000)
+      // 제한 시간에 걸리면 다음 공유 때 다시 불러온다 (실패를 계속 기억하지 않는다)
+      setTimeout(() => { if (!w.window!.Kakao) loading = null; resolve(null) }, 8000)
     })
   }
   return loading

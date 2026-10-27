@@ -131,7 +131,8 @@ export default function DailyFortunePage() {
             <div className="bg-white rounded-[22px] p-5 text-center border border-line">
               <p className="text-xs font-medium text-accent">{오늘날짜}</p>
               <h2 className="font-serif text-[25px] font-bold mt-1">{result.띠}띠</h2>
-              <p className="text-muted text-sm">
+              {/* 출생 연도는 화면에만, 저장·공유 이미지에는 넣지 않는다 */}
+              <p className="text-muted text-sm no-screenshot">
                 {birthYear}년생 {isEarlyYear && "(입춘 전)"}
               </p>
             </div>
