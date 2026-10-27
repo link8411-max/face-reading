@@ -1,5 +1,6 @@
 "use client";
 
+import SeasonPicks from "@/components/SeasonPicks";
 import { track } from "@/lib/analytics";
 import { useState } from "react";
 import CoupangBanner from "@/components/CoupangBanner";
@@ -345,6 +346,9 @@ export default function FortuneClient() {
                 ))}
               </div>
             </div>
+
+            {/* 학업·직장운 옆: 시즌 추천(수능 합격 선물) */}
+            <SeasonPicks slot="fortune" />
 
             {/* 행운 요소 */}
             <div className="bg-white rounded-[22px] p-5 border border-line">

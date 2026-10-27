@@ -1,5 +1,6 @@
 "use client";
 
+import SeasonPicks from "@/components/SeasonPicks";
 import { track } from "@/lib/analytics";
 import { useState } from "react";
 import CoupangBanner from "@/components/CoupangBanner";
@@ -202,6 +203,7 @@ export default function DailyFortunePage() {
               </div>
             </div>
 
+            <SeasonPicks slot="daily" />
             <CoupangBanner subId="daily" />
 
             <Link href="/mbti/match" className="block w-full py-3 text-center bg-white border border-line rounded-full font-medium">

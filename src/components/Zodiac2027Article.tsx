@@ -1,4 +1,5 @@
 import Link from "next/link";
+import SeasonPicks from "@/components/SeasonPicks";
 import { birthYears, zodiac2027, ZODIAC_SLUGS, type ZodiacSlug } from "@/content/fortune2027Zodiac";
 import { FORTUNE_YEAR } from "@/lib/fortuneYear";
 import CoupangBanner from "@/components/CoupangBanner";
@@ -101,6 +102,8 @@ export default function Zodiac2027Article({ slug }: { slug: ZodiacSlug }) {
           <h2 className={h2}>한마디 조언</h2>
           <p className="leading-relaxed">{z.조언}</p>
         </section>
+
+        <SeasonPicks slot="zodiac2027" />
 
         <Link href="/fortune" className="block text-center h-[52px] leading-[52px] bg-ink rounded-full font-medium text-paper">
           내 생년월일 사주로 {FORTUNE_YEAR.year} 운세 자세히 보기
