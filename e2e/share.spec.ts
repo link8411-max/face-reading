@@ -131,6 +131,34 @@ test.describe('카카오톡 인앱 브라우저', () => {
     await expect(page.getByRole('status')).toHaveCount(0)
   })
 
+  // 운세는 결과 링크 대신 띠별 운세·오늘의 운세 페이지로 보낸다 (생년월일은 링크에 없음)
+  for (const c of [
+    { name: '신년운세', path: '/fortune', fill: async (page: Page) => { await page.getByPlaceholder('1990').fill('1991'); await page.getByPlaceholder('5', { exact: true }).fill('5'); await page.getByPlaceholder('15', { exact: true }).fill('15') }, link: /^https:\/\/unse-ai\.com\/fortune\/2027\/sheep\?utm_source=share&utm_medium=friend_link&utm_campaign=fortune$/, image: /^https:\/\/unse-ai\.com\/api\/og\?title=2027%EB%85%84/, title: /^2027년 양띠 운세는 '.+'래\. 너도 봐줄까\?$/, test: 'fortune' },
+    { name: '오늘의 운세', path: '/fortune/daily', fill: async (page: Page) => { await page.getByPlaceholder('예: 1990').fill('1991') }, link: /^https:\/\/unse-ai\.com\/fortune\/daily\?utm_source=share&utm_medium=friend_link&utm_campaign=daily$/, image: /^https:\/\/unse-ai\.com\/api\/og\?title=/, title: /^오늘 양띠 운세는 '.+'래\. 너도 봐줄까\?$/, test: 'daily' },
+  ]) {
+    test(`${c.name} 공유하기: 카카오톡 공유 카드(띠 페이지 링크·미리보기 이미지), 생년월일은 보내지 않는다`, async ({ page }) => {
+      await page.addInitScript(() => {
+        const w = window as unknown as { __kakao: unknown[]; Kakao: unknown }
+        w.__kakao = []
+        let inited = false
+        w.Kakao = { isInitialized: () => inited, init: () => { inited = true }, Share: { sendDefault: (t: unknown) => w.__kakao.push(t) } }
+        Object.assign(navigator, { canShare: undefined, share: undefined })
+      })
+      await page.goto(c.path)
+      await c.fill(page)
+      await page.getByRole('button', { name: /운세 보기/ }).click()
+      await page.getByRole('button', { name: /공유하기/ }).first().click({ timeout: 15000 })
+      await expect.poll(() => page.evaluate(() => (window as unknown as { __kakao: unknown[] }).__kakao.length), { timeout: 15000 }).toBe(1)
+      const t = await page.evaluate(() => (window as unknown as { __kakao: { content: { title: string; imageUrl: string; link: { mobileWebUrl: string } } }[] }).__kakao[0])
+      expect(t.content.title).toMatch(c.title)
+      expect(t.content.link.mobileWebUrl).toMatch(c.link)
+      expect(t.content.imageUrl).toMatch(c.image)
+      expect(JSON.stringify(t)).not.toMatch(/1991|5월 15일/)
+      await expect(page.getByRole('status')).toHaveCount(0)
+      await expect.poll(() => page.evaluate(() => ((window as unknown as { dataLayer?: unknown[][] }).dataLayer ?? []).filter((a) => a[0] === 'event' && a[1] === 'share_click').map((a) => (a[2] as { method: string }).method))).toEqual(['kakao'])
+    })
+  }
+
   test('공유하기: 카카오 SDK를 못 불러오면 링크 복사로 넘어간다', async ({ page, context }) => {
     test.skip(!existsSync(FACE), '개발용 테스트 얼굴이 없으면 건너뜀')
     await context.grantPermissions(['clipboard-read', 'clipboard-write'])
