@@ -49,7 +49,7 @@ export default function FortuneClient() {
   const dateCheck = validateBirthDate(birthDate, new Date(), { lunar: isLunar });
   const [result, setResult] = useState<FortuneResult | null>(null);
 
-  const { ref: resultRef, isCapturing, download, share, shareNotice } = useScreenshot();
+  const { ref: resultRef, isCapturing, download, share, shareNotice } = useScreenshot(result);
 
   const getShareOptions = () => ({
     fileName: `${FORTUNE_YEAR.year}년운세_${result?.사주정보.띠}띠`,

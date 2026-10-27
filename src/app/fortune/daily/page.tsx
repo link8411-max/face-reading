@@ -26,7 +26,7 @@ export default function DailyFortunePage() {
     운세: { rating: number; 한마디: string; 행운시간: string; 행운색: string };
   } | null>(null);
 
-  const { ref: resultRef, isCapturing, download, share, shareNotice } = useScreenshot();
+  const { ref: resultRef, isCapturing, download, share, shareNotice } = useScreenshot(result);
 
   const today = new Date();
   const 오늘요일 = 요일목록[today.getDay()];
