@@ -1,4 +1,5 @@
 import Link from "next/link";
+import SeasonPicks from "@/components/SeasonPicks";
 import CoupangBanner from "@/components/CoupangBanner";
 import FaceHero from "@/components/home/FaceHero";
 import PlayTogether from "@/components/home/PlayTogether";
@@ -42,6 +43,7 @@ export default function Home() {
       {/* 쿠팡 배너: 첫 흐름(히어로·친구랑·띠) 다음 */}
       <CoupangBanner subId="home" />
       <SeasonCard />
+      <SeasonPicks slot="home" />
       <CategoryTabs />
 
       <section aria-label={`${FORTUNE_YEAR.year} 띠별 운세`}>

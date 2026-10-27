@@ -12,9 +12,10 @@ type Events = {
   share_click: { test_name: TestName; method: ShareMethod }
   fortune_submit: { test_name: TestName }
   shared_landing: { test_name: TestName; result_id?: string }
+  coupang_click: { slot: string; keyword: string }
 }
 
-const ALLOWED_KEYS = new Set(['test_name', 'result_id', 'method'])
+const ALLOWED_KEYS = new Set(['test_name', 'result_id', 'method', 'slot', 'keyword'])
 // 유형 키만 통과: 영문·숫자·밑줄·한글 1~24자, 숫자 4자리 이상 연속(연도·날짜)은 막는다
 const SAFE_VALUE = /^[A-Za-z0-9_가-힣]{1,24}$/
 const safe = (v: unknown) => typeof v === 'string' && SAFE_VALUE.test(v) && !/\d{4,}/.test(v)
