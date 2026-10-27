@@ -7,7 +7,6 @@ const FACE = 'public/dev-faces/person1.jpg'
 async function faceResult(page: Page) {
   await page.goto('/face2')
   await page.locator('input[type=file]').setInputFiles(FACE)
-  await page.getByRole('radio', { name: '여자' }).click()
   await page.getByRole('button', { name: '관상 보기' }).click({ timeout: 30000 })
   await expect(page.getByRole('button', { name: '공유하기' })).toBeVisible({ timeout: 30000 })
 }

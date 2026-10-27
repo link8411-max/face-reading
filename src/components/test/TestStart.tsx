@@ -5,25 +5,27 @@ import { useRef } from "react";
 import { Icon, SmileFace } from "@/components/icons";
 import GenderPills, { type Gender } from "@/components/test/GenderPills";
 
-export function analyzeButtonLabel(s: { hasImage: boolean; gender: Gender | null; loading: boolean; preparing: boolean; label: string }) {
+export function analyzeButtonLabel(s: { hasImage: boolean; gender: Gender | null; needsGender?: boolean; loading: boolean; preparing: boolean; label: string }) {
   if (!s.hasImage) return "사진을 먼저 골라 주세요";
-  if (!s.gender) return "성별을 먼저 골라 주세요";
+  if (s.needsGender !== false && !s.gender) return "성별을 먼저 골라 주세요";
   if (s.preparing) return "분석 준비 중…";
   if (s.loading) return "분석 중…";
   return s.label;
 }
 
 // 사진 테스트 공통 시작 화면 (디자인 시안 TestStart): 성별 → 사진 → 안내 → 분석 버튼
+// 성별을 분석에 쓰지 않는 테스트(관상)는 needsGender={false}로 성별을 묻지 않는다
 export default function TestStart({
-  heading, desc, tips, analyzeLabel, image, gender, onGender, onFile, onAnalyze, onReset, loading, error, preparing = false, imageRef,
+  heading, desc, tips, analyzeLabel, image, gender, onGender, onFile, onAnalyze, onReset, loading, error, preparing = false, imageRef, needsGender = true,
 }: {
   heading: string;
   desc: string;
   tips: string[];
   analyzeLabel: string;
   image: string | null;
-  gender: Gender | null;
-  onGender: (g: Gender) => void;
+  gender?: Gender | null;
+  onGender?: (g: Gender) => void;
+  needsGender?: boolean;
   onFile: (e: ChangeEvent<HTMLInputElement>) => void;
   onAnalyze: () => void;
   onReset: () => void;
@@ -33,7 +35,7 @@ export default function TestStart({
   imageRef?: RefObject<HTMLImageElement | null>; // 분석이 이 이미지 요소를 직접 읽는다 (관상: face-api, 동물상: MediaPipe)
 }) {
   const fileRef = useRef<HTMLInputElement>(null);
-  const label = analyzeButtonLabel({ hasImage: !!image, gender, loading, preparing, label: analyzeLabel });
+  const label = analyzeButtonLabel({ hasImage: !!image, gender: gender ?? null, needsGender, loading, preparing, label: analyzeLabel });
   const ready = label === analyzeLabel;
 
   return (
@@ -41,10 +43,12 @@ export default function TestStart({
       <h2 className="mt-2.5 font-serif font-bold text-[27px] leading-[1.4] whitespace-pre-line break-keep">{heading}</h2>
       <p className="mt-2.5 text-sm text-muted leading-relaxed">{desc}</p>
 
-      <fieldset className="mt-6">
-        <legend className="text-[13px] text-muted mb-2.5">나는</legend>
-        <GenderPills value={gender} onChange={onGender} />
-      </fieldset>
+      {needsGender && (
+        <fieldset className="mt-6">
+          <legend className="text-[13px] text-muted mb-2.5">나는</legend>
+          <GenderPills value={gender ?? null} onChange={(g) => onGender?.(g)} />
+        </fieldset>
+      )}
 
       <button
         type="button"

@@ -8,6 +8,7 @@ import type { Gender } from "@/components/test/GenderPills";
 import ResultActions from "@/components/result/ResultActions";
 import FaceMatchCard from "@/components/faceMatch/FaceMatchCard";
 import PhotoSlot from "@/components/faceMatch/PhotoSlot";
+import { loadGender, saveGender } from "@/lib/genderMemory";
 import { useScreenshot } from "@/hooks/useScreenshot";
 import { useResultShare } from "@/hooks/useResultShare";
 import { analyzePhoto, REASON_TEXT } from "@/lib/face/analyzePhoto";
@@ -33,6 +34,11 @@ export default function FaceMatchClient({ invite }: { invite?: { key: AnimalKey;
   const [me, setMe] = useState<Slot>(empty);
   const [other, setOther] = useState<Slot>(invite ? { ...empty, animal: invite.key } : empty);
   const [meFixed, setMeFixed] = useState(false);
+  // "나" 칸은 다른 사진 테스트에서 고른 내 성별을 미리 고른다 (상대 칸은 비워 둔다)
+  useEffect(() => {
+    const g = loadGender();
+    if (g) setMe((cur) => (cur.gender ? cur : { ...cur, gender: g }));
+  }, []);
   const [busy, setBusy] = useState(false);
   const running = useRef(false);
   const [done, setDone] = useState(false);
@@ -126,7 +132,7 @@ export default function FaceMatchClient({ invite }: { invite?: { key: AnimalKey;
         </fieldset>
       )}
 
-      <PhotoSlot label="나" gender={me.gender} onGender={(g) => setMe(withGender(me, g))} image={me.image} onFile={(d) => { setMe(withPhoto(me, d)); track("photo_selected", { test_name: "face_match" }); }} error={me.error} disabled={busy} fixed={meFixed ? me.animal ?? undefined : undefined} />
+      <PhotoSlot label="나" gender={me.gender} onGender={(g) => { setMe(withGender(me, g)); saveGender(g); }} image={me.image} onFile={(d) => { setMe(withPhoto(me, d)); track("photo_selected", { test_name: "face_match" }); }} error={me.error} disabled={busy} fixed={meFixed ? me.animal ?? undefined : undefined} />
 
       {inviteUrl && (
         <div className="bg-white border border-line rounded-[22px] p-4 flex flex-col gap-2">

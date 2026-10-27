@@ -3,6 +3,7 @@
 import { track } from "@/lib/analytics";
 import { useState, useRef, useEffect } from "react";
 import CoupangBanner from "@/components/CoupangBanner";
+import { useRememberedGender } from "@/hooks/useRememberedGender";
 import { useBackOrHome } from "@/hooks/useBackOrHome";
 import TestHeader from "@/components/test/TestHeader";
 import TestStart from "@/components/test/TestStart";
@@ -15,7 +16,7 @@ import { Icon } from "@/components/icons";
 import Link from "next/link";
 import { SamgukCharacter } from "@/lib/samgukDB";
 import { useScreenshot } from "@/hooks/useScreenshot";
-import { matchCharacter, type Gender } from "@/lib/samguk/matcher";
+import { matchCharacter } from "@/lib/samguk/matcher";
 import calibration from "@/lib/samguk/calibration.json";
 import { analyzePhoto, REASON_TEXT } from "@/lib/face/analyzePhoto";
 
@@ -53,7 +54,7 @@ export default function SamgukPage() {
   const [loading, setLoading] = useState(false);
   const [loadingStep, setLoadingStep] = useState(0);
   const [result, setResult] = useState<AnalysisResult | null>(null);
-  const [gender, setGender] = useState<Gender | null>(null);
+  const [gender, setGender] = useRememberedGender(); // 다른 사진 테스트에서 고른 성별을 미리 고른다
   const [error, setError] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
