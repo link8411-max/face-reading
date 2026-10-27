@@ -1,7 +1,9 @@
 import { ImageResponse } from '@vercel/og';
 import { NextRequest } from 'next/server';
 import { parseShared, type ShareKind } from '@/lib/shareLinks';
-import { mbtiShared } from '@/lib/shareLinks';
+import { mbtiShared, parseFaceMatch, parseInvite, parseTeam } from '@/lib/shareLinks';
+import { buildTeam } from '@/lib/samguk/team';
+import { REL_NAME } from '@/lib/faceMatch/compat';
 
 export const runtime = 'edge';
 
@@ -17,6 +19,19 @@ export async function GET(request: NextRequest) {
     const m = mbtiShared(q.get('a') ?? '', q.get('b') ?? '');
     if (!m) return new Response('bad request', { status: 400 });
     big = `${m.a} × ${m.b}`; score = `궁합 ${m.score}점`; phrase = m.phrase; label = 'MBTI 궁합';
+  } else if (kind === 'face-match') {
+    const m = parseFaceMatch(`${q.get('a') ?? ''}-${q.get('b') ?? ''}`, q.get('rel') ?? '');
+    if (!m) return new Response('bad request', { status: 400 });
+    big = `${m.aName} × ${m.bName}`; score = m.result.headline; phrase = m.phrase; label = `얼굴 궁합 · ${REL_NAME[m.rel]}`;
+  } else if (kind === 'team') {
+    const p = parseTeam(q.get('ids') ?? '');
+    if (!p) return new Response('bad request', { status: 400 });
+    const team = buildTeam(p.members.map((character) => ({ character })));
+    big = `우리 팀은 ${team.spirit}`; score = team.members.map((m) => m.character.name).join(' · '); phrase = '너희 팀은 삼국지 속 누구야?'; label = '우리 팀 삼국지';
+  } else if (kind === 'invite') {
+    const inv = parseInvite(q.get('key') ?? '', q.get('rel') ?? '');
+    if (!inv) return new Response('bad request', { status: 400 });
+    big = `${REL_NAME[inv.rel]} 궁합 신청`; score = `${inv.who === '친구' ? '친구는' : '내 사람은'} ${inv.name}`; phrase = '내 사진을 올리면 바로 궁합이 나와요'; label = '얼굴 궁합';
   } else if ((KINDS as string[]).includes(kind)) {
     const r = parseShared(kind as ShareKind, q.get('key') ?? '', q.get('s') ?? undefined);
     if (!r) return new Response('bad request', { status: 400 });

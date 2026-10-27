@@ -46,7 +46,7 @@ test('홈에 "곧 열려요" 같은 열리지 않은 기능 안내가 없다', (
   for (const f of HOME_FILES) expect(readFileSync(f, 'utf8'), f).not.toContain('곧 열려요')
 })
 
-test('친구랑 같이 해봐요: 관상·동물상·삼국지·MBTI 궁합 4개', async () => {
+test('친구랑 같이 해봐요: 관상·동물상·삼국지·얼굴 궁합 4개', async () => {
   const { PLAY_TOGETHER } = await import('@/components/home/PlayTogether')
-  expect(PLAY_TOGETHER.map((c) => c.href)).toEqual(['/face2', '/animal', '/samguk', '/mbti/match'])
+  expect(PLAY_TOGETHER.map((c) => c.href)).toEqual(['/face2', '/animal', '/samguk', '/face-match'])
 })

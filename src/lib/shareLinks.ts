@@ -5,6 +5,8 @@ import { animalTypeDB } from '@/lib/animalTypeDB'
 import { ANIMAL_KEYS } from '@/lib/animal/matcher'
 import { samgukCharacters } from '@/lib/samgukDB'
 import { compatSummary, isMbti } from '@/lib/mbti/compat'
+import { faceMatch, REL, REL_NAME, type Rel } from '@/lib/faceMatch/compat'
+import type { AnimalKey } from '@/lib/animal/matcher'
 
 export const SITE = 'https://unse-ai.com'
 export type ShareKind = 'animal' | 'samguk' | 'face'
@@ -77,4 +79,48 @@ export function mbtiShared(aIn: string, bIn: string): { a: string; b: string; sc
 export function ogImageUrl(kind: ShareKind | 'mbti', key: string, score?: number | null, b?: string): string {
   if (kind === 'mbti') return `${SITE}/api/og/result?kind=mbti&a=${key}&b=${b}`
   return `${SITE}/api/og/result?kind=${kind}&key=${encodeURIComponent(key)}${score !== undefined && score !== null ? `&s=${score}` : ''}`
+}
+
+// ===== 얼굴 궁합 (8단계) =====
+
+const isAnimal = (k: string): k is AnimalKey => (ANIMAL_KEYS as readonly string[]).includes(k)
+export const isRel = (r: string): r is Rel => (REL as readonly string[]).includes(r)
+
+export function faceMatchUrl(a: AnimalKey, b: AnimalKey, rel: Rel): string {
+  return `${SITE}/face-match/r/${a}-${b}?rel=${rel}&${UTM('face_match')}`
+}
+
+// 짝사랑은 초대 링크를 만들지 않는다 (상대에게 보내는 순간 짝사랑이 아니다)
+export function faceMatchInviteUrl(key: AnimalKey, rel: Rel): string | null {
+  return rel === 'crush' ? null : `${SITE}/face-match/i/${key}?rel=${rel}&${UTM('face_match_invite')}`
+}
+
+export function parseFaceMatch(pair: string, rel: string) {
+  const parts = pair.split('-')
+  if (parts.length !== 2) return null
+  const [a, b] = parts
+  if (!isAnimal(a) || !isAnimal(b) || !isRel(rel)) return null
+  const r = faceMatch(a, b, rel)
+  const phrase = rel === 'crush' ? `나 짝사랑 성공 가능성 ${r.score}% 나왔어. 너도 해볼래?` : `우리 ${REL_NAME[rel]} 궁합 ${r.score}점이래. 너희도 해볼래?`
+  return { a, b, rel, score: r.score, result: r, phrase, aName: animalTypeDB[a].name, bName: animalTypeDB[b].name }
+}
+
+export function parseInvite(key: string, rel: string) {
+  if (!isAnimal(key) || !isRel(rel) || rel === 'crush') return null
+  const name = animalTypeDB[key].name
+  return { key, rel, name, who: rel === 'lover' ? '내 사람' : '친구', phrase: `나는 ${name}이야. 우리 ${REL_NAME[rel]} 궁합 볼래?` }
+}
+
+// ===== 우리 팀 삼국지 (8단계) =====
+// 링크에는 장수 id 2~6개만 담는다(중복 허용). 별칭은 넣지 않는다.
+export function teamUrl(ids: string[]): string {
+  return `${SITE}/samguk/team/r/${ids.join('-')}?${UTM('team_samguk')}`
+}
+
+export function parseTeam(path: string) {
+  const ids = path.split('-')
+  if (ids.length < 2 || ids.length > 6) return null
+  const members = ids.map((id) => samgukCharacters.find((c) => c.id === id))
+  if (members.some((m) => !m)) return null
+  return { ids, members: members as NonNullable<(typeof members)[number]>[] }
 }

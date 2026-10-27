@@ -1,12 +1,12 @@
 import Link from "next/link";
 import { Icon, type IconName } from "@/components/icons";
 
-// "친구랑 같이 해봐요" 2열 카드. 4번째 칸은 친구 얼굴 궁합(8단계)이 생기기 전까지 MBTI 궁합.
+// "친구랑 같이 해봐요" 2열 카드
 export const PLAY_TOGETHER: { title: string; desc: string; href: string; icon: IconName; bg: string }[] = [
   { title: "관상 테스트", desc: "타고난 복과 연애운", href: "/face2", icon: "face", bg: "#F1EBE2" },
   { title: "동물상 테스트", desc: "고양이상? 여우상?", href: "/animal", icon: "cat", bg: "#F3EBDD" },
   { title: "나는 삼국지 속 누구?", desc: "닮은 장수와 회사생활 스탯", href: "/samguk", icon: "fan", bg: "#E8EEE6" },
-  { title: "MBTI 궁합", desc: "우리 둘 궁합은 몇 점?", href: "/mbti/match", icon: "heart", bg: "#E6E8DF" },
+  { title: "얼굴 궁합", desc: "친구·연인·짝사랑 궁합", href: "/face-match", icon: "heart", bg: "#E6E8DF" },
 ];
 
 export default function PlayTogether() {

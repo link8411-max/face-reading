@@ -32,7 +32,15 @@ test('결과 버튼: 1순위 공유하기(기본 공유창), 그다음 이미지
   expect(order.every((i) => i > 0)).toBe(true)
   expect([...order].sort((a, b) => a - b)).toEqual(order)
   expect(html).not.toContain('스토리')
-  expect(html).not.toContain('친구 얼굴이랑 궁합') // 8단계 전까지 숨김
+})
+
+test('결과 버튼: 짝 기능 링크(동물상→얼굴 궁합)와 맨 앞 링크(삼국지→우리 팀)를 붙일 수 있다', () => {
+  const pair = renderToStaticMarkup(<ResultActions onShare={() => {}} onSave={() => {}} onRetry={() => {}} busy={false} notice={null} companion={{ label: '친구 얼굴이랑 궁합', href: '/face-match?me=cat' }} />)
+  expect(pair).toContain('href="/face-match?me=cat"')
+  expect(pair.indexOf('공유하기')).toBeLessThan(pair.indexOf('친구 얼굴이랑 궁합'))
+  expect(pair).toContain('다시하기')
+  const lead = renderToStaticMarkup(<ResultActions onShare={() => {}} onSave={() => {}} onRetry={() => {}} busy={false} notice={null} lead={{ label: '우리 팀 삼국지 만들기', href: '/samguk/team' }} />)
+  expect(lead.indexOf('우리 팀 삼국지 만들기')).toBeLessThan(lead.indexOf('공유하기'))
 })
 
 import { saveMethod } from '@/lib/saveImage'

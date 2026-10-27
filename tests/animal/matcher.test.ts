@@ -49,9 +49,9 @@ test('특징 묘사에 외모를 깎아내리는 말이 없다', () => {
 test('동물상 페이지는 face-api를 쓰지 않고 MediaPipe·성별 기준을 쓴다', () => {
   const src = readFileSync('src/app/animal/page.tsx', 'utf8')
   expect(src).not.toContain('faceDetection')
-  expect(src).toContain('detectLandmarks')
-  expect(src).toContain('checkFrontal')
-  expect(src).toContain('toZ(features, gender)')
+  expect(src).toContain('analyzePhoto(image, gender)')
+  const shared = readFileSync('src/lib/face/analyzePhoto.ts', 'utf8')
+  for (const w of ['detectLandmarks', 'checkFrontal', 'toZ(extractFeatures(lm), gender)']) expect(shared).toContain(w)
 })
 
 // 리뷰 Important: 특징 문장이 같은 화면의 동물상 설명(대표 인상)과 반대로 나오지 않는다

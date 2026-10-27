@@ -15,11 +15,9 @@ import { Icon } from "@/components/icons";
 import Link from "next/link";
 import { SamgukCharacter } from "@/lib/samgukDB";
 import { useScreenshot } from "@/hooks/useScreenshot";
-import { extractFeatures, checkFrontal } from "@/lib/face/landmarkFeatures";
-import { toZ } from "@/lib/face/featureStats";
 import { matchCharacter, type Gender } from "@/lib/samguk/matcher";
 import calibration from "@/lib/samguk/calibration.json";
-import { compressImage } from "@/lib/compressImage";
+import { analyzePhoto, REASON_TEXT } from "@/lib/face/analyzePhoto";
 
 interface AnalysisResult {
   name: string;
@@ -111,32 +109,13 @@ export default function SamgukPage() {
     track("test_start", { test_name: "samguk" });
     setError(null);
     try {
-      // 이미지 축소 후 브라우저 안에서 얼굴 랜드마크 추출 (사진은 서버로 보내지 않음)
-      const compressedImage = await compressImage(image);
-      const img = new Image();
-      img.src = compressedImage;
-      await img.decode();
-
-      let landmarks;
-      try {
-        const { detectLandmarks } = await import("@/lib/face/mediapipe");
-        landmarks = await detectLandmarks(img);
-      } catch {
-        setError("분석 도구를 불러오지 못했어요. 새로고침해 주세요.");
+      // 브라우저 안에서 얼굴 분석 (사진은 서버로 보내지 않음)
+      const r = await analyzePhoto(image, gender);
+      if (!r.ok) {
+        setError(REASON_TEXT[r.reason]);
         return;
       }
-      if (!landmarks) {
-        setError("얼굴을 찾지 못했어요. 얼굴이 잘 보이는 사진을 올려 주세요.");
-        return;
-      }
-      if (!checkFrontal(landmarks).ok) {
-        setError("정면 사진을 올려 주세요. 고개를 돌린 사진은 닮은꼴을 찾기 어려워요.");
-        return;
-      }
-
-      const features = extractFeatures(landmarks);
-      if (process.env.NODE_ENV !== "production") console.info("[samguk] features", features);
-      const matched = matchCharacter(toZ(features, gender), gender, calibration.bias);
+      const matched = matchCharacter(r.z, gender, calibration.bias);
       setResult(matched);
       track("result_view", { test_name: "samguk", result_id: matched.character.id });
       // 결과가 나오면 페이지 상단으로 스크롤하여 결과를 바로 볼 수 있게 함
@@ -231,6 +210,7 @@ export default function SamgukPage() {
 
               <ResultActions
                 onShare={shareCard}
+                lead={{ label: "우리 팀 삼국지 만들기", href: "/samguk/team" }}
                 onSave={() => { track("share_click", { test_name: "samguk", method: "save_image" }); download(getShareOptions()); }}
                 onRetry={resetAll}
                 busy={busy || isCapturing}
