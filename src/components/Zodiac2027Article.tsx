@@ -1,6 +1,6 @@
 import Link from "next/link";
 import SeasonPicks from "@/components/SeasonPicks";
-import { birthYears, zodiac2027, ZODIAC_SLUGS, type ZodiacSlug } from "@/content/fortune2027Zodiac";
+import { birthYears, SAMJAE_2027, zodiac2027, ZODIAC_SLUGS, type ZodiacSlug } from "@/content/fortune2027Zodiac";
 import { FORTUNE_YEAR } from "@/lib/fortuneYear";
 import CoupangBanner from "@/components/CoupangBanner";
 
@@ -61,6 +61,16 @@ export default function Zodiac2027Article({ slug }: { slug: ZodiacSlug }) {
           <p className="leading-relaxed">{years.map((y) => `${y}년`).join(", ")}생</p>
           <p className="text-xs text-muted mt-2">※ 띠는 입춘(2월 4일 무렵)에 바뀌어요. 1월 1일~2월 3일에 태어났다면 전년도 띠의 운세를 보세요.</p>
         </section>
+
+        {SAMJAE_2027[slug] && (
+          <section className={card}>
+            <h2 className={h2}>{FORTUNE_YEAR.year}년 {z.띠}띠 삼재</h2>
+            <p className="leading-relaxed">
+              {FORTUNE_YEAR.year}년 {FORTUNE_YEAR.간지}년은 {z.띠}띠의 <strong>날삼재</strong>예요. 돼지·토끼·양띠는 2025년 들삼재, 2026년 눌삼재를 지나 올해 삼재가 끝나요.
+              날삼재는 삼재가 나가는 마지막 해라, 그동안 미뤄 둔 일을 차분히 마무리하면 다음 흐름으로 가볍게 넘어간다고 봐요.
+            </p>
+          </section>
+        )}
 
         {([["총운", z.총운], ["재물운", z.재물], ["연애·인간관계", z.연애관계], ["직장·학업운", z.직장학업], ["건강운", z.건강]] as const).map(([title, body]) => (
           <section key={title} className={card}>

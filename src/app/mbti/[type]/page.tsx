@@ -17,7 +17,7 @@ export async function generateMetadata({ params }: { params: Promise<{ type: str
   const T = type.toUpperCase();
   if (!isMbti(T)) return {};
   const p = mbtiProfiles[T];
-  const title = `${T} ${p.nickname} — 궁합·연애·여행지·직업 | 운명을 읽다`;
+  const title = `${T} ${p.nickname} — 궁합·연애·여행지·직업 – 운명을 읽다`;
   const description = `${T}와 잘 맞는 MBTI, 연애 스타일, 어울리는 여행지와 직업까지. ${p.summary.slice(0, 60)}…`;
   const url = `https://unse-ai.com/mbti/${type}`;
   return {

@@ -32,13 +32,17 @@ const silkscreen = Silkscreen({
   preload: false,
 });
 
+// 검색 결과 제목·설명 (클릭률 위주, 길이 상한은 tests/seo-snippets.test.tsx). og·트위터도 같은 문구
+const TITLE = "무료 AI 관상·동물상 테스트 | 사진 한 장, 저장 없이 – 운명을 읽다";
+const DESCRIPTION = "사진 한 장으로 보는 무료 AI 관상·동물상·삼국지 닮은꼴 테스트. 가입 없이, 사진은 저장하지 않아요. 2027 신년운세와 오늘의 운세도 무료예요.";
+
 export const metadata: Metadata = {
-  title: "운명을 읽다 | 2027 무료 신년운세 & AI 관상 테스트",
-  description: "2027 무료 신년운세와 오늘의 운세, AI 관상·동물상·삼국지 닮은꼴 테스트로 나의 운명을 확인해 보세요. 사진은 브라우저 안에서만 분석해요.",
+  title: TITLE,
+  description: DESCRIPTION,
   keywords: "2027 신년운세, 오늘의 운세, 띠별 운세, 사주팔자, AI 관상, 관상 테스트, 동물상 테스트, 얼굴 테스트, 무료 운세, 정미년 운세, 삼국지 닮은꼴, 관상 분석",
   openGraph: {
-    title: "운명을 읽다 | 2027 무료 신년운세 & AI 관상 테스트",
-    description: "2027년 정미년 신년운세와 오늘의 운세, AI 관상·동물상·삼국지 닮은꼴 테스트를 지금 바로 무료로 확인하세요!",
+    title: TITLE,
+    description: DESCRIPTION,
     type: "website",
     locale: "ko_KR",
     siteName: "운명을 읽다",
@@ -46,8 +50,8 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: "summary_large_image",
-    title: "운명을 읽다 | 2027 무료 신년운세 & AI 관상 테스트",
-    description: "2027년 정미년 신년운세와 오늘의 운세, AI 관상·동물상·삼국지 닮은꼴 테스트를 지금 바로 무료로 확인하세요!",
+    title: TITLE,
+    description: DESCRIPTION,
     images: ["/api/og?title=운명을%20읽다&subtitle=2027%20신년운세%20%26%20AI%20관상"],
   },
   robots: {
