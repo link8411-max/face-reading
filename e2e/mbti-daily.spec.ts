@@ -98,3 +98,27 @@ test('미리보기 이미지 kind=mbti-daily: PNG, 잘못된 유형은 400', asy
   expect(ok.headers()['content-type']).toContain('image/png')
   expect((await request.get('/api/og/result?kind=mbti-daily&type=INFP')).status()).toBe(400)
 })
+
+// 최종 리뷰: 열어 둔 탭이 자정을 넘기면(다시 볼 때) 오늘로 바뀐다
+test('열어 둔 화면으로 돌아오면 날짜가 오늘로 바뀐다 (결과·친구 착지)', async ({ page }) => {
+  await at(page, D27)
+  await page.goto('/fortune/mbti?t=infp')
+  await expect(page.locator('article').first()).toContainText(mbtiDaily('INFP', '2026-10-27').headline)
+  await at(page, D28)
+  await page.evaluate(() => document.dispatchEvent(new Event('visibilitychange')))
+  await expect(page.locator('article').first()).toContainText(mbtiDaily('INFP', '2026-10-28').headline)
+  await page.getByRole('button', { name: '다른 유형 보기' }).click()
+  await page.getByRole('button', { name: 'ENTJ', exact: true }).click()
+  await expect(page.locator('article').first()).toContainText('10월 28일')
+  await at(page, D27)
+  await page.goto('/fortune/mbti/r/entj')
+  await expect(page.locator('article').first()).toContainText(mbtiDaily('ENTJ', '2026-10-27').headline)
+  await at(page, D28)
+  await page.evaluate(() => document.dispatchEvent(new Event('visibilitychange')))
+  await expect(page.locator('article').first()).toContainText(mbtiDaily('ENTJ', '2026-10-28').headline)
+})
+
+test('기억한 유형이 있으면 고르기 화면이 잠깐 보였다 사라지지 않는다 (서버 HTML에 고르기 버튼 없음)', async ({ request }) => {
+  const html = await (await request.get('/fortune/mbti')).text()
+  expect(html).not.toContain('aria-label="내 MBTI"')
+})

@@ -67,3 +67,10 @@ test('모든 문장: 부정어·겁주는 말·이모지·느낌표 없음', () 
     expect(s, s).not.toContain('!')
   }
 })
+
+// 최종 리뷰: 어색한 문장 고침
+test('어색한 문장이 다시 들어오지 않는다', () => {
+  const all = [...Object.values(MBTI_DAILY.headlines).flat(), ...Object.values(MBTI_DAILY.axis).flatMap((a) => Object.values(a).flat())].join('\n')
+  expect(all).not.toMatch(/(?<!돈을 )쓰기 전에/) // 쓰기(글? 돈?)가 모호하지 않게
+  for (const bad of ['에너지를 잠깐 쉬어 주면', '부탁을 하나쯤 내려놓으면', '함께 해결해 주세요', '나중에 봐도 옳아요', '눈이 마주친 사람과 인연']) expect(all).not.toContain(bad)
+})

@@ -12,6 +12,7 @@ import { useResultShare } from "@/hooks/useResultShare";
 import { useScreenshot } from "@/hooks/useScreenshot";
 import { track } from "@/lib/analytics";
 import { kstDate, mbtiDaily } from "@/lib/mbti/daily";
+import { onDayMaybeChanged } from "@/lib/kst";
 import { loadMbti, saveMbti } from "@/lib/mbtiMemory";
 import { mbtiDailyPhrase, mbtiDailyUrl, parseMbtiDailyKey, SITE } from "@/lib/shareLinks";
 import { mbtiProfiles } from "@/content/mbtiTypes";
@@ -23,14 +24,18 @@ export default function MbtiDailyClient() {
   const goBack = useBackOrHome();
   const [date, setDate] = useState<string | null>(null);
   const [type, setType] = useState<MbtiType | null>(null);
+  const [ready, setReady] = useState(false); // 기억한 유형을 읽기 전에는 고르기 화면을 그리지 않는다(잠깐 보였다 사라지는 것 방지)
   const { ref, isCapturing, download } = useScreenshot<HTMLElement>();
 
   useEffect(() => {
-    setDate(kstDate(new Date()));
+    const today = () => setDate(kstDate(new Date()));
+    today();
     const fromLink = parseMbtiDailyKey(new URLSearchParams(window.location.search).get("t") ?? "");
     if (fromLink) saveMbti(fromLink);
     const t = fromLink ?? loadMbti();
     if (t) setType(t);
+    setReady(true);
+    return onDayMaybeChanged(today);
   }, []);
 
   const daily = useMemo(() => (type && date ? mbtiDaily(type, date) : null), [type, date]);
@@ -48,6 +53,7 @@ export default function MbtiDailyClient() {
   } : null);
 
   const choose = (t: MbtiType) => {
+    setDate(kstDate(new Date()));
     saveMbti(t);
     setType(t);
     window.scrollTo({ top: 0 });
@@ -79,6 +85,8 @@ export default function MbtiDailyClient() {
             <SeasonPicks slot="mbti_daily" />
           </div>
         </div>
+      ) : !ready ? (
+        <div className="h-[520px]" aria-hidden />
       ) : (
         <div className="pb-7 no-screenshot">
           <h2 className="mt-2.5 font-serif font-bold text-[27px] leading-[1.4] break-keep">MBTI만 고르면<br />오늘 운세가 나와요</h2>

@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import MbtiDailyCard from "@/components/mbti/MbtiDailyCard";
 import { kstDate, mbtiDaily } from "@/lib/mbti/daily";
+import { onDayMaybeChanged } from "@/lib/kst";
 import { loadMbti } from "@/lib/mbtiMemory";
 import type { MbtiType } from "@/lib/mbti/compat";
 
@@ -13,8 +14,10 @@ export default function MbtiDailyShared({ type }: { type: MbtiType }) {
   const [date, setDate] = useState<string | null>(null);
   const [mine, setMine] = useState<MbtiType | null>(null);
   useEffect(() => {
-    setDate(kstDate(new Date()));
+    const today = () => setDate(kstDate(new Date()));
+    today();
     setMine(loadMbti());
+    return onDayMaybeChanged(today);
   }, []);
   return (
     <>

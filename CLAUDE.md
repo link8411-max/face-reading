@@ -131,6 +131,10 @@ public/
 - 궁합 `src/lib/mbti/compat.ts`: 네 축 같음/다름 × 맥락(연애·친구·직장) 가중치 → 55~100으로 펼침. 맥락마다 가장 잘 맞는 쌍이 정확히 100점(테스트로 고정). 대칭·결정적. 널리 쓰이는 궁합표 경향(E/I·J/P 반대, S/N 같음)을 따른다.
 - 유형 본문 `src/content/mbtiTypes.ts`(16유형, 페이지 본문 1,500자 이상). **이달의 운세는 `monthly.month`가 현재 달과 다르면 숨는다** → 매달 갱신(7단계 파이프라인 전까지 수동).
 - 페이지: `/mbti`(허브), `/mbti/[type]`(소문자 16개, 정적), `/mbti/match`(계산기, `?a=&b=` 미리 선택). 조합별 개별 페이지는 만들지 않는다(얇은 콘텐츠).
+- **오늘의 MBTI 운세** `/fortune/mbti`(운세 탭): MBTI만 고르면 오늘(한국 시간) 운세. `lib/mbti/daily.ts` `mbtiDaily(type, date)`가 `src/content/mbtiDaily.ts` 문장 풀에서 결정적으로 고른다(한마디 14일 안 반복 없음, 같은 날 유형끼리 세 줄 겹침 없음, 테스트로 고정). 문장을 고치면 `npx vitest run tests/mbti`.
+  - 날짜는 브라우저에서 계산하고(정적 HTML·캐시의 어제 방지) 탭이 다시 보이면 갱신(`lib/kst.ts` `onDayMaybeChanged`). 고른 유형은 기기에만 기억(`lib/mbtiMemory.ts`), `?t=infp`로 바로 열기.
+  - 공유 `/fortune/mbti/r/[type]`(소문자, 날짜 없음, 친구의 '오늘' 운세 + 내 MBTI로 보기), 미리보기 `/api/og/result?kind=mbti-daily&type=`. GA test_name `mbti_daily`.
+- 운세 묶음은 `CategoryItem.group`으로 "생년월일로 보는 운세 / MBTI로 보는 운세" 소제목을 나눈다(`CategoryList`).
 
 ## 페이지별 기능
 
