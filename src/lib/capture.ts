@@ -1,6 +1,5 @@
-// 결과 카드 DOM → PNG (modern-screenshot). 배경색은 주지 않는다(카드가 자기 배경을 가진다). 광고 iframe은 뺀다.
-export async function captureBlob(el: HTMLElement): Promise<Blob | null> {
-  const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent)
-  const { domToBlob } = await import('modern-screenshot')
-  return domToBlob(el, { scale: isMobile ? 2 : 2.5, filter: (node) => !(node instanceof HTMLIFrameElement) })
+// 결과 이미지 캡처에서 뺄 요소: 광고 iframe, no-screenshot 표시(생년월일처럼 공유 이미지에 남기지 않을 정보 포함)
+export function captureFilter(node: Node): boolean {
+  if (node.nodeName === 'IFRAME') return false
+  return !(node as Element).classList?.contains('no-screenshot')
 }

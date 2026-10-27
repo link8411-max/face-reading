@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useMemo, useRef, useState } from "react";
 import Link from "next/link";
 import CoupangBanner from "@/components/CoupangBanner";
 import { Icon } from "@/components/icons";
@@ -27,6 +27,7 @@ const MAX = 6;
 export default function TeamClient() {
   const [slots, setSlots] = useState<Slot[]>([empty(), empty()]);
   const [busy, setBusy] = useState(false);
+  const running = useRef(false);
   const [done, setDone] = useState(false);
   const { ref: cardRef, isCapturing, download } = useScreenshot<HTMLElement>();
 
@@ -44,7 +45,8 @@ export default function TeamClient() {
   } : null);
 
   const analyze = async () => {
-    if (!ready || busy) return;
+    if (!ready || running.current) return;
+    running.current = true; // 빠른 두 번 누르기도 한 번만
     setBusy(true);
     track("test_start", { test_name: "team_samguk" });
     const next: Slot[] = [];
@@ -55,6 +57,7 @@ export default function TeamClient() {
     }
     setSlots(next);
     setBusy(false);
+    running.current = false;
     if (next.every((s) => s.character)) {
       setDone(true);
       const t = buildTeam(next.map((s) => ({ character: s.character! })));
@@ -82,13 +85,13 @@ export default function TeamClient() {
   return (
     <div className="flex flex-col gap-4 pb-7 no-screenshot">
       {slots.map((s, i) => (
-        <PhotoSlot key={i} label={`${i + 1}번 팀원`} gender={s.gender} onGender={(g) => setSlots((all) => all.map((x, j) => (j === i ? withGender(x, g) : x)))} image={s.image} onFile={(d) => { setSlots((all) => all.map((x, j) => (j === i ? withPhoto(x, d) : x))); track("photo_selected", { test_name: "team_samguk" }); }} error={s.error}>
-          <input value={s.nickname} onChange={(e) => set(i, { nickname: e.target.value.slice(0, 8) })} maxLength={8} placeholder="별칭 (선택, 예: 김대리)" aria-label={`${i + 1}번 팀원 별칭`} className="h-11 rounded-full border border-line bg-white px-4 text-sm" />
+        <PhotoSlot key={i} label={`${i + 1}번 팀원`} gender={s.gender} onGender={(g) => setSlots((all) => all.map((x, j) => (j === i ? withGender(x, g) : x)))} image={s.image} onFile={(d) => { setSlots((all) => all.map((x, j) => (j === i ? withPhoto(x, d) : x))); track("photo_selected", { test_name: "team_samguk" }); }} error={s.error} disabled={busy}>
+          <input value={s.nickname} onChange={(e) => set(i, { nickname: e.target.value.slice(0, 8) })} maxLength={8} placeholder="별칭 (선택, 예: 김대리)" aria-label={`${i + 1}번 팀원 별칭`} disabled={busy} className="h-11 rounded-full border border-line bg-white px-4 text-sm disabled:opacity-60" />
         </PhotoSlot>
       ))}
       <div className="flex gap-2">
-        {slots.length < MAX && <button type="button" onClick={() => setSlots([...slots, empty()])} className="flex-1 h-12 rounded-full bg-white border border-line text-sm font-medium">한 명 더</button>}
-        {slots.length > 2 && <button type="button" onClick={() => setSlots(slots.slice(0, -1))} className="flex-1 h-12 rounded-full bg-white border border-line text-sm font-medium">마지막 칸 빼기</button>}
+        {slots.length < MAX && <button type="button" disabled={busy} onClick={() => setSlots([...slots, empty()])} className="flex-1 h-12 rounded-full bg-white border border-line text-sm font-medium">한 명 더</button>}
+        {slots.length > 2 && <button type="button" disabled={busy} onClick={() => setSlots(slots.slice(0, -1))} className="flex-1 h-12 rounded-full bg-white border border-line text-sm font-medium">마지막 칸 빼기</button>}
       </div>
       <div className="flex items-center gap-2.5 bg-white rounded-[18px] px-3.5 py-3">
         <Icon name="shield" size={20} className="text-accent flex-none" />

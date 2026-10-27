@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import Link from "next/link";
 import CoupangBanner from "@/components/CoupangBanner";
 import { Icon } from "@/components/icons";
@@ -34,6 +34,7 @@ export default function FaceMatchClient({ invite }: { invite?: { key: AnimalKey;
   const [other, setOther] = useState<Slot>(invite ? { ...empty, animal: invite.key } : empty);
   const [meFixed, setMeFixed] = useState(false);
   const [busy, setBusy] = useState(false);
+  const running = useRef(false);
   const [done, setDone] = useState(false);
   const { ref: cardRef, isCapturing, download } = useScreenshot<HTMLElement>();
 
@@ -63,7 +64,8 @@ export default function FaceMatchClient({ invite }: { invite?: { key: AnimalKey;
   const ready = !!rel && (me.animal || (me.image && me.gender)) && (other.animal || (other.image && other.gender));
 
   const analyze = async () => {
-    if (!rel || !ready || busy) return;
+    if (!rel || !ready || running.current) return;
+    running.current = true; // 빠른 두 번 누르기도 한 번만
     setBusy(true);
     track("test_start", { test_name: "face_match" });
     const run = async (s: Slot): Promise<Slot> => {
@@ -75,6 +77,7 @@ export default function FaceMatchClient({ invite }: { invite?: { key: AnimalKey;
     setMe(m);
     setOther(o);
     setBusy(false);
+    running.current = false;
     if (m.animal && o.animal) {
       setDone(true);
       track("result_view", { test_name: "face_match", result_id: `${m.animal}_${o.animal}_${rel}` });
@@ -115,7 +118,7 @@ export default function FaceMatchClient({ invite }: { invite?: { key: AnimalKey;
           <legend className="text-[13px] text-muted mb-2.5">어떤 사이예요?</legend>
           <div role="radiogroup" aria-label="관계" className="grid grid-cols-3 gap-2">
             {REL.map((r) => (
-              <button key={r} type="button" role="radio" aria-checked={rel === r} onClick={() => setRel(r)} className={`h-12 rounded-full border text-[15px] font-medium transition ${rel === r ? "bg-ink text-paper border-ink" : "bg-white text-ink border-line"}`}>
+              <button key={r} type="button" role="radio" aria-checked={rel === r} disabled={busy} onClick={() => setRel(r)} className={`h-12 rounded-full border text-[15px] font-medium transition disabled:opacity-60 ${rel === r ? "bg-ink text-paper border-ink" : "bg-white text-ink border-line"}`}>
                 {REL_NAME[r]}
               </button>
             ))}
@@ -123,7 +126,7 @@ export default function FaceMatchClient({ invite }: { invite?: { key: AnimalKey;
         </fieldset>
       )}
 
-      <PhotoSlot label="나" gender={me.gender} onGender={(g) => setMe(withGender(me, g))} image={me.image} onFile={(d) => { setMe(withPhoto(me, d)); track("photo_selected", { test_name: "face_match" }); }} error={me.error} fixed={meFixed ? me.animal ?? undefined : undefined} />
+      <PhotoSlot label="나" gender={me.gender} onGender={(g) => setMe(withGender(me, g))} image={me.image} onFile={(d) => { setMe(withPhoto(me, d)); track("photo_selected", { test_name: "face_match" }); }} error={me.error} disabled={busy} fixed={meFixed ? me.animal ?? undefined : undefined} />
 
       {inviteUrl && (
         <div className="bg-white border border-line rounded-[22px] p-4 flex flex-col gap-2">
@@ -136,7 +139,7 @@ export default function FaceMatchClient({ invite }: { invite?: { key: AnimalKey;
         </div>
       )}
 
-      <PhotoSlot label={otherLabel} gender={other.gender} onGender={(g) => setOther(withGender(other, g))} image={other.image} onFile={(d) => { setOther(withPhoto(other, d)); track("photo_selected", { test_name: "face_match" }); }} error={other.error} fixed={invite ? invite.key : undefined} />
+      <PhotoSlot label={otherLabel} gender={other.gender} onGender={(g) => setOther(withGender(other, g))} image={other.image} onFile={(d) => { setOther(withPhoto(other, d)); track("photo_selected", { test_name: "face_match" }); }} error={other.error} disabled={busy} fixed={invite ? invite.key : undefined} />
 
       <div className="flex items-center gap-2.5 bg-white rounded-[18px] px-3.5 py-3">
         <Icon name="shield" size={20} className="text-accent flex-none" />

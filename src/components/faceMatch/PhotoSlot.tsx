@@ -7,7 +7,7 @@ import { animalTypeDB } from "@/lib/animalTypeDB";
 import type { AnimalKey } from "@/lib/animal/matcher";
 
 // 얼굴 궁합·우리 팀 삼국지의 사진 한 칸: 성별 + 사진 + 그 칸의 오류. 이미 결과가 있는 칸(fixed)은 결과만 보여준다.
-export default function PhotoSlot({ label, gender, onGender, image, onFile, error, fixed, children }: {
+export default function PhotoSlot({ label, gender, onGender, image, onFile, error, fixed, disabled, children }: {
   label: string;
   gender: Gender | null;
   onGender: (g: Gender) => void;
@@ -15,6 +15,7 @@ export default function PhotoSlot({ label, gender, onGender, image, onFile, erro
   onFile: (dataUrl: string) => void;
   error: string | null;
   fixed?: AnimalKey;
+  disabled?: boolean; // 분석 중에는 바꿀 수 없다 (분석이 끝나며 바꾼 사진을 덮어쓰지 않게)
   children?: React.ReactNode;
 }) {
   const fileRef = useRef<HTMLInputElement>(null);
@@ -36,8 +37,8 @@ export default function PhotoSlot({ label, gender, onGender, image, onFile, erro
         </p>
       ) : (
         <>
-          <GenderPills value={gender} onChange={onGender} label={`${label} 성별`} />
-          <button type="button" aria-label={`${label} 사진 고르기`} onClick={() => fileRef.current?.click()} className="min-h-[150px] rounded-[18px] border-[1.5px] border-dashed border-[#D6C8B4] bg-paper flex flex-col items-center justify-center gap-2 p-3 overflow-hidden">
+          <GenderPills value={gender} onChange={onGender} label={`${label} 성별`} disabled={disabled} />
+          <button type="button" aria-label={`${label} 사진 고르기`} disabled={disabled} onClick={() => fileRef.current?.click()} className="min-h-[150px] rounded-[18px] border-[1.5px] border-dashed border-[#D6C8B4] bg-paper flex flex-col items-center justify-center gap-2 p-3 overflow-hidden disabled:opacity-60">
             {image ? (
               // eslint-disable-next-line @next/next/no-img-element
               <img src={image} alt={`${label} 사진`} className="max-h-40 rounded-[14px] object-contain" />
@@ -48,7 +49,7 @@ export default function PhotoSlot({ label, gender, onGender, image, onFile, erro
               </>
             )}
           </button>
-          <input ref={fileRef} type="file" accept="image/*" onChange={pick} className="hidden" aria-label={`${label} 사진 파일`} />
+          <input ref={fileRef} type="file" accept="image/*" onChange={pick} disabled={disabled} className="hidden" aria-label={`${label} 사진 파일`} />
         </>
       )}
       {error && <p role="alert" id={`${label}-error`} className="text-sm text-accent">{error}</p>}
