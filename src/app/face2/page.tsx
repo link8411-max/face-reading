@@ -12,6 +12,8 @@ import { useScreenshot } from "@/hooks/useScreenshot";
 import type { AnalysisResult } from "@/lib/faceAnalyzer";
 import ResultCard, { type ResultCardProps } from "@/components/result/ResultCard";
 import ResultActions from "@/components/result/ResultActions";
+import NextTests from "@/components/result/NextTests";
+import { useHandedPhoto } from "@/hooks/useHandedPhoto";
 import { useResultShare } from "@/hooks/useResultShare";
 import { faceSlug, ogImageUrl, parseShared, shareUrl, SITE } from "@/lib/shareLinks";
 import { Icon } from "@/components/icons";
@@ -119,6 +121,9 @@ export default function Face2Page() {
     }
   };
 
+  // 다른 사진 테스트에서 같은 사진으로 넘어오면 바로 분석 (사진 표시가 끝난 뒤)
+  useHandedPhoto(setImage, !!image && !modelsLoading, () => void imageRef.current?.decode().then(analyzeImage, analyzeImage));
+
   const resetAll = () => {
     setImage(null);
     setResult(null);
@@ -163,6 +168,7 @@ export default function Face2Page() {
               busy={busy || isCapturing}
               notice={notice}
             />
+            {image && <NextTests current="face" image={image} />}
             <div className="mt-2">
               <CoupangBanner subId="face" />
             </div>

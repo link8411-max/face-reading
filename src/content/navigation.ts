@@ -36,7 +36,7 @@ export const CATEGORIES: Category[] = [
     href: '/face-tests',
     intro: '사진 한 장으로 해 보는 얼굴 테스트예요. 얼굴의 기준점을 측정해 관상을 풀이하고, 닮은 동물상과 삼국지 영웅을 찾아 드려요. 사진은 브라우저 안에서만 분석되고 서버로 전송되지 않아요.',
     items: [
-      { title: '나는 삼국지 속 누구?', desc: '52명 영웅 중 닮은 장수와 회사생활 스탯', href: '/samguk', thumb: { image: '/images/samguk/관우.jpg' }, chip: '52명 영웅' },
+      { title: '나는 삼국지 속 누구?', desc: '76명 영웅 중 닮은 장수와 회사생활 스탯', href: '/samguk', thumb: { image: '/images/samguk/관우.jpg' }, chip: '76명 영웅' },
       { title: '우리 팀 삼국지', desc: '팀원 얼굴로 보는 세력과 역할', href: '/samguk/team', thumb: { icon: 'users', bg: '#E8EEE6' }, chip: '2~6명' },
       { title: '동물상 테스트', desc: '강아지상? 고양이상? 8가지 중 하나', href: '/animal', thumb: { icon: 'cat', bg: '#F3EBDD' }, chip: '친구랑 비교' },
       { title: 'AI 관상 테스트', desc: '초년·중년·말년운과 재물운', href: '/face2', thumb: { icon: 'face', bg: '#F1EBE2' }, chip: '무제한 무료' },

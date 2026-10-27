@@ -1,3 +1,5 @@
+import { readFileSync } from 'node:fs'
+import { samgukCharacters } from '@/lib/samgukDB'
 // 검색 결과 제목·설명(스니펫): 클릭률 위주 문구, 길이 상한, 옛 문구 금지 (2026-10-27)
 import type { Metadata } from 'next'
 
@@ -57,14 +59,14 @@ test('메인은 관상·동물상을 신년운세보다 앞에, 가입 없이·�
   expect(d).toContain('2027 신년운세')
 })
 
-test('관상·동물상·삼국지 설명은 가입 없이·사진 저장 안 함, 동물상은 남녀 따로, 삼국지는 52명·회사생활 스탯', () => {
+test('관상·동물상·삼국지 설명은 가입 없이·사진 저장 안 함, 동물상은 남녀 따로, 삼국지는 장수 수·회사생활 스탯', () => {
   for (const m of [face2, animal, samguk]) {
     expect(String(m.description)).toContain('가입 없이')
     expect(String(m.description)).toContain('저장하지 않아요')
   }
   expect(String(face2.title)).toContain('AI 관상 테스트')
   expect(String(animal.title)).toMatch(/남녀|남자·여자/)
-  expect(String(samguk.title)).toContain('52명')
+  expect(String(samguk.title)).toContain(`${samgukCharacters.length}명`)
   expect(String(samguk.description)).toMatch(/칼퇴력|꼰대력/)
   expect(String(fortune.title).startsWith('2027 신년운세')).toBe(true)
 })
@@ -91,4 +93,13 @@ test('오늘의 MBTI 운세: 제목 앞에 핵심어, 설명에 가입 없이·M
   expect(String(mbtiDaily.title).startsWith('오늘의 MBTI 운세')).toBe(true)
   expect(String(mbtiDaily.description)).toContain('가입 없이')
   expect(String(mbtiDaily.description)).toContain('MBTI만 고르면')
+})
+
+test('삼국지 장수 수 문구는 실제 장수 수와 같다 (옛 52명이 남지 않음)', () => {
+  for (const f of ['src/app/samguk/layout.tsx', 'src/app/samguk/page.tsx', 'src/content/navigation.ts']) {
+    const src = readFileSync(f, 'utf8')
+    expect(src, f).not.toContain('52명')
+    expect(src, f).not.toContain('간신')
+  }
+  expect(readFileSync('src/content/navigation.ts', 'utf8')).toContain(`${samgukCharacters.length}명`)
 })

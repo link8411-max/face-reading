@@ -15,6 +15,8 @@ import { analyzePhoto, REASON_TEXT } from "@/lib/face/analyzePhoto";
 import { animalTypeDB } from "@/lib/animalTypeDB";
 import ResultCard, { type ResultCardProps } from "@/components/result/ResultCard";
 import ResultActions from "@/components/result/ResultActions";
+import NextTests from "@/components/result/NextTests";
+import { useHandedPhoto } from "@/hooks/useHandedPhoto";
 import { useResultShare } from "@/hooks/useResultShare";
 import { faceSlug, ogImageUrl, parseShared, shareUrl, SITE } from "@/lib/shareLinks";
 import { Icon } from "@/components/icons";
@@ -93,6 +95,9 @@ export default function AnimalTypePage() {
     }
   };
 
+  // 다른 사진 테스트에서 같은 사진으로 넘어오면 바로 분석
+  useHandedPhoto(setImage, !!image && !!gender, () => void analyzeImage());
+
   const resetAll = () => {
     setImage(null);
     setResult(null);
@@ -138,6 +143,7 @@ export default function AnimalTypePage() {
               busy={busy || isCapturing}
               notice={notice}
             />
+            {image && <NextTests current="animal" image={image} />}
             <div className="mt-2">
               <CoupangBanner subId="animal" />
             </div>

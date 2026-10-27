@@ -1,6 +1,9 @@
 import type { FeatureKey } from '@/lib/face/landmarkFeatures'
+import { portraitRelativeZ, profileFromRelative } from './portraitProfiles'
 
 // 삼국지 인물별 얼굴 프로필 (z 단위: 0 = 평균, ±1 = 흔한 차이, ±2 = 뚜렷한 특징)
+// 기본은 초상화에서 잰 특징이다(portraitProfiles.ts). 결과로 보여 주는 그림과 실제로 닮게 하려는 것.
+// 아래 handProfiles는 초상화에서 얼굴을 인식하지 못한 장수에게만 쓴다.
 // 근거는 samgukDB의 appearance와 연의·고전 게임 속 인상. 각 인물 위 주석이 근거다.
 //
 // 특징 의미 (+ / -)
@@ -18,7 +21,7 @@ export interface CharacterProfile {
   weight: Partial<Record<FeatureKey, number>>
 }
 
-export const characterProfiles: Record<string, CharacterProfile> = {
+export const handProfiles: Record<string, CharacterProfile> = {
   // ===== 위 =====
   // 조조: 날카롭고 깊은 눈매, 강인한 턱선, 위엄 있는 표정
   caocao: {
@@ -286,4 +289,36 @@ export const characterProfiles: Record<string, CharacterProfile> = {
     z: { faceAspect: -1.6, eyeAspect: 1.8, chinLength: -1.6, noseLength: -1.2, midfaceRatio: -1 },
     weight: { eyeAspect: 2, faceAspect: 1.5, chinLength: 1.5 },
   },
+  // ===== 초상화에서 얼굴을 인식하지 못한 새 장수 (그림 묘사 기준) =====
+  // 정욱: 키 크고 여윈 노년의 얼굴, 길고 가는 수염, 엄한 가는 눈
+  chengyu: {
+    z: { faceAspect: 1.4, jawWidth: -1.2, eyeAspect: -1.2, mouthCornerLift: -1, chinLength: 1 },
+    weight: { faceAspect: 1.5, eyeAspect: 1.5 },
+  },
+  // 황개: 풍상을 겪은 노장, 회색 수염, 전장에서 단련된 매서운 눈썹
+  huanggai: {
+    z: { browTilt: 1.4, browGap: -1.2, mouthCornerLift: -1.4, jawWidth: 1.2, noseWidth: 1 },
+    weight: { mouthCornerLift: 1.5, browGap: 1.5 },
+  },
+  // 방덕: 사나운 얼굴, 거친 수염, 강렬한 눈빛
+  pangde: {
+    z: { eyeAspect: 1.2, browTilt: 1.8, browGap: -1.4, jawWidth: 1.4, mouthCornerLift: -1 },
+    weight: { browTilt: 1.8, eyeAspect: 1.5 },
+  },
+  // 하후연: 날렵하고 여윈 얼굴, 날카로운 눈
+  xiahouyuan: {
+    z: { eyeTilt: 1.6, faceAspect: 0.8, jawWidth: -0.8, noseLength: 1, browTilt: 1 },
+    weight: { eyeTilt: 1.8, faceAspect: 1.5 },
+  },
+  // 우금: 엄격한 중년, 단정한 수염, 지치고 부끄러운 눈빛
+  yujin: {
+    z: { eyeTilt: -1.2, browTilt: -1, mouthCornerLift: -1.2, faceAspect: 0.6, eyeAspect: -0.8 },
+    weight: { eyeTilt: 1.5, mouthCornerLift: 1.5 },
+  },
 }
+
+const relative = portraitRelativeZ()
+
+export const characterProfiles: Record<string, CharacterProfile> = Object.fromEntries(
+  Object.keys({ ...handProfiles, ...relative }).map((id) => [id, relative[id] ? profileFromRelative(relative[id]!) : handProfiles[id]]),
+)

@@ -107,7 +107,8 @@ function buildAnalysis(z: ZVector, p: CharacterProfile): MatchResult['faceAnalys
 
 export function matchCharacter(z: ZVector, gender: Gender, bias: Record<string, number> = {}): MatchResult {
   const candidates = samgukCharacters
-    .filter((c) => c.gender === gender)
+    // 프로필이 없는 장수(초상화를 아직 재지 않음)는 건너뛴다. 모든 장수에 프로필이 있는지는 테스트가 지킨다
+    .filter((c) => c.gender === gender && characterProfiles[c.id])
     .map((c) => {
       const d = distance(z, characterProfiles[c.id])
       return { c, d, score: d + (bias[c.id] ?? 0) }

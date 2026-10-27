@@ -9,6 +9,8 @@ import TestHeader from "@/components/test/TestHeader";
 import TestStart from "@/components/test/TestStart";
 import SamgukGameCard from "@/components/samguk/SamgukGameCard";
 import ResultActions from "@/components/result/ResultActions";
+import NextTests from "@/components/result/NextTests";
+import { useHandedPhoto } from "@/hooks/useHandedPhoto";
 import { useResultShare } from "@/hooks/useResultShare";
 import { faceSlug, ogImageUrl, parseShared, shareUrl, SITE } from "@/lib/shareLinks";
 import { guardianFor } from "@/lib/samguk/guardian";
@@ -128,6 +130,9 @@ export default function SamgukPage() {
     }
   };
 
+  // 다른 사진 테스트에서 같은 사진으로 넘어오면 바로 분석
+  useHandedPhoto(setImage, !!image && !!gender, () => void analyzeImage());
+
   const resetAll = () => {
     setImage(null);
     setResult(null);
@@ -146,7 +151,7 @@ export default function SamgukPage() {
         {!result && (
           <TestStart
             heading={"나는 삼국지 속\n누구?"}
-            desc="얼굴 특징을 삼국지 영웅 52명의 전해 오는 인상과 비교해 가장 닮은 장수를 찾아요."
+            desc="얼굴 특징을 삼국지 인물 76명의 초상화와 비교해 가장 닮은 장수를 찾아요."
             tips={["정면 사진이 좋아요", "밝은 곳에서"]}
             analyzeLabel="닮은 장수 찾기"
             image={image}
@@ -217,6 +222,7 @@ export default function SamgukPage() {
                 busy={busy || isCapturing}
                 notice={notice}
               />
+              {image && <NextTests current="samguk" image={image} />}
               <div className="mt-2">
                 <CoupangBanner subId="samguk" />
               </div>

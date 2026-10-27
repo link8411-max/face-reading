@@ -52,6 +52,7 @@ npm run test:e2e     # E2E (next build 후 3200 포트): 전 페이지 로딩·�
 - 결과 캡처는 `no-screenshot` 요소와 iframe을 뺀다(`lib/capture.ts`). 운세의 생년월일 줄은 화면에만. 운세 공유 이미지는 결과가 나오면 미리 만들어 두고(`useScreenshot(result)`), 공유하기는 누르자마자 공유창을 연다.
 - 얼굴 궁합·우리 팀은 분석 중에 입력(관계·성별·사진·별칭·인원)을 잠근다.
 - 이미지 저장: `lib/saveImage.ts`. iOS와 인앱 브라우저(카카오톡·인스타·네이버 등)는 다운로드 대신 길게 눌러 저장 화면(data 이미지), 카카오톡이면 "다른 브라우저로 열기"(`kakaotalk://web/openExternal`)
+- 같은 사진으로 다음 테스트: 삼국지·동물상·관상 결과 아래 `components/result/NextTests`(나머지 두 사진 테스트 카드). 사진은 `lib/photoHandoff.ts` 메모리로만 넘기고(브라우저 저장소 금지, 테스트로 막음) 받는 쪽은 `useHandedPhoto`로 바로 분석한다. 새로고침하면 사라진다. GA `next_test_click(test_name=간 곳)`.
 - 삼국지: `components/samguk/SamgukGameCard`(회사생활 STATUS), `lib/samguk/guardian.ts`(나를 지켜줄 장수: 같은 세력에서 funStats 빈틈을 가장 많이 메우는 장수, 80~98점)
 - 8단계 전까지 없는 기능(친구 얼굴 궁합, 우리 팀 삼국지) 버튼은 넣지 않는다.
 
@@ -85,7 +86,9 @@ src/
 │   │   ├── landmarkFeatures.ts # 랜드마크 → 연속 특징 15개 (크기·위치·기울기 불변)
 │   │   └── featureStats.ts   # 특징 평균·표준편차, z 점수
 │   ├── samguk/
-│   │   ├── profiles.ts       # 장수 52명 얼굴 프로필 (z값 + 가중치, 근거 주석)
+│   │   ├── profiles.ts       # 장수 얼굴 프로필: 초상화 측정 기준 + 인식 못 한 그림만 글 묘사(handProfiles)
+│   │   ├── portraitProfiles.ts # 초상화 특징 → 화풍 쏠림 제거(성별별 표준화) → 프로필
+│   │   ├── portraitFeatures.json # 초상화 측정값 (scripts/measure-portraits.mjs)
 │   │   ├── matcher.ts        # 가중 거리 매칭 + 닮은 이유/얼굴 분석 문장
 │   │   ├── simulate.ts       # 분포 시뮬레이션 (시드 고정)
 │   │   └── calibration.json  # 쏠림 보정 bias (scripts/calibrate-samguk.ts로 생성)
@@ -195,6 +198,8 @@ public/
 **성별별 기준값 (2b)**: `src/lib/face/featureStats.ts`의 `FEATURE_STATS_BY_GENDER`, z는 `toZ(f, gender)`로 사용자가 고른 성별 기준을 쓴다.
 - 재측정: 개발 서버(`npx next dev -p 3311`)를 띄우고 `node scripts/measure-face-stats.mjs` → 출력값을 붙여 넣는다. 성별 라벨은 `scripts/dev-face-genders.json`, 정면 사진만 쓴다. 표본이 작아 t 기반 축소 추정.
 - 시뮬레이션은 성별 분포에서 특징값을 뽑아 실제 경로(`toZ(f, gender)`)로 매칭한다 (`src/lib/face/sampleFeatures.ts`).
+
+**장수 추가·초상화 교체**: 그림은 `public/images/samguk/<한글이름>.jpg`(화풍·생성 지침 `docs/portrait-prompts.md`, Antigravity로 생성). 데이터는 `samgukDB.ts`(`allSamgukCharacters`)와 `vibes.ts`. 그림이 아직 없는 장수는 `PENDING_PORTRAIT_IDS`에 두면 결과·공유·팀에서 빠진다(그림이 들어왔는데 남아 있으면 테스트 실패). 그림을 넣으면 개발 서버(3311)를 띄우고 `node scripts/measure-portraits.mjs` → calibrate-samguk. 얼굴 인식이 안 되는 그림은 `profiles.ts` handProfiles에 글 묘사 프로필을 쓴다. 장수 수 문구(삼국지 제목·소개·메뉴)는 실제 수와 같아야 한다(테스트).
 
 **프로필이나 기준값을 바꾸면** `npx tsx --tsconfig tsconfig.json scripts/calibrate-samguk.ts`와 `scripts/calibrate-animal.ts`로 bias를 다시 만들고 `npm test`(분포 테스트: 전원 1회 이상, 균등의 3배 이하, 성별별)를 통과시킬 것.
 

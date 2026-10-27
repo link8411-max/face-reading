@@ -14,6 +14,7 @@ type Events = {
   shared_landing: { test_name: TestName; result_id?: string }
   coupang_click: { slot: string; keyword: string }
   coupang_banner_view: { slot: string }
+  next_test_click: { test_name: TestName }
 }
 
 const ALLOWED_KEYS = new Set(['test_name', 'result_id', 'method', 'slot', 'keyword'])
