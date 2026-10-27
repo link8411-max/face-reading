@@ -1,13 +1,18 @@
+import { Fragment } from "react";
 import Link from "next/link";
 import type { CategoryItem } from "@/content/navigation";
 import { Icon } from "@/components/icons";
 
-// 묶음 항목 목록 (썸네일 + 제목 + 설명 + 칩) — 홈 묶음 탭과 허브 페이지 공용
+// 묶음 항목 목록 (썸네일 + 제목 + 설명 + 칩) — 홈 묶음 탭과 허브 페이지 공용. group이 바뀌는 곳에 소제목을 그린다
 export default function CategoryList({ items }: { items: CategoryItem[] }) {
   return (
     <ul className="flex flex-col gap-2.5">
-      {items.map((item) => (
-        <li key={item.href}>
+      {items.map((item, i) => (
+        <Fragment key={item.href}>
+        {item.group && item.group !== items[i - 1]?.group && (
+          <li className={i > 0 ? "mt-3" : undefined}><h3 className="text-[13px] font-medium text-muted px-1">{item.group}</h3></li>
+        )}
+        <li>
           <Link href={item.href} className="flex gap-3 items-center bg-white border border-line rounded-[22px] p-2.5 hover:border-accent/50 transition">
             <span
               aria-hidden
@@ -24,6 +29,7 @@ export default function CategoryList({ items }: { items: CategoryItem[] }) {
             <Icon name="chevron" size={18} className="text-muted mr-1 flex-none" />
           </Link>
         </li>
+        </Fragment>
       ))}
     </ul>
   );

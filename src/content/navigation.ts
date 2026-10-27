@@ -16,6 +16,7 @@ export interface CategoryItem {
   href: string
   thumb: { image?: string; icon?: IconName; bg?: string }
   chip?: string
+  group?: string // 묶음 안 소제목 (연속된 같은 group 앞에 한 번 그린다)
 }
 
 export interface Category {
@@ -46,11 +47,12 @@ export const CATEGORIES: Category[] = [
     title: '운세·사주',
     tabLabel: '운세·사주',
     href: '/unse',
-    intro: '생년월일로 보는 사주 신년운세와 띠별 운세, 요일마다 바뀌는 오늘의 운세를 모았어요. 음력 생일도 양력으로 바꿔 계산하고, 띠는 입춘을 기준으로 봐요.',
+    intro: '생년월일로 보는 사주 신년운세와 띠별 운세, 요일마다 바뀌는 오늘의 운세를 모았어요. 생년월일 없이 MBTI만 고르면 보는 오늘의 MBTI 운세도 있어요. 음력 생일도 양력으로 바꿔 계산하고, 띠는 입춘을 기준으로 봐요.',
     items: [
-      { title: '2027 신년운세', desc: '사주로 보는 정미년 한 해', href: '/fortune', thumb: { icon: 'moon', bg: '#F1EBE2' }, chip: '음력 지원' },
-      { title: '2027 띠별 운세', desc: '쥐띠부터 돼지띠까지 12띠', href: '/fortune/2027', thumb: { icon: 'spark', bg: '#F3EBDD' }, chip: '12띠' },
-      { title: '오늘의 운세', desc: '띠별 운세와 행운의 시간·색', href: '/fortune/daily', thumb: { icon: 'sun', bg: '#E8EEE6' }, chip: '요일별' },
+      { group: '생년월일로 보는 운세', title: '2027 신년운세', desc: '사주로 보는 정미년 한 해', href: '/fortune', thumb: { icon: 'moon', bg: '#F1EBE2' }, chip: '음력 지원' },
+      { group: '생년월일로 보는 운세', title: '2027 띠별 운세', desc: '쥐띠부터 돼지띠까지 12띠', href: '/fortune/2027', thumb: { icon: 'spark', bg: '#F3EBDD' }, chip: '12띠' },
+      { group: '생년월일로 보는 운세', title: '오늘의 운세', desc: '띠별 운세와 행운의 시간·색', href: '/fortune/daily', thumb: { icon: 'sun', bg: '#E8EEE6' }, chip: '요일별' },
+      { group: 'MBTI로 보는 운세', title: '오늘의 MBTI 운세', desc: 'MBTI만 고르면 오늘의 한마디와 행운', href: '/fortune/mbti', thumb: { icon: 'spark', bg: '#ECE6F0' }, chip: '생년월일 없이' },
     ],
   },
   {
@@ -62,6 +64,7 @@ export const CATEGORIES: Category[] = [
     items: [
       { title: '얼굴 궁합', desc: '두 얼굴로 보는 친구·연인·짝사랑 궁합', href: '/face-match', thumb: { icon: 'heart', bg: '#F1EBE2' }, chip: '짝사랑도' },
       { title: 'MBTI 궁합 계산기', desc: '두 유형의 연애·친구·직장 궁합 점수', href: '/mbti/match', thumb: { icon: 'rings', bg: '#E6E8DF' }, chip: '결과 저장·공유' },
+      { title: '오늘의 MBTI 운세', desc: '16유형별 오늘의 한마디와 행운', href: '/fortune/mbti', thumb: { icon: 'spark', bg: '#ECE6F0' }, chip: '매일 바뀜' },
       { title: 'MBTI 16유형 풀이', desc: '궁합·연애·여행지·직업·이달의 운세', href: '/mbti', thumb: { icon: 'users', bg: '#E8EEE6' }, chip: '16유형' },
     ],
   },
