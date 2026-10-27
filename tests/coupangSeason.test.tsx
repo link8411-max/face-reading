@@ -40,6 +40,6 @@ test('링크는 쿠팡 파트너스 단축 주소만', () => {
 import { readFileSync } from 'node:fs'
 test('위치: 메인 시즌 카드·오늘의 운세 결과·띠별 운세·신년운세 결과에만, 사진 테스트 흐름에는 없음', () => {
   const has = (f: string) => readFileSync(f, 'utf8').includes('<SeasonPicks slot=')
-  for (const f of ['src/app/page.tsx', 'src/app/fortune/daily/page.tsx', 'src/components/Zodiac2027Article.tsx', 'src/app/fortune/FortuneClient.tsx']) expect(has(f), f).toBe(true)
+  for (const f of ['src/app/page.tsx', 'src/app/fortune/daily/page.tsx', 'src/components/Zodiac2027Article.tsx', 'src/app/fortune/FortuneClient.tsx', 'src/components/mbti/MbtiDailyClient.tsx']) expect(has(f), f).toBe(true)
   for (const f of ['src/app/face2/page.tsx', 'src/app/animal/page.tsx', 'src/app/samguk/page.tsx', 'src/components/faceMatch/FaceMatchClient.tsx', 'src/components/samguk/TeamClient.tsx']) expect(has(f), f).toBe(false)
 })

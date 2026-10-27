@@ -9,7 +9,7 @@ import { MBTI_TYPES, compatSummary, isMbti, type MbtiType } from "@/lib/mbti/com
 import { mbtiProfiles } from "@/content/mbtiTypes";
 import { useScreenshot } from "@/hooks/useScreenshot";
 
-function TypeGroup({ label, value, onChange }: { label: string; value: MbtiType | null; onChange: (t: MbtiType) => void }) {
+export function TypeGroup({ label, value, onChange }: { label: string; value: MbtiType | null; onChange: (t: MbtiType) => void }) {
   return (
     <div role="group" aria-label={label}>
       <p className="font-bold text-sm mb-2">{label}</p>
