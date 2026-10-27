@@ -6,7 +6,6 @@ import CoupangBanner from "@/components/CoupangBanner";
 import { useBackOrHome } from "@/hooks/useBackOrHome";
 import TestHeader from "@/components/test/TestHeader";
 import TestStart from "@/components/test/TestStart";
-import type { Gender } from "@/components/test/GenderPills";
 import Link from "next/link";
 import dynamic from "next/dynamic";
 import { useScreenshot } from "@/hooks/useScreenshot";
@@ -44,8 +43,6 @@ export default function Face2Page() {
   const [modelsLoading, setModelsLoading] = useState(true);
   const [result, setResult] = useState<AnalysisResult | null>(null);
   const [error, setError] = useState<string | null>(null);
-  // 성별: 2b단계부터 성별별 얼굴 기준값에 쓴다
-  const [gender, setGender] = useState<Gender | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const imageRef = useRef<HTMLImageElement>(null);
 
@@ -90,7 +87,7 @@ export default function Face2Page() {
   };
 
   const analyzeImage = async () => {
-    if (!image || !gender || !imageRef.current) return;
+    if (!image || !imageRef.current) return;
 
     setLoading(true);
     track("test_start", { test_name: "face" });
@@ -144,8 +141,7 @@ export default function Face2Page() {
             tips={["앞머리는 살짝 넘겨주세요", "밝은 곳에서"]}
             analyzeLabel="관상 보기"
             image={image}
-            gender={gender}
-            onGender={setGender}
+            needsGender={false} // 관상 분석은 성별을 쓰지 않는다
             onFile={handleImageUpload}
             onAnalyze={analyzeImage}
             onReset={resetAll}

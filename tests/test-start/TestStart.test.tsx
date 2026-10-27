@@ -36,3 +36,18 @@ test('사진과 성별이 다 있으면 분석 버튼이 활성', () => {
   const html = renderToStaticMarkup(<TestStart {...base} image="data:image/png;base64,AA" gender="여" />)
   expect(html).toMatch(/<button(?![^>]*disabled="")[^>]*>관상 보기/)
 })
+
+// 관상은 분석에 성별을 쓰지 않아 묻지 않는다 (2026-10-27)
+test('성별이 필요 없는 테스트(관상): 성별 pill 없음, 사진만 있으면 분석 버튼 활성', () => {
+  expect(analyzeButtonLabel({ hasImage: true, gender: null, needsGender: false, loading: false, preparing: false, label: '관상 보기' })).toBe('관상 보기')
+  const html = renderToStaticMarkup(<TestStart {...base} needsGender={false} image="data:image/png;base64,AA" />)
+  expect(html).not.toContain('role="radiogroup"')
+  expect(html).toMatch(/<button(?![^>]*disabled="")[^>]*>관상 보기/)
+})
+
+import { readFileSync } from 'node:fs'
+test('관상 페이지는 성별을 묻지 않는다', () => {
+  const src = readFileSync('src/app/face2/page.tsx', 'utf8')
+  expect(src).toContain('needsGender={false}')
+  expect(src).not.toMatch(/useState<Gender/)
+})

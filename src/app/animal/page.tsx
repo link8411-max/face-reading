@@ -3,10 +3,10 @@
 import { track } from "@/lib/analytics";
 import { useState, useRef } from "react";
 import CoupangBanner from "@/components/CoupangBanner";
+import { useRememberedGender } from "@/hooks/useRememberedGender";
 import { useBackOrHome } from "@/hooks/useBackOrHome";
 import TestHeader from "@/components/test/TestHeader";
 import TestStart from "@/components/test/TestStart";
-import type { Gender } from "@/components/test/GenderPills";
 import Link from "next/link";
 import { useScreenshot } from "@/hooks/useScreenshot";
 import { matchAnimal, type AnimalTypeResult } from "@/lib/animal/matcher";
@@ -42,7 +42,7 @@ export default function AnimalTypePage() {
   const [result, setResult] = useState<AnimalTypeResult | null>(null);
   const [error, setError] = useState<string | null>(null);
   // 성별: 성별별 얼굴 기준값으로 z 점수를 낸다
-  const [gender, setGender] = useState<Gender | null>(null);
+  const [gender, setGender] = useRememberedGender(); // 다른 사진 테스트에서 고른 성별을 미리 고른다
   const fileInputRef = useRef<HTMLInputElement>(null);
   const imageRef = useRef<HTMLImageElement>(null);
 

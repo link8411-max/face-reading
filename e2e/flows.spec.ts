@@ -68,8 +68,13 @@ for (const path of ['/face2', '/animal']) {
     page.on('dialog', (d) => d.dismiss())
     await page.goto(path)
     await page.locator('input[type=file]').setInputFiles({ name: 'blank.png', mimeType: 'image/png', buffer: await blankPng(page) })
-    await expect(page.getByRole('button', { name: /성별을 먼저/ })).toBeDisabled()
-    await page.getByRole('radio', { name: '여자' }).click()
+    if (path === '/face2') {
+      // 관상은 성별을 묻지 않는다
+      await expect(page.getByRole('radio', { name: '여자' })).toHaveCount(0)
+    } else {
+      await expect(page.getByRole('button', { name: /성별을 먼저/ })).toBeDisabled()
+      await page.getByRole('radio', { name: '여자' }).click()
+    }
     await page.getByRole('button', { name: /관상 보기|동물상 찾기/ }).click({ timeout: 30000 })
     await expect(page.getByText(path === '/animal' ? /얼굴을 찾지 못했어요/ : /얼굴을 감지할 수 없습니다/)).toBeVisible({ timeout: 30000 })
     expect(errors).toEqual([])
@@ -167,4 +172,18 @@ for (const [path, btn] of [['/animal', '동물상 찾기'], ['/samguk', '닮은 
     await expect(page.getByText(/분석 도구를 불러오지 못했어요/)).toBeVisible({ timeout: 60000 })
   })
 }
+})
+
+test('한 번 고른 성별은 다음 사진 테스트에서 미리 골라져 있다 (관상은 묻지 않음)', async ({ page }) => {
+  await page.goto('/animal')
+  await page.getByRole('radio', { name: '남자' }).click()
+  await page.goto('/samguk')
+  await expect(page.getByRole('radio', { name: '남자' })).toHaveAttribute('aria-checked', 'true')
+  await page.getByRole('radio', { name: '여자' }).click()
+  await page.goto('/face-match')
+  await page.getByRole('radio', { name: '친구' }).click()
+  await expect(page.getByRole('region', { name: '나' }).getByRole('radio', { name: '여자' })).toHaveAttribute('aria-checked', 'true')
+  await expect(page.getByRole('region', { name: '친구' }).getByRole('radio', { name: '여자' })).toHaveAttribute('aria-checked', 'false')
+  await page.goto('/face2')
+  await expect(page.getByRole('radio', { name: '여자' })).toHaveCount(0)
 })
