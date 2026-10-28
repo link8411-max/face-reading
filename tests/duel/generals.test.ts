@@ -62,5 +62,6 @@ describe('skillDesc', () => {
     expect(skillDesc('guanyu_ult')).toEqual({ short: '큰 한 방', long: '큰 한 방' });
     expect(skillDesc('zhangfei_ult').long).toBe('큰 한 방 + 기 꺾기');
     expect(skillDesc('taunt').long).toBe('상대 2턴 기본만');
+    expect(skillDesc('taunt').short).toBe('묶기 2턴');
   });
 });

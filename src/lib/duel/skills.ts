@@ -110,6 +110,6 @@ export function skillDesc(id: string): { short: string; long: string } {
     case 'ambush':
       return { short: '반격', long: '다음 피격 때 반격' };
     case 'taunt':
-      return { short: '도발', long: `상대 ${SKILL_RULES.tauntActions}턴 기본만` };
+      return { short: `묶기 ${SKILL_RULES.tauntActions}턴`, long: `상대 ${SKILL_RULES.tauntActions}턴 기본만` };
   }
 }
