@@ -9,6 +9,7 @@ import { PanelScene } from './PanelScene';
 import { playSfx } from './sfx';
 import { portraitKeyFor } from './textures';
 import { box, cursor } from './ui';
+import { drawRewardIcon } from './rewardIcons';
 import type { PickView, RecruitView, RewardShow } from './bridge';
 
 const CARD_INNER = REWARD_CARD.w - 12;
@@ -89,24 +90,33 @@ export class RewardScene extends PanelScene {
     return { x: REWARD_CARD.x0 + i * REWARD_CARD.step + REWARD_CARD.w / 2, y: REWARD_CARD.y + REWARD_CARD.h / 2 };
   }
 
-  /** 뒷면: 남색 바탕에 금 테두리 문양 */
+  /** 뒷면: 틀과 같은 먹녹색 천(체커 디더)에 진금 테두리, 가운데 주홍 인장 */
   private back(i: number): Phaser.GameObjects.Container {
     const { x, y } = this.cardCenter(i);
     const c = this.add.container(x, y);
     const g = this.add.graphics();
     const ox = -REWARD_CARD.w / 2;
     const oy = -REWARD_CARD.h / 2;
-    box(g, ox, oy, REWARD_CARD.w, REWARD_CARD.h, S.navy);
-    g.lineStyle(1, hex(S.gold2), 1);
-    g.strokeRect(ox + 6, oy + 6, REWARD_CARD.w - 12, REWARD_CARD.h - 12);
-    // 가운데 마름모 문양
-    g.fillStyle(hex(S.gold), 1);
-    g.fillTriangle(0, -16, 14, 0, -14, 0);
-    g.fillTriangle(-14, 0, 14, 0, 0, 16);
+    box(g, ox, oy, REWARD_CARD.w, REWARD_CARD.h, S.green1);
+    g.fillStyle(hex(S.green2), 1);
+    for (let yy = 2; yy < REWARD_CARD.h - 2; yy++) for (let xx = 2 + (yy % 2); xx < REWARD_CARD.w - 2; xx += 2) g.fillRect(ox + xx, oy + yy, 1, 1);
+    g.fillStyle(hex(S.gold2), 1);
+    g.fillRect(ox + 6, oy + 6, REWARD_CARD.w - 12, 1);
+    g.fillRect(ox + 6, oy + REWARD_CARD.h - 7, REWARD_CARD.w - 12, 1);
+    g.fillRect(ox + 6, oy + 6, 1, REWARD_CARD.h - 12);
+    g.fillRect(ox + REWARD_CARD.w - 7, oy + 6, 1, REWARD_CARD.h - 12);
+    // 주홍 인장(20×20): 테두리와 안쪽 획
     g.fillStyle(hex(S.red), 1);
-    g.fillRect(-4, -4, 8, 8);
-    g.fillStyle(hex(S.gold), 1);
-    g.fillRect(-1, -1, 2, 2);
+    g.fillRect(-10, -10, 20, 20);
+    g.fillStyle(hex(S.cream), 1);
+    g.fillRect(-8, -8, 16, 1);
+    g.fillRect(-8, 7, 16, 1);
+    g.fillRect(-8, -8, 1, 16);
+    g.fillRect(7, -8, 1, 16);
+    g.fillRect(-5, -5, 10, 1);
+    g.fillRect(-5, -1, 10, 1);
+    g.fillRect(-5, 3, 10, 1);
+    g.fillRect(0, -5, 1, 9);
     c.add(g);
     return c;
   }
@@ -139,12 +149,12 @@ export class RewardScene extends PanelScene {
       if (on) cursor(g, ox + 2, oy + 20);
       return c;
     }
-    g.fillStyle(hex(rare ? S.red : S.blue), 1);
+    // 아이콘 칸: 등급 색 테두리 안에 종류별 16×16 도트 아이콘
+    g.fillStyle(hex(rare ? S.red : S.gold2), 1);
     g.fillRect(ix, iy, 20, 20);
-    g.fillStyle(hex(S.ink), 1);
-    g.fillRect(ix + 3, iy + 3, 14, 14);
-    g.fillStyle(hex(S.gold), 1);
-    g.fillRect(ix + 7, iy + 7, 6, 6);
+    g.fillStyle(hex(S.cream), 1);
+    g.fillRect(ix + 1, iy + 1, 18, 18);
+    drawRewardIcon(g, card.id, ix + 2, iy + 2);
     if (on) cursor(g, ix - 8, iy + 7);
     return c;
   }

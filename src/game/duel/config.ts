@@ -9,8 +9,8 @@ export const TALL_BELOW_CSS = 400;
 /** 벌판 띠(전투 장면) 자리 */
 export const FIELD = { x: 12, y: 78, w: 296, h: 70 } as const;
 
-/** 스프라이트 크기(128px 원본을 줄여 그림) */
-export const SPRITE_PX = 34;
+/** 스프라이트 크기: 외곽선을 넣어 미리 만든 40px PNG(sprites-outlined)를 그대로 그린다 */
+export const SPRITE_PX = 40;
 
 /** 와꾸 v5의 S 객체 */
 export const PALETTE = {

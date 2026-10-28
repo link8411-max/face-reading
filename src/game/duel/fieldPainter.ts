@@ -56,7 +56,8 @@ export function paintField(ctx: Ctx, w: number, h: number): void {
   ridge('#55727a', 35, 7, 4.1, 16);
   for (let y = 32; y < 36; y++) for (let i = y % 2; i < W; i += 2) r(y < 34 ? '#4f6b43' : '#5d7a4b', i, y);
   r('#5d7a4b', 0, 34, W, 2);
-  const g = ['#c7ad70', '#bfa365', '#b3985b', '#a98e52'];
+  // 땅은 한 단계 밝게(갈색 말이 땅에 묻히지 않게)
+  const g = ['#d2bf8a', '#cbb67f', '#c2ad75', '#b9a26a'];
   for (let y = 36; y < 70; y++) {
     const b = Math.min(3, ((y - 36) / 9) | 0);
     r(g[b], 0, y, W, 1);

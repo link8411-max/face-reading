@@ -1,4 +1,4 @@
-// 에셋 로드 → 글꼴 대기(최대 1초) → 텍스처 생성 → 전투 장면
+// 에셋 로드(장수록 초상·스프라이트) → 글꼴 대기(최대 1초) → 텍스처 생성 → 첫 장면, 그 뒤 보스 초상
 import * as Phaser from 'phaser';
 import { DUEL_GENERALS } from '@/lib/duel/generals';
 import { FONT_KR, FONT_NUM } from './config';
@@ -8,6 +8,9 @@ import { SCENE_KEY } from './sceneKeys';
 import type { DuelBridge } from './bridge';
 
 const FONT_WAIT_MS = 1000;
+
+/** 게임용 초상 PNG(scripts/duel-portraits.ts가 만든다) */
+const portraitUrl = (id: string) => `/images/samguk/duel-portraits/${id}.png`;
 
 /** next/font는 글꼴 이름에 해시를 붙여 CSS 변수로만 알려 준다. 변수가 있으면 그 이름을 쓴다 */
 function resolveFont(varName: string, fallback: string): string {
@@ -46,11 +49,19 @@ export class BootScene extends Phaser.Scene {
     this.load.on('loaderror', (file: Phaser.Loader.File) => {
       if (typeof console !== 'undefined') console.debug(`[duel] 그림 없음 ${file.key} → 대체`);
     });
+    // 게임용 작은 초상(46×54 팔레트 PNG, 장당 수 KB)은 시작 화면 장수록에 보이는 장수만 먼저, 보스는 뒤에(lateLoad)
     for (const g of DUEL_GENERALS) {
-      // 졸개는 초상이 없다
-      if (g.role !== 'mob') this.load.image(`portrait:${g.id}`, `/images/samguk/${g.name}.jpg`);
-      this.load.image(`sprite:${g.id}`, `/images/samguk/sprites/${g.sprite}`);
+      if (g.role === 'starter' || g.role === 'recruit') this.load.image(`portrait:${g.id}`, portraitUrl(g.id));
+      // 외곽선을 넣은 40px 스프라이트
+      this.load.image(`sprite:${g.id}`, `/images/samguk/sprites-outlined/${g.id}.png`);
     }
+  }
+
+  /** 시작 화면이 뜬 뒤 나머지 초상(보스)을 받는다. 보스 웨이브(6) 전에 다 온다 */
+  private lateLoad(): void {
+    const rest = DUEL_GENERALS.filter((g) => g.role === 'boss');
+    for (const g of rest) this.load.image(`portrait:${g.id}`, portraitUrl(g.id));
+    this.load.start();
   }
 
   create(): void {
@@ -61,7 +72,9 @@ export class BootScene extends Phaser.Scene {
     void waitFonts().then(() => {
       const bridge = this.registry.get('bridge') as DuelBridge;
       this.registry.set('booted', true);
-      this.scene.start(SCENE_KEY[bridge.wantScene]);
+      // Boot는 그림 없이 남아 나머지 초상을 받는다(장면 컨트롤러는 Boot를 멈추지 않는다)
+      this.scene.launch(SCENE_KEY[bridge.wantScene]);
+      this.lateLoad();
     });
   }
 }

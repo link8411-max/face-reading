@@ -50,10 +50,9 @@ export class StartScene extends PanelScene {
         // 잠긴 장수: 거의 검은 그림자(누군지는 이름으로만)
         if (gen.locked) img.setTint(0x161616);
       }
-      // 유형 한 글자 표찰(왼쪽 위)
-      g.fillStyle(hex(S.ink), 1);
-      g.fillRect(x + 2, y + 2, 10, 10);
-      this.t(x + 3, y + 2, KIND_MARK[gen.kind] ?? '', { ko: 7, color: S.gold });
+      // 유형 한 글자 표찰(왼쪽 위, 초상 위에 얹는다)
+      this.add.rectangle(x + 2, y + 2, 11, 11, hex(S.ink)).setOrigin(0);
+      this.t(x + 4, y + 3, KIND_MARK[gen.kind] ?? '', { ko: 7, color: S.gold });
       if (gen.locked) this.t(x + 25, y + 20, '?', { ko: 11, bold: true, color: S.gold2 }).setOrigin(0.5, 0);
       const name = this.t(x + 25, y + 59, gen.name, { ko: 9, color: gen.locked ? S.cream2 : on || picked ? S.gold : S.cream, shadow: true });
       name.setOrigin(0.5, 0);
