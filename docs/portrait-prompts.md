@@ -110,6 +110,27 @@ SUBJECT:
 | 순우경.jpg | Chunyu Qiong, drunk general who lost the grain depot at Wuchao. Flushed red-cheeked tipsy face, droopy half-closed sleepy eyes, bushy gray-streaked beard, loose grin, worn brown armor. |
 | 이숙.jpg | Li Su, smooth-talking envoy who bribed Lu Bu with the Red Hare horse. Smooth friendly face, persuasive salesman smile, clever twinkling eyes, thin mustache, black headscarf, light leather armor. |
 
+### 여성 인물 16명 (2026-10-29 추가, 2×2 바둑판 4장)
+화풍 참고는 기존 여성 초상화 `초선.jpg`, `손상향.jpg`, `대교.jpg`를 같이 넣어요. 모두 아름답거나 기품 있게, 서로 얼굴형·눈매·머리 모양이 확실히 다르게.
+| 바둑판 | 칸 | 파일 | 묘사 |
+|---|---|---|---|
+| grid3 | 왼위 | 왕이.jpg | Wang Yi, resolute Wei strategist wife. Hair tied up neatly, cool determined eyes, firmly closed lips, dark navy robe with light armor. |
+| grid3 | 오위 | 장성채.jpg | Zhang Xingcai, Zhang Fei's daughter and Shu empress. Clear bright eyes, straight brows, hair tied back, green silk robe with silver hairpin, upright and brave. |
+| grid3 | 왼아래 | 관은병.jpg | Guan Yinping, Guan Yu's cheerful daughter. Round bright eyes, big warm smile, long braided hair, red outfit with light armor. |
+| grid3 | 오아래 | 마운록.jpg | Ma Yunlu, Ma Chao's sister, horsewoman of Xiliang. Sun-tanned healthy face, sharp lively eyes, high ponytail, silver armor with white feather. |
+| grid4 | 왼위 | 왕원희.jpg | Wang Yuanji, Sima Zhao's wise wife. Slender elegant face, calm lowered intelligent eyes, tall hairdo with gold pins, dark purple silk robe. |
+| grid4 | 오위 | 신헌영.jpg | Xin Xianying, wise Wei lady. Gentle intelligent face, serene eyes, neatly combed-up hair, pale teal robe. |
+| grid4 | 왼아래 | 곽황후.jpg | Empress Guo of Wei, the clever "Queen". Sparkling clever eyes, defined brows, confident smile, ornate phoenix crown, red empress robe. |
+| grid4 | 오아래 | 하태후.jpg | Empress Dowager He of Han. Glamorous commanding face, long dark eyeliner eyes, red lips, golden phoenix crown, crimson empress robe. |
+| grid5 | 왼위 | 복황후.jpg | Empress Fu of Han, loyal tragic empress. Very fair clear skin, large sorrowful eyes, gentle mouth, gold hairpins, pale golden robe. |
+| grid5 | 오위 | 추씨.jpg | Lady Zou, the fatal beauty at Wancheng. Alluring half-lidded eyes, long flowing black hair, faint mysterious smile, pale pink silk with jade ornaments. |
+| grid5 | 왼아래 | 번씨.jpg | Lady Fan, modest beauty of Guiyang. Slender delicate face, shyly lowered eyes, neat low bun, light sky-blue robe. |
+| grid5 | 오아래 | 손노반.jpg | Sun Luban, Sun Quan's scheming eldest princess. Sharp defined eyes, slightly raised smirk, elaborate updo with gold ornaments, red silk robe. |
+| grid6 | 왼위 | 하후씨.jpg | Lady Xiahou, Zhang Fei's gentle wife. Round soft face, warm kind eyes, shy smile, simple tied hair, light green robe. |
+| grid6 | 오위 | 서씨.jpg | Lady Xu, calm avenging widow of Wu. Graceful composed face, deep clear eyes, firmly closed lips, white mourning robe, simple hair ornament. |
+| grid6 | 왼아래 | 반부인.jpg | Lady Pan, Sun Quan's breathtaking empress. Fairy-like beautiful face, large dewy eyes, red lips, tall hairdo with jade and pearls, pink silk robe. |
+| grid6 | 오아래 | 조절.jpg | Cao Jie, Cao Cao's daughter and loyal Han empress. Dignified face, straight strong gaze, firmly closed mouth, golden crown, dark green empress robe. |
+
 ### 바둑판으로 여러 명 만들기 (할당량 절약)
 - 정사각형 한 장을 같은 크기 4칸(2×2)으로 나눠 4명을 한 번에 만들고, 칸 사이는 굵은 검은 선, 각 칸은 위와 같은 구도로 요청해요. 머리 위에 여백을 조금 두라고 해야 관이 잘리지 않아요.
 - 원본은 `새장수/gridN.jpg`로 저장하고 `/usr/bin/python3 scripts/split-grid.py <grid.jpg> 왼위 오위 왼아래 오아래`로 잘라요(각 칸을 1024로 키워 한글이름.jpg로 저장).
