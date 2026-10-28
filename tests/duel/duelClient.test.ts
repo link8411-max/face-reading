@@ -295,6 +295,6 @@ describe('전투 버튼 aria-label (battleRowInfo)', () => {
     run.battle!.party.push({ ...run.battle!.party[0], id: 'zhangfei' });
     const sw = battleRowInfo(run, 'switch');
     expect(sw.label).toMatch(/^장비로 교체 (유리|불리|비등)$/);
-    expect(sw.action).toEqual({ type: 'switch', toIndex: 1 });
+    expect(sw.action).toEqual({ type: 'switch', toIndex: 1 }); // view.switchTo.index와 같은 자리
   });
 });

@@ -167,11 +167,10 @@ export function battleRowInfo(run: RunState, id: BattleFocusId): { label: string
   if (!run.battle) return { label: '', action: null };
   const view = toBattleView(run);
   if (id === 'switch') {
-    const to = nextSwitchIndex(run);
     const sw = view?.switchTo;
-    return to === null || !sw
-      ? { label: '교체할 장수 없음', action: null }
-      : { label: `${euro(sw.name)} 교체 ${EFF_WORD[sw.eff]}`, action: { type: 'switch', toIndex: to } };
+    return sw
+      ? { label: `${euro(sw.name)} 교체 ${EFF_WORD[sw.eff]}`, action: { type: 'switch', toIndex: sw.index } }
+      : { label: '교체할 장수 없음', action: null };
   }
   const sk = view?.player.skills[Number(id.slice(5))];
   if (!sk) return { label: '', action: null };

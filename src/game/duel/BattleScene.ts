@@ -32,10 +32,15 @@ const FOCUS_IDS: BattleFocusId[] = ['skill0', 'skill1', 'skill2', 'skill3', 'swi
 const FLASH_MS = 34;
 const SHAKE_MS = 150;
 const SHAKE_STEPS = [4, -4, 4, -4, 4, -4, 0];
-/** 적 의도 줄(오른끝 맞춤)이 넘으면 안 되는 너비. 넘으면 피해 숫자를 뺀다 */
-const INTENT_MAX_W = 150;
-/** 유형·레벨 줄 옆에 상태 표를 붙일 수 있는 너비(가운데 상성 낱말과 겹치지 않게) */
-const INFO_MAX_W = 76;
+/** 적 의도 줄(오른끝 x=256)은 가운데 TURN 글자(오른끝 약 x=177)와 겹치지 않게 왼끝 x=184까지만 */
+const INTENT_MAX_W = 72;
+/**
+ * 상태 표 줄: 플레이어는 (64,44)에서 x=137까지.
+ * 적은 y=30 오른끝 x=256(웨이브 띠 끝 x≈213 앞 x=216까지). 보스면 표찰(x232~256) 왼쪽 x=230 오른끝인데
+ * 그 높이(y30)에는 웨이브 띠가 있어 한 줄 아래 y=35에 둔다(TURN 글자 오른끝 x≈177보다 오른쪽, x=186까지)
+ */
+const STATUS_PLAYER = { x: 64, y: 44, maxW: 73 } as const;
+const STATUS_ENEMY = { y: 30, right: 256, minX: 216, boss: { y: 35, right: 230, minX: 186 } } as const;
 
 interface FighterObjs {
   sprite: Phaser.GameObjects.Image;
@@ -44,6 +49,8 @@ interface FighterObjs {
   noPortrait: Phaser.GameObjects.Text;
   name: Phaser.GameObjects.Text;
   info: Phaser.GameObjects.Text;
+  /** 상태 표 줄(최대 2개) */
+  status: Phaser.GameObjects.Text;
   /** 적 의도 줄(적만) */
   intent: Phaser.GameObjects.Text | null;
   /** 보스 표찰(적만) */
@@ -208,7 +215,10 @@ export class BattleScene extends Phaser.Scene {
       const sprite = this.add.image(SIDE_X[left ? 'left' : 'right'], SPR_BOTTOM, '__DEFAULT').setOrigin(0.5, 1);
       // 적 의도: 이름(14)·보스 표찰(30) 아래, 유형 줄(56) 위
       const intent = left ? null : text(this, 256, 44, '', { ko: 9, color: S.cream, shadow: true }).setOrigin(1, 0);
-      return { sprite, baseScale: 1, portrait, noPortrait, name, info, intent, boss, border, hpNum };
+      const status = left
+        ? text(this, STATUS_PLAYER.x, STATUS_PLAYER.y, '', { ko: 9, color: S.cream, shadow: true })
+        : text(this, STATUS_ENEMY.right, STATUS_ENEMY.y, '', { ko: 9, color: S.cream, shadow: true }).setOrigin(1, 0);
+      return { sprite, baseScale: 1, portrait, noPortrait, name, info, status, intent, boss, border, hpNum };
     };
     this.f = { player: make('player'), enemy: make('enemy') };
   }
@@ -272,10 +282,10 @@ export class BattleScene extends Phaser.Scene {
     this.wave.setText(`WAVE ${v.wave}/${WAVES}`);
     this.turn.setText(`TURN ${v.turn}`);
     this.drawStrip(v.wave);
+    this.f.enemy.boss?.setVisible(v.enemy.isBoss); // 적 상태 표 자리가 보스 표찰 여부에 달렸다
     this.applyFighter('player', v.player, v.player);
     this.applyFighter('enemy', v.enemy, v.enemy);
     this.applyIntent(v);
-    this.f.enemy.boss?.setVisible(v.enemy.isBoss);
     // 필살기 예고 중이면 적 초상에 빨간 테두리를 남긴다
     const bg = this.f.enemy.border.clear();
     if (v.enemy.charging) {
@@ -295,9 +305,14 @@ export class BattleScene extends Phaser.Scene {
     const it = v.enemy.intent;
     const o = this.f.enemy.intent;
     if (o) {
-      const full = `다음 ${it.name}${it.dmg ? ` ~${it.dmg.max}` : ''}${it.sure ? '' : '?'}`;
-      o.setText(full);
-      if (o.width > INTENT_MAX_W) o.setText(`다음 ${it.name}${it.sure ? '' : '?'}`);
+      // 좁으면 "다음"을 떼고, 피해 숫자를 떼고, 마지막엔 끝을 말줄임
+      const dmg = it.dmg ? ` ~${it.dmg.max}` : '';
+      const q = it.sure ? '' : '?';
+      const tries = [`다음 ${it.name}${dmg}${q}`, `${it.name}${dmg}${q}`, `${it.name}${q}`];
+      for (const t of tries) {
+        o.setText(t);
+        if (o.width <= INTENT_MAX_W) break;
+      }
       this.fitText(o, INTENT_MAX_W);
       o.setColor(it.ult || it.eff === 'win' ? S.red : it.eff === 'lose' ? S.gold : S.cream);
     }
@@ -305,16 +320,28 @@ export class BattleScene extends Phaser.Scene {
     this.matchupT.setColor(v.matchup === 'win' ? S.gold : v.matchup === 'lose' ? S.red : S.cream);
   }
 
+  /** 상태 표(최대 2개)를 따로 둔 줄에. 자리를 넘으면 첫 표만, 그래도 넘으면 끝을 말줄임 */
+  private applyStatus(who: Who, tags: string[]): void {
+    const t = this.f[who].status;
+    let maxW: number;
+    if (who === 'player') maxW = STATUS_PLAYER.maxW;
+    else {
+      const e = this.f.enemy.boss?.visible ? STATUS_ENEMY.boss : STATUS_ENEMY;
+      t.setPosition(e.right, e.y);
+      maxW = e.right - e.minX;
+    }
+    for (const use of [tags.slice(0, 2), tags.slice(0, 1)]) {
+      t.setText(use.join(' '));
+      if (t.width <= maxW) return;
+    }
+    this.fitText(t, maxW);
+  }
+
   private applyFighter(who: Who, fv: FighterView, base: { kind: string; level: number; status: string[] }): void {
     const o = this.f[who];
     o.name.setText(fv.name);
-    // 유형·레벨 + 상태 표. 가운데 상성 낱말을 넘으면 첫 표만, 그래도 넘으면 표 없이
-    const head = `${base.kind} Lv${base.level}`;
-    const tries = [base.status, base.status.slice(0, 1), []];
-    for (const tags of tries) {
-      o.info.setText(tags.length ? `${head} ${tags.join(' ')}` : head);
-      if (o.info.width <= INFO_MAX_W) break;
-    }
+    o.info.setText(`${base.kind} Lv${base.level}`);
+    this.applyStatus(who, base.status);
     const pk = portraitKeyFor(this, fv.id);
     if (pk) o.portrait.setTexture(pk).setDisplaySize(46, 54).setVisible(true);
     else o.portrait.setVisible(false);
