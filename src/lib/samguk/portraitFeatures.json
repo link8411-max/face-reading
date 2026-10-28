@@ -587,6 +587,7 @@
     "chinLength": 0.2375,
     "midfaceRatio": 0.4076
   },
+  "liyan": null,
   "lusu": {
     "eyeAspect": 0.3128,
     "eyeTilt": 7.3596,
@@ -1068,6 +1069,7 @@
   },
   "xuyou": null,
   "yangsong": null,
+  "yangyi": null,
   "yanliang": null,
   "yuanshao": {
     "eyeAspect": 0.3125,

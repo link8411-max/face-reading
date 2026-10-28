@@ -360,6 +360,16 @@ export const handProfiles: Record<string, CharacterProfile> = {
     z: { eyeSpacing: 1.2, eyeTilt: 1.2, noseLength: 0.9, mouthWidth: -0.9, mouthCornerLift: 0.8 },
     weight: { eyeSpacing: 1.5, eyeTilt: 1.3 },
   },
+  // 양의: 불만 가득 처진 입꼬리, 찡그린 가는 눈, 홀쭉한 얼굴
+  yangyi: {
+    z: { mouthCornerLift: -1.5, eyeAspect: -1.1, jawWidth: -0.9, browGap: -0.9, lipFullness: -0.8 },
+    weight: { mouthCornerLift: 1.6, jawWidth: 1.2 },
+  },
+  // 이엄: 넓고 둥근 얼굴에 여유로운 웃음, 짙은 수염
+  liyan: {
+    z: { faceAspect: -1.1, jawWidth: 1.1, mouthCornerLift: 1.1, noseWidth: 1, eyeTilt: -0.8 },
+    weight: { faceAspect: 1.4, noseWidth: 1.3 },
+  },
   // 황개: 풍상을 겪은 노장, 회색 수염, 전장에서 단련된 매서운 눈썹
   huanggai: {
     z: { browTilt: 1.4, browGap: -1.2, mouthCornerLift: -1.4, jawWidth: 1.2, noseWidth: 1 },

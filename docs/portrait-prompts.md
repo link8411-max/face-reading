@@ -96,6 +96,20 @@ SUBJECT:
 | 고순.jpg | Gao Shun, Lu Bu's loyal and incorruptible commander. Stoic plain face, short beard, silent resolute eyes, dark armor. |
 | 이유.jpg | Li Ru, Dong Zhuo's cunning advisor. Thin pale-ochre face, narrow scheming eyes, thin mustache, sly smile, black scholar cap, dark purple robe. A villainous schemer. |
 
+### 이름난 악역 10명 (2026-10-29 추가)
+| 파일 | 묘사 |
+|---|---|
+| 왕랑.jpg | Wang Lang, elderly Wei minister famous for losing a debate to Zhuge Liang. Old proud face, long flowing white beard, stiff haughty posture, strict lecturing eyes, black official cap, dark navy court robe. |
+| 화흠.jpg | Hua Xin, cold-hearted Wei minister who dragged the empress out of hiding. Lean cold face, narrow slit eyes, neat mustache and chin beard, expressionless mouth, black official cap, dark green court robe. |
+| 사마소.jpg | Sima Zhao, ambitious regent of Wei, son of Sima Yi. Long sharp face, half-lidded calculating eyes hiding his ambition, trimmed mustache and short beard, faint confident smirk, ornate black-and-gold cap, dark navy silk robe. |
+| 조상.jpg | Cao Shuang, idle pampered Wei regent overthrown by Sima Yi. Plump soft round face, relaxed naive eyes, short beard, carefree content expression, gold-ornamented cap, luxurious crimson silk robe. |
+| 장송.jpg | Zhang Song, brilliant but famously ugly official who betrayed Yi province. Small bony face with bulging forehead, pointed chin, snub upturned nose, protruding buck teeth, sharp intelligent glinting eyes, plain black cap and gray robe. Clearly homely, not handsome. |
+| 이각.jpg | Li Jue, brutal warlord who seized Chang'an after Dong Zhuo. Thuggish square face, wide glaring bulging eyes, rough sideburns and stubble beard, sneering mouth, dark red armor and helmet. |
+| 곽사.jpg | Guo Si, Li Jue's paranoid partner in crime. Face covered in thick shaggy beard, heavy furrowed eyebrows knitted in suspicion, thick broad nose, scowling eyes, worn iron armor and helmet. |
+| 손호.jpg | Sun Hao, tyrannical last emperor of Wu. Pale nervous face, sharp upward-slanting cruel eyes, thin tight lips, short beard, arrogant sneer, golden imperial crown with hanging beads, red imperial robe. |
+| 순우경.jpg | Chunyu Qiong, drunk general who lost the grain depot at Wuchao. Flushed red-cheeked tipsy face, droopy half-closed sleepy eyes, bushy gray-streaked beard, loose grin, worn brown armor. |
+| 이숙.jpg | Li Su, smooth-talking envoy who bribed Lu Bu with the Red Hare horse. Smooth friendly face, persuasive salesman smile, clever twinkling eyes, thin mustache, black headscarf, light leather armor. |
+
 ## 4. 저장 규칙
 - 1024×1024 JPEG로 `public/images/samguk/새장수/` 폴더에 한글 이름으로 저장해요. 기존 폴더와 섞이지 않게 따로 둬요.
 - 한 장씩 만들어서 기존 3장과 나란히 놓고 비교해요. 화풍이 다르면(실사 느낌, 매끈함, 하얀 피부) 다시 만들어요.
