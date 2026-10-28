@@ -72,6 +72,49 @@ describe('loadSave', () => {
   });
 });
 
+describe('loadSave 손상 내성', () => {
+  const load = (v: unknown) => loadSave(fakeStorage(JSON.stringify(v)));
+  it('battle.party가 객체/숫자/true여도 throw 없음', () => {
+    for (const bad of [{}, 5, true]) {
+      const run = startRun('guanyu', 1);
+      (run.battle as unknown as { party: unknown }).party = bad;
+      expect(() => load({ ...empty(), current: run })).not.toThrow();
+    }
+  });
+  it('current가 42/문자열/배열이면 null', () => {
+    for (const bad of [42, 'x', [], true]) expect(load({ ...empty(), current: bad }).current).toBeNull();
+  });
+  it('battle.party / battle.enemy의 알 수 없는 id → current null', () => {
+    const a = startRun('guanyu', 1);
+    a.battle!.party[0].id = 'ghost';
+    expect(load({ ...empty(), current: a }).current).toBeNull();
+    const b = startRun('guanyu', 1);
+    b.battle!.enemy.id = 'ghost';
+    expect(load({ ...empty(), current: b }).current).toBeNull();
+  });
+  it('best: 음수·NaN(null)·문자열 → 0', () => {
+    expect(load({ ...empty(), best: { wave: -3, clears: 'x' } }).best).toEqual({ wave: 0, clears: 0 });
+    expect(load({ ...empty(), best: { wave: null, clears: NaN } }).best).toEqual({ wave: 0, clears: 0 });
+    expect(load({ ...empty(), best: 7 }).best).toEqual({ wave: 0, clears: 0 });
+  });
+  it('최상위 null·배열·원시값 → 기본값', () => {
+    expect(load(null)).toEqual(empty());
+    expect(load([1, 2])).toEqual(empty());
+    expect(load('str')).toEqual(empty());
+  });
+  it('history: 비객체·waves 불량 항목 제거, 21개 이상이면 20개', () => {
+    const good = rec(1);
+    const out = load({ ...empty(), history: [null, 3, 'x', { waves: 'no' }, { waves: [1] }, good] });
+    expect(out.history).toEqual([good]);
+    expect(load({ ...empty(), history: Array.from({ length: 25 }, () => good) }).history).toHaveLength(20);
+    expect(load({ ...empty(), history: {} }).history).toEqual([]);
+  });
+  it('roster가 배열이 아니면 시작 장수만', () => {
+    expect(load({ ...empty(), roster: 'lvbu' }).roster).toEqual([...STARTER_IDS]);
+    expect(load({ ...empty(), roster: { a: 1 } }).roster).toEqual([...STARTER_IDS]);
+  });
+});
+
 describe('writeSave', () => {
   it('setItem이 throw → false', () => {
     const s = { getItem: () => null, setItem: () => { throw new Error('quota'); }, removeItem() {} };

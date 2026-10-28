@@ -28,12 +28,29 @@ function validCurrent(c: unknown): RunState | null {
   if (!c || typeof c !== 'object') return null;
   const run = c as RunState;
   if (!Array.isArray(run.party) || !Array.isArray(run.roster) || !run.record) return null;
-  const fighters: (Fighter | null | undefined)[] = [...run.party, run.enemy, run.battle?.enemy, ...(run.battle?.party ?? [])];
+  const bp = run.battle?.party;
+  const fighters: (Fighter | null | undefined)[] = [...run.party, run.enemy, run.battle?.enemy, ...(Array.isArray(bp) ? bp : [])];
   for (const f of fighters) {
     if (f && !known(f.id)) return null;
   }
   if (!run.roster.every(known) || !known(run.record.starter)) return null;
   return run;
+}
+
+function safeCurrent(c: unknown): RunState | null {
+  try {
+    return validCurrent(c);
+  } catch {
+    return null;
+  }
+}
+
+function sanitizeHistory(raw: unknown): RunRecord[] {
+  if (!Array.isArray(raw)) return [];
+  const isObj = (x: unknown): x is Record<string, unknown> => !!x && typeof x === 'object';
+  return raw
+    .filter((r) => isObj(r) && Array.isArray(r.waves) && r.waves.every(isObj))
+    .slice(0, HISTORY_MAX) as RunRecord[];
 }
 
 export function loadSave(storage: Store | null): SaveData {
@@ -45,15 +62,15 @@ export function loadSave(storage: Store | null): SaveData {
   } catch {
     return defaults();
   }
-  if (!parsed || typeof parsed !== 'object') return defaults();
+  if (!parsed || typeof parsed !== 'object' || Array.isArray(parsed)) return defaults();
   const p = parsed as Partial<SaveData> & { version?: unknown };
   const best = (p.best ?? {}) as Partial<SaveData['best']>;
   return {
     version: 1,
     roster: sanitizeRoster(p.roster),
     best: { wave: num(best.wave), clears: num(best.clears) },
-    history: Array.isArray(p.history) ? (p.history.filter((r) => r && typeof r === 'object' && Array.isArray(r.waves)) as RunRecord[]).slice(0, HISTORY_MAX) : [],
-    current: p.version === SAVE_VERSION ? validCurrent(p.current) : null,
+    history: sanitizeHistory(p.history),
+    current: p.version === SAVE_VERSION ? safeCurrent(p.current) : null,
   };
 }
 
