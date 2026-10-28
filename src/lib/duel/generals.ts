@@ -3,7 +3,11 @@ import { getCharacterById } from '@/lib/samgukDB';
 import type { DuelGeneral, GeneralKind } from './types';
 
 export const STARTER_IDS = ['guanyu', 'zhangfei', 'zhaoyun'] as const;
-export const BOSS_IDS = ['zhangjiao', 'dongzhuo', 'lvbu'] as const;
+/**
+ * 보스 웨이브(6·12·18·24·30·36) 순서대로의 보스. 장각·동탁·여포는 role 'boss'(영입 불가),
+ * 하후돈·허저·마초는 role 'recruit'를 유지한 채 자기 보스 웨이브에만 보스로 나온다(run.ts nextEnemyId).
+ */
+export const BOSS_IDS = ['zhangjiao', 'xiaohoudun', 'dongzhuo', 'xuchu', 'machao', 'lvbu'] as const;
 export const MOB_ID = 'mob';
 
 // 유형별 기본 속도: 기장 70 / 맹장 55 / 지장 45

@@ -7,6 +7,8 @@ import { REWARDS, drawRewards, getReward } from '@/lib/duel/rewards';
 import {
   WAVES,
   BOSS_WAVES,
+  bossIdFor,
+  enemyLevel,
   startRun,
   nextEnemyId,
   playerTurn,
@@ -46,7 +48,7 @@ function autoPlay(seed: number, onStep?: (prev: RunState, next: RunState) => voi
       run = pickReward(run, id, rng, firstTarget(run, id));
     }
     onStep?.(prev, run);
-    if (turns > 500) throw new Error(`시드 ${seed}: 500턴 넘음`);
+    if (turns > 2000) throw new Error(`시드 ${seed}: 2000턴 넘음`);
   }
   return { run, turns };
 }
@@ -83,17 +85,17 @@ describe('startRun', () => {
     expect(run.battle!.active).toBe(0);
     expect(run.record.starter).toBe('guanyu');
     expect(run.record.waves).toEqual([{ wave: 1, enemy: MOB_ID, turns: 0 }]);
-    expect(WAVES).toBe(18);
-    expect(BOSS_WAVES).toEqual([6, 12, 18]);
+    expect(WAVES).toBe(36);
+    expect(BOSS_WAVES).toEqual([6, 12, 18, 24, 30, 36]);
   });
 });
 
 describe('자동 플레이', () => {
-  it.each(SEEDS)('시드 %i: 기본 공격만 눌러도 500턴 안에 won 또는 lost로 끝난다', (seed) => {
+  it.each(SEEDS)('시드 %i: 기본 공격만 눌러도 2000턴 안에 won 또는 lost로 끝난다', (seed) => {
     const { run } = autoPlay(seed);
     expect(['won', 'lost']).toContain(run.phase);
     if (run.phase === 'won') {
-      expect(run.wave).toBe(18);
+      expect(run.wave).toBe(WAVES);
       expect(run.record.cleared).toBe(true);
     } else {
       expect(run.party.every((f) => f.hp <= 0)).toBe(true);
@@ -101,7 +103,7 @@ describe('자동 플레이', () => {
     }
   });
 
-  it.each(SEEDS)('시드 %i: 한 방에 끝내는 관우면 18웨이브를 다 돌아 won, 보스 6·12·18 순서', (seed) => {
+  it.each(SEEDS)('시드 %i: 한 방에 끝내는 관우면 36웨이브를 다 돌아 won, 보스 6·12·18·24·30·36 순서', (seed) => {
     const rng = createRng(seed);
     let run = structuredClone(startRun('guanyu', seed));
     run.party[0].bonus = { atk: 5000, int: 0, speed: 5000 };
@@ -112,20 +114,24 @@ describe('자동 플레이', () => {
     while (run.phase === 'battle' || run.phase === 'reward') {
       if (run.phase === 'battle') {
         enemies.push(run.enemy!.id);
-        if ([6, 12, 18].includes(run.wave)) bosses[run.wave] = run.enemy!.id;
+        if ((BOSS_WAVES as readonly number[]).includes(run.wave)) bosses[run.wave] = run.enemy!.id;
         run = playerTurn(run, basicAttack(run), rng);
         turns += 1;
       } else {
         const id = run.rewardsOffered[0];
         run = pickReward(run, id, rng, firstTarget(run, id));
       }
-      expect(turns).toBeLessThanOrEqual(500);
+      expect(turns).toBeLessThanOrEqual(2000);
     }
     expect(run.phase).toBe('won');
     expect(run.record.cleared).toBe(true);
-    expect(run.record.waves).toHaveLength(18);
-    expect(run.record.rewards).toHaveLength(17);
-    expect(bosses).toEqual({ 6: 'zhangjiao', 12: 'dongzhuo', 18: 'lvbu' });
+    expect(run.record.waves).toHaveLength(36);
+    expect(run.record.rewards).toHaveLength(35);
+    // 하후돈·허저·마초는 항복하지 않았으면 자기 보스 웨이브에 나온다(항복했으면 대신할 장수)
+    expect(bosses[6]).toBe('zhangjiao');
+    expect(bosses[18]).toBe('dongzhuo');
+    expect(bosses[36]).toBe('lvbu');
+    for (const w of [12, 24, 30]) expect(['recruit', 'starter', 'mob']).toContain(getDuelGeneral(bosses[w])!.role);
     const named = enemies.filter((id) => id !== MOB_ID);
     expect(new Set(named).size).toBe(named.length);
   });
@@ -165,16 +171,20 @@ describe('자동 플레이', () => {
 
 describe('nextEnemyId', () => {
   const rng = createRng(5);
-  it('1~3 졸개, 4~5 영입급, 보스 웨이브는 장각·동탁·여포', () => {
+  it('1~3 졸개, 4~5 영입급, 보스 웨이브는 장각·하후돈·동탁·허저·마초·여포', () => {
     const base = startRun('guanyu', 5);
     for (const w of [1, 2, 3]) expect(nextEnemyId({ ...base, wave: w }, rng)).toBe(MOB_ID);
     for (const w of [4, 5]) expect(getDuelGeneral(nextEnemyId({ ...base, wave: w }, rng))!.role).toBe('recruit');
     expect(nextEnemyId({ ...base, wave: 6 }, rng)).toBe('zhangjiao');
-    expect(nextEnemyId({ ...base, wave: 12 }, rng)).toBe('dongzhuo');
-    expect(nextEnemyId({ ...base, wave: 18 }, rng)).toBe('lvbu');
-    for (const w of [7, 9, 13, 17]) {
+    expect(nextEnemyId({ ...base, wave: 12 }, rng)).toBe('xiaohoudun');
+    expect(nextEnemyId({ ...base, wave: 18 }, rng)).toBe('dongzhuo');
+    expect(nextEnemyId({ ...base, wave: 24 }, rng)).toBe('xuchu');
+    expect(nextEnemyId({ ...base, wave: 30 }, rng)).toBe('machao');
+    expect(nextEnemyId({ ...base, wave: 36 }, rng)).toBe('lvbu');
+    for (const w of [4, 5, 7, 9, 13, 17, 23, 35]) {
       const id = nextEnemyId({ ...base, wave: w }, rng);
       expect(id).not.toBe('guanyu');
+      expect(['xiaohoudun', 'xuchu', 'machao']).not.toContain(id);
       expect(['recruit', 'starter', 'mob']).toContain(getDuelGeneral(id)!.role);
     }
   });
@@ -182,13 +192,11 @@ describe('nextEnemyId', () => {
   it.each(SEEDS)('시드 %i: 자동 플레이에서 보스 웨이브 적과 레벨', (seed) => {
     autoPlay(seed, (_prev, next) => {
       if (next.phase !== 'battle') return;
-      const boss = BOSS_WAVES.indexOf(next.wave as 6 | 12 | 18);
-      if (boss >= 0) {
-        expect(next.enemy!.id).toBe(['zhangjiao', 'dongzhuo', 'lvbu'][boss]);
-        expect(next.enemy!.level).toBe(next.wave + 3);
-      } else {
-        expect(next.enemy!.level).toBe(next.wave);
+      const boss = (BOSS_WAVES as readonly number[]).indexOf(next.wave);
+      if (boss === 0 || boss === 2 || boss === 5) {
+        expect(next.enemy!.id).toBe(['zhangjiao', '', 'dongzhuo', '', '', 'lvbu'][boss]);
       }
+      expect(next.enemy!.level).toBe(enemyLevel(next.wave));
     });
   });
 });
@@ -276,8 +284,8 @@ describe('afterWin', () => {
     expect(next.record.waves[0].recruited).toBeFalsy();
   });
 
-  it('18웨이브 승리면 won, cleared', () => {
-    const run = structuredClone(atWave(startRun('guanyu', 1), 18, 'lvbu', 21));
+  it('36웨이브 승리면 won, cleared', () => {
+    const run = structuredClone(atWave(startRun('guanyu', 1), 36, 'lvbu', enemyLevel(36)));
     run.battle!.enemy.hp = 0;
     const next = afterWin(run, createRng(1));
     expect(next.phase).toBe('won');
@@ -597,5 +605,31 @@ describe('markRecruitHandled', () => {
     expect(run.record.waves.at(-1)!.recruitHandled).toBeUndefined();
     const plain = startRun('guanyu', 1);
     expect(markRecruitHandled(plain)).toBe(plain);
+  });
+});
+
+describe('36웨이브 보스 구조', () => {
+  it('보스로 나올 영입 장수가 이미 동행·장수록에 있거나 나왔으면 아직 안 나온 영입 장수로 대신한다', () => {
+    const base = startRun('guanyu', 5);
+    expect(bossIdFor(base, 7)).toBeNull();
+    expect(bossIdFor({ ...base, roster: ['guanyu', 'xiaohoudun'] }, 12)).toBe('huangzhong');
+    const used = {
+      ...base,
+      record: { ...base.record, waves: ['huangzhong', 'zhouyu', 'xiaohoudun'].map((enemy, i) => ({ wave: i + 4, enemy, turns: 1 })) },
+    };
+    expect(bossIdFor({ ...used, party: [...base.party, makeFighter('xuchu', 5)] }, 24)).toBe('jiangwei');
+    // 장각·동탁·여포는 대신하지 않는다
+    expect(bossIdFor({ ...base, roster: ['guanyu', 'dongzhuo'] }, 18)).toBe('dongzhuo');
+  });
+
+  it('보스로 나온 영입 장수의 항복 확률은 보통의 절반, 이기면 전원 회복', () => {
+    const base = startRun('guanyu', 1);
+    const boss = atWave(base, 12, 'xiaohoudun', enemyLevel(12));
+    const normal = atWave(base, 11, 'xiaohoudun', enemyLevel(12) - 1);
+    expect(surrenderChance(boss)).toBeCloseTo(surrenderChance(normal) / 2);
+    boss.party[0].hp = 1;
+    boss.battle!.enemy.hp = 0;
+    const next = afterWin(boss, () => 0.99);
+    for (const f of next.party) expect(f.hp).toBe(f.maxHp);
   });
 });

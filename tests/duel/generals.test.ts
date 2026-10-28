@@ -31,7 +31,9 @@ describe('일기토 장수 데이터', () => {
 
   it('시작·보스 장수가 role과 함께 조회된다', () => {
     for (const id of STARTER_IDS) expect(getDuelGeneral(id)?.role).toBe('starter');
-    for (const id of BOSS_IDS) expect(getDuelGeneral(id)?.role).toBe('boss');
+    expect(BOSS_IDS).toEqual(['zhangjiao', 'xiaohoudun', 'dongzhuo', 'xuchu', 'machao', 'lvbu']);
+    for (const id of ['zhangjiao', 'dongzhuo', 'lvbu']) expect(getDuelGeneral(id)?.role).toBe('boss');
+    for (const id of ['xiaohoudun', 'xuchu', 'machao']) expect(getDuelGeneral(id)?.role).toBe('recruit');
     expect(getDuelGeneral(MOB_ID)?.role).toBe('mob');
     expect(getDuelGeneral('nobody')).toBeUndefined();
   });

@@ -1,6 +1,7 @@
 // 열전(列傳): 한 판의 기록을 삼국지 열전 문체의 짧은 이야기로. AI·난수 없이 문장 틀에 기록을 끼운다.
 import { josa } from '@/lib/shareLinks';
-import { BOSS_IDS, getDuelGeneral, MOB_ID } from './generals';
+import { getDuelGeneral, MOB_ID } from './generals';
+import { isBossWave } from './run';
 import { REWARDS } from './rewards';
 import { SKILLS } from './skills';
 import type { RunRecord, RunWave } from './types';
@@ -43,7 +44,9 @@ const iga = (w: string) => josa(w, '이', '가');
 const eulreul = (w: string) => josa(w, '을', '를');
 const gwawa = (w: string) => josa(w, '과', '와');
 
-const isBoss = (id: string) => (BOSS_IDS as readonly string[]).includes(id);
+/** 보스 싸움: 장각·동탁·여포, 또는 보스 웨이브에 나온 이름 있는 장수(하후돈·허저·마초 등) */
+const isBoss = (w: RunWave) =>
+  getDuelGeneral(w.enemy)?.role === 'boss' || (isBossWave(w.wave) && w.enemy !== MOB_ID);
 
 type Kind = 'open' | 'mob' | 'win' | 'plain' | 'fold' | 'boss' | 'flourish' | 'recruit' | 'reward' | 'final';
 
@@ -79,9 +82,9 @@ function winItems(w: RunWave, lead: string): Item[] {
     const ally = nameOf(w.lostAlly);
     const how = skill ? `${euro(skill)} ` : '';
     // 보스를 꺾었으면 전사가 있어도 사기 문구를 붙인다
-    const end = isBoss(w.enemy) ? `${iga(by)} ${how}끝을 내니 사기가 올랐다.` : `${iga(by)} ${how}끝을 냈다.`;
+    const end = isBoss(w) ? `${iga(by)} ${how}끝을 내니 사기가 올랐다.` : `${iga(by)} ${how}끝을 냈다.`;
     items.push({ kind: 'win', text: `${ord} 싸움, ${enemy}에게 ${iga(ally)} 쓰러졌으나 ${end}` });
-  } else if (isBoss(w.enemy)) {
+  } else if (isBoss(w)) {
     const how = skill ? `${euro(skill)} ` : '';
     items.push({
       kind: 'boss',
@@ -117,7 +120,7 @@ function winItems(w: RunWave, lead: string): Item[] {
     });
   }
 
-  if (isBoss(w.enemy)) {
+  if (isBoss(w)) {
     items.push({
       kind: 'flourish',
       text: pick([`${iga(enemy)} 쓰러지자 적진이 흩어졌다.`, `${enemy}의 군세가 무너져 내렸다.`], w.wave),

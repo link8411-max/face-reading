@@ -25,8 +25,8 @@ const MENU_Y = 173;
 const MENU_STEP = 11;
 const SWITCH_Y = 219;
 const MSG_LINES = 3;
-/** 웨이브 진행 띠: 18칸, 보스(6·12·18)는 금색 긴 칸 */
-const STRIP = { x: 124, y: 30, cell: 4, w: 3, h: 5 } as const;
+/** 웨이브 진행 띠: WAVES(36)칸 한 줄(가운데 맞춤), 보스(BOSS_WAVES)는 금색 긴 칸 */
+const STRIP = { x: 160 - (WAVES * 3 - 1) / 2, y: 30, cell: 3, w: 2, h: 5 } as const;
 const FOCUS_IDS: BattleFocusId[] = ['skill0', 'skill1', 'skill2', 'skill3', 'switch'];
 
 interface FighterObjs {

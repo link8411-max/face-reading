@@ -1,6 +1,7 @@
 // 일기토 공유 키: <선두>.<마지막 적>.<싸움 번호>.<c|l>.<합 수> (예 guanyu.lvbu.17.l.9)
 // 영문 id·숫자·점만 담는다. 이름·보상·전체 기록은 넣지 않는다.
 import { getDuelGeneral, MOB_ID } from './generals';
+import { WAVES } from './run';
 import type { RunRecord } from './types';
 
 export interface RunKey {
@@ -13,7 +14,7 @@ export interface RunKey {
 
 const KEY_RE = /^[a-z]+\.[a-z]+\.\d{1,2}\.[cl]\.\d{1,2}$/;
 const MAX_LEN = 60;
-const MAX_WAVE = 18;
+const MAX_WAVE = WAVES;
 const MAX_TURNS = 99;
 
 const clamp = (n: number, lo: number, hi: number) => Math.max(lo, Math.min(hi, Math.round(n) || lo));

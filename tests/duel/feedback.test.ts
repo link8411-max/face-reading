@@ -22,8 +22,8 @@ describe('validateFeedback', () => {
   });
   it('wave 범위 검사', () => {
     expect(validateFeedback({ ...ok, wave: 0 })).toBeNull();
-    expect(validateFeedback({ ...ok, wave: 19 })).toBeNull();
-    expect(validateFeedback({ ...ok, wave: 18 })).not.toBeNull();
+    expect(validateFeedback({ ...ok, wave: 37 })).toBeNull();
+    expect(validateFeedback({ ...ok, wave: 36 })).not.toBeNull();
   });
   it('알 수 없는 starter는 null', () => {
     expect(validateFeedback({ ...ok, starter: 'caocao' })).toBeNull();

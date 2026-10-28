@@ -1,13 +1,13 @@
 // RunState·SaveData → 장면이 그리는 값(순수 함수, Phaser 없음)
 import { skillsOf } from '@/lib/duel/battle';
-import { BOSS_IDS, DUEL_GENERALS, getDuelGeneral, MOB_ID } from '@/lib/duel/generals';
+import { DUEL_GENERALS, getDuelGeneral, MOB_ID } from '@/lib/duel/generals';
 import { getReward } from '@/lib/duel/rewards';
 import { SKILLS } from '@/lib/duel/skills';
 import { narrate } from '@/lib/duel/narrative';
 import { wrapText } from '@/game/duel/wrap';
 import { MSG_CHARS } from '@/game/duel/layout';
 import { josa } from '@/lib/shareLinks';
-import { BOSS_WAVES, WAVES, markRecruitHandled, swapInRecruit } from '@/lib/duel/run';
+import { WAVES, bossIdFor, isBossWave, markRecruitHandled, swapInRecruit } from '@/lib/duel/run';
 import type { Rng } from '@/lib/duel/rng';
 import type { Fighter, RunRecord, RunState, SaveData } from '@/lib/duel/types';
 import type { BattleView, FighterView, PickView, RecruitView, ResultShow, RewardShow, StartShow } from '@/game/duel/bridge';
@@ -55,7 +55,7 @@ export function toBattleView(run: RunState): BattleView | null {
     wave: run.wave,
     turn: b.turn,
     player,
-    enemy: { ...enemy, isBoss: getDuelGeneral(b.enemy.id)?.role === 'boss' },
+    enemy: { ...enemy, isBoss: isBossWave(run.wave) },
     party: b.party.map((f) => ({ id: f.id, name: nameOf(f.id), hp: Math.max(0, f.hp), maxHp: f.maxHp })),
     message,
   };
@@ -98,11 +98,11 @@ function historyLine(r: RunRecord): string {
 }
 
 /** 다음 싸움 한 줄: 보스는 이름, 졸개 구간은 졸개, 나머지는 모른다 */
-function nextLine(wave: number): string {
-  const n = wave + 1;
-  const b = (BOSS_WAVES as readonly number[]).indexOf(n);
-  if (b >= 0) {
-    return `제${n}전 — ${nameOf(BOSS_IDS[b])} (보스)  이기면 전원 회복`;
+function nextLine(run: RunState): string {
+  const n = run.wave + 1;
+  const boss = bossIdFor(run, n);
+  if (boss) {
+    return `제${n}전 — ${nameOf(boss)} (보스)  이기면 전원 회복`;
   }
   if (n <= 3) return `제${n}전 — ${nameOf(MOB_ID)}`;
   return `제${n}전 — 누가 막아설지 모른다`;
@@ -125,7 +125,7 @@ export function toRewardShow(run: RunState, pick?: PickView, recruit?: RecruitVi
       return { id: r.id, name: r.name, desc: r.desc, rarity: r.rarity };
     }),
     party: run.party.map((f) => nameOf(f.id)),
-    next: run.wave >= WAVES ? '' : nextLine(run.wave),
+    next: run.wave >= WAVES ? '' : nextLine(run),
     ...(pick ? { pick } : {}),
     ...(recruit ? { recruit } : {}),
   };

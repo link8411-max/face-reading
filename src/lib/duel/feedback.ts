@@ -1,4 +1,5 @@
 import { getDuelGeneral, MOB_ID } from '@/lib/duel/generals';
+import { WAVES } from '@/lib/duel/run';
 
 export interface DuelFeedback {
   rating: 1 | 2 | 3 | 4 | 5;
@@ -16,7 +17,7 @@ export function validateFeedback(body: unknown): DuelFeedback | null {
 
   const { rating, wave, starter, cleared, device } = b;
   if (typeof rating !== 'number' || !Number.isInteger(rating) || rating < 1 || rating > 5) return null;
-  if (typeof wave !== 'number' || !Number.isInteger(wave) || wave < 1 || wave > 18) return null;
+  if (typeof wave !== 'number' || !Number.isInteger(wave) || wave < 1 || wave > WAVES) return null;
   if (typeof starter !== 'string' || starter === MOB_ID || !getDuelGeneral(starter)) return null;
   if (typeof cleared !== 'boolean') return null;
   if (device !== 'mobile' && device !== 'desktop') return null;

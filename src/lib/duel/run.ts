@@ -7,8 +7,8 @@ import { SKILLS } from './skills';
 import { createRng, type Rng } from './rng';
 import type { Action, BattleState, Fighter, RunState, RunWave, TurnEvent } from './types';
 
-export const WAVES = 18;
-export const BOSS_WAVES = [6, 12, 18] as const;
+export const WAVES = 36;
+export const BOSS_WAVES = [6, 12, 18, 24, 30, 36] as const;
 
 const MOB_WAVES = 3;
 const RECRUIT_ONLY_UNTIL = 5;
@@ -19,6 +19,8 @@ const EXP_PER_LEVEL = 100;
 const SURRENDER_BASE = 0.25;
 const SURRENDER_MIN = 0.05;
 const SURRENDER_MAX = 0.8;
+/** 보스로 나온 영입 장수의 항복 확률 배율 */
+const BOSS_SURRENDER_FACTOR = 0.5;
 
 function gen(id: string) {
   const g = getDuelGeneral(id);
@@ -29,6 +31,32 @@ function gen(id: string) {
 const maxHpOf = (id: string, level: number) => gen(id).stats.통솔 * 2 + level * 6;
 
 const bossIndex = (wave: number) => (BOSS_WAVES as readonly number[]).indexOf(wave);
+
+/** 보스 웨이브인가 (장각·동탁·여포뿐 아니라 보스로 나온 영입 장수도) */
+export const isBossWave = (wave: number) => bossIndex(wave) >= 0;
+
+/** 동행 중인 장수, 이번 판 장수록(시작 장수 포함, 교체로 내보낸 장수도), 이번 판에 이미 나온 장수 */
+function usedIds(run: RunState): Set<string> {
+  return new Set([...run.roster, ...run.party.map((f) => f.id), ...run.record.waves.map((x) => x.enemy)]);
+}
+
+/**
+ * 이 보스 웨이브의 보스 id(보스 웨이브가 아니면 null). 정해진 보스(BOSS_IDS)가 영입 장수(하후돈·허저·마초)인데
+ * 이번 판에 이미 동행·장수록에 있거나 나왔으면, 아직 안 나온 영입 장수로 대신한다:
+ * 뒤 보스 웨이브에 예약된 장수가 아닌 영입 장수 → 남은 영입 장수 → 남은 시작 장수 순, 각 안에서 명단 순서(난수 없음). 없으면 졸개.
+ */
+export function bossIdFor(run: RunState, wave: number): string | null {
+  const b = bossIndex(wave);
+  if (b < 0) return null;
+  const id = BOSS_IDS[b];
+  const used = usedIds(run);
+  if (gen(id).role === 'boss' || !used.has(id)) return id;
+  const later = new Set<string>(BOSS_IDS.slice(b + 1));
+  const free = (role: string) => DUEL_GENERALS.filter((g) => g.role === role && !used.has(g.id));
+  const sub =
+    free('recruit').find((g) => !later.has(g.id)) ?? free('recruit')[0] ?? free('starter')[0];
+  return sub ? sub.id : MOB_ID;
+}
 
 const firstAlive = (party: Fighter[]) => party.findIndex((f) => f.hp > 0);
 
@@ -46,25 +74,23 @@ export function freshForBattle(f: Fighter): Fighter {
   return next;
 }
 
-/** 적 레벨 = 웨이브, 보스는 +3 */
+/** 적 레벨 = 웨이브, 보스는 +BOSS_LEVEL_BONUS */
 export function enemyLevel(wave: number): number {
   return wave + (bossIndex(wave) >= 0 ? BOSS_LEVEL_BONUS : 0);
 }
 
 /**
- * 1~3 졸개, 4~5 영입 장수, 보스 웨이브는 장각·동탁·여포, 나머지는 영입·시작 장수.
+ * 1~3 졸개, 4~5 영입 장수, 보스 웨이브는 bossIdFor(장각·하후돈·동탁·허저·마초·여포), 나머지는 영입·시작 장수.
+ * 보스 웨이브에 예약된 영입 장수(하후돈·허저·마초)는 보통 웨이브에 나오지 않는다.
  * 동행 중인 장수, 이번 판 장수록(시작 장수 포함, 교체로 내보낸 장수도), 이번 판에 이미 나온 장수는 빼고, 남은 장수가 없으면 졸개.
  */
 export function nextEnemyId(run: RunState, rng: Rng): string {
   const w = run.wave;
-  const b = bossIndex(w);
-  if (b >= 0) return BOSS_IDS[b];
+  const boss = bossIdFor(run, w);
+  if (boss) return boss;
   if (w <= MOB_WAVES) return MOB_ID;
-  const used = new Set([
-    ...run.roster,
-    ...run.party.map((f) => f.id),
-    ...run.record.waves.map((x) => x.enemy),
-  ]);
+  const used = usedIds(run);
+  for (const id of BOSS_IDS) used.add(id);
   const roles = w <= RECRUIT_ONLY_UNTIL ? ['recruit'] : ['recruit', 'starter'];
   const pool = DUEL_GENERALS.filter((g) => roles.includes(g.role) && !used.has(g.id));
   if (pool.length === 0) return MOB_ID;
@@ -171,7 +197,10 @@ export function playerTurn(run: RunState, action: Action, rng: Rng): RunState {
   return next;
 }
 
-/** 항복 확률. 이름 있는 적(졸개·보스 아님)만, 0.25 + (선두 매력−50)/200 − (적 level−wave)/20 을 0.05~0.8로. 그 외 0 */
+/**
+ * 항복 확률. 이름 있는 적(졸개·보스 아님)만, 0.25 + (선두 매력−50)/200 − (적 level−wave)/20 을 0.05~0.8로. 그 외 0.
+ * 보스 웨이브에 보스로 나온 영입 장수는 그 값의 절반.
+ */
 export function surrenderChance(run: RunState): number {
   const e = run.enemy;
   if (!e) return 0;
@@ -179,7 +208,8 @@ export function surrenderChance(run: RunState): number {
   if (role === 'mob' || role === 'boss') return 0;
   const lead = run.battle ? run.battle.party[run.battle.active] : run.party[0];
   const p = SURRENDER_BASE + (gen(lead.id).stats.매력 - 50) / 200 - (e.level - run.wave) / 20;
-  return Math.min(SURRENDER_MAX, Math.max(SURRENDER_MIN, p));
+  const c = Math.min(SURRENDER_MAX, Math.max(SURRENDER_MIN, p));
+  return isBossWave(run.wave) ? c * BOSS_SURRENDER_FACTOR : c;
 }
 
 function gainExp(f: Fighter, amount: number): Fighter {
@@ -200,13 +230,13 @@ function gainExp(f: Fighter, amount: number): Fighter {
   return next;
 }
 
-/** 승리 뒤: 경험치·레벨업 → 보스면 전원 회복 → 항복 판정 → 18웨이브면 won, 아니면 보상 3장 */
+/** 승리 뒤: 경험치·레벨업 → 보스 웨이브면 전원 회복 → 항복 판정 → 마지막(WAVES) 웨이브면 won, 아니면 보상 3장 */
 export function afterWin(run: RunState, rng: Rng): RunState {
   const enemy = run.enemy;
   if (!enemy) throw new Error('쓰러뜨린 적이 없다');
   const chance = surrenderChance(run);
   let party = run.party.map((f) => gainExp(f, EXP_BASE + run.wave * EXP_PER_WAVE));
-  if (gen(enemy.id).role === 'boss') party = party.map((f) => ({ ...f, hp: f.maxHp }));
+  if (isBossWave(run.wave)) party = party.map((f) => ({ ...f, hp: f.maxHp }));
 
   let roster = run.roster;
   const wave: RunWave = { ...currentWave(run) };
