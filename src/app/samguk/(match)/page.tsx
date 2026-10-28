@@ -156,7 +156,7 @@ export default function SamgukPage() {
         {!result && (
           <TestStart
             heading={"나는 삼국지 속\n누구?"}
-            desc="얼굴 특징을 삼국지 인물 101명의 초상화와 비교해 가장 닮은 장수를 찾아요."
+            desc="얼굴 특징을 삼국지 인물 111명의 초상화와 비교해 가장 닮은 장수를 찾아요."
             tips={["정면 사진이 좋아요", "밝은 곳에서"]}
             analyzeLabel="닮은 장수 찾기"
             image={image}

@@ -370,6 +370,26 @@ export const handProfiles: Record<string, CharacterProfile> = {
     z: { faceAspect: -1.1, jawWidth: 1.1, mouthCornerLift: 1.1, noseWidth: 1, eyeTilt: -0.8 },
     weight: { faceAspect: 1.4, noseWidth: 1.3 },
   },
+  // 왕랑: 흰 수염 아래 길게 내려온 턱, 작게 다문 입, 넓은 미간
+  wanglang: {
+    z: { chinLength: 1.4, mouthWidth: -1, eyeSpacing: 0.9, browGap: 0.8, lipFullness: -0.9 },
+    weight: { chinLength: 1.5, mouthWidth: 1.3 },
+  },
+  // 장송: 들창코와 뻐드렁니가 드러나는 웃음, 짧은 중안부
+  zhangsong: {
+    z: { noseWidth: 1.4, noseLength: -1.2, mouthCornerLift: 1.2, eyeSpacing: 1, midfaceRatio: -1 },
+    weight: { noseWidth: 1.6, noseLength: 1.4 },
+  },
+  // 곽사: 수염에 덮인 넓은 턱, 찌푸린 눈썹, 처진 눈매
+  guosi: {
+    z: { jawWidth: 1.4, browGap: -1, eyeTilt: -0.9, chinLength: -1, noseWidth: 1.2 },
+    weight: { jawWidth: 1.5, chinLength: 1.3 },
+  },
+  // 순우경: 불콰한 둥근 얼굴에 풀린 눈웃음
+  chunyuqiong: {
+    z: { eyeAspect: -1.4, mouthCornerLift: 1.2, faceAspect: -0.9, eyeTilt: -1, lipFullness: 0.9 },
+    weight: { eyeAspect: 1.5, eyeTilt: 1.3 },
+  },
   // 황개: 풍상을 겪은 노장, 회색 수염, 전장에서 단련된 매서운 눈썹
   huanggai: {
     z: { browTilt: 1.4, browGap: -1.2, mouthCornerLift: -1.4, jawWidth: 1.2, noseWidth: 1 },

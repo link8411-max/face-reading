@@ -118,6 +118,23 @@
     "chinLength": 0.2352,
     "midfaceRatio": 0.4068
   },
+  "caoshuang": {
+    "eyeAspect": 0.2955,
+    "eyeTilt": 3.9306,
+    "eyeWidth": 0.4382,
+    "eyeSpacing": 0.2457,
+    "browGap": 0.3893,
+    "browTilt": -11.8067,
+    "noseLength": 0.2643,
+    "noseWidth": 0.7069,
+    "mouthWidth": 0.9249,
+    "lipFullness": 0.2843,
+    "mouthCornerLift": 0.0267,
+    "faceAspect": 1.1571,
+    "jawWidth": 0.872,
+    "chinLength": 0.2375,
+    "midfaceRatio": 0.405
+  },
   "cenhun": {
     "eyeAspect": 0.191,
     "eyeTilt": 6.1812,
@@ -170,6 +187,7 @@
     "midfaceRatio": 0.4527
   },
   "chengyu": null,
+  "chunyuqiong": null,
   "daqiao": {
     "eyeAspect": 0.3332,
     "eyeTilt": 12.0975,
@@ -412,6 +430,7 @@
     "chinLength": 0.2043,
     "midfaceRatio": 0.4497
   },
+  "guosi": null,
   "guotu": null,
   "huanggai": {
     "eyeAspect": 0.2863,
@@ -482,6 +501,23 @@
     "chinLength": 0.2072,
     "midfaceRatio": 0.4362
   },
+  "huaxin": {
+    "eyeAspect": 0.3288,
+    "eyeTilt": 5.8517,
+    "eyeWidth": 0.4508,
+    "eyeSpacing": 0.2649,
+    "browGap": 0.368,
+    "browTilt": -2.3387,
+    "noseLength": 0.2793,
+    "noseWidth": 0.684,
+    "mouthWidth": 0.7987,
+    "lipFullness": 0.3126,
+    "mouthCornerLift": -0.0193,
+    "faceAspect": 1.2746,
+    "jawWidth": 0.8643,
+    "chinLength": 0.2261,
+    "midfaceRatio": 0.4268
+  },
   "huaxiong": null,
   "jiachong": null,
   "jiangwei": {
@@ -535,7 +571,41 @@
     "chinLength": 0.2392,
     "midfaceRatio": 0.4057
   },
+  "lijue": {
+    "eyeAspect": 0.3875,
+    "eyeTilt": 2.4904,
+    "eyeWidth": 0.4325,
+    "eyeSpacing": 0.2925,
+    "browGap": 0.3215,
+    "browTilt": -15.4799,
+    "noseLength": 0.2548,
+    "noseWidth": 0.7004,
+    "mouthWidth": 0.885,
+    "lipFullness": 0.2562,
+    "mouthCornerLift": -0.0973,
+    "faceAspect": 1.2803,
+    "jawWidth": 0.8574,
+    "chinLength": 0.2541,
+    "midfaceRatio": 0.3891
+  },
   "liru": null,
+  "lisu": {
+    "eyeAspect": 0.3184,
+    "eyeTilt": 6.0157,
+    "eyeWidth": 0.4547,
+    "eyeSpacing": 0.2484,
+    "browGap": 0.3609,
+    "browTilt": -3.3787,
+    "noseLength": 0.2911,
+    "noseWidth": 0.7313,
+    "mouthWidth": 0.9051,
+    "lipFullness": 0.2567,
+    "mouthCornerLift": 0.0222,
+    "faceAspect": 1.1842,
+    "jawWidth": 0.8575,
+    "chinLength": 0.2442,
+    "midfaceRatio": 0.4364
+  },
   "liubei": {
     "eyeAspect": 0.2774,
     "eyeTilt": 8.7565,
@@ -810,6 +880,23 @@
     "chinLength": 0.2131,
     "midfaceRatio": 0.4209
   },
+  "simazhao": {
+    "eyeAspect": 0.3029,
+    "eyeTilt": 5.1156,
+    "eyeWidth": 0.4428,
+    "eyeSpacing": 0.2735,
+    "browGap": 0.3686,
+    "browTilt": -0.7627,
+    "noseLength": 0.2957,
+    "noseWidth": 0.7028,
+    "mouthWidth": 0.8484,
+    "lipFullness": 0.3092,
+    "mouthCornerLift": 0.0233,
+    "faceAspect": 1.243,
+    "jawWidth": 0.8647,
+    "chinLength": 0.2097,
+    "midfaceRatio": 0.4489
+  },
   "sunce": {
     "eyeAspect": 0.3807,
     "eyeTilt": 8.9442,
@@ -843,6 +930,23 @@
     "jawWidth": 0.8568,
     "chinLength": 0.2281,
     "midfaceRatio": 0.4443
+  },
+  "sunhao": {
+    "eyeAspect": 0.3454,
+    "eyeTilt": 10.8059,
+    "eyeWidth": 0.4449,
+    "eyeSpacing": 0.2631,
+    "browGap": 0.3775,
+    "browTilt": 4.8335,
+    "noseLength": 0.2739,
+    "noseWidth": 0.662,
+    "mouthWidth": 0.9041,
+    "lipFullness": 0.3105,
+    "mouthCornerLift": 0.0339,
+    "faceAspect": 1.2221,
+    "jawWidth": 0.8203,
+    "chinLength": 0.1953,
+    "midfaceRatio": 0.4366
   },
   "sunjian": {
     "eyeAspect": 0.3416,
@@ -912,6 +1016,7 @@
     "chinLength": 0.2529,
     "midfaceRatio": 0.3948
   },
+  "wanglang": null,
   "wangping": {
     "eyeAspect": 0.3408,
     "eyeTilt": 6.9152,
@@ -1225,6 +1330,7 @@
     "chinLength": 0.2339,
     "midfaceRatio": 0.432
   },
+  "zhangsong": null,
   "zhangyun": {
     "eyeAspect": 0.1895,
     "eyeTilt": 6.0014,

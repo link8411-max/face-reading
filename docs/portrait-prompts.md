@@ -110,6 +110,11 @@ SUBJECT:
 | 순우경.jpg | Chunyu Qiong, drunk general who lost the grain depot at Wuchao. Flushed red-cheeked tipsy face, droopy half-closed sleepy eyes, bushy gray-streaked beard, loose grin, worn brown armor. |
 | 이숙.jpg | Li Su, smooth-talking envoy who bribed Lu Bu with the Red Hare horse. Smooth friendly face, persuasive salesman smile, clever twinkling eyes, thin mustache, black headscarf, light leather armor. |
 
+### 바둑판으로 여러 명 만들기 (할당량 절약)
+- 정사각형 한 장을 같은 크기 4칸(2×2)으로 나눠 4명을 한 번에 만들고, 칸 사이는 굵은 검은 선, 각 칸은 위와 같은 구도로 요청해요. 머리 위에 여백을 조금 두라고 해야 관이 잘리지 않아요.
+- 원본은 `새장수/gridN.jpg`로 저장하고 `/usr/bin/python3 scripts/split-grid.py <grid.jpg> 왼위 오위 왼아래 오아래`로 잘라요(각 칸을 1024로 키워 한글이름.jpg로 저장).
+- 3×3은 칸이 너무 작아 얼굴이 뭉개져서 쓰지 않아요.
+
 ## 4. 저장 규칙
 - 1024×1024 JPEG로 `public/images/samguk/새장수/` 폴더에 한글 이름으로 저장해요. 기존 폴더와 섞이지 않게 따로 둬요.
 - 한 장씩 만들어서 기존 3장과 나란히 놓고 비교해요. 화풍이 다르면(실사 느낌, 매끈함, 하얀 피부) 다시 만들어요.
