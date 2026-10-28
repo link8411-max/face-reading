@@ -67,7 +67,8 @@ export default function FeedbackForm({ wave, starter, cleared, runId, rating: ra
         value={note}
         maxLength={200}
         onChange={(e) => setNote(e.target.value)}
-        placeholder="한 줄 남기기 (선택)"
+        placeholder="한 줄 남기기 (선택, 개인정보는 적지 마세요)"
+        aria-label="한 줄 의견"
         className="mt-3 h-11 w-full rounded-full border border-line bg-card px-4 text-sm text-ink placeholder:text-muted"
       />
       <button
