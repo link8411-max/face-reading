@@ -10,6 +10,7 @@ const PARAMS: Record<string, string[]> = {
   invite: ['key', 'rel'],
   team: ['ids'],
   'mbti-daily': ['type'],
+  duel: ['key'],
 }
 
 export const OG_CACHE_CONTROL = 'public, max-age=86400, s-maxage=31536000, immutable'
