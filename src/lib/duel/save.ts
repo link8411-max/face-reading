@@ -9,7 +9,8 @@ const HISTORY_MAX = 20;
 
 type Store = Pick<Storage, 'getItem' | 'setItem' | 'removeItem'>;
 
-function defaults(): SaveData {
+/** 처음 저장 값(시작 장수 3명, 기록 없음) */
+export function defaultSave(): SaveData {
   return { version: 1, roster: [...STARTER_IDS], best: { wave: 0, clears: 0 }, history: [], current: null };
 }
 
@@ -57,12 +58,12 @@ export function loadSave(storage: Store | null): SaveData {
   let parsed: unknown;
   try {
     const raw = storage?.getItem(SAVE_KEY);
-    if (!raw) return defaults();
+    if (!raw) return defaultSave();
     parsed = JSON.parse(raw);
   } catch {
-    return defaults();
+    return defaultSave();
   }
-  if (!parsed || typeof parsed !== 'object' || Array.isArray(parsed)) return defaults();
+  if (!parsed || typeof parsed !== 'object' || Array.isArray(parsed)) return defaultSave();
   const p = parsed as Partial<SaveData> & { version?: unknown };
   const best = (p.best ?? {}) as Partial<SaveData['best']>;
   return {

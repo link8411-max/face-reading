@@ -34,16 +34,58 @@ export interface BattleView {
   message: string[];
 }
 
+// ── 시작·보상·결과 화면 값 ──
+
+export interface StartShow {
+  roster: { id: string; name: string; kind: GeneralKind; locked: boolean }[];
+  best: number;
+  clears: number;
+  /** 행군 기록 줄(최신 먼저, 최대 5) */
+  history: string[];
+  /** 고른 시작 장수 id */
+  selected: string;
+}
+
+/** 카드 위에 띄우는 고르기 창(보상 대상·영입 교체) */
+export interface PickView {
+  title: string;
+  options: { label: string; sub?: string; disabled?: boolean }[];
+}
+
+export interface RewardShow {
+  headline: string;
+  cards: { id: string; name: string; desc: string; rarity: 'common' | 'rare' }[];
+  party: string[];
+  next: string;
+  pick?: PickView;
+}
+
+export interface ResultShow {
+  starter: string;
+  title: string;
+  headline: string;
+  lines: string[];
+  best: number;
+  clears: number;
+  /** 고른 별 수(0 = 아직) */
+  stars?: number;
+}
+
 export type UiAction =
   | { type: 'skill'; skillId: string }
   | { type: 'switch'; toIndex: number }
   | { type: 'reward'; rewardId: string; targetIndex?: number }
   | { type: 'result'; action: 'share' | 'retry' | 'samguk' }
-  | { type: 'rate'; stars: number };
+  | { type: 'rate'; stars: number }
+  | { type: 'select'; starterId: string }
+  | { type: 'sortie' }
+  | { type: 'pick'; index: number };
 
-export type SceneName = 'battle' | 'reward' | 'result';
-/** 메뉴 커서 자리 */
-export type FocusId = 'skill0' | 'skill1' | 'skill2' | 'skill3' | 'switch';
+export type SceneName = 'start' | 'battle' | 'reward' | 'result';
+/** 전투 메뉴 커서 자리 */
+export type BattleFocusId = 'skill0' | 'skill1' | 'skill2' | 'skill3' | 'switch';
+/** 커서 자리: 전투는 BattleFocusId, 그 밖은 general0·sortie·card0·opt0·share·star1 같은 투명 버튼 id */
+export type FocusId = BattleFocusId | (string & {});
 
 export interface DuelEvents {
   // React → Phaser
@@ -52,6 +94,11 @@ export interface DuelEvents {
   /** view: 턴이 끝난 뒤의 화면 값(있으면 연출이 끝날 때 적용) */
   'anim:play': { timeline: TimelineItem[]; sides: { player: Side }; view?: BattleView };
   'ui:focus': { id: FocusId };
+  /** 장면 바꾸기(게임의 작은 컨트롤러가 받는다) */
+  'scene:go': { scene: SceneName };
+  'start:show': StartShow;
+  'reward:show': RewardShow;
+  'result:show': ResultShow;
   // Phaser → React
   'ui:action': UiAction;
   'anim:done': { sides: { player: Side } };
@@ -117,7 +164,11 @@ declare global {
 export class DuelBridge extends Emitter<DuelEvents> {
   /** 마지막으로 받은 화면 값(장면이 늦게 만들어져도 바로 그린다) */
   view: BattleView | null = null;
-  private debug: DuelDebug = { scene: 'battle', animating: false };
+  /** 마지막으로 받은 시작·보상·결과 화면 값(장면이 뜰 때 읽는다) */
+  shown: { start?: StartShow; reward?: RewardShow; result?: ResultShow } = {};
+  /** 마지막으로 요청된 장면(부팅이 끝나면 여기로 간다) */
+  wantScene: SceneName = 'start';
+  private debug: DuelDebug = { scene: 'start', animating: false };
 
   override emit<K extends keyof DuelEvents>(name: K, payload: DuelEvents[K]): boolean {
     if (name === 'scene:changed') {
@@ -126,6 +177,14 @@ export class DuelBridge extends Emitter<DuelEvents> {
       const p = payload as DuelEvents['run:update'];
       if (p.view) this.view = p.view;
       this.patchDebug({ phase: p.run?.phase, wave: p.run?.wave });
+    } else if (name === 'scene:go') {
+      this.wantScene = (payload as DuelEvents['scene:go']).scene;
+    } else if (name === 'start:show') {
+      this.shown.start = payload as StartShow;
+    } else if (name === 'reward:show') {
+      this.shown.reward = payload as RewardShow;
+    } else if (name === 'result:show') {
+      this.shown.result = payload as ResultShow;
     } else if (name === 'anim:play') {
       const p = payload as DuelEvents['anim:play'];
       if (p.view) this.view = p.view;

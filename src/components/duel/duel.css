@@ -1,0 +1,32 @@
+/* 일기토 캔버스 글꼴: Galmuri (SIL OFL 1.1, public/fonts/galmuri/LICENSE.txt). DuelClient만 불러온다 */
+@font-face {
+  font-family: "Galmuri7";
+  src: url("/fonts/galmuri/Galmuri7.woff2") format("woff2");
+  font-weight: 400;
+  font-style: normal;
+  font-display: block;
+}
+
+@font-face {
+  font-family: "Galmuri9";
+  src: url("/fonts/galmuri/Galmuri9.woff2") format("woff2");
+  font-weight: 400;
+  font-style: normal;
+  font-display: block;
+}
+
+@font-face {
+  font-family: "Galmuri11";
+  src: url("/fonts/galmuri/Galmuri11.woff2") format("woff2");
+  font-weight: 400;
+  font-style: normal;
+  font-display: block;
+}
+
+@font-face {
+  font-family: "Galmuri11";
+  src: url("/fonts/galmuri/Galmuri11-Bold.woff2") format("woff2");
+  font-weight: 700;
+  font-style: normal;
+  font-display: block;
+}

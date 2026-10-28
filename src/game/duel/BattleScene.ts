@@ -2,12 +2,14 @@
 import * as Phaser from 'phaser';
 import { SKILLS } from '@/lib/duel/skills';
 import { WAVES } from '@/lib/duel/run';
-import { FIELD, MUTED, PALETTE as S, SPRITE_PX, hex } from './config';
-import type { BattleView, DuelBridge, DuelEvents, FighterView, FocusId } from './bridge';
+import { FIELD, KO_FAMILY, KO_PX, MUTED, PALETTE as S, SPRITE_PX, hex } from './config';
+import type { BattleFocusId, BattleView, DuelBridge, DuelEvents, FighterView } from './bridge';
 import { playSfx } from './sfx';
 import { otherSide, otherWho, timelineLength, CLASH_MS, PASS_MS, STRIKE_MS, KO_MS, type Side, type TimelineItem, type Who } from './timeline';
 import { portraitKeyFor, spriteKeyFor } from './textures';
-import { KIND_MARK, box, cursor, hpBar, slashArc, spark, tag, text } from './ui';
+import { KIND_MARK, box, cursor, fonts, hpBar, slashArc, spark, tag, text } from './ui';
+import { BATTLE_MENU, BATTLE_SWITCH } from './layout';
+import { wrapText } from './wrap';
 
 // ── 배치(와꾸 v5 좌표) ──
 const SPR_BOTTOM = FIELD.y + 68;
@@ -19,11 +21,13 @@ const CLASH_Y = FIELD.y + 50;
 /** 돌진 끝·충돌 정지 끝(timeline.ts passPose와 같은 비율) */
 const T_MEET = 0.45;
 const T_LEAVE = 0.55;
-const MENU_Y = 175;
+const MENU_Y = 174;
 const MENU_STEP = 11;
-const SWITCH_Y = 222;
+const SWITCH_Y = 219;
 const MSG_LINES = 3;
-const FOCUS_IDS: FocusId[] = ['skill0', 'skill1', 'skill2', 'skill3', 'switch'];
+/** 대사창 한 줄 글자 수 */
+const MSG_CHARS = 18;
+const FOCUS_IDS: BattleFocusId[] = ['skill0', 'skill1', 'skill2', 'skill3', 'switch'];
 
 interface FighterObjs {
   sprite: Phaser.GameObjects.Image;
@@ -52,7 +56,7 @@ export class BattleScene extends Phaser.Scene {
   private pendingView: BattleView | null = null;
   private sides: { player: Side } = { player: 'left' };
   private animating = false;
-  private focus: FocusId = 'skill0';
+  private focus: BattleFocusId = 'skill0';
   /** 연출 중 보여 주는 체력(피해를 맞을 때마다 깎는다) */
   private shownHp: Record<Who, number> = { player: 0, enemy: 0 };
   private messages: string[] = [];
@@ -98,7 +102,9 @@ export class BattleScene extends Phaser.Scene {
       else this.applyView(p.view);
     };
     const onPlay = (p: DuelEvents['anim:play']) => this.play(p.timeline, p.sides, p.view);
-    const onFocus = (p: DuelEvents['ui:focus']) => this.setFocus(p.id, true);
+    const onFocus = (p: DuelEvents['ui:focus']) => {
+      if ((FOCUS_IDS as string[]).includes(p.id)) this.setFocus(p.id as BattleFocusId, true);
+    };
     this.bridge.on('run:update', onUpdate);
     this.bridge.on('anim:play', onPlay);
     this.bridge.on('ui:focus', onFocus);
@@ -146,8 +152,8 @@ export class BattleScene extends Phaser.Scene {
       const tagX = left ? 64 : 212;
       const str = tag(this, g, tagX, 28, '무력');
       const lead = tag(this, g, tagX, 42, '통솔');
-      const name = text(this, left ? 64 : 256, 14, '', { size: 10, color: S.cream, bold: true }).setOrigin(left ? 0 : 1, 0);
-      const info = text(this, left ? 64 : 256, 56, '', { size: 7, color: S.gold, bold: true }).setOrigin(left ? 0 : 1, 0);
+      const name = text(this, left ? 64 : 256, 14, '', { ko: 11, color: S.cream, bold: true }).setOrigin(left ? 0 : 1, 0);
+      const info = text(this, left ? 64 : 256, 57, '', { ko: 7, color: S.gold }).setOrigin(left ? 0 : 1, 0);
       const hpNum = text(this, left ? 12 : 308, 160, '', { size: 7, color: S.cream2, num: true }).setOrigin(left ? 0 : 1, 0);
       const sprite = this.add.image(SIDE_X[left ? 'left' : 'right'], SPR_BOTTOM, '__DEFAULT').setOrigin(0.5, 1);
       return { sprite, baseScale: 1, portrait, noPortrait, name, str, lead, info, hpNum };
@@ -163,22 +169,22 @@ export class BattleScene extends Phaser.Scene {
     this.menu = [0, 1, 2, 3].map((i) => {
       const y = MENU_Y + i * MENU_STEP;
       return {
-        name: text(this, 22, y, '', { size: 9 }),
-        sub: text(this, 82, y + 1, '', { size: 6, color: MUTED }),
+        name: text(this, 22, y, '', { ko: 9 }),
+        sub: text(this, 125, y + 2, '', { ko: 7, color: MUTED }).setOrigin(1, 0),
       };
     });
-    this.switchLine = text(this, 22, SWITCH_Y, '', { size: 6, color: MUTED });
-    this.msg = [0, 1, 2].map((i) => text(this, 140, 178 + i * 13, '', { size: 9, bold: i === 0 }));
+    this.switchLine = text(this, 22, SWITCH_Y, '', { ko: 7, color: MUTED });
+    this.msg = [0, 1, 2].map((i) => text(this, 140, 178 + i * 13, '', { ko: 9 }));
     // 메뉴 위에 포인터를 올리면 커서만 옮긴다(누르기는 React DOM 버튼 몫)
     FOCUS_IDS.forEach((id, i) => {
-      const y = i < 4 ? MENU_Y + i * MENU_STEP - 1 : SWITCH_Y - 2;
-      const zone = this.add.zone(12, y, 114, i < 4 ? MENU_STEP : 9).setOrigin(0).setInteractive();
+      const y = i < 4 ? BATTLE_MENU.y + i * BATTLE_MENU.rowH : BATTLE_SWITCH.y;
+      const zone = this.add.zone(BATTLE_MENU.x, y, BATTLE_MENU.w, i < 4 ? BATTLE_MENU.rowH : BATTLE_SWITCH.h).setOrigin(0).setInteractive();
       zone.on('pointerover', () => this.setFocus(id, true));
     });
     this.fx = this.add.graphics();
     this.overlay = this.add.rectangle(0, 0, 320, 240, hex(S.navy), 0.65).setOrigin(0).setVisible(false);
     this.cutinImg = this.add.image(CENTER_X, 104, '__DEFAULT').setVisible(false);
-    this.cutinTitle = text(this, CENTER_X, 146, '', { size: 12, color: S.gold, bold: true }).setOrigin(0.5, 0).setVisible(false);
+    this.cutinTitle = text(this, CENTER_X, 146, '', { ko: 11, color: S.gold, bold: true }).setOrigin(0.5, 0).setVisible(false);
     this.cutinTitle.setShadow(1, 1, S.ink, 0);
   }
 
@@ -243,10 +249,14 @@ export class BattleScene extends Phaser.Scene {
       const empty = s.usesLeft === 0;
       row.name.setText(s.name);
       row.name.setColor(empty ? MUTED : on ? S.red : S.ink);
-      row.name.setFontStyle(on ? 'bold' : 'normal');
       const mark = KIND_MARK[s.kind] ?? '';
       const desc = SKILLS[s.id]?.effect === 'guard' ? '피해 절반' : null;
       row.sub.setText(desc ?? `${mark}·${s.usesLeft === null ? '무제한' : `남은 ${s.usesLeft}`}`);
+      // 기술 이름이 보조 글과 겹치면 작은 글꼴로
+      const room = 125 - row.sub.width - 4 - 22;
+      const ko = (f: 7 | 9) => row.name.setFontFamily(`${KO_FAMILY[f]}, ${fonts.kr}`).setFontSize(KO_PX[f]);
+      ko(9);
+      if (row.name.width > room) ko(7);
       if (on) cursor(g, 15, MENU_Y + i * MENU_STEP + 2);
     });
     const others = v.party
@@ -254,10 +264,10 @@ export class BattleScene extends Phaser.Scene {
       .map((p) => (p.hp <= 0 ? `${p.name}(전사)` : p.hp < p.maxHp / 2 ? `${p.name}(부상)` : p.name));
     this.switchLine.setText(`교체 ▷ ${others.length ? others.join(' · ') : '없음'}`);
     this.switchLine.setColor(this.focus === 'switch' ? S.red : MUTED);
-    if (this.focus === 'switch') cursor(g, 15, SWITCH_Y + 1);
+    if (this.focus === 'switch') cursor(g, 15, SWITCH_Y + 2);
   }
 
-  private setFocus(id: FocusId, sound: boolean): void {
+  private setFocus(id: BattleFocusId, sound: boolean): void {
     if (this.focus === id) return;
     this.focus = id;
     if (sound) playSfx('card');
@@ -474,7 +484,8 @@ export class BattleScene extends Phaser.Scene {
 
   private pushMessage(line: string): void {
     if (!line) return;
-    this.messages = [...this.messages, line].slice(-MSG_LINES);
+    // 대사창은 줄바꿈이 없으니 18자씩 나눠 넣는다
+    this.messages = [...this.messages, ...wrapText(line, MSG_CHARS)].slice(-MSG_LINES);
     this.drawMessages();
   }
 

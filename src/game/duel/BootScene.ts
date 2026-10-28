@@ -4,6 +4,8 @@ import { DUEL_GENERALS } from '@/lib/duel/generals';
 import { FONT_KR, FONT_NUM } from './config';
 import { makeTextures } from './textures';
 import { fonts } from './ui';
+import { SCENE_KEY } from './sceneKeys';
+import type { DuelBridge } from './bridge';
 
 const FONT_WAIT_MS = 1000;
 
@@ -55,6 +57,11 @@ export class BootScene extends Phaser.Scene {
     fonts.kr = resolveFont('--font-noto-sans-kr', FONT_KR);
     fonts.num = resolveFont('--font-silkscreen', FONT_NUM);
     makeTextures(this);
-    void waitFonts().then(() => this.scene.start('Battle'));
+    // 부팅이 끝나면 React가 마지막으로 부른 장면으로 간다(그 뒤의 장면 바꾸기는 game.ts의 컨트롤러 몫)
+    void waitFonts().then(() => {
+      const bridge = this.registry.get('bridge') as DuelBridge;
+      this.registry.set('booted', true);
+      this.scene.start(SCENE_KEY[bridge.wantScene]);
+    });
   }
 }

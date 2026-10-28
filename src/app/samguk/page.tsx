@@ -216,7 +216,8 @@ export default function SamgukPage() {
 
               <ResultActions
                 onShare={shareCard}
-                lead={{ label: "우리 팀 삼국지 만들기", href: "/samguk/team" }}
+                lead={{ label: "이 장수로 일기토 하기", href: `/samguk/duel?me=${result.character.id}` }}
+                companion={{ label: "우리 팀 삼국지 만들기", href: "/samguk/team" }}
                 onSave={() => { track("share_click", { test_name: "samguk", method: "save_image" }); download(getShareOptions()); }}
                 onRetry={resetAll}
                 busy={busy || isCapturing}

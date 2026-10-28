@@ -9,4 +9,4 @@ export async function createDuelGame(parent: HTMLElement, bridge: DuelBridge): P
 }
 
 export { DuelBridge } from './bridge';
-export type { BattleView, FighterView, SkillView, UiAction, FocusId } from './bridge';
+export type { BattleView, FighterView, SkillView, UiAction, FocusId, SceneName, StartShow, RewardShow, ResultShow, PickView } from './bridge';

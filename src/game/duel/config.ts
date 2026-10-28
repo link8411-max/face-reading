@@ -30,5 +30,14 @@ export const MUTED = '#6B6259';
 export const FONT_KR = '"Noto Sans KR", sans-serif';
 export const FONT_NUM = 'Silkscreen, monospace';
 
+/** Galmuri 비트맵 한글(SIL OFL, public/fonts/galmuri, duel.css의 @font-face). 숫자는 Silkscreen 그대로 */
+export const FONT_KO_9 = 'Galmuri9';
+export const FONT_KO_11 = 'Galmuri11';
+export const FONT_KO_7 = 'Galmuri7';
+export type KoFont = 7 | 9 | 11;
+export const KO_FAMILY: Record<KoFont, string> = { 7: FONT_KO_7, 9: FONT_KO_9, 11: FONT_KO_11 };
+/** 각 글꼴의 화소 격자에 맞는 글자 크기(px) */
+export const KO_PX: Record<KoFont, number> = { 7: 8, 9: 10, 11: 12 };
+
 /** '#RRGGBB' → 0xRRGGBB (Phaser Graphics용) */
 export const hex = (c: string): number => parseInt(c.slice(1), 16);

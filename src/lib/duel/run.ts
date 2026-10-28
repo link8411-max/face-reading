@@ -84,13 +84,15 @@ function beginWave(run: RunState, rng: Rng): RunState {
     battle,
     phase: 'battle',
     rewardsOffered: [],
+    lastEvents: [],
     record: { ...run.record, waves: [...run.record.waves, { wave: run.wave, enemy: enemy.id, turns: 0 }] },
   };
 }
 
 export function startRun(starterId: string, seed: number): RunState {
   const g = gen(starterId);
-  if (g.role !== 'starter') throw new Error(`시작 장수가 아니다: ${starterId}`);
+  // 장수록에 오른 영입 장수도 시작 장수가 된다(설계 문서 §1). 보스·졸개는 안 된다
+  if (g.role !== 'starter' && g.role !== 'recruit') throw new Error(`시작 장수가 아니다: ${starterId}`);
   const run: RunState = {
     seed,
     wave: 1,
@@ -147,6 +149,8 @@ export function playerTurn(run: RunState, action: Action, rng: Rng): RunState {
     enemy: battle.enemy,
     battle,
     record: { ...run.record, waves: [...run.record.waves.slice(0, -1), wave] },
+    // 화면이 이번 턴 연출·대사를 그리도록 사건 기록을 담는다
+    lastEvents: log,
   };
 
   const alive = firstAlive(battle.party);

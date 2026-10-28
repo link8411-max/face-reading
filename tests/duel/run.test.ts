@@ -569,3 +569,19 @@ describe('freshForBattle', () => {
     expect(f.uses.guanyu_ult).toBe(0);
   });
 });
+
+describe('Task 8 보강', () => {
+  it('playerTurn은 이번 턴 사건을 lastEvents에 담고, 새 웨이브는 비운다', () => {
+    const run = startRun('guanyu', 7);
+    expect(run.lastEvents ?? []).toEqual([]);
+    const next = playerTurn(run, basicAttack(run), createRng(7));
+    expect(next.lastEvents!.length).toBeGreaterThan(0);
+    expect(next.lastEvents!.some((e) => e.kind === 'skill')).toBe(true);
+  });
+
+  it('영입 장수(장수록에 오른 장수)도 시작 장수가 될 수 있다, 보스·졸개는 안 된다', () => {
+    expect(startRun('zhouyu', 1).party[0].id).toBe('zhouyu');
+    expect(() => startRun('lvbu', 1)).toThrow();
+    expect(() => startRun(MOB_ID, 1)).toThrow();
+  });
+});

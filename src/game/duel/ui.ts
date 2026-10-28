@@ -1,6 +1,6 @@
 // 캔버스 UI 그리기 헬퍼(와꾸 v5의 box·tag·hp·cursor·fire를 Phaser Graphics/Text로)
 import type * as Phaser from 'phaser';
-import { FONT_KR, FONT_NUM, MUTED, PALETTE as S, hex } from './config';
+import { FONT_KR, FONT_NUM, KO_FAMILY, KO_PX, MUTED, PALETTE as S, hex, type KoFont } from './config';
 
 type G = Phaser.GameObjects.Graphics;
 
@@ -63,13 +63,20 @@ export interface TextOpt {
   color?: string;
   bold?: boolean;
   num?: boolean;
+  /** Galmuri 글꼴(7·9·11). size를 안 주면 그 글꼴의 제 크기. 없는 글자(한자 등)는 본문 글꼴로 */
+  ko?: KoFont;
+  wrap?: number;
 }
 
-/** 도트 느낌 글씨(resolution 1). num이면 Silkscreen */
+const family = (opt: TextOpt) =>
+  opt.num ? fonts.num : opt.ko ? `${KO_FAMILY[opt.ko]}, ${fonts.kr}` : fonts.kr;
+
+/** 도트 느낌 글씨(resolution 1). num이면 Silkscreen, ko면 Galmuri */
 export function text(scene: Phaser.Scene, x: number, y: number, s: string, opt: TextOpt = {}): Phaser.GameObjects.Text {
   return scene.add.text(x, y, s, {
-    fontFamily: opt.num ? fonts.num : fonts.kr,
-    fontSize: `${opt.size ?? 8}px`,
+    fontFamily: family(opt),
+    fontSize: `${opt.size ?? (opt.ko ? KO_PX[opt.ko] : 8)}px`,
+    ...(opt.wrap ? { wordWrap: { width: opt.wrap, useAdvancedWrap: true } } : {}),
     fontStyle: opt.bold ? 'bold' : 'normal',
     color: opt.color ?? S.ink,
     resolution: 1,
@@ -79,7 +86,7 @@ export function text(scene: Phaser.Scene, x: number, y: number, s: string, opt: 
 /** 표찰(예: 무력 73). 값 글씨를 돌려준다 */
 export function tag(scene: Phaser.Scene, g: G, x: number, y: number, label: string): Phaser.GameObjects.Text {
   box(g, x, y, 44, 12, S.cream);
-  text(scene, x + 3, y + 1, label, { size: 7, color: S.red, bold: true });
+  text(scene, x + 3, y + 1, label, { ko: 9, color: S.red });
   return text(scene, x + 25, y + 2, '', { size: 7, num: true });
 }
 

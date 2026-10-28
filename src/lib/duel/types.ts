@@ -114,6 +114,8 @@ export interface RunState {
   battle: BattleState | null;
   record: RunRecord;
   rewardsOffered: string[];
+  /** 마지막 playerTurn의 사건(연출·대사창용). 새 웨이브에서 비운다. 옛 저장에는 없다 */
+  lastEvents?: TurnEvent[];
 }
 
 export interface Reward {

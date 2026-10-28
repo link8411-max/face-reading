@@ -6,13 +6,15 @@ interface Props {
   wave: number;
   starter: string;
   cleared: boolean;
+  /** 캔버스 별점 줄에서 고른 별 수(처음 값) */
+  initialRating?: number;
 }
 
 type Status = "idle" | "sending" | "done" | "failed";
 
 // 한 판 종료 후 한 번만 보내는 피드백 폼. 실패해도 게임 흐름에는 영향 없음.
-export default function FeedbackForm({ wave, starter, cleared }: Props) {
-  const [rating, setRating] = useState(0);
+export default function FeedbackForm({ wave, starter, cleared, initialRating = 0 }: Props) {
+  const [rating, setRating] = useState(initialRating);
   const [note, setNote] = useState("");
   const [status, setStatus] = useState<Status>("idle");
 
