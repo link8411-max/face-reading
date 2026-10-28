@@ -30,6 +30,7 @@ function cardProps(r: AnimalTypeResult): ResultCardProps {
     title: r.data.title,
     summary: firstSentence(r.data.description),
     chips: r.data.personality.positive.slice(0, 3),
+    art: <img src={`/images/animal/${r.type}.jpg`} alt={`${r.data.name} 그림`} width={104} height={104} className="w-[104px] h-[104px] rounded-full object-cover" />,
     reasons: [
       { label: "매력", text: r.data.charm },
       { label: "얼굴", text: `${r.features.눈} · 얼굴형 ${r.features.얼굴형}` },

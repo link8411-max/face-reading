@@ -43,3 +43,13 @@ test('다음 테스트 카드는 관상을 먼저 추천한다', () => {
     expect(html.indexOf('href="/face2"'), current).toBeLessThan(html.indexOf(current === 'samguk' ? 'href="/animal"' : 'href="/samguk"'))
   }
 })
+
+test('동물상 8종마다 결과 카드 일러스트가 있고 가볍다', () => {
+  const { existsSync, statSync, readFileSync } = require('node:fs')
+  for (const k of ANIMAL_KEYS) {
+    const f = `public/images/animal/${k}.jpg`
+    expect(existsSync(f), f).toBe(true)
+    expect(statSync(f).size / 1024, f).toBeLessThan(40)
+  }
+  expect(readFileSync('src/app/animal/page.tsx', 'utf8')).toContain('/images/animal/${r.type}.jpg')
+})
