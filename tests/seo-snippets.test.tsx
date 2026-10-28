@@ -71,6 +71,7 @@ test('관상·동물상·삼국지 설명은 가입 없이·사진 저장 안 �
   expect(String(face2.title)).toContain('AI 관상 테스트')
   expect(String(animal.title)).toMatch(/남녀|남자·여자/)
   expect(String(samguk.title)).toContain(`${samgukCharacters.length}명`)
+  expect(String(samguk.title), '실제 검색어(삼국지 인물 테스트)를 제목 앞에 둔다').toMatch(/^삼국지 인물 테스트/)
   expect(String(samguk.description)).toMatch(/칼퇴력|꼰대력/)
   expect(String(fortune.title).startsWith('2027 신년운세')).toBe(true)
 })

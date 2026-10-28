@@ -1,13 +1,13 @@
 import type { Metadata } from "next";
 
 // 검색 결과 제목·설명 (클릭률 위주, 길이 상한은 tests/seo-snippets.test.tsx). og·트위터도 같은 문구
-const TITLE = "나는 삼국지 속 누구? 93명 영웅 닮은꼴 테스트 – 운명을 읽다";
+const TITLE = "삼국지 인물 테스트 | 얼굴로 찾는 닮은 장수 93명 – 운명을 읽다";
 const DESCRIPTION = "얼굴 사진 한 장으로 찾는 나와 닮은 삼국지 장수. 칼퇴력·꼰대력 회사생활 스탯과 나를 지켜줄 장수까지. 가입 없이, 사진은 저장하지 않아요.";
 
 export const metadata: Metadata = {
   title: TITLE,
   description: DESCRIPTION,
-  keywords: "삼국지 닮은꼴, 삼국지 테스트, 삼국지 얼굴, AI 얼굴 분석, 삼국지 인물, 제갈량, 조조, 유비, 관우, 장비, 무료 테스트",
+  keywords: "삼국지 인물 테스트, 삼국지 테스트, 삼국지 장수 테스트, 삼국지 닮은꼴, 삼국지 얼굴, AI 얼굴 분석, 삼국지 인물, 제갈량, 조조, 유비, 관우, 장비, 무료 테스트",
   alternates: {
     canonical: "https://unse-ai.com/samguk",
   },
