@@ -128,3 +128,16 @@ export interface Reward {
   /** 대상이 필요한 보상에 잘못된 자리를 주면 throw */
   apply(run: RunState, targetIndex?: number): RunState;
 }
+
+// ── 저장 ──
+
+export interface SaveData {
+  version: 1;
+  /** 영구 장수록 (시작 장수는 항상 포함) */
+  roster: string[];
+  best: { wave: number; clears: number };
+  /** 지난 판 기록, 최신이 앞 (최대 20) */
+  history: RunRecord[];
+  /** 진행 중인 판 */
+  current: RunState | null;
+}
