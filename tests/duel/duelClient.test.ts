@@ -1,7 +1,7 @@
 import { describe, it, expect } from 'vitest';
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
-import { abandonWarning, hitRects, needsAbandonConfirm, overlayLayout, resolveStarterUnlock, showFeedbackForm, sortieTap, type Rect } from '@/components/duel/clientLogic';
+import { abandonWarning, hitRects, needsAbandonConfirm, overlayLayout, resolveStarterUnlock, showFeedbackForm, sortieTap, tapRow, type Rect } from '@/components/duel/clientLogic';
 import { DIALOG_BOX, FIELD_BOX, MENU_BOX, RESULT_TALL, RESULT_WIDE } from '@/game/duel/layout';
 import { GAME_H_TALL } from '@/game/duel/config';
 import { battleRowInfo } from '@/components/duel/view';
@@ -76,6 +76,19 @@ describe('needsAbandonConfirm (새로 출진 전에 한 번 더 묻기)', () => 
     expect(abandonWarning(7)).toBe('진행 중인 판(제7전)이 사라져요');
   });
 });
+
+describe('tapRow (고른 줄 pendingSel)', () => {
+  it('고른 줄이 없으면 누른 줄을 고르기만 한다', () => {
+    expect(tapRow(null, 'skill2')).toEqual({ pendingSel: 'skill2', confirm: false })
+  })
+  it('다른 줄을 고른 뒤 포커스로 커서가 옮겨 와도 첫 탭은 결정이 아니라 고르기', () => {
+    // skill0 미리보기 중 skill2 탭: 포커스가 커서를 skill2로 옮기지만 고른 줄은 skill0 그대로
+    expect(tapRow('skill0', 'skill2')).toEqual({ pendingSel: 'skill2', confirm: false })
+  })
+  it('고른 줄을 다시 누르면 결정', () => {
+    expect(tapRow('skill2', 'skill2')).toEqual({ pendingSel: 'skill2', confirm: true })
+  })
+})
 
 describe('overlayLayout', () => {
   it('전투: 기술 4 + 교체 1 + 결정, 320×240 안, 겹치지 않음', () => {

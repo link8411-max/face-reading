@@ -22,7 +22,7 @@ import { useResultShare } from "@/hooks/useResultShare";
 import CoupangBanner from "@/components/CoupangBanner";
 import FeedbackForm from "./FeedbackForm";
 import OverlayButtons, { type OverlayButton } from "./OverlayButtons";
-import { abandonWarning, needsAbandonConfirm, overlayLayout, resolveStarterUnlock, showFeedbackForm, sortieTap, stageLayout } from "./clientLogic";
+import { abandonWarning, needsAbandonConfirm, overlayLayout, resolveStarterUnlock, showFeedbackForm, sortieTap, stageLayout, tapRow } from "./clientLogic";
 import { GAME_H, GAME_W } from "@/game/duel/config";
 import { resultLayout } from "@/game/duel/layout";
 import { bodyPages } from "@/game/duel/wrap";
@@ -146,9 +146,9 @@ export default function DuelClient() {
   const [animating, setAnimating] = useState(false);
   const [selected, setSelected] = useState<string>(STARTER_IDS[0]);
   const [pick, setPick] = useState<PendingPick | null>(null);
-  /** 전투 메뉴 커서 줄, 그리고 그 줄을 눌러 결정을 기다리는지 */
+  /** 전투 메뉴: 커서 줄(battleSel, 포커스·호버를 따라감)과 고른 줄(pendingSel, 눌러서 정한 줄 = 미리보기·결정 대상) */
   const [battleSel, setBattleSel] = useState<BattleFocusId>("skill0");
-  const [pending, setPending] = useState(false);
+  const [pendingSel, setPendingSel] = useState<BattleFocusId | null>(null);
   /** turn()의 안전 타이머(언마운트 때 지운다) */
   const turnTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const [record, setRecord] = useState<RunRecord | null>(null);
@@ -523,20 +523,20 @@ export default function DuelClient() {
     if (!run?.battle) return { label: "", action: null };
     return battleRowInfo(run, id);
   }, [run]);
-  const battleChoice = useMemo(() => (screen === "battle" ? rowInfo(battleSel) : null), [battleSel, rowInfo, screen]);
+  const battleChoice = useMemo(() => (screen === "battle" && pendingSel ? rowInfo(pendingSel) : null), [pendingSel, rowInfo, screen]);
 
-  /** 줄 고르기: 커서를 옮기고(pend면) 결정을 기다린다 */
-  const selectRow = useCallback((id: BattleFocusId, pend: boolean) => {
+  /** 줄 고르기: 커서를 옮기고(choose면 그 줄을 고른 줄로 삼아 미리보기). 포커스·호버는 커서만 옮긴다 */
+  const selectRow = useCallback((id: BattleFocusId, choose: boolean) => {
     setBattleSel(id);
-    if (pend) setPending(true);
+    if (choose) setPendingSel(id);
     bridge.emit("ui:focus", { id });
   }, [bridge]);
 
-  /** 결정: 고른 줄의 행동을 실행한다 */
-  const confirmBattle = useCallback(() => {
-    const act = rowInfo(battleSel).action;
+  /** 결정: 주어진 줄의 행동을 실행한다 */
+  const confirmBattle = useCallback((id: BattleFocusId) => {
+    const act = rowInfo(id).action;
     if (!act) return;
-    setPending(false);
+    setPendingSel(null);
     if (!hintDone) {
       setHintDone(true);
       try {
@@ -546,19 +546,19 @@ export default function DuelClient() {
       }
     }
     bridge.emit("ui:action", act);
-  }, [battleSel, bridge, hintDone, rowInfo]);
+  }, [bridge, hintDone, rowInfo]);
 
-  // 대사창 미리보기: 결정 대기 중이면 고른 명령의 결과 0~3줄(+ 금색 결정 단추)
+  // 대사창 미리보기: 고른 줄이 있으면 그 명령의 결과 0~3줄(+ 금색 결정 단추)
   useEffect(() => {
-    const lines = screen === "battle" && run && pending && !animating && battleChoice?.action ? battlePreview(run, battleSel, !hintDone) : [];
+    const lines = screen === "battle" && run && pendingSel && !animating && battleChoice?.action ? battlePreview(run, pendingSel, !hintDone) : [];
     bridge.emit("battle:prompt", { lines });
-  }, [animating, battleChoice, battleSel, bridge, hintDone, pending, run, screen]);
+  }, [animating, battleChoice, bridge, hintDone, pendingSel, run, screen]);
 
   // 새 싸움(웨이브)이 열리면 커서를 첫 줄로, 결정 대기는 끈다
   const battleKey = run?.battle ? `${run.wave}` : "";
   useEffect(() => {
     setBattleSel("skill0");
-    setPending(false);
+    setPendingSel(null);
   }, [battleKey]);
 
   /** 전투 키보드: 위아래 화살표로 커서, Enter/Space로 결정 */
@@ -571,7 +571,7 @@ export default function DuelClient() {
       selectRow(BATTLE_ROWS[(i + (e.key === "ArrowDown" ? 1 : n - 1)) % n], true);
     } else if (e.key === "Enter" || e.key === " ") {
       e.preventDefault();
-      confirmBattle();
+      confirmBattle(battleSel);
     }
   }, [animating, battleSel, booted, confirmBattle, readyScene, screen, selectRow]);
 
@@ -595,12 +595,12 @@ export default function DuelClient() {
       const choice = battleChoice;
       return overlayLayout("battle", 0, false, { tall }).map((s) => {
         if (s.id === "confirm") {
-          return { ...s, label: choice && pending ? `결정: ${choice.label}` : "먼저 메뉴에서 명령을 고르세요", disabled: !pending || !choice?.action };
+          return { ...s, label: choice ? `결정: ${choice.label}` : "먼저 메뉴에서 명령을 고르세요", disabled: !choice?.action };
         }
         const row = rowInfo(s.id as BattleFocusId);
         // 동행이 없으면 교체는 누를 수 없다(흐리게 + "동행 없음")
         if (s.id === "switch" && !row.action) return { ...s, label: "교체: 동행 없음", disabled: true };
-        const again = battleSel === s.id && pending ? " (한 번 더 누르면 결정)" : " 고르기";
+        const again = pendingSel === s.id ? " (한 번 더 누르면 결정)" : " 고르기";
         return { ...s, label: `${row.label}${row.action ? "" : " (쓸 수 없음)"}${again}`, pressed: battleSel === s.id };
       });
     }
@@ -617,7 +617,7 @@ export default function DuelClient() {
     }
     const pages = record ? bodyPages(narrate(record).lines, resultLayout(tall).bodyLines).length : 1;
     return overlayLayout("result", 0, false, { tall, pages }).map((s) => (s.id === "page" ? { ...s, label: `열전 다음 쪽 (${resultPage + 1}/${pages})` } : s));
-  }, [abandonArmed, battleChoice, battleSel, pending, pick, record, resultPage, rowInfo, run, screen, selected, startShow, tall]);
+  }, [abandonArmed, battleChoice, battleSel, pendingSel, pick, record, resultPage, rowInfo, run, screen, selected, startShow, tall]);
 
   const onAction = useCallback((id: string) => {
     let a: UiAction | null = null;
@@ -627,10 +627,10 @@ export default function DuelClient() {
       else a = { type: "select", starterId: startShow.roster[Number(id.slice(7))]?.id ?? "" };
     } else if (screen === "battle" && run?.battle) {
       if (id === "confirm") {
-        if (pending) confirmBattle();
-      } else if (id === battleSel && pending) {
-        // 같은 줄(카드)을 다시 누르면 결정
-        confirmBattle();
+        if (pendingSel) confirmBattle(pendingSel);
+      } else if (tapRow(pendingSel, id as BattleFocusId).confirm) {
+        // 고른 줄을 다시 누르면 결정
+        confirmBattle(id as BattleFocusId);
       } else selectRow(id as BattleFocusId, true);
     } else if (screen === "reward") {
       if (id.startsWith("opt")) a = { type: "pick", index: Number(id.slice(3)) };
@@ -644,7 +644,7 @@ export default function DuelClient() {
       else a = { type: "result", action: id as "share" | "retry" | "samguk" };
     }
     if (a) bridge.emit("ui:action", a);
-  }, [battleSel, bridge, confirmBattle, pending, run, screen, selectRow, startShow, turnPage]);
+  }, [bridge, confirmBattle, pendingSel, run, screen, selectRow, startShow, turnPage]);
 
   const onFocus = useCallback((id: string) => {
     if (screen === "battle") {
