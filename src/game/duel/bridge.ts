@@ -49,7 +49,8 @@ export interface DuelEvents {
   // React → Phaser
   'run:start': { run: RunState; seed: number };
   'run:update': { run: RunState; view?: BattleView };
-  'anim:play': { timeline: TimelineItem[]; sides: { player: Side } };
+  /** view: 턴이 끝난 뒤의 화면 값(있으면 연출이 끝날 때 적용) */
+  'anim:play': { timeline: TimelineItem[]; sides: { player: Side }; view?: BattleView };
   'ui:focus': { id: FocusId };
   // Phaser → React
   'ui:action': UiAction;
@@ -125,6 +126,9 @@ export class DuelBridge extends Emitter<DuelEvents> {
       const p = payload as DuelEvents['run:update'];
       if (p.view) this.view = p.view;
       this.patchDebug({ phase: p.run?.phase, wave: p.run?.wave });
+    } else if (name === 'anim:play') {
+      const p = payload as DuelEvents['anim:play'];
+      if (p.view) this.view = p.view;
     }
     return super.emit(name, payload);
   }

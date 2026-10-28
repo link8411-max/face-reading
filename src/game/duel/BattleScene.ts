@@ -74,12 +74,20 @@ export class BattleScene extends Phaser.Scene {
   private cutinImg!: Phaser.GameObjects.Image;
   private cutinTitle!: Phaser.GameObjects.Text;
   private doneTimer: Phaser.Time.TimerEvent | null = null;
+  /** 말발굽 먼지 조각(연출이 끝나면 지운다) */
+  private dust: Phaser.GameObjects.Rectangle[] = [];
 
   constructor() {
     super('Battle');
   }
 
   create(): void {
+    // scene.restart()에도 안전하게 연출 상태를 비운다
+    this.animating = false;
+    this.pendingView = null;
+    this.koed = new Set<Who>();
+    this.doneTimer = null;
+    this.dust = [];
     this.bridge = this.registry.get('bridge') as DuelBridge;
     this.buildStatic();
     this.buildDynamic();
@@ -89,16 +97,22 @@ export class BattleScene extends Phaser.Scene {
       if (this.animating) this.pendingView = p.view;
       else this.applyView(p.view);
     };
-    const onPlay = (p: DuelEvents['anim:play']) => this.play(p.timeline, p.sides);
+    const onPlay = (p: DuelEvents['anim:play']) => this.play(p.timeline, p.sides, p.view);
     const onFocus = (p: DuelEvents['ui:focus']) => this.setFocus(p.id, true);
     this.bridge.on('run:update', onUpdate);
     this.bridge.on('anim:play', onPlay);
     this.bridge.on('ui:focus', onFocus);
-    this.events.once(Phaser.Scenes.Events.SHUTDOWN, () => {
-      this.bridge.off('run:update', onUpdate);
-      this.bridge.off('anim:play', onPlay);
-      this.bridge.off('ui:focus', onFocus);
-    });
+    // game.destroy(true)는 SHUTDOWN이 아니라 DESTROY만 보낸다 → 둘 다에서 뗀다(다리는 게임보다 오래 산다)
+    const bridge = this.bridge;
+    const cleanup = () => {
+      bridge.off('run:update', onUpdate);
+      bridge.off('anim:play', onPlay);
+      bridge.off('ui:focus', onFocus);
+      this.events.off(Phaser.Scenes.Events.SHUTDOWN, cleanup);
+      this.events.off(Phaser.Scenes.Events.DESTROY, cleanup);
+    };
+    this.events.once(Phaser.Scenes.Events.SHUTDOWN, cleanup);
+    this.events.once(Phaser.Scenes.Events.DESTROY, cleanup);
 
     if (this.bridge.view) this.applyView(this.bridge.view);
     this.bridge.setAnimating(false);
@@ -267,8 +281,10 @@ export class BattleScene extends Phaser.Scene {
 
   // ── 연출 ──
 
-  private play(timeline: TimelineItem[], sides: { player: Side }): void {
+  private play(timeline: TimelineItem[], sides: { player: Side }, view?: BattleView): void {
     if (this.animating) this.finish();
+    // 턴이 끝난 뒤의 화면 값을 같이 받으면 연출이 끝날 때 적용한다
+    if (view) this.pendingView = view;
     this.sides = { player: sides.player };
     this.koed.clear();
     this.placeIdle();
@@ -276,14 +292,20 @@ export class BattleScene extends Phaser.Scene {
     this.bridge.setAnimating(true);
     const reduce = reducedMotion();
     const k = reduce ? 0.5 : 1;
+    const passStarts = new Set(timeline.filter((it) => it.kind === 'pass').map((it) => it.at));
     for (const it of timeline) {
       const at = it.at * k;
       switch (it.kind) {
         case 'pass':
           this.playPass(at, it, k);
           break;
-        case 'clash':
-          this.time.delayedCall(at, () => this.playClash(it, k, reduce));
+        case 'clash': {
+          // 보통 부딪힘은 타임라인상 합의 한가운데지만, 화면에서는 둘이 실제로 맞닿는 순간(T_MEET)에 터뜨린다
+          const passStart = it.at - (PASS_MS / 2 - CLASH_MS / 2);
+          const when = passStarts.has(passStart) ? (passStart + PASS_MS * T_MEET) * k : at;
+          this.time.delayedCall(when, () => this.playClash(it, k, reduce));
+          break;
+        }
           break;
         case 'cutin':
           this.time.delayedCall(at, () => this.playCutin(it, k));
@@ -315,16 +337,43 @@ export class BattleScene extends Phaser.Scene {
       const from = this.sideOf(who, startSides);
       const to = otherSide(from);
       const meetX = CENTER_X + (from === 'left' ? -MEET_GAP : MEET_GAP);
-      this.tweens.add({ targets: o.sprite, x: meetX, delay: at, duration: meet, ease: 'Quad.easeIn' });
+      const dir: 1 | -1 = from === 'left' ? 1 : -1;
+      const kick = this.dustKicker(o.sprite, dir, k);
+      this.tweens.add({ targets: o.sprite, x: meetX, delay: at, duration: meet, ease: 'Quad.easeIn', onUpdate: kick });
       this.tweens.add({
         targets: o.sprite,
         x: SIDE_X[to],
         delay: at + meet + stay,
         duration: leave,
         ease: 'Quad.easeOut',
+        onUpdate: kick,
         onComplete: () => o.sprite.setFlipX(to === 'right'),
       });
     }
+  }
+
+  /** 달리는 동안 3px 움직일 때마다 말 뒤에 2×1 먼지 조각을 남기고 짧게 사라지게 한다(와꾸 draw1) */
+  private dustKicker(sprite: Phaser.GameObjects.Image, dir: 1 | -1, k: number): () => void {
+    let lastX = sprite.x;
+    let n = 0;
+    return () => {
+      if (Math.abs(sprite.x - lastX) < 3) return;
+      lastX = sprite.x;
+      n++;
+      const x = Math.round(sprite.x - dir * (SPRITE_PX / 2 - 2));
+      const y = SPR_BOTTOM - 6 + (n % 3);
+      const r = this.add.rectangle(x, y, 2, 1, hex(n % 2 ? '#e3d4a6' : '#d2c08d')).setOrigin(0);
+      this.dust.push(r);
+      this.tweens.add({
+        targets: r,
+        alpha: 0,
+        duration: 250 * k,
+        onComplete: () => {
+          this.dust = this.dust.filter((d) => d !== r);
+          r.destroy();
+        },
+      });
+    };
   }
 
   /** 맞은 쪽(공격한 쪽의 상대)이 서 있는 충돌 지점 */
@@ -333,13 +382,13 @@ export class BattleScene extends Phaser.Scene {
     return CENTER_X + (defFrom === 'left' ? -MEET_GAP : MEET_GAP);
   }
 
-  private damage(attacker: Who, amount: number, x: number): void {
+  private damage(attacker: Who, amount: number, x: number, k: number): void {
     const def = otherWho(attacker);
     this.shownHp[def] = Math.max(0, this.shownHp[def] - amount);
     this.drawHp();
     const t = text(this, x, FIELD.y + 30, `-${amount}`, { size: 9, color: S.white, num: true }).setOrigin(0.5, 0);
     t.setShadow(1, 1, S.ink, 0);
-    this.tweens.add({ targets: t, y: t.y - 14, alpha: 0, duration: 600, ease: 'Quad.easeOut', onComplete: () => t.destroy() });
+    this.tweens.add({ targets: t, y: t.y - 14, alpha: 0, duration: 600 * k, ease: 'Quad.easeOut', onComplete: () => t.destroy() });
   }
 
   /** 프레임 3장을 dur 동안 차례로 그리고 지운다 */
@@ -358,13 +407,13 @@ export class BattleScene extends Phaser.Scene {
       // 빗나감·가드: 불꽃 없음
       const x = this.hitPoint(who, it);
       const t = text(this, x, FIELD.y + 30, 'MISS', { size: 7, color: S.cream, num: true }).setOrigin(0.5, 0);
-      this.tweens.add({ targets: t, y: t.y - 10, alpha: 0, duration: 500, onComplete: () => t.destroy() });
+      this.tweens.add({ targets: t, y: t.y - 10, alpha: 0, duration: 500 * k, onComplete: () => t.destroy() });
       return;
     }
     playSfx('hit');
     if (!reduce) this.cameras.main.shake(120, 0.004);
     this.frames3(CLASH_MS * k, (g, i) => spark(g, CENTER_X, CLASH_Y, i));
-    this.damage(who, amount, this.hitPoint(who, it));
+    this.damage(who, amount, this.hitPoint(who, it), k);
   }
 
   private playCutin(it: TimelineItem, k: number): void {
@@ -404,7 +453,7 @@ export class BattleScene extends Phaser.Scene {
     const x = this.hitPoint(who, it);
     const dir: 1 | -1 = this.sideOf(who, { player: otherSide(it.sidesAfter.player) }) === 'left' ? 1 : -1;
     this.frames3(STRIKE_MS * k, (g, i) => slashArc(g, x, CLASH_Y - 6, i, dir));
-    if (it.amount) this.damage(who, it.amount, x);
+    if (it.amount) this.damage(who, it.amount, x, k);
   }
 
   private playKo(it: TimelineItem, k: number): void {
@@ -439,6 +488,8 @@ export class BattleScene extends Phaser.Scene {
     // 무한 반복(▼ 깜빡임)은 남기고 연출 트윈만 끝낸다
     for (const o of [this.f.player.sprite, this.f.enemy.sprite, this.overlay, this.cutinImg, this.cutinTitle]) this.tweens.killTweensOf(o);
     this.fx.clear();
+    for (const d of this.dust) d.destroy();
+    this.dust = [];
     this.overlay.setVisible(false);
     this.cutinImg.setVisible(false);
     this.cutinTitle.setVisible(false);

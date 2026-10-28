@@ -57,6 +57,16 @@ describe('DuelBridge', () => {
     expect(w.__duel?.animating).toBe(true);
   });
 
+  it("'anim:play'에 같이 온 view를 마지막 화면 값으로 보관한다", () => {
+    const b = new DuelBridge();
+    const view = { wave: 2 } as never;
+    let got: unknown = null;
+    b.on('anim:play', (p) => (got = p.view));
+    b.emit('anim:play', { timeline: [], sides: { player: 'left' }, view });
+    expect(got).toBe(view);
+    expect(b.view).toBe(view);
+  });
+
   it('window가 없어도 예외 없이 동작한다', () => {
     delete g.window;
     const b = new DuelBridge();
