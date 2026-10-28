@@ -3,12 +3,12 @@ import { getCharacterById } from '@/lib/samgukDB';
 import { BALANCE, onBalanceChange } from './balance';
 import type { DuelGeneral, GeneralKind } from './types';
 
-export const STARTER_IDS = ['guanyu', 'zhangfei', 'zhaoyun'] as const;
+export const STARTER_IDS = ['guanyu', 'zhangfei', 'zhaoyun', 'zhouyu'] as const;
 /**
  * 보스 웨이브(6·12·18·24·30·36) 순서대로의 보스. 장각·동탁·여포는 role 'boss'(영입 불가),
- * 하후돈·허저·마초는 role 'recruit'를 유지한 채 자기 보스 웨이브에만 보스로 나온다(run.ts nextEnemyId).
+ * 하후돈·황충·마초는 role 'recruit'를 유지한 채 자기 보스 웨이브에만 보스로 나온다(run.ts nextEnemyId).
  */
-export const BOSS_IDS = ['zhangjiao', 'xiaohoudun', 'dongzhuo', 'xuchu', 'machao', 'lvbu'] as const;
+export const BOSS_IDS = ['zhangjiao', 'xiaohoudun', 'dongzhuo', 'huangzhong', 'machao', 'lvbu'] as const;
 export const MOB_ID = 'mob';
 
 // 유형별 기본 속도: 기장 70 / 맹장 55 / 지장 45
@@ -30,13 +30,14 @@ const DEFS: Def[] = [
   { id: 'zhangfei', kind: '맹장', role: 'starter', speedAdj: 0, skills: ['strike', 'zhangfei_ult', 'guard', 'shout'] },
   // 조운: 신출귀몰한 기동 +10
   { id: 'zhaoyun', kind: '기장', role: 'starter', speedAdj: 10, skills: ['thrust', 'zhaoyun_ult', 'ambush', 'breathe'] },
+  // 주유: 지장 시작 장수(맹장·기장·지장이 고루 시작 장수에 있게)
+  { id: 'zhouyu', kind: '지장', role: 'starter', speedAdj: 0, skills: ['scheme', 'zhouyu_ult', 'confuse', 'breathe'] },
   // 영입 장수
   // 마초: 서량 기병의 돌진 +10
   { id: 'machao', kind: '기장', role: 'recruit', speedAdj: 10, skills: ['thrust', 'machao_ult', 'ambush', 'breathe'] },
   { id: 'huangzhong', kind: '기장', role: 'recruit', speedAdj: 0, skills: ['thrust', 'huangzhong_ult', 'ambush', 'breathe'] },
   { id: 'xuchu', kind: '맹장', role: 'recruit', speedAdj: 0, skills: ['strike', 'xuchu_ult', 'guard', 'shout'] },
   { id: 'xiaohoudun', kind: '맹장', role: 'recruit', speedAdj: 0, skills: ['strike', 'xiaohoudun_ult', 'guard', 'shout'] },
-  { id: 'zhouyu', kind: '지장', role: 'recruit', speedAdj: 0, skills: ['scheme', 'zhouyu_ult', 'confuse', 'breathe'] },
   { id: 'jiangwei', kind: '지장', role: 'recruit', speedAdj: 0, skills: ['scheme', 'jiangwei_ult', 'fire', 'breathe'] },
   // 보스
   { id: 'zhangjiao', kind: '지장', role: 'boss', speedAdj: 0, skills: ['scheme', 'zhangjiao_ult', 'fire', 'breathe'] },

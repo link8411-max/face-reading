@@ -44,7 +44,7 @@ const iga = (w: string) => josa(w, '이', '가');
 const eulreul = (w: string) => josa(w, '을', '를');
 const gwawa = (w: string) => josa(w, '과', '와');
 
-/** 보스 싸움: 장각·동탁·여포, 또는 보스 웨이브에 나온 이름 있는 장수(하후돈·허저·마초 등) */
+/** 보스 싸움: 장각·동탁·여포, 또는 보스 웨이브에 나온 이름 있는 장수(하후돈·황충·마초 등) */
 const isBoss = (w: RunWave) =>
   getDuelGeneral(w.enemy)?.role === 'boss' || (isBossWave(w.wave) && w.enemy !== MOB_ID);
 

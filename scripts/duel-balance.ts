@@ -23,7 +23,7 @@ if (!isMainThread) {
   });
 }
 
-const STARTERS = ['guanyu', 'zhangfei', 'zhaoyun'];
+const STARTERS = ['guanyu', 'zhangfei', 'zhaoyun', 'zhouyu'];
 const RECRUITS = ['machao', 'huangzhong', 'xuchu', 'xiaohoudun', 'zhouyu', 'jiangwei'];
 const ROSTER = ['zhaoyun', 'machao', 'zhouyu'];
 const pct = (x: number) => `${Math.round(x * 100)}%`.padStart(4);

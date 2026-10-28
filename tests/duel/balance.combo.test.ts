@@ -2,11 +2,11 @@
 import { describe, it, expect } from 'vitest';
 import { COMBO_SEEDS, RECRUITS, STARTERS, sum } from './balanceHelpers';
 
-/** 첫 판에서 자주 함께한 영입 장수 쌍 셋 (scripts/duel-balance.ts combo 표, 시드 500) */
+/** 첫 판에서 자주 함께한 영입 장수 쌍 셋 (scripts/duel-balance.ts combo 표, 시드 500; 주유는 시작 장수지만 적으로 나와 영입되기도 한다) */
 const PAIRS = [
-  ['huangzhong', 'jiangwei'],
-  ['huangzhong', 'zhouyu'],
+  ['xuchu', 'zhouyu'],
   ['jiangwei', 'zhouyu'],
+  ['jiangwei', 'xuchu'],
 ];
 const COMBOS = [...RECRUITS.map((r) => [r]), ...PAIRS];
 

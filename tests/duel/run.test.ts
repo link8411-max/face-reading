@@ -130,7 +130,7 @@ describe('자동 플레이', () => {
     expect(run.record.waves).toHaveLength(36);
     expect(run.record.rewards).toHaveLength(35);
     // 하후돈·허저·마초는 자기 보스 웨이브에서만 나오고 영입도 그때만 되므로, 시작 장수가 관우면 여섯 보스가 그대로 나온다
-    expect(bosses).toEqual({ 6: 'zhangjiao', 12: 'xiaohoudun', 18: 'dongzhuo', 24: 'xuchu', 30: 'machao', 36: 'lvbu' });
+    expect(bosses).toEqual({ 6: 'zhangjiao', 12: 'xiaohoudun', 18: 'dongzhuo', 24: 'huangzhong', 30: 'machao', 36: 'lvbu' });
     const named = enemies.filter((id) => id !== MOB_ID);
     expect(new Set(named).size).toBe(named.length);
   });
@@ -170,20 +170,20 @@ describe('자동 플레이', () => {
 
 describe('nextEnemyId', () => {
   const rng = createRng(5);
-  it('1~3 졸개, 4~5 영입급, 보스 웨이브는 장각·하후돈·동탁·허저·마초·여포', () => {
+  it('1~3 졸개, 4~5 영입급, 보스 웨이브는 장각·하후돈·동탁·황충·마초·여포', () => {
     const base = startRun('guanyu', 5);
     for (const w of [1, 2, 3]) expect(nextEnemyId({ ...base, wave: w }, rng)).toBe(MOB_ID);
     for (const w of [4, 5]) expect(getDuelGeneral(nextEnemyId({ ...base, wave: w }, rng))!.role).toBe('recruit');
     expect(nextEnemyId({ ...base, wave: 6 }, rng)).toBe('zhangjiao');
     expect(nextEnemyId({ ...base, wave: 12 }, rng)).toBe('xiaohoudun');
     expect(nextEnemyId({ ...base, wave: 18 }, rng)).toBe('dongzhuo');
-    expect(nextEnemyId({ ...base, wave: 24 }, rng)).toBe('xuchu');
+    expect(nextEnemyId({ ...base, wave: 24 }, rng)).toBe('huangzhong');
     expect(nextEnemyId({ ...base, wave: 30 }, rng)).toBe('machao');
     expect(nextEnemyId({ ...base, wave: 36 }, rng)).toBe('lvbu');
     for (const w of [4, 5, 7, 9, 13, 17, 23, 35]) {
       const id = nextEnemyId({ ...base, wave: w }, rng);
       expect(id).not.toBe('guanyu');
-      expect(['xiaohoudun', 'xuchu', 'machao']).not.toContain(id);
+      expect(['xiaohoudun', 'huangzhong', 'machao']).not.toContain(id);
       expect(['recruit', 'starter', 'mob']).toContain(getDuelGeneral(id)!.role);
     }
   });
@@ -616,12 +616,14 @@ describe('36웨이브 보스 구조', () => {
   it('보스로 나올 영입 장수가 이미 동행·장수록에 있거나 나왔으면 아직 안 나온 영입 장수로 대신한다', () => {
     const base = startRun('guanyu', 5);
     expect(bossIdFor(base, 7)).toBeNull();
-    expect(bossIdFor({ ...base, roster: ['guanyu', 'xiaohoudun'] }, 12)).toBe('huangzhong');
+    // 뒤 보스(황충·마초)로 예약되지 않은 영입 장수가 먼저: 허저
+    expect(bossIdFor({ ...base, roster: ['guanyu', 'xiaohoudun'] }, 12)).toBe('xuchu');
     const used = {
       ...base,
-      record: { ...base.record, waves: ['huangzhong', 'zhouyu', 'xiaohoudun'].map((enemy, i) => ({ wave: i + 4, enemy, turns: 1 })) },
+      record: { ...base.record, waves: ['xuchu', 'jiangwei', 'xiaohoudun'].map((enemy, i) => ({ wave: i + 4, enemy, turns: 1 })) },
     };
-    expect(bossIdFor({ ...used, party: [...base.party, makeFighter('xuchu', 5)] }, 24)).toBe('jiangwei');
+    // 남은 영입 장수가 뒤 보스(마초)뿐이면 그 장수가 대신한다
+    expect(bossIdFor({ ...used, party: [...base.party, makeFighter('huangzhong', 5)] }, 24)).toBe('machao');
     // 장각·동탁·여포는 대신하지 않는다
     expect(bossIdFor({ ...base, roster: ['guanyu', 'dongzhuo'] }, 18)).toBe('dongzhuo');
   });

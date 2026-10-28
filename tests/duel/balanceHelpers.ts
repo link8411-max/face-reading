@@ -6,7 +6,7 @@ export const FULL = process.env.DUEL_BALANCE_FULL === '1';
 export const SEEDS = FULL ? 500 : 200;
 /** 조합·영입 표는 설정이 많아 평소엔 시드를 줄인다 */
 export const COMBO_SEEDS = FULL ? 500 : 100;
-export const STARTERS = ['guanyu', 'zhangfei', 'zhaoyun'] as const;
+export const STARTERS = ['guanyu', 'zhangfei', 'zhaoyun', 'zhouyu'] as const;
 export const RECRUITS = ['machao', 'huangzhong', 'xuchu', 'xiaohoudun', 'zhouyu', 'jiangwei'];
 export const ROSTER = ['zhaoyun', 'machao', 'zhouyu'];
 export const EPS = 1e-9;

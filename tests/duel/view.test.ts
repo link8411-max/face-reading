@@ -98,7 +98,8 @@ describe('toStartShow / toRewardShow', () => {
     const s = toStartShow({ ...save, roster: [...save.roster, 'machao'] }, 'guanyu');
     expect(s.roster).toHaveLength(9);
     expect(s.roster.find((g) => g.id === 'machao')!.locked).toBe(false);
-    expect(s.roster.find((g) => g.id === 'zhouyu')!.locked).toBe(true);
+    expect(s.roster.find((g) => g.id === 'zhouyu')!.locked).toBe(false); // 시작 장수
+    expect(s.roster.find((g) => g.id === 'jiangwei')!.locked).toBe(true);
     expect(s.roster.some((g) => g.id === 'lvbu' || g.id === 'mob')).toBe(false);
     expect(s.selected).toBe('guanyu');
   });

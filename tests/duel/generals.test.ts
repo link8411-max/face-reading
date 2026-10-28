@@ -31,9 +31,11 @@ describe('일기토 장수 데이터', () => {
 
   it('시작·보스 장수가 role과 함께 조회된다', () => {
     for (const id of STARTER_IDS) expect(getDuelGeneral(id)?.role).toBe('starter');
-    expect(BOSS_IDS).toEqual(['zhangjiao', 'xiaohoudun', 'dongzhuo', 'xuchu', 'machao', 'lvbu']);
+    expect(BOSS_IDS).toEqual(['zhangjiao', 'xiaohoudun', 'dongzhuo', 'huangzhong', 'machao', 'lvbu']);
     for (const id of ['zhangjiao', 'dongzhuo', 'lvbu']) expect(getDuelGeneral(id)?.role).toBe('boss');
-    for (const id of ['xiaohoudun', 'xuchu', 'machao']) expect(getDuelGeneral(id)?.role).toBe('recruit');
+    for (const id of ['xiaohoudun', 'huangzhong', 'machao', 'xuchu']) expect(getDuelGeneral(id)?.role).toBe('recruit');
+    // 보스 유형 2·2·2: 지장(장각·동탁) 맹장(하후돈·여포) 기장(황충·마초)
+    expect(BOSS_IDS.map((id) => getDuelGeneral(id)!.kind).sort()).toEqual(['기장', '기장', '맹장', '맹장', '지장', '지장']);
     expect(getDuelGeneral(MOB_ID)?.role).toBe('mob');
     expect(getDuelGeneral('nobody')).toBeUndefined();
   });
