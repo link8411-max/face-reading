@@ -6,9 +6,10 @@ import { SKILLS, skillDesc } from '@/lib/duel/skills';
 import { narrate } from '@/lib/duel/narrative';
 import { wrapText } from '@/game/duel/wrap';
 import { MSG_CHARS } from '@/game/duel/layout';
-import { josa } from '@/lib/josa';
+import { euro, josa } from '@/lib/josa';
 import { WAVES, bossIdFor, isBossWave, markRecruitHandled, swapInRecruit } from '@/lib/duel/run';
 import type { Rng } from '@/lib/duel/rng';
+import type { UiAction } from '@/game/duel/bridge';
 import type { Fighter, RunRecord, RunState, SaveData } from '@/lib/duel/types';
 import { EFF_WORD } from '@/game/duel/bridge';
 import type { BattleFocusId, BattleView, FighterView, IntentView, PickView, RecruitView, ResultShow, RewardShow, StartShow } from '@/game/duel/bridge';
@@ -159,6 +160,24 @@ export function battlePreview(run: RunState, id: BattleFocusId, hint: boolean): 
     return [head, dmg ? `피해 절반 ~${Math.max(1, Math.round(dmg.max * 0.5))}` : skillDesc(planned).long, ...tail];
   }
   return [head, skillDesc(planned).long, ...tail];
+}
+
+/** 전투 메뉴 한 줄의 이름(aria-label 바탕)과 실행할 행동. 실행할 수 없으면 action null */
+export function battleRowInfo(run: RunState, id: BattleFocusId): { label: string; action: UiAction | null } {
+  if (!run.battle) return { label: '', action: null };
+  const view = toBattleView(run);
+  if (id === 'switch') {
+    const to = nextSwitchIndex(run);
+    const sw = view?.switchTo;
+    return to === null || !sw
+      ? { label: '교체할 장수 없음', action: null }
+      : { label: `${euro(sw.name)} 교체 ${EFF_WORD[sw.eff]}`, action: { type: 'switch', toIndex: to } };
+  }
+  const sk = view?.player.skills[Number(id.slice(5))];
+  if (!sk) return { label: '', action: null };
+  const uses = sk.usesLeft === null ? '무제한' : `남은 ${sk.usesLeft}회`;
+  const body = sk.eff ? `${sk.name} ${EFF_WORD[sk.eff]}` : `${sk.name} ${sk.desc.long}`;
+  return { label: `${body} ${uses}`, action: sk.usesLeft === 0 ? null : { type: 'skill', skillId: sk.id } };
 }
 
 /** 교체 버튼이 보낼 자리: 지금 장수 다음의 살아 있는 장수, 없으면 null */

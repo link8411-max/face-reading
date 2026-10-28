@@ -15,7 +15,7 @@ import { encodeRunKey } from "@/lib/duel/shareKey";
 import { makeRunId, newRunNonce } from "@/lib/duel/feedback";
 import { advancePlayed, buildRunLog, endEventId, waveEventId } from "@/lib/duel/runLog";
 import { duelOgImageUrl, duelShareUrl } from "@/lib/duel/share";
-import { euro, josa } from "@/lib/josa";
+import { josa } from "@/lib/josa";
 import type { RunRecord, RunState, SaveData } from "@/lib/duel/types";
 import { track } from "@/lib/analytics";
 import { useResultShare } from "@/hooks/useResultShare";
@@ -27,7 +27,8 @@ import { GAME_H, GAME_W } from "@/game/duel/config";
 import { resultLayout } from "@/game/duel/layout";
 import { bodyPages } from "@/game/duel/wrap";
 import {
-  nextSwitchIndex,
+  battlePreview,
+  battleRowInfo,
   pendingRecruit,
   pickView,
   recruitView,
@@ -520,16 +521,7 @@ export default function DuelClient() {
   // ── 전투 메뉴: 줄의 이름과 실행할 행동 ──
   const rowInfo = useCallback((id: BattleFocusId): { label: string; action: UiAction | null } => {
     if (!run?.battle) return { label: "", action: null };
-    if (id === "switch") {
-      const to = nextSwitchIndex(run);
-      return to === null
-        ? { label: "교체할 장수 없음", action: null }
-        : { label: `${euro(nameOf(run.battle.party[to].id))} 교체`, action: { type: "switch", toIndex: to } };
-    }
-    const sk = toBattleView(run)?.player.skills[Number(id.slice(5))];
-    if (!sk) return { label: "", action: null };
-    const uses = sk.usesLeft === null ? "무제한" : `남은 ${sk.usesLeft}회`;
-    return { label: `${sk.name} ${uses}`, action: sk.usesLeft === 0 ? null : { type: "skill", skillId: sk.id } };
+    return battleRowInfo(run, id);
   }, [run]);
   const battleChoice = useMemo(() => (screen === "battle" ? rowInfo(battleSel) : null), [battleSel, rowInfo, screen]);
 
@@ -556,12 +548,11 @@ export default function DuelClient() {
     bridge.emit("ui:action", act);
   }, [battleSel, bridge, hintDone, rowInfo]);
 
-  // 대사창 안내 줄: 결정 대기 중이면 "▶ 일격"(+ 금색 결정 단추), 처음에는 "한 번 더 누르면 결정"
+  // 대사창 미리보기: 결정 대기 중이면 고른 명령의 결과 0~3줄(+ 금색 결정 단추)
   useEffect(() => {
-    const name = battleChoice?.label.replace(/ (무제한|남은 \d+회)$/, "") ?? "";
-    const text = screen === "battle" && pending && !animating && battleChoice?.action ? `▶ ${name}` : null;
-    bridge.emit("battle:prompt", { text, hint: !hintDone });
-  }, [animating, battleChoice, bridge, hintDone, pending, screen]);
+    const lines = screen === "battle" && run && pending && !animating && battleChoice?.action ? battlePreview(run, battleSel, !hintDone) : [];
+    bridge.emit("battle:prompt", { lines });
+  }, [animating, battleChoice, battleSel, bridge, hintDone, pending, run, screen]);
 
   // 새 싸움(웨이브)이 열리면 커서를 첫 줄로, 결정 대기는 끈다
   const battleKey = run?.battle ? `${run.wave}` : "";

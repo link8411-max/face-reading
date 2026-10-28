@@ -4,6 +4,8 @@ import { join } from 'node:path';
 import { abandonWarning, hitRects, needsAbandonConfirm, overlayLayout, resolveStarterUnlock, showFeedbackForm, sortieTap, type Rect } from '@/components/duel/clientLogic';
 import { DIALOG_BOX, FIELD_BOX, MENU_BOX, RESULT_TALL, RESULT_WIDE } from '@/game/duel/layout';
 import { GAME_H_TALL } from '@/game/duel/config';
+import { battleRowInfo } from '@/components/duel/view';
+import { startRun } from '@/lib/duel/run';
 
 const inside = (r: Rect, W = 320, H = 240) => r.x >= 0 && r.y >= 0 && r.x + r.w <= W && r.y + r.h <= H;
 // 배율 곱의 소수 오차(1e-12 수준)는 겹침으로 치지 않는다
@@ -273,5 +275,26 @@ describe('결과 열전 쪽 넘김 단추', () => {
     expect(noOverlap(l)).toBe(true);
     const lt = overlayLayout('result', 0, false, { pages: 3, tall: true });
     expect(lt.find((b) => b.id === 'page')).toMatchObject(RESULT_TALL.body);
+  });
+});
+
+describe('전투 버튼 aria-label (battleRowInfo)', () => {
+  it('유불리·설명이 들어간다', () => {
+    const run = startRun('guanyu', 7);
+    const skill0 = battleRowInfo(run, 'skill0');
+    const skill2 = battleRowInfo(run, 'skill2');
+    expect(skill0.label).toMatch(/^일격 비등 무제한/); // 공격 기술: `${name} ${effWord} ${uses}`
+    expect(skill2.label).toMatch(/^방어 태세 이번 턴 피해 절반 무제한/); // 효과 기술: `${name} ${desc.long} ${uses}`
+    expect(skill0.action).toEqual({ type: 'skill', skillId: expect.any(String) });
+  });
+
+  it('교체 라벨에 상성이 들어가고, 동행이 없으면 행동이 없다', () => {
+    const solo = battleRowInfo(startRun('guanyu', 7), 'switch');
+    expect(solo.action).toBeNull();
+    const run = structuredClone(startRun('guanyu', 7));
+    run.battle!.party.push({ ...run.battle!.party[0], id: 'zhangfei' });
+    const sw = battleRowInfo(run, 'switch');
+    expect(sw.label).toMatch(/^장비로 교체 (유리|불리|비등)$/);
+    expect(sw.action).toEqual({ type: 'switch', toIndex: 1 });
   });
 });
