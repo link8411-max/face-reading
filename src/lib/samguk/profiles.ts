@@ -340,6 +340,26 @@ export const handProfiles: Record<string, CharacterProfile> = {
     z: { jawWidth: 1.3, faceAspect: -1.2, mouthCornerLift: 1.5, mouthWidth: 1.2, eyeAspect: -1 },
     weight: { mouthCornerLift: 1.6, faceAspect: 1.3 },
   },
+  // 곽도: 길고 좁은 얼굴에 뾰족한 턱, 가는 눈과 작은 입
+  guotu: {
+    z: { faceAspect: 1.3, jawWidth: -1.1, chinLength: 1.2, mouthWidth: -0.8, eyeAspect: -0.9 },
+    weight: { faceAspect: 1.5, chinLength: 1.4 },
+  },
+  // 봉기: 짙은 수염에 미간을 모은 고집스러운 얼굴
+  fengji: {
+    z: { browGap: -1.2, mouthCornerLift: -1, noseWidth: 1, lipFullness: 0.8, eyeAspect: -0.7 },
+    weight: { browGap: 1.5, noseWidth: 1.3 },
+  },
+  // 허유: 입을 크게 벌려 웃는 거친 얼굴
+  xuyou: {
+    z: { mouthWidth: 1.3, mouthCornerLift: 1.4, lipFullness: 1, faceAspect: -0.6, eyeAspect: -0.8 },
+    weight: { mouthWidth: 1.5, lipFullness: 1.3 },
+  },
+  // 가충: 넓게 벌어진 눈이 치켜 올라간 속을 알 수 없는 미소
+  jiachong: {
+    z: { eyeSpacing: 1.2, eyeTilt: 1.2, noseLength: 0.9, mouthWidth: -0.9, mouthCornerLift: 0.8 },
+    weight: { eyeSpacing: 1.5, eyeTilt: 1.3 },
+  },
   // 황개: 풍상을 겪은 노장, 회색 수염, 전장에서 단련된 매서운 눈썹
   huanggai: {
     z: { browTilt: 1.4, browGap: -1.2, mouthCornerLift: -1.4, jawWidth: 1.2, noseWidth: 1 },
