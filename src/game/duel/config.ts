@@ -36,8 +36,10 @@ export const FONT_KO_11 = 'Galmuri11';
 export const FONT_KO_7 = 'Galmuri7';
 export type KoFont = 7 | 9 | 11;
 export const KO_FAMILY: Record<KoFont, string> = { 7: FONT_KO_7, 9: FONT_KO_9, 11: FONT_KO_11 };
-/** 각 글꼴의 화소 격자에 맞는 글자 크기(px) */
+/** 각 글꼴의 화소 격자에 맞는 글자 크기(px). Galmuri는 이 크기에서만 또렷하다(Galmuri7 8px, Galmuri9 10px, Galmuri11 12px) */
 export const KO_PX: Record<KoFont, number> = { 7: 8, 9: 10, 11: 12 };
+/** Silkscreen(숫자)의 화소 격자 크기. 8px 또는 그 배수(16px)만 쓴다 */
+export const FONT_NUM_PX = 8;
 
 /** '#RRGGBB' → 0xRRGGBB (Phaser Graphics용) */
 export const hex = (c: string): number => parseInt(c.slice(1), 16);

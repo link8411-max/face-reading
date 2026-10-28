@@ -117,7 +117,7 @@ export interface DuelEvents {
   /** view: 턴이 끝난 뒤의 화면 값(있으면 연출이 끝날 때 적용) */
   'anim:play': { timeline: TimelineItem[]; sides: { player: Side }; view?: BattleView };
   'ui:focus': { id: FocusId };
-  /** 전투: 고른 명령을 대사창에 띄운다("▶ 일격 — 탭하여 결정"). null이면 대사만 */
+  /** 전투: 고른 명령을 대사창에 띄운다("▶ 일격\n탭하여 결정"). null이면 대사만 */
   'battle:prompt': { text: string | null };
   /** 장면 바꾸기(게임의 작은 컨트롤러가 받는다) */
   'scene:go': { scene: SceneName };

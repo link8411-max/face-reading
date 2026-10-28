@@ -174,3 +174,19 @@ export function hitRects(rects: (Rect & { panel?: Rect })[], W: number, H: numbe
     return { x: r.x, y: y0, w: r.w, h: y1 - y0 };
   });
 }
+
+/**
+ * 캔버스 무대 크기(CSS px). 화소가 또렷하도록 기기 화소 기준 정수 배율(320×z)을 고른다.
+ * 래퍼가 320px보다 좁을 때만 래퍼에 맞춘 소수 배율로 물러선다.
+ */
+export function stageSize(wrapperW: number, dpr = 1): { w: number; h: number; zoom: number } {
+  const ratio = dpr > 0 ? dpr : 1;
+  if (wrapperW < 320) return { w: wrapperW, h: (wrapperW * 3) / 4, zoom: (wrapperW * ratio) / 320 };
+  // 1) 기기 화소 정수 배율(예: 2배 화면 480px 래퍼 → 960 기기px = 3배 → CSS 480px)
+  const zd = Math.floor((wrapperW * ratio) / 320);
+  const wd = (320 * zd) / ratio;
+  if (zd >= 1 && wd >= 320) return { w: wd, h: (240 * zd) / ratio, zoom: zd };
+  // 2) 그게 CSS 320px보다 작아지면(1.5배 화면 등) CSS 정수 배율
+  const zc = Math.max(1, Math.floor(wrapperW / 320));
+  return { w: 320 * zc, h: 240 * zc, zoom: zc * ratio };
+}

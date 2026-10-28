@@ -29,7 +29,7 @@ describe('wrapText', () => {
 });
 
 describe('messageLines', () => {
-  it('줄마다 MSG_CHARS(15)자 이하, 마지막 3줄', () => {
+  it('줄마다 MSG_CHARS(14)자 이하, 마지막 3줄', () => {
     const lines = messageLines([
       '관우의 일격!',
       '황건적 졸개에게 12의 피해!',
@@ -37,7 +37,7 @@ describe('messageLines', () => {
       '황건적 졸개은(는) 불길에 휩싸였다! 3의 피해!',
     ]);
     expect(lines).toHaveLength(3);
-    expect(MSG_CHARS).toBe(15);
+    expect(MSG_CHARS).toBe(14);
     expect(lines.every((l) => l.length <= MSG_CHARS)).toBe(true);
     expect(lines[2]).toContain('피해!');
   });

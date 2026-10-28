@@ -19,7 +19,7 @@ import { useResultShare } from "@/hooks/useResultShare";
 import CoupangBanner from "@/components/CoupangBanner";
 import FeedbackForm from "./FeedbackForm";
 import OverlayButtons, { type OverlayButton } from "./OverlayButtons";
-import { overlayLayout, resolveStarterUnlock } from "./clientLogic";
+import { overlayLayout, resolveStarterUnlock, stageSize } from "./clientLogic";
 import {
   nextSwitchIndex,
   pendingRecruit,
@@ -60,6 +60,30 @@ function seedFrom(param: string | null): number {
 export default function DuelClient() {
   const router = useRouter();
   const hostRef = useRef<HTMLDivElement>(null);
+  /** 캔버스 무대를 담는 바깥 칸(폭을 재서 정수 배율 무대 크기를 정한다) */
+  const outerRef = useRef<HTMLDivElement>(null);
+  const [stage, setStage] = useState<{ w: number; h: number; left: number } | null>(null);
+  useEffect(() => {
+    const el = outerRef.current;
+    if (!el) return;
+    const measure = () => {
+      const dpr = window.devicePixelRatio || 1;
+      const { w, h } = stageSize(el.clientWidth, dpr);
+      // 가운데 정렬도 기기 화소 경계에 맞춘다(반 화소 어긋나면 도트가 번진다)
+      const left = Math.floor(((el.clientWidth - w) / 2) * dpr) / dpr;
+      setStage((old) => (old && old.w === w && old.h === h && old.left === left ? old : { w, h, left }));
+    };
+    measure();
+    const ro = new ResizeObserver(measure);
+    ro.observe(el);
+    return () => ro.disconnect();
+  }, []);
+  /** 만들어진 게임(무대 크기가 바뀌면 Phaser에 다시 재라고 알린다) */
+  const gameRef = useRef<DuelGame | null>(null);
+  useEffect(() => {
+    // Phaser는 창 resize 때만 부모 크기를 다시 잰다 → React가 무대 크기를 바꾼 뒤 직접 알린다
+    gameRef.current?.scale.refresh();
+  }, [stage]);
   const [bridge] = useState(() => new DuelBridge());
   const rngRef = useRef<Rng>(createRng(1));
   const sidesRef = useRef<{ player: Side }>({ player: "left" });
@@ -174,11 +198,14 @@ export default function DuelClient() {
       if (cancelled) g.destroy(true);
       else {
         game = g;
+        gameRef.current = g;
+        g.scale.refresh();
         setBooted(true);
       }
     });
     return () => {
       cancelled = true;
+      if (gameRef.current === game) gameRef.current = null;
       game?.destroy(true);
       game = null;
     };
@@ -376,10 +403,10 @@ export default function DuelClient() {
     bridge.emit("ui:action", act);
   }, [battleSel, bridge, rowInfo]);
 
-  // 대사창 안내 줄: 결정 대기 중이면 "▶ 일격 — 탭하여 결정"
+  // 대사창 안내 줄: 결정 대기 중이면 "▶ 일격" / "탭하여 결정" 두 줄
   useEffect(() => {
     const name = battleChoice?.label.replace(/ (무제한|남은 \d+회)$/, "") ?? "";
-    const text = screen === "battle" && pending && !animating && battleChoice?.action ? `▶ ${name} — 탭하여 결정` : null;
+    const text = screen === "battle" && pending && !animating && battleChoice?.action ? `▶ ${name}\n탭하여 결정` : null;
     bridge.emit("battle:prompt", { text });
   }, [animating, battleChoice, bridge, pending, screen]);
 
@@ -477,10 +504,16 @@ export default function DuelClient() {
 
   return (
     <div>
-      <div className="relative w-full max-w-[480px] mx-auto overflow-hidden rounded-sm bg-ink" style={{ aspectRatio: "4 / 3" }}>
-        <div ref={hostRef} className="absolute inset-0" aria-hidden />
-        <OverlayButtons buttons={buttons} disabled={locked} onFocus={onFocus} onAction={onAction} onKeyDown={onKeyDown} hover={screen !== "battle"} />
-        {!painted && <p className="absolute inset-0 grid place-items-center text-sm text-paper bg-ink">불러오는 중…</p>}
+      {/* 무대는 기기 화소 정수 배율(320×z)로 맞춰 도트가 번지지 않게 한다. 투명 버튼도 무대 안에 둔다 */}
+      <div ref={outerRef} className="w-full max-w-[480px] mx-auto">
+        <div
+          className="relative overflow-hidden rounded-sm bg-ink"
+          style={stage ? { width: stage.w, height: stage.h, marginLeft: stage.left } : { width: "100%", aspectRatio: "4 / 3" }}
+        >
+          <div ref={hostRef} className="absolute inset-0 [&_canvas]:[image-rendering:pixelated]" aria-hidden />
+          <OverlayButtons buttons={buttons} disabled={locked} onFocus={onFocus} onAction={onAction} onKeyDown={onKeyDown} hover={screen !== "battle"} />
+          {!painted && <p className="absolute inset-0 grid place-items-center text-sm text-paper bg-ink">불러오는 중…</p>}
+        </div>
       </div>
       <p className="sr-only" aria-live="polite">
         {screen === "battle" && run ? toBattleView(run)?.message.join(" ") : ""}

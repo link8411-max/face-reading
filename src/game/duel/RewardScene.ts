@@ -66,7 +66,7 @@ export class RewardScene extends PanelScene {
     if (!v) return;
     box(g, 10, 12, 300, 22, S.cream);
     this.fit(this.t(16, 17, v.headline, { ko: 9 }), 288);
-    this.t(16, 38, '보상 하나를 고르시오', { ko: 9, color: S.gold });
+    this.t(16, 38, '보상 하나를 고르시오', { ko: 9, color: S.gold, shadow: true });
 
     this.backs = [];
     v.cards.forEach((c, i) => {
@@ -125,18 +125,20 @@ export class RewardScene extends PanelScene {
       g.fillRect(ox + 2, oy + 2, REWARD_CARD.w - 4, 2);
     }
     const rare = card.rarity === 'rare';
-    c.add(this.t(ox + 6, oy + 5, rare ? '희귀' : '보통', { ko: 7, color: rare ? S.red : MUTED }));
+    c.add(this.t(ox + 6, oy + 4, rare ? '희귀' : '보통', { ko: 9, color: rare ? S.red : MUTED }));
     c.add(this.fit(this.t(ox + 6, oy + 16, card.name, { ko: 11, bold: true }), CARD_INNER));
     g.fillStyle(hex(S.gold2), 1);
     g.fillRect(ox + 6, oy + 32, CARD_INNER, 1);
-    let desc = this.t(ox + 6, oy + 37, card.desc, { ko: 9, wrap: CARD_INNER });
-    if (desc.height > 54) {
-      desc.destroy();
-      desc = this.t(ox + 6, oy + 37, card.desc, { ko: 7, wrap: CARD_INNER });
-    }
+    // 설명은 늘 Galmuri9. 길면 아래 작은 문장을 빼고 그 자리까지 쓴다
+    const desc = this.t(ox + 6, oy + 37, card.desc, { ko: 9, wrap: CARD_INNER });
     c.add(desc);
+    const long = desc.height > 54;
     const ix = -10;
     const iy = oy + 94;
+    if (long) {
+      if (on) cursor(g, ox + 2, oy + 20);
+      return c;
+    }
     g.fillStyle(hex(rare ? S.red : S.blue), 1);
     g.fillRect(ix, iy, 20, 20);
     g.fillStyle(hex(S.ink), 1);
@@ -211,7 +213,7 @@ export class RewardScene extends PanelScene {
       playSfx('cutin');
     }
     this.t(R.slotX, R.portY + 2, r.name, { ko: 11, bold: true }).setDepth(3);
-    this.t(R.slotX, R.portY + 18, `${r.kind} Lv${r.level}`, { ko: 7, color: MUTED }).setDepth(3);
+    this.t(R.slotX, R.portY + 18, `${r.kind} Lv${r.level}`, { ko: 9, color: MUTED }).setDepth(3);
 
     // 동행 칸
     this.t(R.slotX + r.slots * R.slotStep + 2, R.slotY + 12, '동행', { ko: 9, color: S.red }).setDepth(3);
@@ -225,7 +227,7 @@ export class RewardScene extends PanelScene {
       box(g, x, R.slotY, R.slotW, R.slotH, m ? S.cream2 : S.ink);
       const k = m ? portraitKeyFor(this, m.id) : null;
       if (k) this.add.image(x + 2, R.slotY + 2, k).setOrigin(0).setDisplaySize(R.slotW - 4, R.slotH - 4).setDepth(3);
-      else if (!m) this.t(x + R.slotW / 2, R.slotY + 12, '빈', { ko: 7, color: MUTED }).setOrigin(0.5, 0).setDepth(3);
+      else if (!m) this.t(x + R.slotW / 2, R.slotY + 12, '빈', { ko: 9, color: S.cream2 }).setOrigin(0.5, 0).setDepth(3);
     }
     this.fit(this.t(R.portX, R.slotY + R.slotH + 3, r.note, { ko: 9, color: r.full ? S.red : S.ink }).setDepth(3), R.w - 24);
 
@@ -238,7 +240,7 @@ export class RewardScene extends PanelScene {
       g.fillRect(R.rowX, y + R.rowH, R.rowW, 1);
       if (on) cursor(g, R.rowX + 3, y + 6);
       this.t(R.rowX + 10, y + 4, o.label, { ko: 9, color: on ? S.red : S.ink }).setDepth(3);
-      if (o.sub) this.t(R.rowX + R.rowW - 4, y + 5, o.sub, { ko: 7, color: MUTED }).setOrigin(1, 0).setDepth(3);
+      if (o.sub) this.t(R.rowX + R.rowW - 4, y + 4, o.sub, { ko: 9, color: MUTED }).setOrigin(1, 0).setDepth(3);
     });
   }
 
@@ -257,7 +259,7 @@ export class RewardScene extends PanelScene {
       if (on) cursor(g, PICK.rowX + 3, y + 7);
       const col = o.disabled ? MUTED : on ? S.red : S.ink;
       this.t(PICK.rowX + 10, y + 5, o.label, { ko: 9, color: col }).setDepth(3);
-      if (o.sub) this.t(PICK.rowX + PICK.rowW - 4, y + 6, o.sub, { ko: 7, color: MUTED }).setOrigin(1, 0).setDepth(3);
+      if (o.sub) this.t(PICK.rowX + PICK.rowW - 4, y + 5, o.sub, { ko: 9, color: MUTED }).setOrigin(1, 0).setDepth(3);
     });
   }
 }

@@ -1,6 +1,6 @@
 // 캔버스 UI 그리기 헬퍼(와꾸 v5의 box·tag·hp·cursor·fire를 Phaser Graphics/Text로)
 import type * as Phaser from 'phaser';
-import { FONT_KR, FONT_NUM, KO_FAMILY, KO_PX, MUTED, PALETTE as S, hex, type KoFont } from './config';
+import { FONT_KR, FONT_NUM, FONT_NUM_PX, KO_FAMILY, KO_PX, MUTED, PALETTE as S, hex, type KoFont } from './config';
 
 type G = Phaser.GameObjects.Graphics;
 
@@ -63,9 +63,11 @@ export interface TextOpt {
   color?: string;
   bold?: boolean;
   num?: boolean;
-  /** Galmuri 글꼴(7·9·11). size를 안 주면 그 글꼴의 제 크기. 없는 글자(한자 등)는 본문 글꼴로 */
+  /** Galmuri 글꼴(7·9·11). 늘 그 글꼴의 제 화소 크기로만 그린다(size 무시). 없는 글자(한자 등)는 본문 글꼴로 */
   ko?: KoFont;
   wrap?: number;
+  /** 어두운 바탕 위 밝은 글씨: 1px 먹색 그림자 */
+  shadow?: boolean;
 }
 
 const family = (opt: TextOpt) =>
@@ -73,21 +75,25 @@ const family = (opt: TextOpt) =>
 
 /** 도트 느낌 글씨(resolution 1). num이면 Silkscreen, ko면 Galmuri */
 export function text(scene: Phaser.Scene, x: number, y: number, s: string, opt: TextOpt = {}): Phaser.GameObjects.Text {
-  return scene.add.text(x, y, s, {
+  // 비트맵 글꼴은 제 크기에서만 또렷하다: Galmuri는 KO_PX, Silkscreen 숫자는 FONT_NUM_PX(또는 그 배수)
+  const px = opt.ko ? KO_PX[opt.ko] : opt.num ? (opt.size && opt.size >= FONT_NUM_PX * 2 ? FONT_NUM_PX * 2 : FONT_NUM_PX) : (opt.size ?? 8);
+  const t = scene.add.text(Math.round(x), Math.round(y), s, {
     fontFamily: family(opt),
-    fontSize: `${opt.size ?? (opt.ko ? KO_PX[opt.ko] : 8)}px`,
+    fontSize: `${px}px`,
     ...(opt.wrap ? { wordWrap: { width: opt.wrap, useAdvancedWrap: true } } : {}),
     fontStyle: opt.bold ? 'bold' : 'normal',
     color: opt.color ?? S.ink,
     resolution: 1,
   });
+  if (opt.shadow) t.setShadow(1, 1, S.ink, 0, false, true);
+  return t;
 }
 
 /** 표찰(예: 무력 73). 값 글씨를 돌려준다 */
 export function tag(scene: Phaser.Scene, g: G, x: number, y: number, label: string): Phaser.GameObjects.Text {
   box(g, x, y, 44, 12, S.cream);
   text(scene, x + 3, y + 1, label, { ko: 9, color: S.red });
-  return text(scene, x + 25, y + 2, '', { size: 7, num: true });
+  return text(scene, x + 25, y + 2, '', { num: true });
 }
 
 /** 유형 한 글자(猛·騎·智) */

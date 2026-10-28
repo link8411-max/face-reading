@@ -26,8 +26,8 @@ export class StartScene extends PanelScene {
     const v: StartShow | undefined = this.bridge.shown.start;
     box(g, 10, 12, 300, 22, S.cream);
     this.t(16, 16, '장수록', { ko: 11, bold: true });
-    this.t(66, 18, '함께 출진할 장수를 고르시오', { ko: 7, color: MUTED });
-    this.t(304, 19, `BEST ${v?.best ?? 0}  CLEAR ${v?.clears ?? 0}`, { size: 7, num: true }).setOrigin(1, 0);
+    this.t(66, 17, '함께 출진할 장수를 고르시오', { ko: 9, color: MUTED });
+    this.t(304, 19, `BEST ${v?.best ?? 0}  CLEAR ${v?.clears ?? 0}`, { num: true }).setOrigin(1, 0);
     if (!v) return;
 
     v.roster.forEach((gen, i) => {
@@ -50,7 +50,7 @@ export class StartScene extends PanelScene {
       g.fillRect(x + 2, y + 2, 10, 10);
       this.t(x + 3, y + 2, KIND_MARK[gen.kind] ?? '', { size: 8, color: S.gold });
       if (gen.locked) this.t(x + 25, y + 20, '?', { ko: 11, bold: true, color: S.gold2 }).setOrigin(0.5, 0);
-      const name = this.t(x + 25, y + 60, gen.name, { ko: 9, color: gen.locked ? MUTED : on || picked ? S.gold : S.cream });
+      const name = this.t(x + 25, y + 59, gen.name, { ko: 9, color: gen.locked ? S.cream2 : on || picked ? S.gold : S.cream, shadow: true });
       name.setOrigin(0.5, 0);
       this.fit(name, START_CELL.w + 8);
       if (on) cursor(g, x - 6, y + 26);
@@ -61,14 +61,11 @@ export class StartScene extends PanelScene {
     box(g, h.x, h.y, h.w, h.h, S.cream);
     this.t(h.x + 6, h.y + 4, '행군 기록', { ko: 9, color: S.red });
     if (v.history.length === 0) {
-      this.t(h.x + 6, h.y + 18, '아직 지난 행군이 없다', { ko: 7, color: MUTED });
+      this.t(h.x + 6, h.y + 16, '아직 지난 행군이 없다', { ko: 9, color: MUTED });
     }
-    v.history.slice(0, 5).forEach((line, i) => {
-      const col = i < 3 ? 0 : 1;
-      const row = i < 3 ? i : i - 3;
-      const t = this.t(h.x + 6 + col * 98, h.y + 16 + row * 9, line, { ko: 7 });
-      this.fit(t, 94);
-      if (t.width > 94) t.setCrop(0, 0, 94, 10);
+    // 읽히게 Galmuri9로 최근 3개만(한 줄에 하나)
+    v.history.slice(0, 3).forEach((line, i) => {
+      this.fit(this.t(h.x + 6, h.y + 15 + i * 10, line, { ko: 9 }), h.w - 12);
     });
 
     const lead = v.roster.find((r) => r.id === v.selected);
@@ -81,7 +78,7 @@ export class StartScene extends PanelScene {
     const on = this.focus === 'sortie';
     box(g, s.x, s.y, s.w, s.h, S.gold);
     this.t(s.x + s.w / 2, s.y + 9, '출진', { ko: 11, bold: true, color: on ? S.red : S.ink }).setOrigin(0.5, 0);
-    if (lead) this.fit(this.t(s.x + s.w / 2, s.y + 28, `선두 ${lead.name}`, { ko: 7 }).setOrigin(0.5, 0), s.w - 8);
+    if (lead) this.fit(this.t(s.x + s.w / 2, s.y + 27, `선두 ${lead.name}`, { ko: 9 }).setOrigin(0.5, 0), s.w - 8);
     if (on) cursor(g, s.x + 8, s.y + 12);
   }
 
@@ -91,10 +88,10 @@ export class StartScene extends PanelScene {
     const onR = this.focus === 'resume';
     const onN = this.focus === 'sortie';
     box(g, START_RESUME.x, START_RESUME.y, START_RESUME.w, START_RESUME.h, S.gold);
-    this.fit(this.t(START_RESUME.x + 12, START_RESUME.y + 5, `이어하기 ${r.name} 제${r.wave}전`, { ko: 9, color: onR ? S.red : S.ink }), START_RESUME.w - 16);
+    this.fit(this.t(START_RESUME.x + 12, START_RESUME.y + 5, `이어하기 제${r.wave}전`, { ko: 9, color: onR ? S.red : S.ink }), START_RESUME.w - 16);
     if (onR) cursor(g, START_RESUME.x + 4, START_RESUME.y + 8);
     box(g, START_NEW.x, START_NEW.y, START_NEW.w, START_NEW.h, S.cream);
-    this.fit(this.t(START_NEW.x + 12, START_NEW.y + 5, `새로 출진 ${leadName}`, { ko: 9, color: onN ? S.red : S.ink }), START_NEW.w - 16);
+    this.fit(this.t(START_NEW.x + 12, START_NEW.y + 5, `새로 ${leadName}`, { ko: 9, color: onN ? S.red : S.ink }), START_NEW.w - 16);
     if (onN) cursor(g, START_NEW.x + 4, START_NEW.y + 8);
   }
 }

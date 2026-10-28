@@ -17,7 +17,7 @@ const MSG_KEEP = 3;
 
 const nameOf = (id: string) => getDuelGeneral(id)?.name ?? id;
 
-/** 사건 글을 MSG_CHARS(15)자 이하 줄로 나누고 마지막 3줄만 */
+/** 사건 글을 MSG_CHARS(14)자 이하 줄로 나누고 마지막 3줄만 */
 export function messageLines(texts: string[], max = MSG_CHARS, keep = MSG_KEEP): string[] {
   return texts.flatMap((t) => wrapText(t, max)).slice(-keep);
 }

@@ -69,9 +69,20 @@ export abstract class PanelScene extends Phaser.Scene {
     this.draw(g);
   }
 
-  /** 글씨가 maxW보다 넓으면 작은 글꼴(Galmuri7)로 바꾼다 */
+  /**
+   * 글씨가 maxW보다 넓으면: Galmuri11이면 Galmuri9로(읽히는 바닥은 Galmuri9), 그래도 넓으면 끝을 말줄임(…).
+   * 글꼴은 제 화소 크기로만 쓴다.
+   */
   protected fit(t: Phaser.GameObjects.Text, maxW: number): Phaser.GameObjects.Text {
-    if (t.width > maxW) t.setFontFamily(`${KO_FAMILY[7]}, ${fonts.kr}`).setFontSize(KO_PX[7]).setFontStyle('normal');
+    if (t.width <= maxW) return t;
+    if (String(t.style.fontSize) === `${KO_PX[11]}px`) {
+      t.setFontFamily(`${KO_FAMILY[9]}, ${fonts.kr}`).setFontSize(KO_PX[9]).setFontStyle('normal');
+    }
+    let s = t.text;
+    while (t.width > maxW && s.length > 1) {
+      s = s.slice(0, -1);
+      t.setText(`${s}…`);
+    }
     return t;
   }
 
