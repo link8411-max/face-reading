@@ -1,4 +1,5 @@
 import { describe, it, expect } from 'vitest';
+import { BALANCE } from '@/lib/duel/balance';
 import { createRng } from '@/lib/duel/rng';
 import { makeFighter, matchup, damage, resolveTurn, enemyAction } from '@/lib/duel/battle';
 import { SKILLS } from '@/lib/duel/skills';
@@ -27,9 +28,9 @@ describe('createRng', () => {
 });
 
 describe('makeFighter', () => {
-  it('maxHp = 통솔×2 + level×6, uses는 횟수 있는 기술만, status 비고 bonus 0', () => {
+  it('maxHp = round(통솔×hpPerLead + level×hpPerLevel), uses는 횟수 있는 기술만, status 비고 bonus 0', () => {
     const f = makeFighter('guanyu', 5);
-    expect(f.maxHp).toBe(88 * 2 + 5 * 6);
+    expect(f.maxHp).toBe(Math.round(88 * BALANCE.hpPerLead + 5 * BALANCE.hpPerLevel));
     expect(f.hp).toBe(f.maxHp);
     expect(f.uses).toEqual({ guanyu_ult: 3, shout: 5 });
     expect(f.status).toEqual({});
@@ -39,11 +40,14 @@ describe('makeFighter', () => {
 
 describe('matchup', () => {
   it('맹장>기장>지장>맹장, 같은 유형 1', () => {
-    expect(matchup('맹장', '기장')).toBe(1.5);
-    expect(matchup('기장', '맹장')).toBe(0.67);
-    expect(matchup('기장', '지장')).toBe(1.5);
-    expect(matchup('지장', '맹장')).toBe(1.5);
-    expect(matchup('맹장', '지장')).toBe(0.67);
+    const { matchWin: W, matchLose: L } = BALANCE;
+    expect(W).toBeGreaterThan(1);
+    expect(L).toBeLessThan(1);
+    expect(matchup('맹장', '기장')).toBe(W);
+    expect(matchup('기장', '맹장')).toBe(L);
+    expect(matchup('기장', '지장')).toBe(W);
+    expect(matchup('지장', '맹장')).toBe(W);
+    expect(matchup('맹장', '지장')).toBe(L);
     expect(matchup('맹장', '맹장')).toBe(1);
     expect(matchup('지장', '지장')).toBe(1);
   });
@@ -72,13 +76,15 @@ describe('damage', () => {
   it('기장 공격 능력치는 무력 + speed/4', () => {
     const att = makeFighter('zhaoyun', 1); // 무력 96, speed 80
     const def = makeFighter('zhaoyun', 1); // 통솔 85
-    expect(damage(att, def, SKILLS.thrust, ONE)).toBe(Math.round(40 * ((96 + 80 / 4) / 85) * 1.2 * F));
+    expect(damage(att, def, SKILLS.thrust, ONE)).toBe(
+      Math.round(40 * ((96 + 80 / 4) / 85) * 1.2 * F * (BALANCE.generalPower.zhaoyun ?? 1)),
+    );
   });
 
   it('난수 계수는 0.85~1.0, 최소 1', () => {
     const att = makeFighter('guanyu', 10);
     const def = makeFighter('zhouyu', 10);
-    const max = 40 * (97 / 95) * 0.67 * 1.2;
+    const max = 40 * (97 / 95) * BALANCE.matchLose * 1.2;
     for (let seed = 1; seed <= 100; seed++) {
       const d = damage(att, def, SKILLS.strike, createRng(seed));
       expect(d).toBeGreaterThanOrEqual(Math.floor(max * 0.85));
@@ -124,8 +130,10 @@ describe('resolveTurn', () => {
 
   it('burn은 턴 끝마다 maxHp 8% 피해, 3턴 후 사라진다', () => {
     const enemy = makeFighter('lvbu', 30);
-    let s = state([makeFighter('zhouyu', 5)], { ...enemy, status: { burn: 3 } });
-    const tick = Math.round(enemy.maxHp * 0.08);
+    const z = makeFighter('zhouyu', 5);
+    z.uses.breathe = 9; // 숨 고르기 횟수 제한이 있어도 네 번 쓸 수 있게
+    let s = state([z], { ...enemy, status: { burn: 3 } });
+    const tick = Math.round(enemy.maxHp * BALANCE.burnRate);
     for (let t = 1; t <= 3; t++) {
       const hpBefore = s.enemy.hp;
       const r = resolveTurn(s, { type: 'skill', skillId: 'breathe' }, ONE);

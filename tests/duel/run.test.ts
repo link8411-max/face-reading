@@ -1,6 +1,7 @@
 import { describe, it, expect } from 'vitest';
 import { createRng, type Rng } from '@/lib/duel/rng';
-import { makeFighter, skillsOf } from '@/lib/duel/battle';
+import { makeFighter, maxHpFor, skillsOf } from '@/lib/duel/battle';
+import { BALANCE } from '@/lib/duel/balance';
 import { getDuelGeneral, MOB_ID } from '@/lib/duel/generals';
 import { SKILLS } from '@/lib/duel/skills';
 import { REWARDS, drawRewards, getReward } from '@/lib/duel/rewards';
@@ -81,7 +82,7 @@ describe('startRun', () => {
     expect(run.party[0].level).toBe(1);
     expect(run.partyMax).toBe(3);
     expect(run.enemy!.id).toBe(MOB_ID);
-    expect(run.enemy!.level).toBe(1);
+    expect(run.enemy!.level).toBe(enemyLevel(1, MOB_ID));
     expect(run.battle!.active).toBe(0);
     expect(run.record.starter).toBe('guanyu');
     expect(run.record.waves).toEqual([{ wave: 1, enemy: MOB_ID, turns: 0 }]);
@@ -196,7 +197,7 @@ describe('nextEnemyId', () => {
       if (boss === 0 || boss === 2 || boss === 5) {
         expect(next.enemy!.id).toBe(['zhangjiao', '', 'dongzhuo', '', '', 'lvbu'][boss]);
       }
-      expect(next.enemy!.level).toBe(enemyLevel(next.wave));
+      expect(next.enemy!.level).toBe(enemyLevel(next.wave, next.enemy!.id));
     });
   });
 });
@@ -245,11 +246,13 @@ describe('afterWin', () => {
     let run = weakenEnemy(startRun('guanyu', 1));
     run.party[0].hp = 50;
     run.battle!.party = run.party;
+    const oldMax = run.party[0].maxHp;
     // 관우가 먼저 친다(속도 55 vs 졸개 40)
     run = playerTurn(run, { type: 'skill', skillId: 'strike' }, createRng(1));
     expect(run.phase).toBe('reward');
-    expect(run.party[0].hp).toBe(50);
-    expect(run.party[0].exp).toBe(10 + 1 * 2);
+    // 레벨이 오르면 체력 비율만 유지(회복은 없다)
+    expect(run.party[0].hp).toBe(Math.round((50 / oldMax) * run.party[0].maxHp));
+    expect(run.party[0].exp).toBe((BALANCE.expBase + 1 * BALANCE.expPerWave) % BALANCE.expPerLevel);
     expect(run.rewardsOffered).toHaveLength(3);
     expect(run.battle).toBeNull();
     const w = run.record.waves[0];
@@ -264,10 +267,11 @@ describe('afterWin', () => {
     run.battle!.party = run.party;
     run.battle!.enemy.hp = 0;
     const next = afterWin(run, createRng(1));
-    const g = getDuelGeneral('guanyu')!;
-    expect(next.party[0].level).toBe(2);
-    expect(next.party[0].exp).toBe(95 + 14 - 100);
-    expect(next.party[0].maxHp).toBe(g.stats.통솔 * 2 + 2 * 6);
+    const total = 95 + BALANCE.expBase + 2 * BALANCE.expPerWave;
+    const level = 1 + Math.floor(total / BALANCE.expPerLevel);
+    expect(next.party[0].level).toBe(level);
+    expect(next.party[0].exp).toBe(total % BALANCE.expPerLevel);
+    expect(next.party[0].maxHp).toBe(maxHpFor('guanyu', level));
     expect(next.party[0].hp).toBe(Math.round((Math.round(oldMax / 2) / oldMax) * next.party[0].maxHp));
   });
 
@@ -285,7 +289,7 @@ describe('afterWin', () => {
   });
 
   it('36웨이브 승리면 won, cleared', () => {
-    const run = structuredClone(atWave(startRun('guanyu', 1), 36, 'lvbu', enemyLevel(36)));
+    const run = structuredClone(atWave(startRun('guanyu', 1), 36, 'lvbu', enemyLevel(36, 'lvbu')));
     run.battle!.enemy.hp = 0;
     const next = afterWin(run, createRng(1));
     expect(next.phase).toBe('won');
@@ -489,11 +493,11 @@ describe('보상 적용', () => {
     const next = pickReward(run, 'sword', rng, 0);
     expect(next.phase).toBe('battle');
     expect(next.wave).toBe(2);
-    expect(next.party[0].bonus.atk).toBe(8);
+    expect(next.party[0].bonus.atk).toBe(BALANCE.swordAtk);
     expect(next.party[0].hp).toBe(77);
     expect(next.party[0].uses.guanyu_ult).toBe(3);
     expect(next.party[0].status).toEqual({});
-    expect(next.enemy!.level).toBe(2);
+    expect(next.enemy!.level).toBe(enemyLevel(2, next.enemy!.id));
     expect(next.battle).toEqual({ party: next.party, active: 0, enemy: next.enemy, turn: 1 });
     expect(next.record.rewards).toEqual(['sword']);
     expect(next.record.waves).toHaveLength(2);
@@ -624,8 +628,8 @@ describe('36웨이브 보스 구조', () => {
 
   it('보스로 나온 영입 장수의 항복 확률은 보통의 절반, 이기면 전원 회복', () => {
     const base = startRun('guanyu', 1);
-    const boss = atWave(base, 12, 'xiaohoudun', enemyLevel(12));
-    const normal = atWave(base, 11, 'xiaohoudun', enemyLevel(12) - 1);
+    const boss = atWave(base, 12, 'xiaohoudun', 13);
+    const normal = atWave(base, 11, 'xiaohoudun', 12);
     expect(surrenderChance(boss)).toBeCloseTo(surrenderChance(normal) / 2);
     boss.party[0].hp = 1;
     boss.battle!.enemy.hp = 0;

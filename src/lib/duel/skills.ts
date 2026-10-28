@@ -1,4 +1,5 @@
 // 일기토 기술 데이터: 공용 기술 + 장수별 필살기
+import { BALANCE, onBalanceChange } from './balance';
 import type { Skill } from './types';
 
 const list: Skill[] = [
@@ -31,4 +32,16 @@ const list: Skill[] = [
   { id: 'lvbu_ult', name: '방천화극 난무', kind: '맹장', power: 80, uses: 3 },
 ];
 
-export const SKILLS: Record<string, Skill> = Object.fromEntries(list.map((s) => [s.id, s]));
+/** 아래 표의 값은 기준값이고, 실제 위력·횟수는 BALANCE.skills가 덮어쓴다 */
+export const SKILLS: Record<string, Skill> = Object.fromEntries(list.map((s) => [s.id, { ...s }]));
+
+function applySkillBalance(): void {
+  for (const base of list) {
+    const o = BALANCE.skills[base.id];
+    const s = SKILLS[base.id];
+    s.power = o?.power ?? base.power;
+    s.uses = o && o.uses !== undefined ? o.uses : base.uses;
+  }
+}
+applySkillBalance();
+onBalanceChange(applySkillBalance);

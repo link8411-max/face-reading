@@ -1,5 +1,6 @@
 // 일기토 장수 명단. stats는 samgukDB에서 모듈 로드 시 복사한다(손으로 옮기지 않음).
 import { getCharacterById } from '@/lib/samgukDB';
+import { BALANCE, onBalanceChange } from './balance';
 import type { DuelGeneral, GeneralKind } from './types';
 
 export const STARTER_IDS = ['guanyu', 'zhangfei', 'zhaoyun'] as const;
@@ -17,7 +18,7 @@ interface Def {
   id: string;
   kind: GeneralKind;
   role: DuelGeneral['role'];
-  /** 장수별 속도 보정 */
+  /** 장수별 속도 보정 (BALANCE.speedAdj에 있으면 그 값) */
   speedAdj: number;
   /** 기본 공격 id 다음 순서: 필살기 id, 공용 기술 2개 */
   skills: [string, string, string, string];
@@ -52,7 +53,7 @@ function build(def: Def): DuelGeneral {
     id: def.id,
     name: c.name,
     kind: def.kind,
-    speed: BASE_SPEED[def.kind] + def.speedAdj,
+    speed: BASE_SPEED[def.kind] + (BALANCE.speedAdj[def.id] ?? def.speedAdj),
     skills: def.skills,
     role: def.role,
     sprite: `${def.id}.png`,
@@ -73,6 +74,14 @@ const MOB: DuelGeneral = {
 };
 
 export const DUEL_GENERALS: DuelGeneral[] = [...DEFS.map(build), MOB];
+
+// BALANCE.speedAdj가 바뀌면(튜너) 속도만 다시 계산한다
+onBalanceChange(() => {
+  for (const def of DEFS) {
+    const g = DUEL_GENERALS.find((x) => x.id === def.id)!;
+    g.speed = BASE_SPEED[def.kind] + (BALANCE.speedAdj[def.id] ?? def.speedAdj);
+  }
+});
 
 export function getDuelGeneral(id: string): DuelGeneral | undefined {
   return DUEL_GENERALS.find((g) => g.id === id);

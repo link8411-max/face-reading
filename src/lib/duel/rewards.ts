@@ -1,13 +1,11 @@
 // 일기토 보상 카드: 웨이브 사이 3장 중 1장. 적용은 순수 함수(입력 상태를 바꾸지 않는다).
 import { skillsOf } from './battle';
+import { BALANCE, type Balance } from './balance';
 import { SKILLS } from './skills';
 import type { Rng } from './rng';
 import type { Fighter, Reward, RunState } from './types';
 
-const RARE_CHANCE = 0.25;
 const DRAW = 3;
-const POTION_RATE = 0.5;
-const REVIVE_RATE = 0.5;
 /** 새 기술은 셋째 칸(첫 공용 기술 자리)을 바꾼다. 넷째 칸의 숨 고르기·일갈은 남긴다 */
 const LEARN_SLOT = 2;
 
@@ -29,22 +27,27 @@ function onTarget(
   return next;
 }
 
+type AmountKey = Extract<keyof Balance, 'redhareSpeed' | 'steedSpeed' | 'greendragonAtk' | 'swordAtk' | 'bookInt'>;
+
 function bonusReward(
   id: string,
   name: string,
-  desc: string,
+  descHead: string,
   rarity: Reward['rarity'],
   stat: keyof Fighter['bonus'],
-  amount: number,
+  /** 오름 폭을 읽을 BALANCE 키 */
+  amount: AmountKey,
   only?: string,
 ): Reward {
   const r: Reward = {
     id,
     name,
-    desc,
+    get desc() {
+      return `${descHead} +${BALANCE[amount]}`;
+    },
     rarity,
     targets: (run) => indices(run, (f) => !only || f.id === only),
-    apply: (run, t) => onTarget(r, run, t, (f) => (f.bonus[stat] += amount)),
+    apply: (run, t) => onTarget(r, run, t, (f) => (f.bonus[stat] += BALANCE[amount])),
   };
   return r;
 }
@@ -77,7 +80,7 @@ const potion: Reward = {
   rarity: 'common',
   targets: (run) => indices(run, (f) => f.hp > 0 && f.hp < f.maxHp),
   apply: (run, t) =>
-    onTarget(potion, run, t, (f) => (f.hp = Math.min(f.maxHp, f.hp + Math.round(f.maxHp * POTION_RATE)))),
+    onTarget(potion, run, t, (f) => (f.hp = Math.min(f.maxHp, f.hp + Math.round(f.maxHp * BALANCE.potionRate)))),
 };
 
 const revive: Reward = {
@@ -86,7 +89,7 @@ const revive: Reward = {
   desc: '쓰러진 장수 1명을 체력 50%로 일으킨다',
   rarity: 'rare',
   targets: (run) => indices(run, (f) => f.hp <= 0),
-  apply: (run, t) => onTarget(revive, run, t, (f) => (f.hp = Math.round(f.maxHp * REVIVE_RATE))),
+  apply: (run, t) => onTarget(revive, run, t, (f) => (f.hp = Math.round(f.maxHp * BALANCE.reviveRate))),
 };
 
 const slot: Reward = {
@@ -102,11 +105,11 @@ const slot: Reward = {
 };
 
 export const REWARDS: Reward[] = [
-  bonusReward('redhare', '적토마', '장수 1명의 속도 +15', 'rare', 'speed', 15),
-  bonusReward('steed', '준마', '장수 1명의 속도 +8', 'common', 'speed', 8),
-  bonusReward('greendragon', '청룡언월도', '관우 전용. 공격 +15', 'rare', 'atk', 15, 'guanyu'),
-  bonusReward('sword', '보검', '장수 1명의 공격 +8', 'common', 'atk', 8),
-  bonusReward('book', '병법서', '장수 1명의 지력 +10', 'common', 'int', 10),
+  bonusReward('redhare', '적토마', '장수 1명의 속도', 'rare', 'speed', 'redhareSpeed'),
+  bonusReward('steed', '준마', '장수 1명의 속도', 'common', 'speed', 'steedSpeed'),
+  bonusReward('greendragon', '청룡언월도', '관우 전용. 공격', 'rare', 'atk', 'greendragonAtk', 'guanyu'),
+  bonusReward('sword', '보검', '장수 1명의 공격', 'common', 'atk', 'swordAtk'),
+  bonusReward('book', '병법서', '장수 1명의 지력', 'common', 'int', 'bookInt'),
   learnReward('book_fire', 'fire', '병법서: 화공', 'rare'),
   potion,
   revive,
@@ -141,7 +144,7 @@ export function topUpRewards(run: RunState, keep: string[], rng: Rng): Reward[] 
   const out = keep.map(getReward).filter((r) => usableReward(r, run));
   const pool = REWARDS.filter((r) => usableReward(r, run) && !out.includes(r));
   while (out.length < DRAW && pool.length > 0) {
-    const want = rng() < RARE_CHANCE ? 'rare' : 'common';
+    const want = rng() < BALANCE.rareChance ? 'rare' : 'common';
     let cands = pool.filter((r) => r.rarity === want);
     if (cands.length === 0) cands = pool;
     const pick = cands[Math.floor(rng() * cands.length)];

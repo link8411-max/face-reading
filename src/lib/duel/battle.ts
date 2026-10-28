@@ -1,4 +1,5 @@
 // 일기토 전투 한 턴: 상성·피해·교체·효과. 순수 함수만 두고 입력 상태는 바꾸지 않는다.
+import { BALANCE } from './balance';
 import { getDuelGeneral } from './generals';
 import { SKILLS } from './skills';
 import type { Rng } from './rng';
@@ -9,13 +10,10 @@ type Side = 'player' | 'enemy';
 /** 이기는 상대: 맹장 > 기장 > 지장 > 맹장 */
 const BEATS: Record<GeneralKind, GeneralKind> = { 맹장: '기장', 기장: '지장', 지장: '맹장' };
 
-const STAB = 1.2;
 const BURN_TURNS = 3;
-const BURN_RATE = 0.08;
 const CONFUSE_ACTIONS = 1;
 const CONFUSE_FAIL = 0.5;
 const TAUNT_ACTIONS = 2;
-const HEAL_RATE = 0.3;
 const SHOUT_RATE = 0.8;
 const AMBUSH_RATE = 0.5;
 const LOW_HP = 0.3;
@@ -33,11 +31,18 @@ function skill(id: string): Skill {
   return s;
 }
 
-/** maxHp = 통솔 × 2 + level × 6. uses는 횟수 제한 있는 기술만 넣는다(키 없음 = 무제한). */
+/** 이 장수·레벨의 최대 체력: round(통솔 × hpPerLead + level × hpPerLevel) (BALANCE) */
+export function maxHpFor(id: string, level: number): number {
+  const g = getDuelGeneral(id);
+  if (!g) throw new Error(`없는 장수: ${id}`);
+  return Math.round(g.stats.통솔 * BALANCE.hpPerLead + level * BALANCE.hpPerLevel);
+}
+
+/** maxHp는 maxHpFor. uses는 횟수 제한 있는 기술만 넣는다(키 없음 = 무제한). */
 export function makeFighter(id: string, level: number): Fighter {
   const g = getDuelGeneral(id);
   if (!g) throw new Error(`없는 장수: ${id}`);
-  const maxHp = g.stats.통솔 * 2 + level * 6;
+  const maxHp = maxHpFor(id, level);
   const uses: Record<string, number> = {};
   for (const sid of g.skills) {
     const n = skill(sid).uses;
@@ -47,9 +52,9 @@ export function makeFighter(id: string, level: number): Fighter {
 }
 
 /** 공격 유형 a가 방어 유형 d를 칠 때 배율 */
-export function matchup(a: GeneralKind, d: GeneralKind): 1.5 | 1 | 0.67 {
-  if (BEATS[a] === d) return 1.5;
-  if (BEATS[d] === a) return 0.67;
+export function matchup(a: GeneralKind, d: GeneralKind): number {
+  if (BEATS[a] === d) return BALANCE.matchWin;
+  if (BEATS[d] === a) return BALANCE.matchLose;
   return 1;
 }
 
@@ -58,7 +63,7 @@ export function speedOf(f: Fighter): number {
 }
 
 /** 맹장 무력, 기장 무력 + 속도/4, 지장 지력 (+보너스) */
-function attackStat(f: Fighter): number {
+export function attackStat(f: Fighter): number {
   const g = gen(f);
   if (g.kind === '지장') return g.stats.지력 + f.bonus.int;
   if (g.kind === '기장') return g.stats.무력 + f.bonus.atk + speedOf(f) / 4;
@@ -73,7 +78,8 @@ export function damage(att: Fighter, def: Fighter, sk: Skill, rng: Rng): number 
   if (sk.power <= 0) return 0;
   const a = gen(att);
   const d = gen(def);
-  let v = sk.power * (attackStat(att) / d.stats.통솔) * matchup(sk.kind, d.kind) * (sk.kind === a.kind ? STAB : 1);
+  let v = sk.power * (attackStat(att) / d.stats.통솔) * matchup(sk.kind, d.kind) * (sk.kind === a.kind ? BALANCE.stab : 1);
+  v *= BALANCE.generalPower[att.id] ?? 1;
   v *= 0.85 + 0.15 * rng();
   if (att.status.shouted) v *= SHOUT_RATE;
   if (def.status.guard) v *= 0.5;
@@ -106,7 +112,7 @@ export function enemyAction(state: BattleState, rng: Rng): Action {
   for (const id of avail) {
     const s = skill(id);
     if (s.power <= 0) continue;
-    const score = s.power * matchup(s.kind, foeKind) * (s.kind === g.kind ? STAB : 1);
+    const score = s.power * matchup(s.kind, foeKind) * (s.kind === g.kind ? BALANCE.stab : 1);
     if (score > bestScore) {
       best = id;
       bestScore = score;
@@ -221,7 +227,7 @@ export function resolveTurn(
         log.push({ who: side, kind: 'status', text: `${g.name}은(는) 매복했다!` });
         break;
       case 'heal': {
-        const amt = Math.min(self.maxHp - self.hp, Math.round(self.maxHp * HEAL_RATE));
+        const amt = Math.min(self.maxHp - self.hp, Math.round(self.maxHp * BALANCE.healRate));
         self.hp += amt;
         log.push({ who: side, kind: 'status', amount: amt, text: `${g.name}은(는) 숨을 골랐다. 체력 ${amt} 회복!` });
         break;
@@ -259,7 +265,7 @@ export function resolveTurn(
     if (!alive('player') || !alive('enemy')) break;
     const f = fighter(side);
     if (!f.status.burn) continue;
-    const amt = Math.max(1, Math.round(f.maxHp * BURN_RATE));
+    const amt = Math.max(1, Math.round(f.maxHp * BALANCE.burnRate));
     f.hp = Math.max(0, f.hp - amt);
     log.push({ who: side, kind: 'status', amount: amt, text: `${name(f)}은(는) 불길에 휩싸였다! ${amt}의 피해!` });
     f.status.burn -= 1;

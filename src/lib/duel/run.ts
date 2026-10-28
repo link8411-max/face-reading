@@ -1,6 +1,8 @@
 // 일기토 한 판의 진행: 웨이브·레벨·항복·보상·클리어. 순수 함수만 두고 입력 상태는 바꾸지 않는다.
 // 난수는 RunState에 두지 않고 인자로 받는다(UI가 seed로 만들어 들고 있는다).
-import { makeFighter, resolveTurn, skillsOf } from './battle';
+import { makeFighter, maxHpFor, resolveTurn, skillsOf } from './battle';
+import { BALANCE } from './balance';
+import { designedEnemy, makeDesignedEnemy } from './design';
 import { BOSS_IDS, DUEL_GENERALS, getDuelGeneral, MOB_ID } from './generals';
 import { drawRewards, getReward, topUpRewards } from './rewards';
 import { SKILLS } from './skills';
@@ -12,15 +14,8 @@ export const BOSS_WAVES = [6, 12, 18, 24, 30, 36] as const;
 
 const MOB_WAVES = 3;
 const RECRUIT_ONLY_UNTIL = 5;
-const BOSS_LEVEL_BONUS = 3;
-const EXP_BASE = 10;
-const EXP_PER_WAVE = 2;
-const EXP_PER_LEVEL = 100;
-const SURRENDER_BASE = 0.25;
 const SURRENDER_MIN = 0.05;
 const SURRENDER_MAX = 0.8;
-/** 보스로 나온 영입 장수의 항복 확률 배율 */
-const BOSS_SURRENDER_FACTOR = 0.5;
 
 function gen(id: string) {
   const g = getDuelGeneral(id);
@@ -28,7 +23,6 @@ function gen(id: string) {
   return g;
 }
 
-const maxHpOf = (id: string, level: number) => gen(id).stats.통솔 * 2 + level * 6;
 
 const bossIndex = (wave: number) => (BOSS_WAVES as readonly number[]).indexOf(wave);
 
@@ -74,9 +68,9 @@ export function freshForBattle(f: Fighter): Fighter {
   return next;
 }
 
-/** 적 레벨 = 웨이브, 보스는 +BOSS_LEVEL_BONUS */
-export function enemyLevel(wave: number): number {
-  return wave + (bossIndex(wave) >= 0 ? BOSS_LEVEL_BONUS : 0);
+/** 웨이브 w에 나오는 적 id의 레벨: 설계표(BALANCE.waveDesign)를 피해 공식으로 푼 값 (design.ts) */
+export function enemyLevel(wave: number, id: string): number {
+  return designedEnemy(wave, id).level;
 }
 
 /**
@@ -98,7 +92,8 @@ export function nextEnemyId(run: RunState, rng: Rng): string {
 }
 
 function beginWave(run: RunState, rng: Rng): RunState {
-  const enemy = makeFighter(nextEnemyId(run, rng), enemyLevel(run.wave));
+  // 레벨·공격 보정은 설계표대로 (design.ts)
+  const enemy = makeDesignedEnemy(run.wave, nextEnemyId(run, rng));
   const party = run.party.map(freshForBattle);
   const active = firstAlive(party);
   if (active < 0) throw new Error('싸울 장수가 없다');
@@ -207,21 +202,21 @@ export function surrenderChance(run: RunState): number {
   const role = gen(e.id).role;
   if (role === 'mob' || role === 'boss') return 0;
   const lead = run.battle ? run.battle.party[run.battle.active] : run.party[0];
-  const p = SURRENDER_BASE + (gen(lead.id).stats.매력 - 50) / 200 - (e.level - run.wave) / 20;
+  const p = BALANCE.surrenderBase + (gen(lead.id).stats.매력 - 50) / 200 - (e.level - run.wave) / 20;
   const c = Math.min(SURRENDER_MAX, Math.max(SURRENDER_MIN, p));
-  return isBossWave(run.wave) ? c * BOSS_SURRENDER_FACTOR : c;
+  return isBossWave(run.wave) ? c * BALANCE.bossSurrenderFactor : c;
 }
 
 function gainExp(f: Fighter, amount: number): Fighter {
   const next = structuredClone(f);
   let exp = (next.exp ?? 0) + amount;
   let level = next.level;
-  while (exp >= EXP_PER_LEVEL) {
-    exp -= EXP_PER_LEVEL;
+  while (exp >= BALANCE.expPerLevel) {
+    exp -= BALANCE.expPerLevel;
     level += 1;
   }
   if (level !== next.level) {
-    const maxHp = maxHpOf(next.id, level);
+    const maxHp = maxHpFor(next.id, level);
     next.hp = Math.round((next.hp / next.maxHp) * maxHp);
     next.maxHp = maxHp;
     next.level = level;
@@ -235,7 +230,7 @@ export function afterWin(run: RunState, rng: Rng): RunState {
   const enemy = run.enemy;
   if (!enemy) throw new Error('쓰러뜨린 적이 없다');
   const chance = surrenderChance(run);
-  let party = run.party.map((f) => gainExp(f, EXP_BASE + run.wave * EXP_PER_WAVE));
+  let party = run.party.map((f) => gainExp(f, Math.max(0, BALANCE.expBase + run.wave * BALANCE.expPerWave)));
   if (isBossWave(run.wave)) party = party.map((f) => ({ ...f, hp: f.maxHp }));
 
   let roster = run.roster;
