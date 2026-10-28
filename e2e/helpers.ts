@@ -1,6 +1,6 @@
 import type { Page } from '@playwright/test'
 
-export const PAGES = ['/', '/face2', '/animal', '/samguk', '/fortune', '/fortune/daily', '/about', '/privacy']
+export const PAGES = ['/', '/face2', '/animal', '/samguk', '/fortune', '/fortune/daily', '/about', '/privacy', '/samguk/duel', '/samguk/duel/generals/lvbu']
 export const TEST_PAGES = ['/face2', '/animal', '/samguk', '/fortune', '/fortune/daily']
 
 // 외부 광고·분석 스크립트 오류는 우리 코드 문제가 아니므로 제외
