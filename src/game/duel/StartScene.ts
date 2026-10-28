@@ -66,16 +66,22 @@ export class StartScene extends PanelScene {
     this.t(h.x + 6, h.y + 4, '행군 기록', { ko: 9, color: S.red });
     // 이 브라우저에 저장할 수 없으면(인앱·사생활 보호 모드) 한 줄 알린다: 세로형은 아래 천 위에, 가로형은 행군 기록 첫 줄에
     const noSave = v.storageOk === false;
-    if (noSave && this.tall) {
-      this.fit(this.t(160, START_TALL.noteY, NO_SAVE, { ko: 11, color: S.gold, shadow: true }).setOrigin(0.5, 0), 296);
+    // 새로 출진 확인 중이면 경고 한 줄: 세로형은 아래 천 위에, 가로형은 행군 기록 첫 줄에(빨강)
+    const warn = v.confirmFresh && v.resume ? v.confirmFresh : null;
+    if (this.tall) {
+      const notes = [warn, noSave ? NO_SAVE : null].filter((x): x is string => !!x);
+      notes.forEach((n, i) => {
+        this.fit(this.t(160, START_TALL.noteY + i * 14, n, { ko: 11, color: S.gold, shadow: true }).setOrigin(0.5, 0), 296);
+      });
     }
-    const lines = noSave && !this.tall ? [NO_SAVE_SHORT, ...v.history.slice(0, 2)] : v.history.slice(0, 3);
+    const top = !this.tall ? (warn ? [warn] : noSave ? [NO_SAVE_SHORT] : []) : [];
+    const lines = [...top, ...v.history.slice(0, 3 - top.length)];
     if (lines.length === 0) {
       this.t(h.x + 6, h.y + 16, '아직 지난 행군이 없다', { ko: 9, color: MUTED });
     }
     // 읽히게 Galmuri9로 최근 3개만(한 줄에 하나)
     lines.forEach((line, i) => {
-      this.fit(this.t(h.x + 6, h.y + 15 + i * 10, line, { ko: 9, color: noSave && i === 0 && !this.tall ? S.red : S.ink }), h.w - 12);
+      this.fit(this.t(h.x + 6, h.y + 15 + i * 10, line, { ko: 9, color: i < top.length ? S.red : S.ink }), h.w - 12);
     });
 
     const lead = v.roster.find((r) => r.id === v.selected);
@@ -102,11 +108,17 @@ export class StartScene extends PanelScene {
     // 세로형은 큰 단추라 Galmuri11로 가운데에
     const ko = this.tall ? 11 : 9;
     const ty = (b: { y: number; h: number }) => b.y + Math.floor((b.h - (this.tall ? 12 : 10)) / 2) - 1;
-    box(g, R.x, R.y, R.w, R.h, S.gold);
-    this.fit(this.t(R.x + 12, ty(R), `이어하기 ${r.name} 제${r.wave}전`, { ko, color: onR ? S.red : S.ink }), R.w - 16);
+    // 새로 출진 확인 중: 위 칸은 "취소"(크림), 아래 칸은 금색 "한 번 더 누르면 새로 출진"
+    const armed = !!v.confirmFresh;
+    box(g, R.x, R.y, R.w, R.h, armed ? S.cream : S.gold);
+    const topLabel = armed ? (this.tall ? '취소 · 이어하기로 두기' : '취소') : `이어하기 ${r.name} 제${r.wave}전`;
+    this.fit(this.t(R.x + 12, ty(R), topLabel, { ko, color: onR ? S.red : S.ink }), R.w - 16);
     if (onR) cursor(g, R.x + 4, ty(R) + 3);
-    box(g, N.x, N.y, N.w, N.h, S.cream);
-    this.fit(this.t(N.x + 12, ty(N), this.tall ? `새로 출진 · 선두 ${leadName}` : `새로 ${leadName}`, { ko, color: onN ? S.red : S.ink }), N.w - 16);
+    box(g, N.x, N.y, N.w, N.h, armed ? S.gold : S.cream);
+    const freshLabel = armed
+      ? this.tall ? `한 번 더 누르면 새로 출진 · ${leadName}` : '한 번 더: 새로'
+      : this.tall ? `새로 출진 · 선두 ${leadName}` : `새로 ${leadName}`;
+    this.fit(this.t(N.x + 12, ty(N), freshLabel, { ko, color: onN || armed ? S.red : S.ink }), N.w - 16);
     if (onN) cursor(g, N.x + 4, ty(N) + 3);
   }
 }

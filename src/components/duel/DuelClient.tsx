@@ -15,14 +15,14 @@ import { encodeRunKey } from "@/lib/duel/shareKey";
 import { makeRunId, newRunNonce } from "@/lib/duel/feedback";
 import { advancePlayed, buildRunLog, endEventId, waveEventId } from "@/lib/duel/runLog";
 import { duelOgImageUrl, duelShareUrl } from "@/lib/duel/share";
-import { euro } from "@/lib/josa";
+import { euro, josa } from "@/lib/josa";
 import type { RunRecord, RunState, SaveData } from "@/lib/duel/types";
 import { track } from "@/lib/analytics";
 import { useResultShare } from "@/hooks/useResultShare";
 import CoupangBanner from "@/components/CoupangBanner";
 import FeedbackForm from "./FeedbackForm";
 import OverlayButtons, { type OverlayButton } from "./OverlayButtons";
-import { overlayLayout, resolveStarterUnlock, stageLayout } from "./clientLogic";
+import { abandonWarning, needsAbandonConfirm, overlayLayout, resolveStarterUnlock, sortieTap, stageLayout } from "./clientLogic";
 import { GAME_H, GAME_W } from "@/game/duel/config";
 import { resultLayout } from "@/game/duel/layout";
 import { bodyPages } from "@/game/duel/wrap";
@@ -184,8 +184,12 @@ export default function DuelClient() {
   }, [bridge]);
 
   const storageOkRef = useRef(true);
-  const showStart = useCallback((data: SaveData, sel: string) => {
-    bridge.emit("start:show", { ...toStartShow(data, sel), storageOk: storageOkRef.current });
+  /** 진행 중인 판이 있을 때 "새로 출진"을 한 번 눌러 확인을 기다리는지(두 번째 누름에 새 판) */
+  const [abandonArmed, setAbandonArmed] = useState(false);
+  const showStart = useCallback((data: SaveData, sel: string, armed = false) => {
+    setAbandonArmed(armed);
+    const show = toStartShow(data, sel);
+    bridge.emit("start:show", { ...show, storageOk: storageOkRef.current, ...(armed && show.resume ? { confirmFresh: abandonWarning(show.resume.wave) } : {}) });
   }, [bridge]);
 
   const showBattle = useCallback((r: RunState) => {
@@ -363,8 +367,9 @@ export default function DuelClient() {
   }, [bridge, enterReward, finishRun, persist, save]);
 
   const startNewRun = useCallback(() => {
-    // 진행 중인 판을 두고 새로 출진하면 그 판은 버려진다
-    if (save.current && (save.current.phase === "battle" || save.current.phase === "reward")) track("duel_abandon", { test_name: "duel" });
+    // 진행 중인 판을 두고 새로 출진하면 그 판은 버려진다(확인을 거친 뒤에만 여기 온다)
+    if (needsAbandonConfirm(save)) track("duel_abandon", { test_name: "duel" });
+    setAbandonArmed(false);
     const seed = seedFrom(seedParamRef.current);
     const r = startRun(selected, seed);
     rngRef.current = createRng(seed);
@@ -411,15 +416,29 @@ export default function DuelClient() {
   const handle = useCallback((a: UiAction) => {
     switch (a.type) {
       case "select": {
-        if (!save.roster.includes(a.starterId)) return;
+        // 다른 단추를 누르면 새로 출진 확인은 풀린다
+        if (!save.roster.includes(a.starterId)) {
+          if (abandonArmed) showStart(save, selected);
+          return;
+        }
         setSelected(a.starterId);
         showStart(save, a.starterId);
         return;
       }
       case "sortie":
+        // 진행 중인 판이 있으면 첫 누름은 확인만("진행 중인 판이 사라져요"), 두 번째 누름에 새 판
+        if (sortieTap(save, abandonArmed) === "arm") {
+          showStart(save, selected, true);
+          return;
+        }
         startNewRun();
         return;
       case "resume": {
+        // 확인 중이면 이 자리는 "취소": 확인만 풀고 시작 화면에 남는다
+        if (abandonArmed) {
+          showStart(save, selected);
+          return;
+        }
         const cur = save.current;
         if (!cur || (cur.phase !== "battle" && cur.phase !== "reward")) return;
         // 같은 시드에서 이어 가되, 지난 턴 수만큼 난수를 비켜 간다
@@ -487,7 +506,7 @@ export default function DuelClient() {
         rate(a.stars);
         return;
     }
-  }, [applyReward, enterReward, go, persist, pick, rate, router, run, save, selected, share, showBattle, showReward, showStart, startNewRun, turn]);
+  }, [abandonArmed, applyReward, enterReward, go, persist, pick, rate, router, run, save, selected, share, showBattle, showReward, showStart, startNewRun, turn]);
 
   // 다리의 ui:action → handle (투명 버튼이 보낸다)
   const handleRef = useRef(handle);
@@ -571,8 +590,11 @@ export default function DuelClient() {
     if (screen === "start") {
       const res = startShow.resume;
       return overlayLayout("start", startShow.roster.length, !!res, { tall }).map((s, i) => {
-        if (s.id === "sortie") return { ...s, label: `${nameOf(selected)}와 함께 ${res ? "새로 " : ""}출진` };
-        if (s.id === "resume") return { ...s, label: `이어하기: ${res!.name} 제${res!.wave}전` };
+        if (s.id === "sortie") {
+          if (res && abandonArmed) return { ...s, label: `${abandonWarning(res.wave)}. 한 번 더 누르면 ${josa(nameOf(selected), "과", "와")} 새로 출진` };
+          return { ...s, label: `${josa(nameOf(selected), "과", "와")} 함께 ${res ? "새로 " : ""}출진` };
+        }
+        if (s.id === "resume") return { ...s, label: abandonArmed ? "취소: 새로 출진하지 않기" : `이어하기: ${res!.name} 제${res!.wave}전` };
         const g = startShow.roster[i];
         return { ...s, label: g.locked ? `${g.name} 잠김` : `${g.name} ${g.kind}${g.id === selected ? " 선택됨" : ""}`, disabled: g.locked };
       });
@@ -604,7 +626,7 @@ export default function DuelClient() {
     }
     const pages = record ? bodyPages(narrate(record).lines, resultLayout(tall).bodyLines).length : 1;
     return overlayLayout("result", 0, false, { tall, pages }).map((s) => (s.id === "page" ? { ...s, label: `열전 다음 쪽 (${resultPage + 1}/${pages})` } : s));
-  }, [battleChoice, battleSel, pending, pick, record, resultPage, rowInfo, run, screen, selected, startShow, tall]);
+  }, [abandonArmed, battleChoice, battleSel, pending, pick, record, resultPage, rowInfo, run, screen, selected, startShow, tall]);
 
   const onAction = useCallback((id: string) => {
     let a: UiAction | null = null;
@@ -658,7 +680,13 @@ export default function DuelClient() {
         </div>
       </div>
       <p className="sr-only" aria-live="polite">
-        {screen === "battle" && run ? toBattleView(run)?.message.join(" ") : screen === "start" && !storageOk ? "이 브라우저에서는 이어하기가 저장되지 않아요" : ""}
+        {screen === "battle" && run
+          ? toBattleView(run)?.message.join(" ")
+          : screen === "start" && abandonArmed && startShow.resume
+            ? `${abandonWarning(startShow.resume.wave)}. 한 번 더 누르면 새로 출진해요.`
+            : screen === "start" && !storageOk
+              ? "이 브라우저에서는 이어하기가 저장되지 않아요"
+              : ""}
       </p>
       {screen === "result" && record && (
         <div className="mt-4 mx-auto px-4 max-w-lg flex flex-col gap-3">

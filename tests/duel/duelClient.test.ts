@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { hitRects, needsAbandonConfirm, overlayLayout, resolveStarterUnlock, type Rect } from '@/components/duel/clientLogic';
+import { abandonWarning, hitRects, needsAbandonConfirm, overlayLayout, resolveStarterUnlock, sortieTap, type Rect } from '@/components/duel/clientLogic';
 import { DIALOG_BOX, FIELD_BOX, MENU_BOX, RESULT_TALL, RESULT_WIDE } from '@/game/duel/layout';
 import { GAME_H_TALL } from '@/game/duel/config';
 
@@ -46,6 +46,18 @@ describe('needsAbandonConfirm (새로 출진 전에 한 번 더 묻기)', () => 
     expect(needsAbandonConfirm({ current: null })).toBe(false);
     expect(needsAbandonConfirm({ current: { phase: 'won' } })).toBe(false);
     expect(needsAbandonConfirm({ current: { phase: 'lost' } })).toBe(false);
+  });
+  it('sortieTap: 진행 중이면 첫 누름은 확인만, 확인 뒤 두 번째 누름에 새 판', () => {
+    const inRun = { current: { phase: 'battle' } };
+    expect(sortieTap(inRun, false)).toBe('arm');
+    expect(sortieTap(inRun, true)).toBe('start');
+    expect(sortieTap({ current: { phase: 'reward' } }, false)).toBe('arm');
+    // 판이 없으면 한 번에 출진
+    expect(sortieTap({ current: null }, false)).toBe('start');
+    expect(sortieTap({ current: { phase: 'lost' } }, false)).toBe('start');
+  });
+  it('경고 문구에 그 판의 싸움 번호', () => {
+    expect(abandonWarning(7)).toBe('진행 중인 판(제7전)이 사라져요');
   });
 });
 

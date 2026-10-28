@@ -49,6 +49,8 @@ export interface StartShow {
   resume?: { starter: string; name: string; wave: number };
   /** false면 이 브라우저에 저장할 수 없다(시작 화면에 한 줄 안내) */
   storageOk?: boolean;
+  /** 있으면 "새로 출진"을 한 번 눌러 확인을 기다린다(값은 경고 한 줄): 위 칸은 취소, 아래 칸은 한 번 더 누르면 새 판 */
+  confirmFresh?: string;
 }
 
 /** 항복 장면: 항복한 장수와 동행 칸 */

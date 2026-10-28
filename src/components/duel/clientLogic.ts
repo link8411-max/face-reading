@@ -56,6 +56,14 @@ export function needsAbandonConfirm(save: { current?: { phase: string } | null }
   return p === 'battle' || p === 'reward';
 }
 
+/** "새로 출진" 누름: 진행 중인 판이 있고 아직 확인 전이면 'arm'(경고만), 그 밖은 'start'(새 판) */
+export function sortieTap(save: { current?: { phase: string } | null }, armed: boolean): 'arm' | 'start' {
+  return needsAbandonConfirm(save) && !armed ? 'arm' : 'start';
+}
+
+/** 새로 출진 확인 문구 */
+export const abandonWarning = (wave: number) => `진행 중인 판(제${wave}전)이 사라져요`;
+
 export interface OverlayOpts {
   /** 세로형(320×408) 배치 */
   tall?: boolean;
