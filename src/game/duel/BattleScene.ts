@@ -8,7 +8,7 @@ import { playSfx } from './sfx';
 import { otherSide, otherWho, timelineLength, CLASH_MS, PASS_MS, STRIKE_MS, KO_MS, type Side, type TimelineItem, type Who } from './timeline';
 import { portraitKeyFor, spriteKeyFor } from './textures';
 import { KIND_MARK, box, cursor, fonts, hpBar, slashArc, spark, tag, text } from './ui';
-import { BATTLE_MENU, BATTLE_SWITCH } from './layout';
+import { BATTLE_MENU, BATTLE_SWITCH, MSG_CHARS } from './layout';
 import { wrapText } from './wrap';
 
 // ── 배치(와꾸 v5 좌표) ──
@@ -25,8 +25,6 @@ const MENU_Y = 174;
 const MENU_STEP = 11;
 const SWITCH_Y = 219;
 const MSG_LINES = 3;
-/** 대사창 한 줄 글자 수 */
-const MSG_CHARS = 15;
 /** 웨이브 진행 띠: 18칸, 보스(6·12·18)는 금색 긴 칸 */
 const STRIP = { x: 124, y: 30, cell: 4, w: 3, h: 5 } as const;
 const FOCUS_IDS: BattleFocusId[] = ['skill0', 'skill1', 'skill2', 'skill3', 'switch'];
@@ -62,6 +60,8 @@ export class BattleScene extends Phaser.Scene {
   /** 연출 중 보여 주는 체력(피해를 맞을 때마다 깎는다) */
   private shownHp: Record<Who, number> = { player: 0, enemy: 0 };
   private messages: string[] = [];
+  /** 결정 대기 중인 명령 안내 줄(대사창 아래쪽에 빨갛게) */
+  private prompt: string[] | null = null;
   /** 이번 연출에서 쓰러진 쪽 */
   private koed = new Set<Who>();
   /** 이번 연출이 끝난 뒤의 자리 */
@@ -95,6 +95,7 @@ export class BattleScene extends Phaser.Scene {
     this.koed = new Set<Who>();
     this.doneTimer = null;
     this.dust = [];
+    this.prompt = null;
     this.bridge = this.registry.get('bridge') as DuelBridge;
     this.buildStatic();
     this.buildDynamic();
@@ -111,12 +112,18 @@ export class BattleScene extends Phaser.Scene {
     this.bridge.on('run:update', onUpdate);
     this.bridge.on('anim:play', onPlay);
     this.bridge.on('ui:focus', onFocus);
+    const onPrompt = (p: DuelEvents['battle:prompt']) => {
+      this.prompt = p.text ? wrapText(p.text, MSG_CHARS).slice(0, 2) : null;
+      this.drawMessages();
+    };
+    this.bridge.on('battle:prompt', onPrompt);
     // game.destroy(true)는 SHUTDOWN이 아니라 DESTROY만 보낸다 → 둘 다에서 뗀다(다리는 게임보다 오래 산다)
     const bridge = this.bridge;
     const cleanup = () => {
       bridge.off('run:update', onUpdate);
       bridge.off('anim:play', onPlay);
       bridge.off('ui:focus', onFocus);
+      bridge.off('battle:prompt', onPrompt);
       this.events.off(Phaser.Scenes.Events.SHUTDOWN, cleanup);
       this.events.off(Phaser.Scenes.Events.DESTROY, cleanup);
     };
@@ -250,7 +257,11 @@ export class BattleScene extends Phaser.Scene {
   }
 
   private drawMessages(): void {
-    this.msg.forEach((t, i) => t.setText(this.messages[i] ?? ''));
+    // 결정 대기 중이면 마지막 대사 1줄 + 안내 줄(빨강), 아니면 대사 3줄
+    const p = this.animating ? null : this.prompt;
+    const lines = p ? [...this.messages.slice(-(MSG_LINES - p.length)), ...p] : this.messages;
+    const firstPrompt = p ? lines.length - p.length : MSG_LINES;
+    this.msg.forEach((t, i) => t.setText(lines[i] ?? '').setColor(i >= firstPrompt ? S.red : S.ink));
   }
 
   private drawMenu(): void {
@@ -503,7 +514,7 @@ export class BattleScene extends Phaser.Scene {
 
   private pushMessage(line: string): void {
     if (!line) return;
-    // 대사창은 줄바꿈이 없으니 18자씩 나눠 넣는다
+    // 대사창은 줄바꿈이 없으니 MSG_CHARS(15)자씩 나눠 넣는다
     this.messages = [...this.messages, ...wrapText(line, MSG_CHARS)].slice(-MSG_LINES);
     this.drawMessages();
   }

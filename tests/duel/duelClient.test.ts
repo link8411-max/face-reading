@@ -1,5 +1,6 @@
 import { describe, it, expect } from 'vitest';
 import { hitRects, overlayLayout, resolveStarterUnlock, type Rect } from '@/components/duel/clientLogic';
+import { DIALOG_BOX, FIELD_BOX, MENU_BOX } from '@/game/duel/layout';
 
 const inside = (r: Rect, W = 320, H = 240) => r.x >= 0 && r.y >= 0 && r.x + r.w <= W && r.y + r.h <= H;
 // 배율 곱의 소수 오차(1e-12 수준)는 겹침으로 치지 않는다
@@ -26,18 +27,19 @@ describe('resolveStarterUnlock', () => {
 });
 
 describe('overlayLayout', () => {
-  it('전투: 기술 4 + 교체 1, 320×240 안, 겹치지 않음', () => {
+  it('전투: 기술 4 + 교체 1 + 결정, 320×240 안, 겹치지 않음', () => {
     const l = overlayLayout('battle');
-    expect(l.map((b) => b.id)).toEqual(['skill0', 'skill1', 'skill2', 'skill3', 'switch']);
+    expect(l.map((b) => b.id)).toEqual(['skill0', 'skill1', 'skill2', 'skill3', 'switch', 'confirm']);
     expect(l.every((b) => inside(b))).toBe(true);
     expect(noOverlap(l)).toBe(true);
     expect(l.every((b) => b.label.length > 0)).toBe(true);
   });
-  it('전투 메뉴 줄 자리(x12, y 174+11i, 폭 146 — 넓힌 메뉴 상자 x10~160 안, 높이 11)', () => {
+  it('전투 메뉴 줄 자리(메뉴 상자 x10~160 안, y 174+11i, 높이 11), 결정 단추는 대사창 전체', () => {
     const l = overlayLayout('battle');
-    l.slice(0, 4).forEach((b, i) => expect(b).toMatchObject({ x: 12, y: 174 + 11 * i, w: 146, h: 11 }));
-    expect(l[4]).toMatchObject({ x: 12, y: 219, w: 146 });
-    l.forEach((b) => expect(b.x + b.w).toBeLessThanOrEqual(160));
+    l.slice(0, 4).forEach((b, i) => expect(b).toMatchObject({ x: 10, y: 174 + 11 * i, w: 150, h: 11, panel: MENU_BOX }));
+    expect(l[4]).toMatchObject({ x: 10, y: 219, w: 150, panel: MENU_BOX });
+    l.slice(0, 5).forEach((b) => expect(b.x + b.w).toBeLessThanOrEqual(160));
+    expect(l[5]).toMatchObject({ id: 'confirm', ...DIALOG_BOX });
   });
   it('결과: 버튼 3 + 별 5 = 8개', () => {
     const l = overlayLayout('result');
@@ -88,6 +90,7 @@ describe('hitRects', () => {
     ['result', 390],
     ['reward', 390],
     ['start', 390],
+    ['recruit', 343],
   ] as const)('%s @%ipx: 래퍼 안, 서로 겹치지 않음, 원래 칸을 덮는다', (scene, W) => {
     const k = W / 320;
     const base = scale(overlayLayout(scene, scene === 'recruit' ? 5 : 9), k);
@@ -98,6 +101,42 @@ describe('hitRects', () => {
       const b = base[i];
       expect(r.x <= b.x + E && r.y <= b.y + E && r.x + r.w >= b.x + b.w - E && r.y + r.h >= b.y + b.h - E).toBe(true);
     });
+  });
+
+  // 375px 화면 = 캔버스 래퍼 343px(좌우 여백 16px)
+  const battleAt = (W: number) => {
+    const k = W / 320;
+    const base = overlayLayout('battle').map((b) => ({
+      x: b.x * k,
+      y: b.y * k,
+      w: b.w * k,
+      h: b.h * k,
+      ...(b.panel ? { panel: { x: b.panel.x * k, y: b.panel.y * k, w: b.panel.w * k, h: b.panel.h * k } } : {}),
+    }));
+    return { k, out: hitRects(base, W, W * 0.75) };
+  };
+
+  it.each([343, 358, 390, 480])('전투 @%ipx: 어떤 터치 영역도 벌판(체력바 포함)과 겹치지 않고 메뉴 줄은 메뉴 상자 안', (W) => {
+    const { k, out } = battleAt(W);
+    const field = { x: FIELD_BOX.x * k, y: FIELD_BOX.y * k, w: FIELD_BOX.w * k, h: (MENU_BOX.y - FIELD_BOX.y) * k };
+    out.forEach((r) => expect(overlaps(r, field)).toBe(false));
+    out.slice(0, 5).forEach((r) => {
+      expect(r.y).toBeGreaterThanOrEqual(MENU_BOX.y * k - E);
+      expect(r.y + r.h).toBeLessThanOrEqual((MENU_BOX.y + MENU_BOX.h) * k + E);
+    });
+    expect(noOverlap(out)).toBe(true);
+  });
+
+  it('결정 단추는 375px 화면(래퍼 343px)에서도 가로·세로 44px 이상', () => {
+    const { out } = battleAt(343);
+    const c = out[5];
+    expect(c.w).toBeGreaterThanOrEqual(44);
+    expect(c.h).toBeGreaterThanOrEqual(44);
+  });
+
+  it('panel을 주면 그 상자 밖으로 늘리지 않는다', () => {
+    const [r] = hitRects([{ x: 10, y: 102, w: 100, h: 10, panel: { x: 0, y: 100, w: 200, h: 14 } }], 400, 300);
+    expect(r).toEqual({ x: 10, y: 100, w: 100, h: 14 });
   });
 
   it('이웃이 없으면 44px까지 위아래로 똑같이 늘린다', () => {

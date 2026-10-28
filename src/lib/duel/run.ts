@@ -255,3 +255,11 @@ export function swapInRecruit(run: RunState, recruitId: string, outIndex: number
   const next = { ...run, party };
   return { ...next, rewardsOffered: topUpRewards(next, run.rewardsOffered, rng).map((r) => r.id) };
 }
+
+/** 이번 웨이브의 항복 창을 처리했다고 적는다(입력은 바꾸지 않는다). 항복이 없으면 그대로 */
+export function markRecruitHandled(run: RunState): RunState {
+  const waves = run.record.waves;
+  const w = waves[waves.length - 1];
+  if (!w?.recruited || w.recruitHandled) return run;
+  return { ...run, record: { ...run.record, waves: [...waves.slice(0, -1), { ...w, recruitHandled: true }] } };
+}

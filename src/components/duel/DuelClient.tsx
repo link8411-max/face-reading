@@ -3,17 +3,16 @@
 import "./duel.css";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
-import type * as Phaser from "phaser";
-import { createDuelGame, DuelBridge, type PickView, type RecruitView, type SceneName, type UiAction } from "@/game/duel/createDuelGame";
+import { createDuelGame, DuelBridge, type BattleFocusId, type SceneName, type UiAction } from "@/game/duel/createDuelGame";
 import { eventsToTimeline, timelineLength, type Side } from "@/game/duel/timeline";
 import { createRng, type Rng } from "@/lib/duel/rng";
-import { pickReward, playerTurn, startRun, swapInRecruit } from "@/lib/duel/run";
+import { pickReward, playerTurn, startRun } from "@/lib/duel/run";
 import { getReward } from "@/lib/duel/rewards";
 import { getDuelGeneral, STARTER_IDS } from "@/lib/duel/generals";
 import { defaultSave, loadSave, recordRunEnd, writeSave } from "@/lib/duel/save";
 import { narrate } from "@/lib/duel/narrative";
 import { encodeRunKey } from "@/lib/duel/shareKey";
-import { duelShareUrl, josa, ogImageUrl } from "@/lib/shareLinks";
+import { duelShareUrl, ogImageUrl } from "@/lib/shareLinks";
 import type { RunRecord, RunState, SaveData } from "@/lib/duel/types";
 import { track } from "@/lib/analytics";
 import { useResultShare } from "@/hooks/useResultShare";
@@ -21,14 +20,26 @@ import CoupangBanner from "@/components/CoupangBanner";
 import FeedbackForm from "./FeedbackForm";
 import OverlayButtons, { type OverlayButton } from "./OverlayButtons";
 import { overlayLayout, resolveStarterUnlock } from "./clientLogic";
-import { nextSwitchIndex, toBattleView, toResultShow, toRewardShow, toStartShow } from "./view";
+import {
+  nextSwitchIndex,
+  pendingRecruit,
+  pickView,
+  recruitView,
+  resolveRecruitPick,
+  toBattleView,
+  toResultShow,
+  toRewardShow,
+  toStartShow,
+  type PendingPick,
+} from "./view";
+
+/** Phaser 타입을 직접 import하지 않고 게임 핸들 타입만 받는다 */
+type DuelGame = Awaited<ReturnType<typeof createDuelGame>>;
+const BATTLE_ROWS: BattleFocusId[] = ["skill0", "skill1", "skill2", "skill3", "switch"];
 
 const FONT_WAIT_MS = 1500;
 /** anim:done이 오지 않을 때(장면이 없을 때) 입력을 다시 여는 여유 시간 */
 const ANIM_GRACE_MS = 3000;
-
-/** 고르기 창 상태: 항복한 장수와 바꿀 자리, 또는 보상 대상 */
-type Pick = { kind: "recruit"; recruitId: string; full: boolean } | { kind: "target"; rewardId: string; targets: number[] };
 
 const storage = (): Storage | null => {
   try {
@@ -39,56 +50,6 @@ const storage = (): Storage | null => {
 };
 
 const nameOf = (id: string) => getDuelGeneral(id)?.name ?? id;
-
-/** 이번 싸움에서 항복한 장수(합류했으면 full=false, 자리가 없어 못 들어왔으면 full=true) */
-function pendingRecruit(run: RunState): { id: string; full: boolean } | null {
-  const w = run.record.waves[run.record.waves.length - 1];
-  if (!w?.recruited) return null;
-  return { id: w.enemy, full: !run.party.some((f) => f.id === w.enemy) };
-}
-
-/** 항복 창 값 */
-function recruitView(run: RunState, pick: Pick | null): RecruitView | undefined {
-  if (pick?.kind !== "recruit") return undefined;
-  const g = getDuelGeneral(pick.recruitId)!;
-  const level = run.enemy?.id === pick.recruitId ? run.enemy.level : run.wave;
-  return {
-    title: `${josa(g.name, "이", "가")} 항복했다!`,
-    note: pick.full ? "동행이 가득 찼다. 누구를 보낼까?" : `${josa(g.name, "이", "가")} 동행에 합류했다.`,
-    id: g.id,
-    name: g.name,
-    kind: g.kind,
-    level,
-    party: run.party.map((f) => ({ id: f.id, name: nameOf(f.id) })),
-    slots: run.partyMax,
-    full: pick.full,
-  };
-}
-
-function pickView(run: RunState, pick: Pick | null): PickView | undefined {
-  if (!pick) return undefined;
-  const hpSub = (i: number) => {
-    const f = run.party[i];
-    return f.hp <= 0 ? "전사" : `${f.hp}/${f.maxHp}`;
-  };
-  if (pick.kind === "recruit") {
-    if (!pick.full) return { title: "", options: [{ label: "함께 간다" }] };
-    return {
-      title: "",
-      options: [
-        ...run.party.map((f, i) => ({ label: `${nameOf(f.id)} 보내기`, sub: `Lv${f.level} ${hpSub(i)}` })),
-        { label: "데려가지 않는다" },
-      ],
-    };
-  }
-  return {
-    title: `${getReward(pick.rewardId).name}: 누구에게 줄까?`,
-    options: [
-      ...pick.targets.map((i) => ({ label: nameOf(run.party[i].id), sub: `Lv${run.party[i].level} ${hpSub(i)}` })),
-      { label: "다른 보상 고르기" },
-    ],
-  };
-}
 
 /** 쿼리의 시드(숫자만), 없으면 무작위 */
 function seedFrom(param: string | null): number {
@@ -110,7 +71,12 @@ export default function DuelClient() {
   const [readyScene, setReadyScene] = useState<SceneName | null>(null);
   const [animating, setAnimating] = useState(false);
   const [selected, setSelected] = useState<string>(STARTER_IDS[0]);
-  const [pick, setPick] = useState<Pick | null>(null);
+  const [pick, setPick] = useState<PendingPick | null>(null);
+  /** 전투 메뉴 커서 줄, 그리고 그 줄을 눌러 결정을 기다리는지 */
+  const [battleSel, setBattleSel] = useState<BattleFocusId>("skill0");
+  const [pending, setPending] = useState(false);
+  /** turn()의 안전 타이머(언마운트 때 지운다) */
+  const turnTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const [record, setRecord] = useState<RunRecord | null>(null);
   const [stars, setStars] = useState(0);
   const [booted, setBooted] = useState(false);
@@ -140,7 +106,7 @@ export default function DuelClient() {
     go("battle");
   }, [bridge, go]);
 
-  const showReward = useCallback((r: RunState, p: Pick | null, restart: boolean) => {
+  const showReward = useCallback((r: RunState, p: PendingPick | null, restart: boolean) => {
     bridge.emit("reward:show", toRewardShow(r, pickView(r, p), recruitView(r, p)));
     if (restart) go("reward");
   }, [bridge, go]);
@@ -157,7 +123,7 @@ export default function DuelClient() {
 
   const enterReward = useCallback((r: RunState) => {
     const rec = pendingRecruit(r);
-    const p: Pick | null = rec ? { kind: "recruit", recruitId: rec.id, full: rec.full } : null;
+    const p: PendingPick | null = rec ? { kind: "recruit", recruitId: rec.id, full: rec.full } : null;
     setPick(p);
     showReward(r, p, true);
   }, [showReward]);
@@ -188,7 +154,7 @@ export default function DuelClient() {
     const host = hostRef.current;
     if (!host) return;
     let cancelled = false;
-    let game: Phaser.Game | null = null;
+    let game: DuelGame | null = null;
     const fontsReady = (async () => {
       try {
         const loads = Promise.allSettled([
@@ -228,6 +194,11 @@ export default function DuelClient() {
     return () => { bridge.off("scene:changed", onChanged); };
   }, [bridge]);
 
+  // 언마운트 때 남은 턴 안전 타이머를 지운다
+  useEffect(() => () => {
+    if (turnTimerRef.current) clearTimeout(turnTimerRef.current);
+  }, []);
+
   // ── 공유 ──
   const shareMeta = useMemo(() => {
     if (!record) return null;
@@ -247,7 +218,8 @@ export default function DuelClient() {
       if (done) return;
       done = true;
       bridge.off("anim:done", onDone);
-      clearTimeout(timer);
+      if (turnTimerRef.current) clearTimeout(turnTimerRef.current);
+      turnTimerRef.current = null;
       if (sides) sidesRef.current = sides;
       setRun(next);
       setAnimating(false);
@@ -261,7 +233,7 @@ export default function DuelClient() {
     };
     const onDone = ({ sides }: { sides: { player: Side } }) => finish(sides);
     bridge.on("anim:done", onDone);
-    const timer = setTimeout(() => finish(), timelineLength(timeline) + ANIM_GRACE_MS);
+    turnTimerRef.current = setTimeout(() => finish(), timelineLength(timeline) + ANIM_GRACE_MS);
     bridge.emit("anim:play", { timeline, sides: sidesRef.current, ...(view ? { view } : {}) });
   }, [bridge, enterReward, finishRun, persist, save]);
 
@@ -284,6 +256,13 @@ export default function DuelClient() {
     persist({ ...save, current: next });
     showBattle(next);
   }, [persist, save, showBattle]);
+
+  /** 별점: 캔버스 별 줄과 아래 폼이 같은 값 */
+  const rate = useCallback((n: number) => {
+    setStars(n);
+    const shown = bridge.shown.result;
+    if (shown) bridge.emit("result:show", { ...shown, stars: n });
+  }, [bridge]);
 
   const handle = useCallback((a: UiAction) => {
     switch (a.type) {
@@ -316,7 +295,7 @@ export default function DuelClient() {
         if (!run || run.phase !== "reward") return;
         const targets = getReward(a.rewardId).targets?.(run);
         if (targets && targets.length > 1) {
-          const p: Pick = { kind: "target", rewardId: a.rewardId, targets };
+          const p: PendingPick = { kind: "target", rewardId: a.rewardId, targets };
           setPick(p);
           showReward(run, p, false);
         } else applyReward(run, a.rewardId, targets?.[0]);
@@ -325,7 +304,8 @@ export default function DuelClient() {
       case "pick": {
         if (!run || !pick) return;
         if (pick.kind === "recruit") {
-          const next = pick.full && a.index < run.party.length ? swapInRecruit(run, pick.recruitId, a.index, rngRef.current) : run;
+          // 교체·거절·합류 확인 모두 "처리함" 표시를 남겨 이어하기 때 창이 다시 뜨지 않게 한다
+          const next = resolveRecruitPick(run, pick, a.index, rngRef.current);
           setPick(null);
           setRun(next);
           persist({ ...save, current: next });
@@ -350,14 +330,11 @@ export default function DuelClient() {
           go("start");
         }
         return;
-      case "rate": {
-        setStars(a.stars);
-        const shown = bridge.shown.result;
-        if (shown) bridge.emit("result:show", { ...shown, stars: a.stars });
+      case "rate":
+        rate(a.stars);
         return;
-      }
     }
-  }, [applyReward, bridge, enterReward, go, persist, pick, router, run, save, selected, share, showBattle, showReward, showStart, startNewRun, turn]);
+  }, [applyReward, enterReward, go, persist, pick, rate, router, run, save, selected, share, showBattle, showReward, showStart, startNewRun, turn]);
 
   // 다리의 ui:action → handle (투명 버튼이 보낸다)
   const handleRef = useRef(handle);
@@ -367,6 +344,65 @@ export default function DuelClient() {
     bridge.on("ui:action", on);
     return () => { bridge.off("ui:action", on); };
   }, [bridge]);
+
+  // ── 전투 메뉴: 줄의 이름과 실행할 행동 ──
+  const rowInfo = useCallback((id: BattleFocusId): { label: string; action: UiAction | null } => {
+    if (!run?.battle) return { label: "", action: null };
+    if (id === "switch") {
+      const to = nextSwitchIndex(run);
+      return to === null
+        ? { label: "교체할 장수 없음", action: null }
+        : { label: `${nameOf(run.battle.party[to].id)}(으)로 교체`, action: { type: "switch", toIndex: to } };
+    }
+    const sk = toBattleView(run)?.player.skills[Number(id.slice(5))];
+    if (!sk) return { label: "", action: null };
+    const uses = sk.usesLeft === null ? "무제한" : `남은 ${sk.usesLeft}회`;
+    return { label: `${sk.name} ${uses}`, action: sk.usesLeft === 0 ? null : { type: "skill", skillId: sk.id } };
+  }, [run]);
+  const battleChoice = useMemo(() => (screen === "battle" ? rowInfo(battleSel) : null), [battleSel, rowInfo, screen]);
+
+  /** 줄 고르기: 커서를 옮기고(pend면) 결정을 기다린다 */
+  const selectRow = useCallback((id: BattleFocusId, pend: boolean) => {
+    setBattleSel(id);
+    if (pend) setPending(true);
+    bridge.emit("ui:focus", { id });
+  }, [bridge]);
+
+  /** 결정: 고른 줄의 행동을 실행한다 */
+  const confirmBattle = useCallback(() => {
+    const act = rowInfo(battleSel).action;
+    if (!act) return;
+    setPending(false);
+    bridge.emit("ui:action", act);
+  }, [battleSel, bridge, rowInfo]);
+
+  // 대사창 안내 줄: 결정 대기 중이면 "▶ 일격 — 탭하여 결정"
+  useEffect(() => {
+    const name = battleChoice?.label.replace(/ (무제한|남은 \d+회)$/, "") ?? "";
+    const text = screen === "battle" && pending && !animating && battleChoice?.action ? `▶ ${name} — 탭하여 결정` : null;
+    bridge.emit("battle:prompt", { text });
+  }, [animating, battleChoice, bridge, pending, screen]);
+
+  // 새 싸움(웨이브)이 열리면 커서를 첫 줄로, 결정 대기는 끈다
+  const battleKey = run?.battle ? `${run.wave}` : "";
+  useEffect(() => {
+    setBattleSel("skill0");
+    setPending(false);
+  }, [battleKey]);
+
+  /** 전투 키보드: 위아래 화살표로 커서, Enter/Space로 결정 */
+  const onKeyDown = useCallback((e: React.KeyboardEvent) => {
+    if (screen !== "battle" || !booted || animating || readyScene !== "battle") return;
+    const i = BATTLE_ROWS.indexOf(battleSel);
+    if (e.key === "ArrowDown" || e.key === "ArrowUp") {
+      e.preventDefault();
+      const n = BATTLE_ROWS.length;
+      selectRow(BATTLE_ROWS[(i + (e.key === "ArrowDown" ? 1 : n - 1)) % n], true);
+    } else if (e.key === "Enter" || e.key === " ") {
+      e.preventDefault();
+      confirmBattle();
+    }
+  }, [animating, battleSel, booted, confirmBattle, readyScene, screen, selectRow]);
 
   // ── 지금 화면의 투명 버튼 ──
   const startShow = useMemo(() => toStartShow(save, selected), [save, selected]);
@@ -381,16 +417,14 @@ export default function DuelClient() {
       });
     }
     if (screen === "battle") {
-      const view = run ? toBattleView(run) : null;
-      const sw = run ? nextSwitchIndex(run) : null;
-      return overlayLayout("battle").map((s, i) => {
-        if (s.id === "switch") {
-          return { ...s, label: sw === null ? "교체할 장수 없음" : `${nameOf(run!.battle!.party[sw].id)}(으)로 교체`, disabled: sw === null };
+      // 고르기 → 결정: 줄은 커서만 옮기고(작아도 됨), 실행은 대사창 위의 큰 "결정" 단추
+      const choice = battleChoice;
+      return overlayLayout("battle").map((s) => {
+        if (s.id === "confirm") {
+          return { ...s, label: choice && pending ? `결정: ${choice.label}` : "먼저 메뉴에서 명령을 고르세요", disabled: !pending || !choice?.action };
         }
-        const sk = view?.player.skills[i];
-        if (!sk) return { ...s, disabled: true };
-        const uses = sk.usesLeft === null ? "무제한" : `남은 ${sk.usesLeft}회`;
-        return { ...s, label: `${sk.name} ${uses}`, disabled: sk.usesLeft === 0 };
+        const row = rowInfo(s.id as BattleFocusId);
+        return { ...s, label: `${row.label}${row.action ? "" : " (쓸 수 없음)"} 고르기`, pressed: battleSel === s.id };
       });
     }
     if (screen === "reward") {
@@ -405,7 +439,7 @@ export default function DuelClient() {
       });
     }
     return overlayLayout("result");
-  }, [pick, run, screen, selected, startShow]);
+  }, [battleChoice, battleSel, pending, pick, rowInfo, run, screen, selected, startShow]);
 
   const onAction = useCallback((id: string) => {
     let a: UiAction | null = null;
@@ -414,13 +448,9 @@ export default function DuelClient() {
       else if (id === "resume") a = { type: "resume" };
       else a = { type: "select", starterId: startShow.roster[Number(id.slice(7))]?.id ?? "" };
     } else if (screen === "battle" && run?.battle) {
-      if (id === "switch") {
-        const to = nextSwitchIndex(run);
-        if (to !== null) a = { type: "switch", toIndex: to };
-      } else {
-        const sk = toBattleView(run)?.player.skills[Number(id.slice(5))];
-        if (sk) a = { type: "skill", skillId: sk.id };
-      }
+      if (id === "confirm") {
+        if (pending) confirmBattle();
+      } else selectRow(id as BattleFocusId, true);
     } else if (screen === "reward") {
       if (id.startsWith("opt")) a = { type: "pick", index: Number(id.slice(3)) };
       else if (run) {
@@ -432,9 +462,16 @@ export default function DuelClient() {
       else a = { type: "result", action: id as "share" | "retry" | "samguk" };
     }
     if (a) bridge.emit("ui:action", a);
-  }, [bridge, run, screen, startShow]);
+  }, [bridge, confirmBattle, pending, run, screen, selectRow, startShow]);
 
-  const onFocus = useCallback((id: string) => bridge.emit("ui:focus", { id }), [bridge]);
+  const onFocus = useCallback((id: string) => {
+    if (screen === "battle") {
+      // Tab으로 줄에 오면 커서만 옮긴다(결정은 Enter/Space 또는 결정 단추)
+      if ((BATTLE_ROWS as string[]).includes(id)) selectRow(id as BattleFocusId, false);
+      return;
+    }
+    bridge.emit("ui:focus", { id });
+  }, [bridge, screen, selectRow]);
 
   const locked = !booted || animating || readyScene !== screen;
 
@@ -442,7 +479,7 @@ export default function DuelClient() {
     <div>
       <div className="relative w-full max-w-[480px] mx-auto overflow-hidden rounded-sm bg-ink" style={{ aspectRatio: "4 / 3" }}>
         <div ref={hostRef} className="absolute inset-0" aria-hidden />
-        <OverlayButtons buttons={buttons} disabled={locked} onFocus={onFocus} onAction={onAction} />
+        <OverlayButtons buttons={buttons} disabled={locked} onFocus={onFocus} onAction={onAction} onKeyDown={onKeyDown} hover={screen !== "battle"} />
         {!painted && <p className="absolute inset-0 grid place-items-center text-sm text-paper bg-ink">불러오는 중…</p>}
       </div>
       <p className="sr-only" aria-live="polite">
@@ -453,7 +490,15 @@ export default function DuelClient() {
           {notice && <p role="status" className="text-xs text-center text-muted">{notice}</p>}
           {busy && <p role="status" className="text-xs text-center text-muted">공유 준비 중…</p>}
           {stars > 0 && (
-            <FeedbackForm key={stars} wave={record.waves.length} starter={record.starter} cleared={record.cleared} initialRating={stars} />
+            // 판마다 한 번: 키는 판(선두·싸움 수·클리어·행군 기록 수), 별점은 캔버스와 폼이 같은 값을 쓴다
+            <FeedbackForm
+              key={`${record.starter}.${record.waves.length}.${record.cleared ? "c" : "l"}.${save.history.length}`}
+              wave={record.waves.length}
+              starter={record.starter}
+              cleared={record.cleared}
+              rating={stars}
+              onRate={rate}
+            />
           )}
           <CoupangBanner subId="samguk-duel" />
         </div>

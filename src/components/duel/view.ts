@@ -1,22 +1,23 @@
 // RunState·SaveData → 장면이 그리는 값(순수 함수, Phaser 없음)
 import { skillsOf } from '@/lib/duel/battle';
-import { BOSS_WAVES, WAVES } from '@/lib/duel/run';
 import { BOSS_IDS, DUEL_GENERALS, getDuelGeneral, MOB_ID } from '@/lib/duel/generals';
 import { getReward } from '@/lib/duel/rewards';
 import { SKILLS } from '@/lib/duel/skills';
 import { narrate } from '@/lib/duel/narrative';
 import { wrapText } from '@/game/duel/wrap';
+import { MSG_CHARS } from '@/game/duel/layout';
 import { josa } from '@/lib/shareLinks';
+import { BOSS_WAVES, WAVES, markRecruitHandled, swapInRecruit } from '@/lib/duel/run';
+import type { Rng } from '@/lib/duel/rng';
 import type { Fighter, RunRecord, RunState, SaveData } from '@/lib/duel/types';
 import type { BattleView, FighterView, PickView, RecruitView, ResultShow, RewardShow, StartShow } from '@/game/duel/bridge';
 
-/** 대사창 한 줄 글자 수(Galmuri9로 146px 대사창에 맞는 값) */
-export const MSG_CHARS = 15;
+export { MSG_CHARS };
 const MSG_KEEP = 3;
 
 const nameOf = (id: string) => getDuelGeneral(id)?.name ?? id;
 
-/** 사건 글을 18자 이하 줄로 나누고 마지막 3줄만 */
+/** 사건 글을 MSG_CHARS(15)자 이하 줄로 나누고 마지막 3줄만 */
 export function messageLines(texts: string[], max = MSG_CHARS, keep = MSG_KEEP): string[] {
   return texts.flatMap((t) => wrapText(t, max)).slice(-keep);
 }
@@ -134,4 +135,69 @@ export function toRewardShow(run: RunState, pick?: PickView, recruit?: RecruitVi
 export function toResultShow(record: RunRecord, save: SaveData): ResultShow {
   const { title, headline, lines } = narrate(record);
   return { starter: record.starter, title, headline, lines, best: save.best.wave, clears: save.best.clears };
+}
+
+// ── 보상 단계의 고르기 창(항복·대상) ──
+
+/** 고르기 창 상태: 항복한 장수와 바꿀 자리, 또는 보상 대상 */
+export type PendingPick = { kind: 'recruit'; recruitId: string; full: boolean } | { kind: 'target'; rewardId: string; targets: number[] };
+
+/** 이번 싸움에서 항복한 장수(합류했으면 full=false, 자리가 없어 못 들어왔으면 full=true) */
+export function pendingRecruit(run: RunState): { id: string; full: boolean } | null {
+  const w = run.record.waves[run.record.waves.length - 1];
+  // 이미 처리한 항복(이어하기로 다시 들어온 경우 포함)은 다시 띄우지 않는다
+  if (run.phase !== 'reward' || !w?.recruited || w.recruitHandled) return null;
+  return { id: w.enemy, full: !run.party.some((f) => f.id === w.enemy) };
+}
+
+/** 항복 창 값 */
+export function recruitView(run: RunState, pick: PendingPick | null): RecruitView | undefined {
+  if (pick?.kind !== 'recruit') return undefined;
+  const g = getDuelGeneral(pick.recruitId)!;
+  const level = run.enemy?.id === pick.recruitId ? run.enemy.level : run.wave;
+  return {
+    title: `${josa(g.name, '이', '가')} 항복했다!`,
+    note: pick.full ? '동행이 가득 찼다. 누구를 보낼까?' : `${josa(g.name, '이', '가')} 동행에 합류했다.`,
+    id: g.id,
+    name: g.name,
+    kind: g.kind,
+    level,
+    party: run.party.map((f) => ({ id: f.id, name: nameOf(f.id) })),
+    slots: run.partyMax,
+    full: pick.full,
+  };
+}
+
+export function pickView(run: RunState, pick: PendingPick | null): PickView | undefined {
+  if (!pick) return undefined;
+  const hpSub = (i: number) => {
+    const f = run.party[i];
+    return f.hp <= 0 ? '전사' : `${f.hp}/${f.maxHp}`;
+  };
+  if (pick.kind === 'recruit') {
+    if (!pick.full) return { title: '', options: [{ label: '함께 간다' }] };
+    return {
+      title: '',
+      options: [
+        ...run.party.map((f, i) => ({ label: `${nameOf(f.id)} 보내기`, sub: `Lv${f.level} ${hpSub(i)}` })),
+        { label: '데려가지 않는다' },
+      ],
+    };
+  }
+  return {
+    title: `${getReward(pick.rewardId).name}: 누구에게 줄까?`,
+    options: [
+      ...pick.targets.map((i) => ({ label: nameOf(run.party[i].id), sub: `Lv${run.party[i].level} ${hpSub(i)}` })),
+      { label: '다른 보상 고르기' },
+    ],
+  };
+}
+
+/**
+ * 항복 창에서 index번 줄을 골랐을 때의 다음 상태. 처리했다는 표시를 남긴다.
+ * 합류(full=false): 줄은 "함께 간다" 하나. 가득(full=true): 0..n-1은 그 자리와 교체, n은 데려가지 않음
+ */
+export function resolveRecruitPick(run: RunState, pick: Extract<PendingPick, { kind: 'recruit' }>, index: number, rng: Rng): RunState {
+  const next = pick.full && index < run.party.length ? swapInRecruit(run, pick.recruitId, index, rng) : run;
+  return markRecruitHandled(next);
 }

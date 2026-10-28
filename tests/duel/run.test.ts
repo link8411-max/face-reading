@@ -15,6 +15,7 @@ import {
   swapInRecruit,
   surrenderChance,
   freshForBattle,
+  markRecruitHandled,
 } from '@/lib/duel/run';
 import type { Action, RunState } from '@/lib/duel/types';
 
@@ -583,5 +584,18 @@ describe('Task 8 보강', () => {
     expect(startRun('zhouyu', 1).party[0].id).toBe('zhouyu');
     expect(() => startRun('lvbu', 1)).toThrow();
     expect(() => startRun(MOB_ID, 1)).toThrow();
+  });
+});
+
+describe('markRecruitHandled', () => {
+  it('항복한 마지막 웨이브에만 표시, 입력은 그대로', () => {
+    const base = atWave(startRun('guanyu', 1), 4, 'machao');
+    base.battle!.enemy.hp = 0;
+    const run = afterWin(base, () => 0);
+    const marked = markRecruitHandled(run);
+    expect(marked.record.waves.at(-1)!.recruitHandled).toBe(true);
+    expect(run.record.waves.at(-1)!.recruitHandled).toBeUndefined();
+    const plain = startRun('guanyu', 1);
+    expect(markRecruitHandled(plain)).toBe(plain);
   });
 });

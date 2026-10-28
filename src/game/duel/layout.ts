@@ -1,8 +1,18 @@
 // 장면 배치 좌표(320×240 설계 좌표). Phaser 없음 — 장면과 React 투명 버튼이 같은 값을 쓴다.
 
-/** 전투 명령 메뉴 4줄 + 교체 줄(BattleScene의 MENU_Y 174, 간격 11 줄. 메뉴 상자는 x10~160) */
-export const BATTLE_MENU = { x: 12, y: 174, w: 146, rowH: 11 } as const;
-export const BATTLE_SWITCH = { x: 12, y: 219, w: 146, h: 11 } as const;
+/** 전투 화면의 상자들: 벌판, 명령 메뉴 상자, 대사창 */
+export const FIELD_BOX = { x: 10, y: 76, w: 300, h: 74 } as const;
+export const MENU_BOX = { x: 10, y: 172, w: 150, h: 58 } as const;
+export const DIALOG_BOX = { x: 164, y: 172, w: 146, h: 58 } as const;
+
+/** 대사창 한 줄 글자 수(Galmuri9로 146px 대사창에 맞는 값). BattleScene과 view.ts가 같이 쓴다 */
+export const MSG_CHARS = 15;
+
+/** 전투 명령 메뉴 4줄 + 교체 줄(BattleScene의 MENU_Y 174, 간격 11 줄). 줄을 누르면 커서만 옮긴다 */
+export const BATTLE_MENU = { x: 10, y: 174, w: 150, rowH: 11 } as const;
+export const BATTLE_SWITCH = { x: 10, y: 219, w: 150, h: 11 } as const;
+/** 결정 단추: 대사창 전체(고른 기술을 실제로 쓴다) */
+export const BATTLE_CONFIRM = DIALOG_BOX;
 
 /** 보상 카드 3장(와꾸 v5 draw2) */
 export const REWARD_CARD = { x0: 14, step: 100, y: 52, w: 92, h: 120 } as const;

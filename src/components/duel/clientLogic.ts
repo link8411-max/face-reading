@@ -1,8 +1,10 @@
 // 일기토 화면의 순수 함수: ?me= 잠금 해제, 투명 버튼 자리, 터치 영역 넓히기 (Phaser·React 없음)
 import { getDuelGeneral } from '@/lib/duel/generals';
 import {
+  BATTLE_CONFIRM,
   BATTLE_MENU,
   BATTLE_SWITCH,
+  MENU_BOX,
   PICK,
   RECRUIT,
   RESULT_BTN,
@@ -25,6 +27,8 @@ export interface Rect {
 export interface OverlaySlot extends Rect {
   id: string;
   label: string;
+  /** 터치 영역을 넓혀도 이 상자 밖으로는 나가지 않는다(전투 메뉴 줄 → 메뉴 상자) */
+  panel?: Rect;
 }
 
 export type OverlayScene = 'start' | 'battle' | 'reward' | 'result' | 'pick' | 'recruit';
@@ -52,8 +56,10 @@ export function overlayLayout(scene: OverlayScene, n = 0, resume = false): Overl
           y: BATTLE_MENU.y + i * BATTLE_MENU.rowH,
           w: BATTLE_MENU.w,
           h: BATTLE_MENU.rowH,
+          panel: MENU_BOX,
         })),
-        { id: 'switch', label: '장수 교체', ...BATTLE_SWITCH },
+        { id: 'switch', label: '장수 교체', ...BATTLE_SWITCH, panel: MENU_BOX },
+        { id: 'confirm', label: '결정', ...BATTLE_CONFIRM },
       ];
     case 'reward':
       return [0, 1, 2].map((i) => ({
@@ -140,25 +146,25 @@ function grow(a0: number, a1: number, lo: number, hi: number, min: number): [num
 
 /**
  * 터치 영역을 min(기본 44px)까지 넓힌다. 양쪽으로 똑같이 늘리되(한쪽이 막히면 다른 쪽으로),
- * 이웃과는 둘 사이 가운데까지만, 래퍼(W×H) 밖으로는 나가지 않는다.
+ * 이웃과는 둘 사이 가운데까지만, 래퍼(W×H)와 제 상자(panel) 밖으로는 나가지 않는다.
  * 먼저 좌우를 늘리고, 그 결과를 이웃 판정에 써서 위아래를 늘리므로 대각선 이웃과도 겹치지 않는다.
- * 그래서 칸이 촘촘한 전투 메뉴는 44px에 못 미칠 수 있다(서로 겹치게 하지 않는 쪽을 고른다).
+ * 그래서 칸이 촘촘한 전투 메뉴 줄은 44px에 못 미친다 — 줄은 커서만 옮기고, 실행은 큰 '결정' 단추(대사창)가 맡는다.
  */
-export function hitRects(rects: Rect[], W: number, H: number, min = 44): Rect[] {
+export function hitRects(rects: (Rect & { panel?: Rect })[], W: number, H: number, min = 44): Rect[] {
   const wide = rects.map((r, i) => {
-    let lo = 0;
-    let hi = W;
+    let lo = r.panel ? Math.max(0, r.panel.x) : 0;
+    let hi = r.panel ? Math.min(W, r.panel.x + r.panel.w) : W;
     rects.forEach((o, j) => {
       if (j === i || !overlap1(r.y, r.y + r.h, o.y, o.y + o.h)) return;
       if (o.x + o.w <= r.x + EPS) lo = Math.max(lo, (o.x + o.w + r.x) / 2);
       if (o.x >= r.x + r.w - EPS) hi = Math.min(hi, (r.x + r.w + o.x) / 2);
     });
     const [x0, x1] = grow(r.x, r.x + r.w, lo, hi, min);
-    return { x: x0, y: r.y, w: x1 - x0, h: r.h };
+    return { x: x0, y: r.y, w: x1 - x0, h: r.h, panel: r.panel };
   });
   return wide.map((r, i) => {
-    let lo = 0;
-    let hi = H;
+    let lo = r.panel ? Math.max(0, r.panel.y) : 0;
+    let hi = r.panel ? Math.min(H, r.panel.y + r.panel.h) : H;
     wide.forEach((o, j) => {
       if (j === i || !overlap1(r.x, r.x + r.w, o.x, o.x + o.w)) return;
       if (o.y + o.h <= r.y + EPS) lo = Math.max(lo, (o.y + o.h + r.y) / 2);

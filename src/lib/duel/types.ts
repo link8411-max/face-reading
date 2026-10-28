@@ -91,6 +91,8 @@ export interface RunWave {
   /** 이 싸움에서 쓰러진 아군 (처음 쓰러진 장수) */
   lostAlly?: string;
   recruited?: boolean;
+  /** 항복 창을 이미 처리했는지(합류 확인·교체·거절). 이어하기 때 창을 다시 띄우지 않는다 */
+  recruitHandled?: boolean;
 }
 
 export interface RunRecord {

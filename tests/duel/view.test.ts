@@ -1,9 +1,20 @@
 import { describe, it, expect } from 'vitest';
 import { createRng } from '@/lib/duel/rng';
 import { makeFighter } from '@/lib/duel/battle';
-import { playerTurn, startRun } from '@/lib/duel/run';
+import { afterWin, playerTurn, startRun } from '@/lib/duel/run';
 import { defaultSave } from '@/lib/duel/save';
-import { MSG_CHARS, messageLines, nextSwitchIndex, toBattleView, toRewardShow, toStartShow } from '@/components/duel/view';
+import {
+  MSG_CHARS,
+  messageLines,
+  nextSwitchIndex,
+  pendingRecruit,
+  pickView,
+  recruitView,
+  resolveRecruitPick,
+  toBattleView,
+  toRewardShow,
+  toStartShow,
+} from '@/components/duel/view';
 import { wrapText } from '@/game/duel/wrap';
 import type { RunState } from '@/lib/duel/types';
 
@@ -95,12 +106,69 @@ describe('toStartShow / toRewardShow', () => {
   it('보상 화면: 카드 3장·동행 이름·다음 싸움', () => {
     const rng = createRng(3);
     let run = startRun('guanyu', 3);
+    // 1전은 졸개라 관우 일격 한 번에 이긴다(시드 3)
     while (run.phase === 'battle') run = playerTurn(run, { type: 'skill', skillId: 'strike' }, rng);
-    if (run.phase !== 'reward') return;
+    expect(run.phase).toBe('reward');
     const r = toRewardShow(run);
     expect(r.cards).toHaveLength(3);
     expect(r.cards[0]).toHaveProperty('rarity');
     expect(r.party).toContain('관우');
     expect(r.next).toContain('제2전');
+  });
+});
+
+describe('항복 창 상태(pendingRecruit · resolveRecruitPick)', () => {
+  /** 4전 마초가 항복한 직후(보상 단계). extra: 이미 동행 중인 장수 */
+  function surrendered(extra: string[] = []): RunState {
+    const r = structuredClone(startRun('guanyu', 1));
+    r.party.push(...extra.map((id) => makeFighter(id, 1)));
+    r.wave = 4;
+    r.enemy = makeFighter('machao', 4);
+    r.battle = { party: r.party, active: 0, enemy: { ...r.enemy, hp: 0 }, turn: 1 };
+    r.record.waves = [{ wave: 4, enemy: 'machao', turns: 2 }];
+    r.enemy.hp = 0;
+    return afterWin(r, () => 0); // 난수 0 → 항복 성공
+  }
+
+  it('자리가 있으면 합류(full=false), "함께 간다" 한 줄', () => {
+    const run = surrendered();
+    expect(run.party.map((f) => f.id)).toEqual(['guanyu', 'machao']);
+    const p = pendingRecruit(run)!;
+    expect(p).toEqual({ id: 'machao', full: false });
+    const pick = { kind: 'recruit' as const, recruitId: p.id, full: p.full };
+    expect(pickView(run, pick)!.options.map((o) => o.label)).toEqual(['함께 간다']);
+    expect(recruitView(run, pick)).toMatchObject({ title: '마초가 항복했다!', slots: 3, full: false });
+    const next = resolveRecruitPick(run, pick, 0, createRng(1));
+    expect(next.party).toEqual(run.party);
+    expect(pendingRecruit(next)).toBeNull();
+  });
+
+  it('가득 차면 full=true, 보내기 n줄 + 데려가지 않는다; 교체하면 자리가 바뀌고 처리됨', () => {
+    const run = surrendered(['zhangfei', 'zhaoyun']);
+    const p = pendingRecruit(run)!;
+    expect(p).toEqual({ id: 'machao', full: true });
+    const pick = { kind: 'recruit' as const, recruitId: p.id, full: p.full };
+    expect(pickView(run, pick)!.options.map((o) => o.label)).toEqual(['관우 보내기', '장비 보내기', '조운 보내기', '데려가지 않는다']);
+    const swapped = resolveRecruitPick(run, pick, 1, createRng(1));
+    expect(swapped.party.map((f) => f.id)).toEqual(['guanyu', 'machao', 'zhaoyun']);
+    expect(swapped.record.waves.at(-1)!.recruitHandled).toBe(true);
+    expect(pendingRecruit(swapped)).toBeNull();
+    // 입력은 그대로
+    expect(run.record.waves.at(-1)!.recruitHandled).toBeUndefined();
+  });
+
+  it('데려가지 않으면 동행 그대로, 처리됨 → 저장했다 이어하기(같은 값) 해도 창이 다시 뜨지 않는다', () => {
+    const run = surrendered(['zhangfei', 'zhaoyun']);
+    const pick = { kind: 'recruit' as const, recruitId: 'machao', full: true };
+    const declined = resolveRecruitPick(run, pick, 3, createRng(1));
+    expect(declined.party.map((f) => f.id)).toEqual(['guanyu', 'zhangfei', 'zhaoyun']);
+    const resumed = JSON.parse(JSON.stringify(declined)) as RunState;
+    expect(pendingRecruit(resumed)).toBeNull();
+    // 처리 전 저장이면 이어하기 때 다시 묻는다
+    expect(pendingRecruit(JSON.parse(JSON.stringify(run)) as RunState)).toEqual({ id: 'machao', full: true });
+  });
+
+  it('항복이 없거나 전투 중이면 null', () => {
+    expect(pendingRecruit(startRun('guanyu', 1))).toBeNull();
   });
 });

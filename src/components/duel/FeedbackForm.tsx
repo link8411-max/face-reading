@@ -6,15 +6,20 @@ interface Props {
   wave: number;
   starter: string;
   cleared: boolean;
-  /** 캔버스 별점 줄에서 고른 별 수(처음 값) */
-  initialRating?: number;
+  /** 별점을 밖(캔버스 별 줄)과 함께 쓸 때: 지금 별 수 */
+  rating?: number;
+  /** 별점을 밖과 함께 쓸 때: 별을 눌렀다 */
+  onRate?: (n: number) => void;
 }
 
 type Status = "idle" | "sending" | "done" | "failed";
 
 // 한 판 종료 후 한 번만 보내는 피드백 폼. 실패해도 게임 흐름에는 영향 없음.
-export default function FeedbackForm({ wave, starter, cleared, initialRating = 0 }: Props) {
-  const [rating, setRating] = useState(initialRating);
+// rating·onRate를 주면 별점은 밖이 가진다(같은 판에서 별을 바꿔도 폼이 새로 만들어지지 않아 한 줄 메모가 남는다).
+export default function FeedbackForm({ wave, starter, cleared, rating: ratingProp, onRate }: Props) {
+  const [ownRating, setOwnRating] = useState(0);
+  const rating = ratingProp ?? ownRating;
+  const setRating = (n: number) => (onRate ? onRate(n) : setOwnRating(n));
   const [note, setNote] = useState("");
   const [status, setStatus] = useState<Status>("idle");
 
