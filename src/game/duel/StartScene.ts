@@ -75,13 +75,15 @@ export class StartScene extends PanelScene {
       });
     }
     const top = !this.tall ? (warn ? [warn] : noSave ? [NO_SAVE_SHORT] : []) : [];
-    const lines = [...top, ...v.history.slice(0, 3 - top.length)];
+    // 첫 줄은 고른 장수의 능력치(없으면 건너뜀), 그 아래 경고·저장 불가(빨강), 남는 줄에 기록(최대 3줄)
+    const stat = v.leadStats ? [v.leadStats] : [];
+    const lines = [...stat, ...top, ...v.history.slice(0, 3 - stat.length - top.length)];
     if (lines.length === 0) {
       this.t(h.x + 6, h.y + 16, '아직 지난 행군이 없다', { ko: 9, color: MUTED });
     }
     // 읽히게 Galmuri9로 최근 3개만(한 줄에 하나)
     lines.forEach((line, i) => {
-      this.fit(this.t(h.x + 6, h.y + 15 + i * 10, line, { ko: 9, color: i < top.length ? S.red : S.ink }), h.w - 12);
+      this.fit(this.t(h.x + 6, h.y + 15 + i * 10, line, { ko: 9, color: i >= stat.length && i < stat.length + top.length ? S.red : S.ink }), h.w - 12);
     });
 
     const lead = v.roster.find((r) => r.id === v.selected);

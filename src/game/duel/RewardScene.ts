@@ -223,7 +223,9 @@ export class RewardScene extends PanelScene {
       playSfx('cutin');
     }
     this.t(R.slotX, R.portY + 2, r.name, { ko: 11, bold: true }).setDepth(3);
-    this.t(R.slotX, R.portY + 18, `${r.kind} Lv${r.level}`, { ko: 9, color: MUTED }).setDepth(3);
+    // 종류·레벨 뒤에 능력치(무·지·통)를 붙이고 칸 폭에 맞춘다
+    const kindLine = r.stats ? `${r.kind} Lv${r.level} ${r.stats}` : `${r.kind} Lv${r.level}`;
+    this.fit(this.t(R.slotX, R.portY + 18, kindLine, { ko: 9, color: MUTED }).setDepth(3), R.w - (R.slotX - R.x) - 10);
 
     // 동행 칸
     this.t(R.slotX + r.slots * R.slotStep + 2, R.slotY + 12, '동행', { ko: 9, color: S.red }).setDepth(3);
