@@ -109,8 +109,11 @@ export default function DuelClient() {
   /** 만들어진 게임(무대 크기가 바뀌면 Phaser에 다시 재라고 알린다) */
   const gameRef = useRef<DuelGame | null>(null);
   useEffect(() => {
-    // Phaser는 창 resize 때만 부모 크기를 다시 잰다 → React가 무대 크기를 바꾼 뒤 직접 알린다
-    gameRef.current?.scale.refresh();
+    // Phaser는 창 resize 때만 부모 크기를 다시 잰다 → React가 무대 크기를 바꾼 뒤 부모 크기를 다시 재게 하고 맞춘다
+    const scale = gameRef.current?.scale;
+    if (!scale) return;
+    scale.getParentBounds();
+    scale.refresh();
   }, [stage]);
   const rngRef = useRef<Rng>(createRng(1));
   const sidesRef = useRef<{ player: Side }>({ player: "left" });
