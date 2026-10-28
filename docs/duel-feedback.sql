@@ -4,11 +4,14 @@ create table if not exists duel_feedback (
   created_at timestamptz not null default now(),
   rating int not null check (rating between 1 and 5),
   note text not null default '',
-  wave int not null check (wave between 1 and 18),
+  wave int not null check (wave between 1 and 36),
   starter text not null,
   cleared boolean not null,
   device text not null check (device in ('mobile', 'desktop'))
 );
+
+-- [이미 18웨이브 제약으로 만든 테이블이면] 아래 한 줄을 실행해 36웨이브로 넓힌다.
+-- alter table duel_feedback drop constraint duel_feedback_wave_check, add constraint duel_feedback_wave_check check (wave between 1 and 36);
 
 alter table duel_feedback enable row level security;
 
