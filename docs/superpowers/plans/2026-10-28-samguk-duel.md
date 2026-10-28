@@ -6,7 +6,7 @@
 
 **Architecture:** 게임 로직(데이터·전투·진행·저장·열전·공유 키)은 React와 무관한 순수 TS 모듈 `src/lib/duel/`에 두고 vitest로 고정한다. 화면은 `src/components/duel/`의 클라이언트 컴포넌트가 Canvas 2D로 전투 장면을 그리고, 페이지·레이아웃·SEO·공유 착지·장수 페이지는 `src/app/samguk/duel/` 아래 사이트 관례대로 둔다. 모든 동작은 코드 트윈(프레임 1장)이며 스프라이트 시트 구조로 나중에 프레임을 늘릴 수 있다.
 
-**Tech Stack:** Next.js 16 App Router, TypeScript, Tailwind 4(사이트 토큰), Canvas 2D, Web Audio, vitest, Playwright. 외부 패키지 추가 없음(Supabase는 REST `fetch`).
+**Tech Stack:** Next.js 16 App Router, TypeScript, Tailwind 4(사이트 토큰), **Phaser 3.90.0**(렌더링·연출, 클라이언트 전용), Web Audio, vitest, Playwright. Supabase는 REST `fetch`.
 
 **Spec:** `docs/superpowers/specs/2026-10-28-samguk-duel-design.md`
 
@@ -233,46 +233,58 @@ public/images/samguk/sprites/*.png
 
 ---
 
-### Task 7: 캔버스 연출(트윈·효과음)
+### Task 7: Phaser 게임 뼈대와 전투 연출
+
+> 2026-10-28 방향 전환(의뢰인): 자체 Canvas 루프 대신 **Phaser 3** 엔진 위에서 게임이 돈다. 이전 Task 7 커밋(7c357db)의 `animations.ts`(타임라인)·`sfx.ts`는 재사용하고, `fieldRenderer.ts`의 그리기 코드는 텍스처 생성에 재사용하며, `BattleCanvas.tsx`는 제거한다.
 
 **Files:**
-- Create: `src/components/duel/animations.ts`, `src/components/duel/sfx.ts`, `src/components/duel/BattleCanvas.tsx`
-- Test: `tests/duel/animations.test.ts`
+- Modify: `package.json` (`phaser` **3.90.0** 고정, Phaser 4.x 금지)
+- Create: `src/game/duel/config.ts`, `src/game/duel/bridge.ts`, `src/game/duel/textures.ts`, `src/game/duel/BootScene.ts`, `src/game/duel/BattleScene.ts`, `src/game/duel/ui.ts`(캔버스 UI 그리기 헬퍼: 베벨 상자·표찰·체력바·커서), `src/game/duel/createDuelGame.ts`
+- Move: `src/components/duel/animations.ts` → `src/game/duel/timeline.ts`(내용 유지, import 경로만), `src/components/duel/sfx.ts` → `src/game/duel/sfx.ts`, `src/components/duel/fieldRenderer.ts` → `src/game/duel/fieldPainter.ts`(React 무관 그리기 함수만 남김)
+- Delete: `src/components/duel/BattleCanvas.tsx`
+- Test: `tests/duel/timeline.test.ts`(기존 animations 테스트 이동), `tests/duel/textures.test.ts`, `tests/duel/bridge.test.ts`
 
 **Interfaces:**
-- Consumes: Task 2 `TurnEvent`
+- Consumes: `src/lib/duel/*`(battle.ts `resolveTurn`/`enemyAction`, run.ts `playerTurn`/`afterWin`, types), `eventsToTimeline(events, sides)` from `timeline.ts`
 - Produces:
-  - `animations.ts` (순수): `interface Pose { dx: number; dy: number; alpha: number; flash: number; shake: number; scale: number }`, `const IDLE: (t: number) => Pose` (dy = sin 들썩임 ±2px), `attackPose(t: 0..1, dir: 1|-1): Pose` (0~0.4 돌진 dx→60·dir, 0.4~0.5 정지, 0.5~1 복귀), `hitPose(t): Pose` (flash 1→0, dx −12·dir → 0), `koPose(t): Pose` (scale 1→0.9, alpha 1→0, dy +20), `cutinAlpha(t): number`, `eventsToTimeline(events: TurnEvent[]): TimelineItem[]` (`{ at: ms; dur: ms; who; anim: 'attack'|'hit'|'ko'|'cutin'|'text'; text?: string; amount?: number }` — attack 450ms, hit 300ms, ko 600ms, cutin 900ms(필살기 = `uses !== null`인 기술), 순차 배치)
-  - `sfx.ts`: `playSfx(name: 'hit' | 'slash' | 'ko' | 'levelup' | 'card' | 'cutin')` — AudioContext 지연 생성, 사용자 첫 터치 후만 재생, 실패 무시
-  - `BattleCanvas.tsx` (클라이언트): props `{ player: {id, hpRatio}, enemy: {id, hpRatio}, timeline: TimelineItem[]; onDone(): void; width: number }` — 내부 해상도 320×180, CSS는 `width:100%`·`image-rendering: pixelated`, 정수 배율; 스프라이트 `/images/samguk/sprites/<id>.png`를 `Image`로 로드(없으면 `mob.png`로 대체, 그래도 없으면 색 사각형), 적은 `scale(-1,1)`, 벌판 배경은 코드로 그림(하늘·지평선·풀 세 띠 + 점 디더링), 피해 숫자 `font-pixel` 대신 canvas `12px monospace`로 올라가며 사라짐, 흔들림은 캔버스 translate, 컷인은 초상 `/images/samguk/<이름>.jpg`를 어둡게 한 화면 위에 그린다. `requestAnimationFrame` 루프는 timeline이 끝나면 멈추고 `onDone`.
-- [ ] **Step 1: 실패하는 테스트** — `attackPose(0.4,1).dx===60`, `attackPose(1,1).dx===0`, `hitPose(0).flash===1`, `koPose(1).alpha===0`, `eventsToTimeline`이 skill→hit→ko 순서로 at가 단조 증가하고 필살기 이벤트 앞에 `cutin`이 들어간다, 빈 events → 빈 timeline
-- [ ] **Step 2: 실패 확인**
-- [ ] **Step 3: animations.ts, sfx.ts, BattleCanvas.tsx 구현**
-- [ ] **Step 4: 통과 확인** + `npx tsc --noEmit`
-- [ ] **Step 5: 커밋** — `"일기토: 캔버스 연출(트윈·흔들림·컷인·효과음)"`
+  - `config.ts`: `GAME_W = 320`, `GAME_H = 240`, `FIELD = { x: 12, y: 78, w: 296, h: 70 }`, `PALETTE`(와꾸 v5의 S 객체 값 그대로: navy, green1~3, gold, gold2, red, cream, cream2, ink, blue, white), `SPRITE_PX = 34`
+  - `bridge.ts`: `class DuelBridge extends Phaser.Events.EventEmitter` — React→Phaser: `bridge.emit('run:start', { run: RunState, seed })`, `bridge.emit('run:update', { run })`; Phaser→React: `'ui:action'`(`{ type: 'skill', skillId } | { type: 'switch', toIndex } | { type: 'reward', rewardId, targetIndex? } | { type: 'result', action: 'share'|'retry'|'samguk' } | { type: 'rate', stars }`), `'anim:done'`, `'scene:changed'`(`{ scene: 'battle'|'reward'|'result' }`). `window.__duel = { phase, wave, scene }`를 `'scene:changed'`·`'run:update'` 때 갱신(E2E 디버그 훅; production에서도 무해).
+  - `textures.ts`: `makeTextures(scene: Phaser.Scene)` — HTMLCanvas에 `fieldPainter`로 벌판(296×70)·천 바탕(320×240)·장식 틀을 1회 그려 `scene.textures.addCanvas('field'|'cloth'|'frame', canvas)`; 초상은 BootScene이 `load.image('portrait:<id>', '/images/samguk/<이름>.jpg')`, 스프라이트는 `load.image('sprite:<id>', '/images/samguk/sprites/<id>.png')` + 실패 시 `'sprite:mob'` → 색 사각형 텍스처 폴백.
+  - `BootScene`: 에셋 로드 → `makeTextures` → `scene.start('Battle')`
+  - `BattleScene`: 레이아웃은 와꾸 v5 draw1과 같다 — 천 바탕, 틀, 양쪽 베벨 액자 초상(46×54) + 이름 + 표찰(무력·통솔) + 유형·레벨, WAVE/TURN 텍스트, 벌판(296×70) 안에 두 스프라이트(34px, 양 끝, `flipX`로 방향), 벌판 아래 파랑/빨강 체력바 + 숫자, 왼쪽 아래 명령 메뉴(▶ 커서, 기술 4개 + 교체 줄), 오른쪽 아래 크림색 대사창(▼). **보이는 UI는 전부 Phaser 오브젝트**(Graphics/Image/Text). 입력은 React의 투명 DOM 버튼이 `bridge`로 보낸다(Phaser 내부 포인터 입력은 메뉴 커서 이동 정도만).
+  - 연출: `eventsToTimeline`의 항목을 Phaser 트윈/타임라인으로 — `pass`: 둘 다 가운데로 돌진(tween x) → 충돌 지점에서 `clash`면 `cameras.main.shake(120, 0.004)` + 불꽃(파티클 또는 3프레임 Graphics) + 피해 텍스트 tween(위로 뜨며 사라짐) → 서로 지나쳐 반대편에 정지(`flipX` 토글, sidesAfter 반영); 빗나감·가드는 불꽃 없음; `cutin`: 돌진 중 가운데 정지 → 검은 반투명 Rect(alpha .65) → 공격자 초상 확대 컷인(tween scale) + 기술명 → `strike`: 흰 호 3프레임 + 피해 텍스트 → 계속 지나침; `ko`: 패자 alpha 1→0, y +20, scale .9 (600ms); `text`: 대사창 갱신. 재생이 끝나면 `bridge.emit('anim:done')`. `prefers-reduced-motion`이면 shake 생략·2배속.
+  - 효과음: `sfx.ts`(Web Audio 합성 유지; Phaser 오디오로 바꾸는 것은 범위 밖) — clash→hit, cutin→cutin, strike→slash, ko→ko, 메뉴 이동→card.
+  - `createDuelGame(parent: HTMLElement, bridge: DuelBridge): Phaser.Game` — `{ type: Phaser.AUTO, parent, width: 320, height: 240, pixelArt: true, roundPixels: true, scale: { mode: Phaser.Scale.FIT, autoCenter: CENTER_BOTH, zoom: Phaser.Scale.MAX_ZOOM }, backgroundColor: PALETTE.green1, scene: [BootScene, BattleScene] }`; `game.destroy(true)`는 호출자 몫.
+  - 글꼴: 숫자 `Silkscreen`, 한글 `"Noto Sans KR"`(Galmuri 승인 후 `public/fonts/`에 넣고 `@font-face` + `document.fonts.load` 뒤 Boot). `Phaser.GameObjects.Text`의 `resolution: 1`로 도트 느낌 유지.
+- [ ] **Step 1: 실패하는 테스트** — `tests/duel/bridge.test.ts`: `DuelBridge`가 `'ui:action'`을 발행·수신하고 `window.__duel`을 갱신한다(jsdom 없이 `globalThis.window` 스텁); `tests/duel/textures.test.ts`: `fieldPainter`의 `paintField(ctx, 296, 70)`·`paintCloth(ctx)`·`paintFrame(ctx)`가 모의 2D 컨텍스트에서 예외 없이 끝나고 fillRect 호출 수가 0보다 크다; `tests/duel/timeline.test.ts`: 기존 animations 테스트가 새 경로에서 통과
+- [ ] **Step 2: 실패 확인** — `npx vitest run tests/duel`
+- [ ] **Step 3: 구현** — `npm i phaser@3.90.0 --save-exact`; 파일 이동·생성; Phaser는 `import Phaser from 'phaser'`로만 `src/game/**`에서 import(서버 번들에 섞이지 않게 `src/components`나 `src/lib`에서는 import 금지, 테스트는 Phaser를 import하지 않는 모듈만 대상)
+- [ ] **Step 4: 통과 확인** — `npx vitest run tests/duel`, `npx tsc --noEmit`, `npx eslint src/game tests/duel`, `npx next build`가 Phaser 청크를 클라이언트 전용으로 분리하는지(빌드 성공) 확인
+- [ ] **Step 5: 커밋** — `"일기토: Phaser 3 게임 뼈대와 전투 연출"`
 
 ---
 
-### Task 8: 게임 화면(시작·전투·보상·결과)
+### Task 8: 게임 화면(React 마운트·보상·결과·시작)
 
 **Files:**
-- Create: `src/components/duel/DuelClient.tsx`, `StartScreen.tsx`, `BattleHud.tsx`, `RewardPick.tsx`, `ResultScreen.tsx`, `src/app/samguk/duel/page.tsx`
-- Modify: `src/app/samguk/page.tsx:217-223` (ResultActions `lead`를 `{ label: "이 장수로 일기토 하기", href: `/samguk/duel?me=${result.character.id}` }`로 바꾸고 "우리 팀 삼국지 만들기"는 `companion`으로 이동)
-- Test: `tests/duel/duelClient.test.tsx`(렌더 검사는 최소: `?me` 처리 함수 단위 테스트), `tests/nextTests.test.tsx`·`tests/design.test.tsx` 통과 유지
+- Create: `src/game/duel/RewardScene.ts`, `src/game/duel/ResultScene.ts`, `src/game/duel/StartScene.ts`, `src/components/duel/DuelClient.tsx`, `src/components/duel/DuelMount.tsx`(dynamic ssr:false 로더), `src/components/duel/OverlayButtons.tsx`(투명 DOM 버튼), `src/app/samguk/duel/page.tsx`
+- Modify: `src/app/samguk/page.tsx:217-223` (ResultActions `lead`를 `{ label: "이 장수로 일기토 하기", href: `/samguk/duel?me=${result.character.id}` }`로 바꾸고 "우리 팀 삼국지 만들기"는 `companion`으로 이동), `src/game/duel/createDuelGame.ts`(장면 등록 추가)
+- Test: `tests/duel/duelClient.test.ts`(`resolveStarterUnlock`, `overlayLayout`), `tests/nextTests.test.tsx`·`tests/design.test.tsx` 통과 유지
 
 **Interfaces:**
-- Consumes: Task 1~7 전부, `useResultShare`, `CoupangBanner`, `NextTests`(current는 기존 타입에 없으므로 쓰지 않고 `/samguk` 링크 카드를 직접 그림), `track`, `useBackOrHome`
+- Consumes: Task 1~7 전부(`startRun`, `playerTurn`, `afterWin`, `pickReward(run, id, rng, target?)`, `swapInRecruit(run, id, out, rng)`, `drawRewards`, `loadSave/writeSave/recordRunEnd`, `narrate`, `duelShareUrl`, `ogImageUrl('duel', key)`, `encodeRunKey`, `DuelBridge`, `createDuelGame`), `useResultShare`, `CoupangBanner`, `FeedbackForm`(Task 10), `track`, `useBackOrHome`
 - Produces:
-  - `resolveStarterUnlock(me: string | null, roster: string[]): string[]` — `me`가 `DUEL_GENERALS`의 starter/recruit 중 하나면 roster에 합치고, 아니면 그대로 (순수 함수, 테스트 대상)
-  - `DuelClient` 상태: `'start' | 'battle' | 'anim' | 'reward' | 'recruit' | 'result'`; `?seed=` 쿼리가 있으면 그 시드(E2E용), 없으면 `Date.now()`
-  - 화면 규칙: 전투 영역은 `bg-navy-game` 카드(`SamgukGameCard`와 같은 테두리), 위 HUD = 초상(`/images/samguk/<이름>.jpg` 56×68 `[image-rendering:pixelated]`)+이름+유형 칩+체력 바(10칸 `bg-gold-game`), 가운데 `BattleCanvas`, 아래 기술 4개(2×2, 높이 48px, 남은 횟수 표시, 유형 글자색) + 교체 버튼 + 메시지 창(최근 2줄). 결과 화면 = 열전 카드(제목·lines) → `ResultActions`(onShare: `useResultShare` meta `{ testName:'duel', title: headline, text: headline, url: duelShareUrl(record), imageUrl: ogImageUrl('duel', key) }`, lead `{label:'내 얼굴은 어떤 장수?', href:'/samguk'}`, retryLabel '다시 출진') → `FeedbackForm`(Task 10) → `CoupangBanner subId="samguk-duel"` → 행군 기록 링크.
-  - GA: 시작 시 `test_start(duel)`, 결과 화면 `result_view(duel, result_id: starterId)`.
-  - 저장: 턴마다 `writeSave(current)`, 결과에서 `recordRunEnd` 후 current null.
-  - 모바일: 최상위 `max-w-[480px] mx-auto`, 버튼 최소 높이 44px, 하단 탭바 여백은 사이트 공통.
-- [ ] **Step 1: 실패하는 테스트** — `resolveStarterUnlock('zhouyu', ['guanyu'])`에 zhouyu 포함; `'caocao'`·`'<script>'`·null은 변화 없음; `'lvbu'`(boss)도 변화 없음
+  - `resolveStarterUnlock(me: string | null, roster: string[]): string[]` — `me`가 starter/recruit면 roster에 합치고 아니면 그대로(순수, 테스트)
+  - `overlayLayout(scene: 'start'|'battle'|'reward'|'result', n?: number): { id: string; x: number; y: number; w: number; h: number; label: string }[]` — 320×240 설계 좌표의 투명 버튼 자리(전투: 기술 4개는 메뉴 줄 위치 118×13 → 높이 44px CSS를 보장하려면 캔버스 배율로 환산해 `min-height:44px`; 교체 1; 보상: 카드 3; 결과: 버튼 3 + 별 5; 시작: 장수록 목록 n개 + 출진). 순수 함수, 테스트.
+  - `DuelClient`("use client"): 상태 = `RunState | null` + `screen`; `?seed=` 있으면 그 시드, `?me=`는 `resolveStarterUnlock`; 게임 규칙 호출은 전부 React 쪽(`bridge.on('ui:action')` → `playerTurn`/`pickReward`/… → `bridge.emit('run:update')`), Phaser는 그리기와 연출만; 턴마다 `writeSave`; 결과에서 `recordRunEnd`; GA `test_start(duel)`·`result_view(duel, result_id: starterId)`; 공유는 `useResultShare` meta `{ testName:'duel', title: headline, text: headline, url: duelShareUrl(record), imageUrl: ogImageUrl('duel', encodeRunKey(record)) }`를 결과 화면 "공유하기" 투명 버튼에 연결; "내 얼굴은 어떤 장수?" → `/samguk`; "다시 출진" → 시작 화면; 별점 → `FeedbackForm`이 캔버스 아래에 펼쳐짐; `CoupangBanner subId="samguk-duel"`은 결과 화면에서만 캔버스 아래 DOM.
+  - `DuelMount`: `dynamic(() => import('./DuelClient'), { ssr: false, loading: 로딩 문구 })`; 컨테이너 `max-w-[480px] mx-auto`, 캔버스 래퍼 `aspect-ratio: 4/3`, 언마운트 시 `game.destroy(true)`.
+  - `StartScene`: 장수록(초상 썸네일 + 이름 + 유형, 잠긴 장수는 어둡게), 최고 기록/클리어, 행군 기록(열전 제목 목록) 창; `RewardScene`: 와꾸 v5 draw2(카드 3장 + 동행/다음 전투 창); `ResultScene`: draw3(초상 + 열전 제목·한 줄 + 열전 본문 창 + 버튼 3 + 별점 줄). 세 장면 모두 `bridge.emit('scene:changed')`.
+  - `page.tsx`: `<TestHeader title="삼국지 일기토" />` + `<DuelMount />`; 그 아래는 Task 9의 PageGuide.
+  - 모바일: 캔버스 CSS 폭 100%(최대 480px), 투명 버튼은 캔버스 위 `position:absolute`에 비율 배치, 각 `min-height:44px`·`aria-label`, 포커스 시 캔버스 커서 이동(`bridge.emit('ui:focus', id)`).
+- [ ] **Step 1: 실패하는 테스트** — `resolveStarterUnlock('zhouyu', ['guanyu'])`에 zhouyu 포함; `'caocao'`·`'<script>'`·null·`'lvbu'`(boss)는 변화 없음; `overlayLayout('battle')`이 5개(기술 4 + 교체)를 돌려주고 모두 320×240 안에 있으며 서로 겹치지 않는다; `overlayLayout('result')`는 8개
 - [ ] **Step 2: 실패 확인**
-- [ ] **Step 3: 컴포넌트·페이지 구현** (page.tsx는 `<TestHeader title="삼국지 일기토" />` + `<DuelClient />`, `"use client"`는 DuelClient 쪽)
-- [ ] **Step 4: 통과 확인** — `npx vitest run tests/duel tests/design.test.tsx tests/nextTests.test.tsx` + `npx tsc --noEmit` + 로컬에서 `npx next dev -p 3311` 로 한 판 끝까지 수동 확인(모바일 뷰 390px)
+- [ ] **Step 3: 구현** — 장면·컴포넌트·페이지; `npx next dev -p 3311`로 한 판 끝까지 수동 확인(모바일 뷰 390px, 투명 버튼이 메뉴 줄과 맞는지, 교대 돌진이 보이는지)
+- [ ] **Step 4: 통과 확인** — `npx vitest run tests/duel tests/design.test.tsx tests/nextTests.test.tsx`, `npx tsc --noEmit`, `npx next build`
 - [ ] **Step 5: 커밋** — `"일기토: 게임 화면(시작·전투·보상·결과)과 삼국지 결과 연결"`
 
 ---
