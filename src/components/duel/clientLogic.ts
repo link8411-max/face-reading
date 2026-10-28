@@ -36,12 +36,24 @@ export interface OverlaySlot extends Rect {
 
 export type OverlayScene = 'start' | 'battle' | 'reward' | 'result' | 'pick' | 'recruit';
 
-/** 삼국지 닮은꼴 결과(?me=)가 시작·영입 장수면 장수록에 더한다. 그 밖(보스·졸개·명단 밖·쓰레기 값)은 그대로 */
-export function resolveStarterUnlock(me: string | null, roster: string[]): string[] {
+/**
+ * ?me=로 장수록에 더할 장수. 시작 장수 4명은 늘 더한다(처음부터 열린 장수).
+ * 영입 장수는 삼국지 닮은꼴 결과에서 온 링크(from=samguk)일 때만 — 장수 소개 페이지나 손으로 친 주소로는 영입을 건너뛸 수 없다.
+ * 보스·졸개·명단 밖·쓰레기 값은 그대로.
+ */
+export function resolveStarterUnlock(me: string | null, roster: string[], from: string | null = null): string[] {
   if (!me) return roster;
   const g = getDuelGeneral(me);
-  if (!g || (g.role !== 'starter' && g.role !== 'recruit')) return roster;
+  if (!g) return roster;
+  const ok = g.role === 'starter' || (g.role === 'recruit' && from === 'samguk');
+  if (!ok) return roster;
   return roster.includes(me) ? roster : [...roster, me];
+}
+
+/** 진행 중인 판(전투·보상)이 있으면 "새로 출진" 전에 한 번 더 묻는다(그 판은 사라진다) */
+export function needsAbandonConfirm(save: { current?: { phase: string } | null }): boolean {
+  const p = save.current?.phase;
+  return p === 'battle' || p === 'reward';
 }
 
 export interface OverlayOpts {

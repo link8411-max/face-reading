@@ -241,7 +241,8 @@ export default function DuelClient() {
     seedParamRef.current = q.get("seed");
     const me = q.get("me");
     let data = loadSave(storage());
-    const roster = resolveStarterUnlock(me, data.roster);
+    // 영입 장수는 닮은꼴 결과에서 온 링크(from=samguk)일 때만 더한다
+    const roster = resolveStarterUnlock(me, data.roster, q.get("from"));
     if (roster !== data.roster) data = { ...data, roster };
     // 한 번 써 보아 저장이 되는지 안다(인앱·사생활 보호 모드면 시작 화면에 안내)
     const ok = writeSave(storage(), data);

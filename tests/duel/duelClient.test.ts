@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { hitRects, overlayLayout, resolveStarterUnlock, type Rect } from '@/components/duel/clientLogic';
+import { hitRects, needsAbandonConfirm, overlayLayout, resolveStarterUnlock, type Rect } from '@/components/duel/clientLogic';
 import { DIALOG_BOX, FIELD_BOX, MENU_BOX, RESULT_TALL, RESULT_WIDE } from '@/game/duel/layout';
 import { GAME_H_TALL } from '@/game/duel/config';
 
@@ -10,20 +10,42 @@ const overlaps = (a: Rect, b: Rect) => a.x < b.x + b.w - E && b.x < a.x + a.w - 
 const noOverlap = (rs: Rect[]) => rs.every((a, i) => rs.every((b, j) => i === j || !overlaps(a, b)));
 
 describe('resolveStarterUnlock', () => {
-  it('영입 장수(zhouyu)는 장수록에 합친다', () => {
-    expect(resolveStarterUnlock('zhouyu', ['guanyu'])).toEqual(['guanyu', 'zhouyu']);
-  });
-  it('시작 장수도 합치고, 이미 있으면 그대로', () => {
+  it('시작 장수는 from 없이도 합치고, 이미 있으면 그대로', () => {
     expect(resolveStarterUnlock('zhaoyun', ['guanyu'])).toEqual(['guanyu', 'zhaoyun']);
+    expect(resolveStarterUnlock('zhouyu', ['guanyu'], null)).toEqual(['guanyu', 'zhouyu']);
     expect(resolveStarterUnlock('guanyu', ['guanyu'])).toEqual(['guanyu']);
   });
-  it.each([['caocao'], ['<script>'], ['lvbu'], ['mob'], [''], [null]])('%s는 변화 없음', (me) => {
+  it('영입 장수는 닮은꼴 결과(from=samguk)에서 왔을 때만 합친다', () => {
+    expect(resolveStarterUnlock('machao', ['guanyu'], 'samguk')).toEqual(['guanyu', 'machao']);
+    expect(resolveStarterUnlock('jiangwei', ['guanyu'], 'samguk')).toEqual(['guanyu', 'jiangwei']);
+  });
+  it.each([[null], [''], ['generals'], ['SAMGUK'], ['samguk2']])('영입 장수 + from=%s는 변화 없음(장수 페이지·손으로 친 주소)', (from) => {
+    expect(resolveStarterUnlock('machao', ['guanyu'], from as string | null)).toEqual(['guanyu']);
+  });
+  it('이미 장수록에 있는 영입 장수는 그대로(from 없이도 골라 쓸 수 있다)', () => {
+    expect(resolveStarterUnlock('machao', ['guanyu', 'machao'])).toEqual(['guanyu', 'machao']);
+  });
+  it.each([['caocao'], ['<script>'], ['lvbu'], ['dongzhuo'], ['zhangjiao'], ['mob'], [''], [null]])('%s는 from=samguk이어도 변화 없음(보스·졸개·명단 밖)', (me) => {
+    expect(resolveStarterUnlock(me as string | null, ['guanyu'], 'samguk')).toEqual(['guanyu']);
     expect(resolveStarterUnlock(me as string | null, ['guanyu'])).toEqual(['guanyu']);
   });
   it('입력 배열을 바꾸지 않는다', () => {
     const roster = ['guanyu'];
-    resolveStarterUnlock('machao', roster);
+    resolveStarterUnlock('machao', roster, 'samguk');
     expect(roster).toEqual(['guanyu']);
+  });
+});
+
+describe('needsAbandonConfirm (새로 출진 전에 한 번 더 묻기)', () => {
+  it('전투·보상 중인 판이 있으면 묻는다', () => {
+    expect(needsAbandonConfirm({ current: { phase: 'battle' } })).toBe(true);
+    expect(needsAbandonConfirm({ current: { phase: 'reward' } })).toBe(true);
+  });
+  it('판이 없거나 끝났으면 묻지 않는다', () => {
+    expect(needsAbandonConfirm({})).toBe(false);
+    expect(needsAbandonConfirm({ current: null })).toBe(false);
+    expect(needsAbandonConfirm({ current: { phase: 'won' } })).toBe(false);
+    expect(needsAbandonConfirm({ current: { phase: 'lost' } })).toBe(false);
   });
 });
 

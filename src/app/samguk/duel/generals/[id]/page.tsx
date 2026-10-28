@@ -5,6 +5,7 @@ import { DUEL_GENERAL_INTRO } from "@/content/duelGuide";
 import { BOSS_IDS, DUEL_GENERALS, getDuelGeneral } from "@/lib/duel/generals";
 import { SKILLS } from "@/lib/duel/skills";
 import { getCharacterById } from "@/lib/samgukDB";
+import RosterStartLink from "@/components/duel/RosterStartLink";
 
 type Props = { params: Promise<{ id: string }> };
 
@@ -54,7 +55,6 @@ export default async function GeneralPage({ params }: Props) {
   if (!g || !c || !intro || g.role === "mob") notFound();
 
   const wave = bossWave(id);
-  const canStart = g.role === "starter" || g.role === "recruit";
   const url = `${SITE}/samguk/duel/generals/${id}`;
   const breadcrumb = {
     "@context": "https://schema.org",
@@ -133,10 +133,13 @@ export default async function GeneralPage({ params }: Props) {
         </section>
 
         <section className="mt-8">
-          {canStart ? (
+          {/* 시작 장수 4명만 바로 시작 링크. 영입 장수는 이 기기 장수록에 있을 때만(RosterStartLink가 브라우저에서 바꾼다) */}
+          {g.role === "starter" ? (
             <Link href={`/samguk/duel?me=${id}`} className="flex h-[52px] items-center justify-center rounded-full bg-ink text-paper font-medium">
               이 장수로 시작
             </Link>
+          ) : g.role === "recruit" ? (
+            <RosterStartLink id={id} />
           ) : (
             <p className="rounded-[18px] bg-card px-4 py-4 text-center">
               보스로 등장 — 웨이브 {wave}
