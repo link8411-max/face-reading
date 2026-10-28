@@ -53,6 +53,10 @@ export interface Fighter {
   uses: Record<string, number>;
   status: FighterStatus;
   bonus: { atk: number; int: number; speed: number };
+  /** 누적 경험치 (100마다 레벨업, 남는 값만 남는다). 없으면 0 */
+  exp?: number;
+  /** 보상으로 배운 기술이 있으면 장수 기본 기술 대신 이 4개를 쓴다 */
+  skills?: [string, string, string, string];
 }
 
 export interface BattleState {
@@ -72,3 +76,55 @@ export type TurnEvent = {
   amount?: number;
   text: string;
 };
+
+// ── 한 판(런) 상태 ──
+
+export interface RunWave {
+  wave: number;
+  /** 적 장수 id */
+  enemy: string;
+  turns: number;
+  /** 결정타 기술 id (화상으로 쓰러뜨렸으면 'burn') */
+  finisher?: string;
+  /** 결정타를 낸 아군 장수 id */
+  finisherBy?: string;
+  /** 이 싸움에서 쓰러진 아군 (처음 쓰러진 장수) */
+  lostAlly?: string;
+  recruited?: boolean;
+}
+
+export interface RunRecord {
+  starter: string;
+  waves: RunWave[];
+  /** 고른 보상 id 순서대로 */
+  rewards: string[];
+  cleared: boolean;
+}
+
+export interface RunState {
+  seed: number;
+  /** 1부터 */
+  wave: number;
+  party: Fighter[];
+  partyMax: 3 | 4;
+  /** 이번 판에서 장수록에 오른 장수 (시작 장수 포함) */
+  roster: string[];
+  enemy: Fighter | null;
+  phase: 'battle' | 'reward' | 'won' | 'lost';
+  battle: BattleState | null;
+  record: RunRecord;
+  rewardsOffered: string[];
+}
+
+export interface Reward {
+  id: string;
+  name: string;
+  desc: string;
+  rarity: 'common' | 'rare';
+  /** 대상이 필요한 보상이면 고를 수 있는 party 자리 목록 */
+  targets?: (run: RunState) => number[];
+  /** 대상과 무관하게 지금 쓸 수 있는지 (없으면 true) */
+  canUse?: (run: RunState) => boolean;
+  /** 대상이 필요한 보상에 잘못된 자리를 주면 throw */
+  apply(run: RunState, targetIndex?: number): RunState;
+}

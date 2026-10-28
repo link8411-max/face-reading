@@ -80,6 +80,11 @@ export function damage(att: Fighter, def: Fighter, sk: Skill, rng: Rng): number 
   return Math.max(1, Math.round(v));
 }
 
+/** 이 장수가 지금 쓰는 기술 4개 (보상으로 배운 기술 반영) */
+export function skillsOf(f: Fighter): [string, string, string, string] {
+  return f.skills ?? gen(f).skills;
+}
+
 function usable(f: Fighter, id: string): boolean {
   return !(id in f.uses) || f.uses[id] > 0;
 }
@@ -88,10 +93,10 @@ function usable(f: Fighter, id: string): boolean {
 export function enemyAction(state: BattleState, rng: Rng): Action {
   const e = state.enemy;
   const g = gen(e);
-  const basic = g.skills[0];
+  const basic = skillsOf(e)[0];
   if (e.status.taunt) return { type: 'skill', skillId: basic };
   const foeKind = gen(state.party[state.active]).kind;
-  const avail = g.skills.filter((id) => usable(e, id));
+  const avail = skillsOf(e).filter((id) => usable(e, id));
   if (e.hp <= e.maxHp * LOW_HP) {
     const defend = avail.filter((id) => skill(id).effect === 'guard' || skill(id).effect === 'heal');
     if (defend.length > 0 && rng() < DEFEND_CHANCE) return { type: 'skill', skillId: defend[0] };
@@ -112,7 +117,7 @@ export function enemyAction(state: BattleState, rng: Rng): Action {
 
 /** 도발 중이면 기본 공격으로 바뀔 기술 (순서 계산용, 부작용 없음) */
 function plannedSkill(f: Fighter, id: string): string {
-  return f.status.taunt ? gen(f).skills[0] : id;
+  return f.status.taunt ? skillsOf(f)[0] : id;
 }
 
 export function resolveTurn(
@@ -138,7 +143,7 @@ export function resolveTurn(
     const foeSide = other(side);
     const foe = fighter(foeSide);
     const g = gen(self);
-    if (!g.skills.includes(chosen)) throw new Error(`${g.name}에게 없는 기술: ${chosen}`);
+    if (!skillsOf(self).includes(chosen)) throw new Error(`${g.name}에게 없는 기술: ${chosen}`);
 
     // 혼란: 이번 행동 50% 실패
     if (self.status.confuse) {
@@ -150,7 +155,7 @@ export function resolveTurn(
       }
     }
 
-    const basic = g.skills[0];
+    const basic = skillsOf(self)[0];
     let id = chosen;
     let note = '';
     if (self.status.taunt) {
