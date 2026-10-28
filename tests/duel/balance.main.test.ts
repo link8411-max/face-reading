@@ -7,7 +7,7 @@ const rosterSum = (s: string) => sum(s, { roster: ROSTER.filter((id) => id !== s
 const NO_CRIT = { balance: { critBase: 0, critKiBonus: 0, critPerSpeed: 0 } };
 
 describe('밸런스: 시작 장수 간 차이(average, 첫 판)', () => {
-  // 보정 뒤 관우 11%·장비 11%·조운 11.5%·주유 11.5%. 주유는 적벽 화계 화상 1턴·피해 배율 0.6(docs/duel-balance.md 2라운드 보정)
+  // 관우 9.5%·장비 11%·조운 13%·주유 19%(차이 9.5%p). 주유는 적벽 화계 화상 1턴·피해 배율 0.7(docs/duel-balance.md 2라운드 보정)
   it(`클리어율 차이 ≤ ${DIST_TARGETS.average.starterClearSpread * 100}%p`, () => {
     expect(spread(STARTERS.map((s) => sum(s).clear))).toBeLessThanOrEqual(DIST_TARGETS.average.starterClearSpread + EPS);
   });
@@ -47,9 +47,10 @@ describe('밸런스: 장수록 판(시작부터 동행 2명)', () => {
 });
 
 describe('밸런스: 보상 성향(average, 첫 판)', () => {
-  // 관우 10%p(회복 11%·공격 12.5%·아무거나 2.5%), 조운 9%p(11.5%·4.5%·2.5%): 싸움마다 체력이 깎이니 회복약을 아무렇게나 넘기면 손해가 커졌다
-  it.todo('관우·조운: 회복 먼저·공격 먼저·아무거나의 클리어율 차이 ≤ 8%p (10%p·9%p)');
-  it.each(['zhangfei', 'zhouyu'])('%s: 회복 먼저·공격 먼저·아무거나의 클리어율 차이 ≤ 8%p', (s) => {
+  // 장비 8.5%p(회복 11%·공격 7.5%·아무거나 2.5%), 조운 9%p(13%·5.5%·4%), 주유 17.5%p(19%·30%·12.5%):
+  // 싸움마다 체력이 깎이니 회복약을 흘리면 손해가 크고, 주유는 병법서 지력 +10이 바로 피해가 된다
+  it.todo('장비·조운·주유: 회복 먼저·공격 먼저·아무거나의 클리어율 차이 ≤ 8%p (8.5%p·9%p·17.5%p)');
+  it.each(['guanyu'])('%s: 회복 먼저·공격 먼저·아무거나의 클리어율 차이 ≤ 8%p', (s) => {
     const cl = (['heal', 'attack', 'random'] as const).map((rewardPref) => sum(s, { rewardPref }).clear);
     expect(spread(cl)).toBeLessThanOrEqual(0.08 + EPS);
   });

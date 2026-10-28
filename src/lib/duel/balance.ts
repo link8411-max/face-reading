@@ -123,7 +123,7 @@ export const BALANCE: Balance = {
     zhouyu_ult: { burnTurns: 1 },
   },
   speedAdj: {},
-  generalPower: { zhouyu: 0.6 },
+  generalPower: { zhouyu: 0.7 },
   generalHp: { zhangfei: 1.3, zhaoyun: 1.05, zhouyu: 0.9 },
 };
 
