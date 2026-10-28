@@ -14,7 +14,7 @@ import { narrate } from "@/lib/duel/narrative";
 import { encodeRunKey } from "@/lib/duel/shareKey";
 import { makeRunId, newRunNonce } from "@/lib/duel/feedback";
 import { advancePlayed, buildRunLog, endEventId, waveEventId } from "@/lib/duel/runLog";
-import { duelShareUrl, ogImageUrl } from "@/lib/shareLinks";
+import { duelOgImageUrl, duelShareUrl } from "@/lib/duel/share";
 import type { RunRecord, RunState, SaveData } from "@/lib/duel/types";
 import { track } from "@/lib/analytics";
 import { useResultShare } from "@/hooks/useResultShare";
@@ -326,7 +326,7 @@ export default function DuelClient() {
   const shareMeta = useMemo(() => {
     if (!record) return null;
     const { headline } = narrate(record);
-    return { testName: "duel" as const, title: headline, text: headline, url: duelShareUrl(record), imageUrl: ogImageUrl("duel", encodeRunKey(record)) };
+    return { testName: "duel" as const, title: headline, text: headline, url: duelShareUrl(record), imageUrl: duelOgImageUrl(encodeRunKey(record)) };
   }, [record]);
   const { busy, notice, share } = useResultShare(shareMeta);
 

@@ -24,10 +24,10 @@ test('잘못된 값이면 결과 메타를 만들지 않는다', async () => {
 })
 
 test('일기토 공유 링크도 검색 제외·canonical은 /samguk/duel', async () => {
-  const m = await duelShareMeta({ params: Promise.resolve({ key: 'zhaoyun.lvbu.18.c.12' }) })
+  const m = await duelShareMeta({ params: Promise.resolve({ key: 'zhaoyun.lvbu.36.c.12' }) })
   expect(m.robots).toEqual({ index: false, follow: true })
   expect(m.alternates?.canonical).toBe('https://unse-ai.com/samguk/duel')
-  expect((m.openGraph as { url?: string }).url).toBe('https://unse-ai.com/samguk/duel/r/zhaoyun.lvbu.18.c.12')
+  expect((m.openGraph as { url?: string }).url).toBe('https://unse-ai.com/samguk/duel/r/zhaoyun.lvbu.36.c.12')
 })
 
 test('결과 공유 페이지는 사이트맵에 없다', () => {

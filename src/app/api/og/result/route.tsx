@@ -5,7 +5,8 @@ import { mbtiShared, parseFaceMatch, parseInvite, parseTeam } from '@/lib/shareL
 import { buildTeam } from '@/lib/samguk/team';
 import { REL_NAME } from '@/lib/faceMatch/compat';
 import { ogQueryOk, OG_CACHE_CONTROL } from '@/lib/ogQuery';
-import { duelShared, parseMbtiDailyKey } from '@/lib/shareLinks';
+import { parseMbtiDailyKey } from '@/lib/shareLinks';
+import { duelShared } from '@/lib/duel/share';
 import { decodeRunKey } from '@/lib/duel/shareKey';
 import { mbtiProfiles } from '@/content/mbtiTypes';
 

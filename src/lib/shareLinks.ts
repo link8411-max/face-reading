@@ -7,12 +7,11 @@ import { samgukCharacters } from '@/lib/samgukDB'
 import { compatSummary, isMbti, type MbtiType } from '@/lib/mbti/compat'
 import { faceMatch, REL, REL_NAME, type Rel } from '@/lib/faceMatch/compat'
 import type { AnimalKey } from '@/lib/animal/matcher'
-import { decodeRunKey, encodeRunKey } from '@/lib/duel/shareKey'
-import { getDuelGeneral } from '@/lib/duel/generals'
-import { narrate } from '@/lib/duel/narrative'
-import type { RunRecord } from '@/lib/duel/types'
+import { josa } from '@/lib/josa'
+import { SITE, UTM } from '@/lib/shareBase'
 
-export const SITE = 'https://unse-ai.com'
+// 기존 호출처를 위해 다시 내보낸다. 일기토 공유 링크는 @/lib/duel/share (일기토 규칙이 다른 페이지에 실리지 않게)
+export { josa, SITE }
 export type ShareKind = 'animal' | 'samguk' | 'face'
 
 const FACE_TYPES: Record<string, string> = { wealth: '재물상', blessing: '복덕상', leader: '리더상', noble: '귀인상', scholar: '학자상', artist: '예술가상' }
@@ -26,12 +25,6 @@ export function faceSlug(type: string): string | null {
 export function clampScore(s: unknown): number | null {
   const n = typeof s === 'number' ? s : typeof s === 'string' && s.trim() !== '' ? Number(s) : NaN
   return Number.isFinite(n) ? Math.max(50, Math.min(99, Math.round(n))) : null
-}
-
-// 받침 유무로 조사 고르기
-export const josa = (w: string, withB: string, without: string) => {
-  const c = w.charCodeAt(w.length - 1) - 0xac00
-  return w + (c >= 0 && c <= 11171 && c % 28 !== 0 ? withB : without)
 }
 
 export interface SharedResult {
@@ -63,8 +56,6 @@ export function parseShared(kind: ShareKind, key: string, s?: unknown): SharedRe
   return { ...base, score, name: c.name, image: `/images/samguk/${c.name}.jpg`, phrase: `나는 ${josa(c.name, '이랑', '랑')} ${score}% 닮았대. 너는 삼국지 속 누구야?` }
 }
 
-const UTM = (campaign: string) => `utm_source=share&utm_medium=friend_link&utm_campaign=${campaign}`
-
 export function shareUrl(kind: ShareKind, key: string, score?: number): string {
   const s = kind === 'face' || score === undefined ? null : clampScore(score)
   return `${SITE}${TEST_PATH[kind]}/r/${encodeURIComponent(key)}?${s !== null ? `s=${s}&` : ''}${UTM(kind)}`
@@ -80,7 +71,7 @@ export function mbtiShared(aIn: string, bIn: string): { a: string; b: string; sc
 }
 
 // 결과 미리보기 이미지 주소 (카톡·인스타 미리보기, 카카오톡 공유 카드)
-export function ogImageUrl(kind: ShareKind | 'mbti' | 'duel', key: string, score?: number | null, b?: string): string {
+export function ogImageUrl(kind: ShareKind | 'mbti', key: string, score?: number | null, b?: string): string {
   if (kind === 'mbti') return `${SITE}/api/og/result?kind=mbti&a=${key}&b=${b}`
   return `${SITE}/api/og/result?kind=${kind}&key=${encodeURIComponent(key)}${score !== undefined && score !== null ? `&s=${score}` : ''}`
 }
@@ -141,23 +132,3 @@ export function parseMbtiDailyKey(key: string): MbtiType | null {
 }
 
 export const mbtiDailyPhrase = (t: MbtiType, headline: string) => `오늘 ${t} 운세는 '${headline}'래. 너는 무슨 유형이야?`
-
-// ===== 삼국지 일기토 =====
-// 링크에는 공유 키(선두·마지막 적·싸움 번호·클리어·합 수)와 utm만 담는다
-export function duelShareUrl(record: RunRecord): string {
-  return `${SITE}/samguk/duel/r/${encodeRunKey(record)}?${UTM('duel')}`
-}
-
-export function duelShared(key: string): { headline: string; starterName: string; image: string } | null {
-  const k = decodeRunKey(key)
-  if (!k) return null
-  const starterName = getDuelGeneral(k.starter)!.name
-  // 열전 headline은 마지막 싸움만 보므로 그 한 판만 담은 최소 기록으로 만든다
-  const { headline } = narrate({
-    starter: k.starter,
-    waves: [{ wave: k.wave, enemy: k.lastEnemy, turns: k.turns }],
-    rewards: [],
-    cleared: k.cleared,
-  })
-  return { headline, starterName, image: `/images/samguk/${starterName}.jpg` }
-}

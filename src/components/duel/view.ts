@@ -6,7 +6,7 @@ import { SKILLS } from '@/lib/duel/skills';
 import { narrate } from '@/lib/duel/narrative';
 import { wrapText } from '@/game/duel/wrap';
 import { MSG_CHARS } from '@/game/duel/layout';
-import { josa } from '@/lib/shareLinks';
+import { josa } from '@/lib/josa';
 import { WAVES, bossIdFor, isBossWave, markRecruitHandled, swapInRecruit } from '@/lib/duel/run';
 import type { Rng } from '@/lib/duel/rng';
 import type { Fighter, RunRecord, RunState, SaveData } from '@/lib/duel/types';

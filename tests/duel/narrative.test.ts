@@ -115,8 +115,19 @@ describe('열전 생성', () => {
     expect(ORDINALS[0]).toBe('첫째');
     expect(ORDINALS[16]).toBe('열일곱째');
     expect(ORDINALS[19]).toBe('스무째');
-    // 21~36번째 싸움(36웨이브)은 숫자 서수
-    for (let w = 21; w <= 36; w++) expect(ordinal(w)).toBe(`${w}번째`);
+    // 36웨이브까지 모두 고유어 서수
+    expect(ORDINALS).toHaveLength(36);
+    expect(ordinal(21)).toBe('스물한째');
+    expect(ordinal(22)).toBe('스물두째');
+    expect(ordinal(23)).toBe('스물셋째');
+    expect(ordinal(29)).toBe('스물아홉째');
+    expect(ordinal(30)).toBe('서른째');
+    expect(ordinal(31)).toBe('서른한째');
+    expect(ordinal(36)).toBe('서른여섯째');
+    for (let w = 1; w <= 36; w++) expect(ordinal(w)).not.toMatch(/\d/);
+    // 범위 밖은 숫자로 물러선다
+    expect(ordinal(37)).toBe('37번째');
+    // 합 수는 열까지 고유어, 그 위는 숫자(한결같이)
     expect(koreanCount(1)).toBe('한');
     expect(koreanCount(3)).toBe('세');
     expect(koreanCount(9)).toBe('아홉');
@@ -297,7 +308,7 @@ describe('열전 생성', () => {
     const n = narrate({ starter: 'guanyu', waves, rewards: ['redhare', 'slot'], cleared: false });
     expect(n.lines.length).toBeLessThanOrEqual(8);
     expect(n.lines.length).toBeGreaterThanOrEqual(3);
-    expect(n.headline).toContain('22번째 싸움');
+    expect(n.headline).toContain('스물두째 싸움');
     expect(n.headline).toContain('22 합 끝에');
     expect(n.lines).toContain('그사이 마초와 주유가 차례로 항복하여 합류하다.');
   });

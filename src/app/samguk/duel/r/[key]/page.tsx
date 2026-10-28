@@ -2,7 +2,8 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import { decodeRunKey } from "@/lib/duel/shareKey";
-import { duelShared, ogImageUrl, SITE } from "@/lib/shareLinks";
+import { duelOgImageUrl, duelShared } from "@/lib/duel/share";
+import { SITE } from "@/lib/shareBase";
 import SharedLandingTracker from "@/components/share/SharedLandingTracker";
 
 type Props = { params: Promise<{ key: string }> };
@@ -14,9 +15,10 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { key } = await params;
   const d = duelShared(key);
   if (!d) return {};
-  const image = ogImageUrl("duel", key);
+  const image = duelOgImageUrl(key);
   return {
-    title: d.headline,
+    // 다른 공유 착지 페이지처럼 사이트 이름을 붙인다(og 제목은 문구만)
+    title: `${d.headline} | 운명을 읽다`,
     description: DESCRIPTION,
     robots: { index: false, follow: true },
     alternates: { canonical: `${SITE}/samguk/duel` },

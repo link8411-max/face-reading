@@ -1,5 +1,5 @@
 // 열전(列傳): 한 판의 기록을 삼국지 열전 문체의 짧은 이야기로. AI·난수 없이 문장 틀에 기록을 끼운다.
-import { josa } from '@/lib/shareLinks';
+import { euro, josa } from '@/lib/josa';
 import { getDuelGeneral, MOB_ID } from './generals';
 import { isBossWave } from './run';
 import { REWARDS } from './rewards';
@@ -9,6 +9,8 @@ import type { RunRecord, RunWave } from './types';
 export const ORDINALS = [
   '첫째', '둘째', '셋째', '넷째', '다섯째', '여섯째', '일곱째', '여덟째', '아홉째', '열째',
   '열한째', '열두째', '열셋째', '열넷째', '열다섯째', '열여섯째', '열일곱째', '열여덟째', '열아홉째', '스무째',
+  '스물한째', '스물두째', '스물셋째', '스물넷째', '스물다섯째', '스물여섯째', '스물일곱째', '스물여덟째', '스물아홉째', '서른째',
+  '서른한째', '서른두째', '서른셋째', '서른넷째', '서른다섯째', '서른여섯째',
 ];
 
 const COUNTS = ['한', '두', '세', '네', '다섯', '여섯', '일곱', '여덟', '아홉', '열'];
@@ -31,13 +33,6 @@ const skillName = (id: string | undefined): string | undefined => {
   if (!id) return undefined;
   if (id === 'burn') return '화상';
   return SKILLS[id]?.name;
-};
-
-/** 받침이 없거나 ㄹ 받침이면 '로', 그 밖은 '으로' */
-const euro = (w: string) => {
-  const c = w.charCodeAt(w.length - 1) - 0xac00;
-  const jong = c >= 0 && c <= 11171 ? c % 28 : 0;
-  return w + (jong === 0 || jong === 8 ? '로' : '으로');
 };
 
 const iga = (w: string) => josa(w, '이', '가');
