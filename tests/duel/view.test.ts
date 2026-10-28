@@ -34,7 +34,7 @@ describe('messageLines', () => {
       '관우의 일격!',
       '황건적 졸개에게 12의 피해!',
       '매복한 황건적 졸개의 반격! 6의 피해!',
-      '황건적 졸개은(는) 불길에 휩싸였다! 3의 피해!',
+      '황건적 졸개는 불길에 휩싸였다! 3의 피해!',
     ]);
     expect(lines).toHaveLength(3);
     expect(MSG_CHARS).toBe(14);

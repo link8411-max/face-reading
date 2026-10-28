@@ -1,4 +1,5 @@
 // 일기토 보상 카드: 웨이브 사이 3장 중 1장. 적용은 순수 함수(입력 상태를 바꾸지 않는다).
+import { josa } from '@/lib/josa';
 import { skillsOf } from './battle';
 import { BALANCE, type Balance } from './balance';
 import { SKILLS } from './skills';
@@ -57,7 +58,7 @@ function learnReward(id: string, skillId: string, name: string, rarity: Reward['
   const r: Reward = {
     id,
     name,
-    desc: `장수 1명이 ${sk.name}을(를) 배운다 (셋째 기술 자리를 바꾼다)`,
+    desc: `장수 1명이 ${josa(sk.name, '을', '를')} 배운다 (셋째 기술 자리를 바꾼다)`,
     rarity,
     targets: (run) => indices(run, (f) => !skillsOf(f).includes(skillId)),
     apply: (run, t) =>

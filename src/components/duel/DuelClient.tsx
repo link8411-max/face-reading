@@ -15,6 +15,7 @@ import { encodeRunKey } from "@/lib/duel/shareKey";
 import { makeRunId, newRunNonce } from "@/lib/duel/feedback";
 import { advancePlayed, buildRunLog, endEventId, waveEventId } from "@/lib/duel/runLog";
 import { duelOgImageUrl, duelShareUrl } from "@/lib/duel/share";
+import { euro } from "@/lib/josa";
 import type { RunRecord, RunState, SaveData } from "@/lib/duel/types";
 import { track } from "@/lib/analytics";
 import { useResultShare } from "@/hooks/useResultShare";
@@ -503,7 +504,7 @@ export default function DuelClient() {
       const to = nextSwitchIndex(run);
       return to === null
         ? { label: "교체할 장수 없음", action: null }
-        : { label: `${nameOf(run.battle.party[to].id)}(으)로 교체`, action: { type: "switch", toIndex: to } };
+        : { label: `${euro(nameOf(run.battle.party[to].id))} 교체`, action: { type: "switch", toIndex: to } };
     }
     const sk = toBattleView(run)?.player.skills[Number(id.slice(5))];
     if (!sk) return { label: "", action: null };

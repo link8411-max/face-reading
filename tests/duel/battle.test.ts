@@ -244,7 +244,11 @@ describe('resolveTurn', () => {
     const hit = log.find((e) => e.who === 'enemy' && e.kind === 'hit')?.amount ?? 0;
     expect(next.party[0].hp).toBe(10 + healed - hit);
     const full = resolveTurn(state([z], makeFighter('mob', 1)), { type: 'skill', skillId: 'breathe' }, ONE);
-    expect(full.log.find((e) => e.who === 'player' && e.kind === 'status')!.amount).toBe(0);
+    // 가득 차 있으면 회복량을 띄우지 않고 "이미 기력이 넘친다"
+    const fullEv = full.log.find((e) => e.who === 'player' && e.kind === 'status')!;
+    expect(fullEv.amount).toBeUndefined();
+    expect(fullEv.text).toContain('이미 기력이 넘친다');
+    expect(full.state.party[0].hp).toBeLessThanOrEqual(z.maxHp);
   });
 
   it('동일 시드·동일 입력 → 동일 결과', () => {

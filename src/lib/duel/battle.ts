@@ -1,4 +1,5 @@
 // 일기토 전투 한 턴: 상성·피해·교체·효과. 순수 함수만 두고 입력 상태는 바꾸지 않는다.
+import { josa } from '@/lib/josa';
 import { BALANCE } from './balance';
 import { getDuelGeneral } from './generals';
 import { SKILLS } from './skills';
@@ -117,11 +118,10 @@ function usable(f: Fighter, id: string): boolean {
 
 const isUlt = (id: string) => id.endsWith('_ult');
 
-/** 받침 있으면 a, 없으면 b (한글이 아니면 b) */
-function josa(word: string, a: string, b: string): string {
-  const c = word.charCodeAt(word.length - 1) - 0xac00;
-  return c >= 0 && c <= 11171 && c % 28 !== 0 ? a : b;
-}
+/** 이름 + 은/는, 이/가, 을/를 */
+const eunneun = (w: string) => josa(w, '은', '는');
+const iga = (w: string) => josa(w, '이', '가');
+const eulreul = (w: string) => josa(w, '을', '를');
 
 /**
  * 적 AI: 체력 30% 이하면 30% 확률로 방어·회복, 아니면 상성·자속 고려해 가장 센 공격 기술.
@@ -177,7 +177,7 @@ export function resolveTurn(
   const name = (f: Fighter) => gen(f).name;
 
   const ko = (side: Side) => {
-    log.push({ who: side, kind: 'ko', text: `${name(fighter(side))}이(가) 쓰러졌다!` });
+    log.push({ who: side, kind: 'ko', text: `${iga(name(fighter(side)))} 쓰러졌다!` });
   };
 
   const act = (side: Side, chosen: string) => {
@@ -192,7 +192,7 @@ export function resolveTurn(
       self.status.confuse -= 1;
       if (self.status.confuse <= 0) delete self.status.confuse;
       if (rng() < CONFUSE_FAIL) {
-        log.push({ who: side, kind: 'miss', text: `${g.name}은(는) 혼란에 빠져 허둥댔다!` });
+        log.push({ who: side, kind: 'miss', text: `${eunneun(g.name)} 혼란에 빠져 허둥댔다!` });
         return;
       }
     }
@@ -209,7 +209,7 @@ export function resolveTurn(
       if (self.status.taunt <= 0) delete self.status.taunt;
     }
     if (!usable(self, id)) {
-      note = `${skill(id).name}을(를) 쓸 힘이 남지 않았다! 대신 `;
+      note = `${eulreul(skill(id).name)} 쓸 힘이 남지 않았다! 대신 `;
       id = basic;
     }
     if (id in self.uses) self.uses[id] -= 1;
@@ -251,28 +251,33 @@ export function resolveTurn(
         break;
       case 'confuse':
         foe.status.confuse = CONFUSE_ACTIONS;
-        log.push({ who: foeSide, kind: 'status', text: `${name(foe)}은(는) 혼란에 빠졌다!` });
+        log.push({ who: foeSide, kind: 'status', text: `${eunneun(name(foe))} 혼란에 빠졌다!` });
         break;
       case 'taunt':
         foe.status.taunt = TAUNT_ACTIONS;
-        log.push({ who: foeSide, kind: 'status', text: `${name(foe)}은(는) 도발에 넘어갔다!` });
+        log.push({ who: foeSide, kind: 'status', text: `${eunneun(name(foe))} 도발에 넘어갔다!` });
         break;
       case 'shout':
         foe.status.shouted = true;
-        log.push({ who: foeSide, kind: 'status', text: `${name(foe)}은(는) 일갈에 기가 꺾였다!` });
+        log.push({ who: foeSide, kind: 'status', text: `${eunneun(name(foe))} 일갈에 기가 꺾였다!` });
         break;
       case 'guard':
         self.status.guard = true;
-        log.push({ who: side, kind: 'status', text: `${g.name}은(는) 방어 태세를 갖췄다!` });
+        log.push({ who: side, kind: 'status', text: `${eunneun(g.name)} 방어 태세를 갖췄다!` });
         break;
       case 'ambush':
         self.status.ambush = true;
-        log.push({ who: side, kind: 'status', text: `${g.name}은(는) 매복했다!` });
+        log.push({ who: side, kind: 'status', text: `${eunneun(g.name)} 매복했다!` });
         break;
       case 'heal': {
         const amt = Math.min(self.maxHp - self.hp, Math.round(self.maxHp * BALANCE.healRate));
         self.hp += amt;
-        log.push({ who: side, kind: 'status', amount: amt, text: `${g.name}은(는) 숨을 골랐다. 체력 ${amt} 회복!` });
+        // 체력이 가득하면 "0 회복" 대신 기력이 넘친다고만 알린다(숫자도 띄우지 않는다)
+        log.push(
+          amt > 0
+            ? { who: side, kind: 'status', amount: amt, text: `${eunneun(g.name)} 숨을 골랐다. 체력 ${amt} 회복!` }
+            : { who: side, kind: 'status', text: `${eunneun(g.name)} 숨을 골랐다. 이미 기력이 넘친다!` },
+        );
         break;
       }
     }
@@ -310,7 +315,7 @@ export function resolveTurn(
     if (!f.status.burn) continue;
     const amt = Math.max(1, Math.round(f.maxHp * BALANCE.burnRate));
     f.hp = Math.max(0, f.hp - amt);
-    log.push({ who: side, kind: 'status', amount: amt, text: `${name(f)}은(는) 불길에 휩싸였다! ${amt}의 피해!` });
+    log.push({ who: side, kind: 'status', amount: amt, text: `${eunneun(name(f))} 불길에 휩싸였다! ${amt}의 피해!` });
     f.status.burn -= 1;
     if (f.status.burn <= 0) delete f.status.burn;
     if (f.hp <= 0) ko(side);
@@ -324,7 +329,7 @@ export function resolveTurn(
       e.status.charging = ult;
       const n = name(e);
       const u = skill(ult).name;
-      log.push({ who: 'enemy', kind: 'status', skillId: ult, text: `${n}${josa(n, '이', '가')} ${u}${josa(u, '을', '를')} 준비한다!` });
+      log.push({ who: 'enemy', kind: 'status', skillId: ult, text: `${iga(n)} ${eulreul(u)} 준비한다!` });
     }
   }
 
