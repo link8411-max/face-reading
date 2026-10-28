@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, afterEach, beforeEach } from 'vitest';
-import { validateFeedback, makeRunId } from '@/lib/duel/feedback';
+import { validateFeedback, makeRunId, newRunNonce } from '@/lib/duel/feedback';
 import { __resetFeedbackLimits } from '@/lib/duel/feedbackGuard';
 import { POST } from '@/app/api/duel/feedback/route';
 
@@ -46,10 +46,14 @@ describe('validateFeedback', () => {
 });
 
 describe('makeRunId', () => {
-  it('같은 입력은 같은 id, 다르면 다른 id, 영문·숫자 32자 이하', () => {
-    expect(makeRunId(123, 'guanyu', 9)).toBe(makeRunId(123, 'guanyu', 9));
-    expect(makeRunId(123, 'guanyu', 9)).not.toBe(makeRunId(124, 'guanyu', 9));
-    expect(makeRunId(123, 'guanyu', 9)).toMatch(/^[A-Za-z0-9]{1,32}$/);
+  it('같은 입력은 같은 id, 영문·숫자 32자 이하', () => {
+    expect(makeRunId('n1', 123, 'guanyu', 9)).toBe(makeRunId('n1', 123, 'guanyu', 9));
+    expect(makeRunId('n1', 123, 'guanyu', 9)).toMatch(/^[A-Za-z0-9]{1,32}$/);
+  });
+  it('시드·장수·웨이브가 같아도 nonce가 다르면 id가 다르다(공유 시드 링크)', () => {
+    expect(makeRunId('a', 123, 'guanyu', 9)).not.toBe(makeRunId('b', 123, 'guanyu', 9));
+    expect(newRunNonce()).not.toBe(newRunNonce());
+    expect(newRunNonce()).toMatch(/^[0-9a-f]{16}$/);
   });
 });
 
@@ -119,6 +123,12 @@ describe('POST /api/duel/feedback', () => {
       for (let i = 0; i < 5; i++) expect((await POST(req(JSON.stringify(ok), h))).status).toBe(201);
       expect((await POST(req(JSON.stringify(ok), h))).status).toBe(429);
       expect((await POST(req(JSON.stringify(ok), { 'x-forwarded-for': '2.2.2.2' }))).status).toBe(201);
+    });
+    it('503 disabled는 한도를 쓰지 않는다', async () => {
+      vi.stubEnv('SUPABASE_URL', '');
+      vi.stubEnv('SUPABASE_SERVICE_KEY', '');
+      const h = { 'x-forwarded-for': '4.4.4.4' };
+      for (let i = 0; i < 7; i++) expect((await POST(req(JSON.stringify(ok), h))).status).toBe(503);
     });
     it('x-forwarded-for가 없으면 x-real-ip로 제한한다', async () => {
       stubUpstream();

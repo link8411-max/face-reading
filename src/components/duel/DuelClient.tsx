@@ -12,7 +12,7 @@ import { getDuelGeneral, STARTER_IDS } from "@/lib/duel/generals";
 import { defaultSave, loadSave, recordRunEnd, writeSave } from "@/lib/duel/save";
 import { narrate } from "@/lib/duel/narrative";
 import { encodeRunKey } from "@/lib/duel/shareKey";
-import { makeRunId } from "@/lib/duel/feedback";
+import { makeRunId, newRunNonce } from "@/lib/duel/feedback";
 import { duelShareUrl, ogImageUrl } from "@/lib/shareLinks";
 import type { RunRecord, RunState, SaveData } from "@/lib/duel/types";
 import { track } from "@/lib/analytics";
@@ -92,6 +92,8 @@ export default function DuelClient() {
 
   const [save, setSave] = useState<SaveData>(defaultSave);
   const [run, setRun] = useState<RunState | null>(null);
+  /** 판마다 새로 만드는 무작위 값(피드백 runId용). 공유 시드 링크로 같은 판이 되어도 겹치지 않게 한다 */
+  const [runNonce, setRunNonce] = useState("");
   const [screen, setScreen] = useState<SceneName>("start");
   const [readyScene, setReadyScene] = useState<SceneName | null>(null);
   const [animating, setAnimating] = useState(false);
@@ -272,6 +274,7 @@ export default function DuelClient() {
     sidesRef.current = { player: "left" };
     track("test_start", { test_name: "duel" });
     setRun(r);
+    setRunNonce(newRunNonce());
     setRecord(null);
     persist({ ...save, current: r });
     showBattle(r);
@@ -311,6 +314,7 @@ export default function DuelClient() {
         rngRef.current = createRng((cur.seed + turns * 7919) >>> 0);
         sidesRef.current = { player: "left" };
         setRun(cur);
+        setRunNonce(newRunNonce());
         if (cur.phase === "battle") showBattle(cur);
         else enterReward(cur);
         return;
@@ -530,7 +534,7 @@ export default function DuelClient() {
               wave={record.waves.length}
               starter={record.starter}
               cleared={record.cleared}
-              runId={run ? makeRunId(run.seed, record.starter, record.waves.length) : undefined}
+              runId={run && runNonce ? makeRunId(runNonce, run.seed, record.starter, record.waves.length) : undefined}
               rating={stars}
               onRate={rate}
             />

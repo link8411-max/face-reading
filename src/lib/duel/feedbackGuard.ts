@@ -17,7 +17,12 @@ export function __resetFeedbackLimits(): void {
   runIds.clear();
 }
 
-/** 요청 헤더에서 클라이언트 IP: x-forwarded-for 첫 값, 없으면 x-real-ip */
+/**
+ * 요청 헤더에서 클라이언트 IP: x-forwarded-for 첫 값, 없으면 x-real-ip.
+ * 첫 값을 믿는 이유: Vercel은 들어온 x-forwarded-for를 덮어써서 클라이언트가 위조할 수 없다.
+ * 다른 호스트(직접 호스팅 등)에서는 신뢰하는 프록시가 값을 덮어쓰는지 확인할 것.
+ * 두 헤더가 모두 없으면 'unknown' 한 칸을 모두가 나눠 쓴다(헤더 없는 요청끼리 한도를 공유, 로컬·테스트 환경).
+ */
 export function clientIp(headers: Headers): string {
   const xff = headers.get('x-forwarded-for')?.split(',')[0]?.trim();
   return xff || headers.get('x-real-ip')?.trim() || 'unknown';
@@ -41,6 +46,12 @@ export function allowRequest(ip: string, now = Date.now()): boolean {
     }
   }
   return true;
+}
+
+/** 방금 센 요청 1건을 돌려준다(서비스가 꺼진 503처럼 처리하지 못한 요청용) */
+export function refundRequest(ip: string): void {
+  const v = hits.get(ip);
+  if (v) v.pop();
 }
 
 /** 선택 항목 runId 검증: 없으면 null(통과), 영문·숫자 32자 이하만 허용, 그 외는 'invalid' */
