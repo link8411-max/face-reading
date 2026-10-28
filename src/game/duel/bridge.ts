@@ -1,9 +1,15 @@
 // React ↔ Phaser 다리. Phaser를 import하지 않아 단위 테스트가 가능하다(작은 자체 이미터 위에 선다).
 import type { RunState } from '@/lib/duel/types';
 import type { GeneralKind } from '@/lib/duel/types';
+import type { Eff } from '@/lib/duel/battle';
 import type { Side, TimelineItem } from './timeline';
 
 // ── 전투 화면이 그리는 값(React가 RunState에서 만든다) ──
+
+export type { Eff };
+
+/** 유불리 말(Phaser 장면·view·DuelClient가 같이 쓴다) */
+export const EFF_WORD: Record<Eff, string> = { win: '유리', lose: '불리', even: '비등' };
 
 export interface SkillView {
   id: string;
@@ -11,6 +17,12 @@ export interface SkillView {
   kind: GeneralKind;
   /** null = 무제한 */
   usesLeft: number | null;
+  /** 위력>0이면 이 기술 유형 vs 상대 유형, 아니면 null */
+  eff: Eff | null;
+  /** 위력>0이면 상대에게 줄 피해 범위(미리보기), 아니면 null */
+  dmg: { min: number; max: number } | null;
+  /** 한 줄 설명(short: 기술 칸 보조글, long: 미리보기) */
+  desc: { short: string; long: string };
 }
 
 export interface FighterView {
@@ -20,17 +32,38 @@ export interface FighterView {
   level: number;
   hp: number;
   maxHp: number;
-  stats: { 무력: number; 통솔: number };
+  /** 보너스(보검·병법서·명마) 합산 */
+  stats: { 무력: number; 지력: number; 통솔: number; 속도: number };
+  /** 상태 이름: 도발·혼란·화상·위축·매복 순, 최대 2개 */
+  status: string[];
   skills: SkillView[];
+}
+
+/** 적이 이번 턴에 쓸 기술(화면에 미리 보인다) */
+export interface IntentView {
+  skillId: string;
+  name: string;
+  /** 적 기술 유형 vs 내 선두 유형: win = 나에게 불리 */
+  eff: Eff;
+  /** 내 선두에게 줄 피해 범위, 위력 0이면 null */
+  dmg: { min: number; max: number } | null;
+  /** false면 체력이 낮아 방어·회복으로 바꿀 수도 있다 */
+  sure: boolean;
+  /** 필살기인지 */
+  ult: boolean;
 }
 
 export interface BattleView {
   wave: number;
   turn: number;
   player: FighterView;
+  /** 내 선두 유형 vs 적 유형 */
+  matchup: Eff;
   /** charging: 보스가 필살기를 예고해 둔 상태(초상 테두리를 빨갛게) */
-  enemy: FighterView & { isBoss: boolean; charging?: boolean };
+  enemy: FighterView & { isBoss: boolean; charging?: boolean; intent: IntentView };
   party: { id: string; name: string; hp: number; maxHp: number }[];
+  /** 교체 버튼이 보낼 장수(없으면 null). eff: 들어올 장수 유형 vs 적 유형, hurt: 체력 절반 미만 */
+  switchTo: { index: number; name: string; eff: Eff; hurt: boolean } | null;
   /** 대사창 줄들(최대 3줄을 보여 준다) */
   message: string[];
 }
@@ -45,6 +78,8 @@ export interface StartShow {
   history: string[];
   /** 고른 시작 장수 id */
   selected: string;
+  /** 고른 시작 장수의 능력치 한 줄(예: 관우 무97 지75 통95 속55) */
+  leadStats: string;
   /** 진행 중인 판(있으면 이어하기 칸을 보인다) */
   resume?: { starter: string; name: string; wave: number };
   /** false면 이 브라우저에 저장할 수 없다(시작 화면에 한 줄 안내) */
@@ -67,6 +102,8 @@ export interface RecruitView {
   party: { id: string; name: string }[];
   /** 동행 자리 수(3 또는 4) */
   slots: number;
+  /** 능력치 한 줄(예: 무92 지70 통85) */
+  stats: string;
   /** 자리가 없어 누군가를 보내야 하는지 */
   full: boolean;
 }
@@ -124,8 +161,8 @@ export interface DuelEvents {
   /** view: 턴이 끝난 뒤의 화면 값(있으면 연출이 끝날 때 적용) */
   'anim:play': { timeline: TimelineItem[]; sides: { player: Side }; view?: BattleView };
   'ui:focus': { id: FocusId };
-  /** 전투: 고른 명령을 대사창에 띄운다("▶ 일격\n탭하여 결정"). null이면 대사만 */
-  'battle:prompt': { text: string | null; hint?: boolean };
+  /** 전투: 고른 명령의 미리보기 줄들을 대사창에 띄운다. 빈 배열이면 미리보기 없이 대사만 */
+  'battle:prompt': { lines: string[] };
   /** 장면 바꾸기(게임의 작은 컨트롤러가 받는다) */
   'scene:go': { scene: SceneName };
   /** 가로형(320×240) ↔ 세로형(320×408) 바꾸기. 게임 크기를 바꾸고 지금 장면을 다시 연다 */

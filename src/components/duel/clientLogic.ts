@@ -61,6 +61,23 @@ export function sortieTap(save: { current?: { phase: string } | null }, armed: b
   return needsAbandonConfirm(save) && !armed ? 'arm' : 'start';
 }
 
+/**
+ * 전투 줄을 누름(탭·클릭): 이미 고른 줄(pendingSel)을 다시 누르면 결정, 다른 줄이면 그 줄을 고르기만 한다.
+ * 포커스가 click보다 먼저 와서 커서(battleSel)는 이미 그 줄이므로 커서가 아니라 고른 줄과 비교해야 한다.
+ */
+export function tapRow<T extends string>(pendingSel: T | null, id: T): { pendingSel: T; confirm: boolean } {
+  return { pendingSel: id, confirm: pendingSel === id };
+}
+
+/**
+ * Enter/Space: 고른 줄(pendingSel)이 있고 커서가 그 줄이거나 결정 단추에 포커스가 있으면 결정,
+ * 아니면 커서 줄을 고르기만 한다(탭과 같다). 미리보기에 보이는 명령과 실행되는 명령이 늘 같다.
+ */
+export function enterKey<T extends string>(pendingSel: T | null, battleSel: T, onConfirmButton: boolean): { confirm: T | null; select: T | null } {
+  if (pendingSel !== null && (battleSel === pendingSel || onConfirmButton)) return { confirm: pendingSel, select: null };
+  return { confirm: null, select: battleSel };
+}
+
 /** 결과 화면 아래 피드백 폼: 세로형(폰)은 처음부터, 가로형은 캔버스 별을 누른 뒤 */
 export const showFeedbackForm = (tall: boolean, stars: number) => tall || stars > 0;
 

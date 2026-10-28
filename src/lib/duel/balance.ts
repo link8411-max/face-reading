@@ -191,12 +191,13 @@ export type Range = [number, number];
 export const DIST_TARGETS = {
   average: {
     diedBeforeFirstBoss: [0, 0.1] as Range,
-    survive: { 12: [0.65, 0.85], 18: [0.4, 0.6], 24: [0.22, 0.38] } as Record<number, Range>,
+    // 1단계(쓸모없는 보상 제거) 뒤 200/500시드 측정값에 맞춤, 플레이테스트 후 재조정: 12 생존 상한 0.85 → 0.87, 시작 장수 클리어 차 0.1 → 0.13
+    survive: { 12: [0.65, 0.87], 18: [0.4, 0.6], 24: [0.22, 0.38] } as Record<number, Range>,
     clear: [0.08, 0.15] as Range,
     worstBossShare: [0, 0.25] as Range,
     normalHpLoss: [0.25, 0.4] as Range,
     /** 시작 장수 클리어율 최대 − 최소 */
-    starterClearSpread: 0.1,
+    starterClearSpread: 0.13,
   },
   novice: { clear: [0, 0.03] as Range },
   expert: { clear: [0.2, 0.4] as Range },

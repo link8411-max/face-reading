@@ -2,6 +2,7 @@
 import { josa } from '@/lib/josa';
 import { skillsOf } from './battle';
 import { BALANCE, type Balance } from './balance';
+import { getDuelGeneral } from './generals';
 import { SKILLS } from './skills';
 import type { Rng } from './rng';
 import type { Fighter, Reward, RunState } from './types';
@@ -30,6 +31,9 @@ function onTarget(
 
 type AmountKey = Extract<keyof Balance, 'redhareSpeed' | 'steedSpeed' | 'greendragonAtk' | 'swordAtk' | 'bookInt'>;
 
+/** 장수 유형 (공격 보상은 지장에게 효과가 없고, 지력 보상은 지장에게만 효과가 있다) */
+const kindOf = (f: Fighter) => getDuelGeneral(f.id)!.kind;
+
 function bonusReward(
   id: string,
   name: string,
@@ -38,7 +42,8 @@ function bonusReward(
   stat: keyof Fighter['bonus'],
   /** 오름 폭을 읽을 BALANCE 키 */
   amount: AmountKey,
-  only?: string,
+  /** 이 보상을 쓸 수 있는 장수 (없으면 누구나) */
+  allow?: (f: Fighter) => boolean,
 ): Reward {
   const r: Reward = {
     id,
@@ -47,7 +52,8 @@ function bonusReward(
       return `${descHead} +${BALANCE[amount]}`;
     },
     rarity,
-    targets: (run) => indices(run, (f) => !only || f.id === only),
+    effect: { stat },
+    targets: (run) => indices(run, (f) => !allow || allow(f)),
     apply: (run, t) => onTarget(r, run, t, (f) => (f.bonus[stat] += BALANCE[amount])),
   };
   return r;
@@ -98,7 +104,8 @@ const slot: Reward = {
   name: '동행 자리 +1',
   desc: '함께 다닐 수 있는 장수가 4명으로 늘어난다 (한 판 1회)',
   rarity: 'rare',
-  canUse: (run) => run.partyMax < 4,
+  // 동행에 빈자리가 있으면 자리를 늘려도 쓸모가 없으니 꽉 찼을 때만 나온다
+  canUse: (run) => run.partyMax < 4 && run.party.length >= run.partyMax,
   apply: (run) => {
     if (run.partyMax >= 4) throw new Error('동행 자리는 이미 4');
     return { ...structuredClone(run), partyMax: 4 };
@@ -108,9 +115,9 @@ const slot: Reward = {
 export const REWARDS: Reward[] = [
   bonusReward('redhare', '적토마', '장수 1명의 속도', 'rare', 'speed', 'redhareSpeed'),
   bonusReward('steed', '준마', '장수 1명의 속도', 'common', 'speed', 'steedSpeed'),
-  bonusReward('greendragon', '청룡언월도', '관우 전용. 공격', 'rare', 'atk', 'greendragonAtk', 'guanyu'),
-  bonusReward('sword', '보검', '장수 1명의 공격', 'common', 'atk', 'swordAtk'),
-  bonusReward('book', '병법서', '장수 1명의 지력', 'common', 'int', 'bookInt'),
+  bonusReward('greendragon', '청룡언월도', '관우 전용. 공격', 'rare', 'atk', 'greendragonAtk', (f) => f.id === 'guanyu' && kindOf(f) !== '지장'),
+  bonusReward('sword', '보검', '장수 1명의 공격', 'common', 'atk', 'swordAtk', (f) => kindOf(f) !== '지장'),
+  bonusReward('book', '병법서', '장수 1명의 지력', 'common', 'int', 'bookInt', (f) => kindOf(f) === '지장'),
   learnReward('book_fire', 'fire', '병법서: 화공', 'rare'),
   potion,
   revive,
@@ -118,6 +125,20 @@ export const REWARDS: Reward[] = [
   learnReward('learn_taunt', 'taunt', '비전: 도발', 'common'),
   slot,
 ];
+
+/** 능력치 보상의 표시용 효과 (오를 능력치와 폭). 폭은 부를 때 BALANCE에서 읽어 튜너 덮어쓰기를 따른다 */
+const AMOUNT_KEYS: Record<string, AmountKey> = {
+  redhare: 'redhareSpeed',
+  steed: 'steedSpeed',
+  greendragon: 'greendragonAtk',
+  sword: 'swordAtk',
+  book: 'bookInt',
+};
+export function rewardEffect(id: string): { stat: 'atk' | 'int' | 'speed'; amount: number } | null {
+  const eff = getReward(id).effect;
+  const key = AMOUNT_KEYS[id];
+  return eff && key ? { stat: eff.stat, amount: BALANCE[key] } : null;
+}
 
 export function getReward(id: string): Reward {
   const r = REWARDS.find((x) => x.id === id);

@@ -4,7 +4,7 @@ import { makeFighter, maxHpFor, skillsOf } from '@/lib/duel/battle';
 import { BALANCE } from '@/lib/duel/balance';
 import { BOSS_IDS, getDuelGeneral, MOB_ID } from '@/lib/duel/generals';
 import { SKILLS } from '@/lib/duel/skills';
-import { REWARDS, drawRewards, getReward } from '@/lib/duel/rewards';
+import { REWARDS, drawRewards, getReward, rewardEffect } from '@/lib/duel/rewards';
 import {
   WAVES,
   BOSS_WAVES,
@@ -452,6 +452,33 @@ describe('drawRewards', () => {
     }
   });
 
+  it('동행 자리 +1은 동행이 꽉 찼을 때만', () => {
+    const run = rewardRun(); // 관우 1명, partyMax 3
+    const rng = createRng(3);
+    for (let i = 0; i < 100; i++) expect(drawRewards(run, rng).map((r) => r.id)).not.toContain('slot');
+    const full = { ...run, party: [run.party[0], makeFighter('zhaoyun', 1), makeFighter('zhouyu', 1)] };
+    let seen = false;
+    for (let i = 0; i < 200; i++) if (drawRewards(full, rng).some((r) => r.id === 'slot')) seen = true;
+    expect(seen).toBe(true);
+  });
+
+  it('보검·병법서는 효과 있는 장수에게만', () => {
+    const run = rewardRun();
+    run.party = [makeFighter('guanyu', 1), makeFighter('zhouyu', 1)];
+    expect(getReward('sword').targets!(run)).toEqual([0]);
+    expect(getReward('book').targets!(run)).toEqual([1]);
+    run.party = [makeFighter('guanyu', 1)];
+    const rng = createRng(5);
+    for (let i = 0; i < 100; i++) expect(drawRewards(run, rng).map((r) => r.id)).not.toContain('book');
+  });
+
+  it('rewardEffect', () => {
+    expect(rewardEffect('sword')).toEqual({ stat: 'atk', amount: BALANCE.swordAtk });
+    expect(rewardEffect('book')).toEqual({ stat: 'int', amount: BALANCE.bookInt });
+    expect(rewardEffect('redhare')).toEqual({ stat: 'speed', amount: BALANCE.redhareSpeed });
+    expect(rewardEffect('potion')).toBeNull();
+  });
+
   it('rare는 대략 25%', () => {
     const rng = createRng(11);
     const run = rewardRun();
@@ -538,7 +565,11 @@ describe('보상 적용', () => {
     expect(g('steed', 0).party[0].bonus.speed).toBe(8);
     expect(g('greendragon', 0).party[0].bonus.atk).toBe(15);
     expect(() => g('greendragon', 1)).toThrow();
-    expect(g('book', 0).party[0].bonus.int).toBe(10);
+    // 병법서는 지장에게만: 관우(맹장)는 못 받고 주유(지장)는 받는다
+    expect(() => g('book', 0)).toThrow();
+    const zyBook = structuredClone(run);
+    zyBook.party[0] = makeFighter('zhouyu', 1);
+    expect(getReward('book').apply(zyBook, 0).party[0].bonus.int).toBe(10);
     const healed = g('potion', 0).party[0];
     expect(healed.hp).toBe(Math.min(healed.maxHp, 10 + Math.round(healed.maxHp * 0.5)));
     const revived = g('revive', 1).party[1];

@@ -2,7 +2,7 @@ import { describe, it, expect } from 'vitest';
 import { BALANCE, withBalance } from '@/lib/duel/balance';
 import { basicHit } from '@/lib/duel/design';
 import { createRng } from '@/lib/duel/rng';
-import { makeFighter, matchup, damage, damageRoll, critChance, resolveTurn, enemyAction } from '@/lib/duel/battle';
+import { makeFighter, matchup, damage, damageRoll, critChance, resolveTurn, enemyAction, enemyIntent, damageRange, effOf } from '@/lib/duel/battle';
 import { SKILLS } from '@/lib/duel/skills';
 import type { BattleState, Fighter, Skill } from '@/lib/duel/types';
 
@@ -485,5 +485,70 @@ describe('보스 필살기 예고 (Task 14b)', () => {
       return out;
     };
     expect(play()).toEqual(play());
+  });
+});
+
+describe('enemyIntent·damageRange (1단계)', () => {
+  const st = (party: Fighter[], enemy: Fighter): BattleState => ({ party, active: 0, enemy, turn: 1 });
+
+  it('enemyIntent: 상성·자속 점수 최대 공격, sure=true', () => {
+    const s = st([makeFighter('guanyu', 10)], makeFighter('zhangjiao', 10));
+    expect(enemyIntent(s)).toEqual({ skillId: 'zhangjiao_ult', sure: true });
+    expect(enemyAction(s, () => 0.1)).toEqual({ type: 'skill', skillId: 'zhangjiao_ult' });
+  });
+  it('enemyIntent: 저체력이면 sure=false, enemyAction은 30%로 방어·회복', () => {
+    const e = makeFighter('zhangjiao', 10);
+    e.hp = Math.floor(e.maxHp * 0.2);
+    const s = st([makeFighter('guanyu', 10)], e);
+    expect(enemyIntent(s)).toEqual({ skillId: 'zhangjiao_ult', sure: false });
+    expect(enemyAction(s, () => 0.1)).toEqual({ type: 'skill', skillId: 'breathe' });
+    expect(enemyAction(s, () => 0.9)).toEqual({ type: 'skill', skillId: 'zhangjiao_ult' });
+  });
+  it('enemyIntent: 도발 중이면 기본 공격', () => {
+    const e = makeFighter('zhangjiao', 10);
+    e.status.taunt = 1;
+    expect(enemyIntent(st([makeFighter('guanyu', 10)], e))).toEqual({ skillId: 'scheme', sure: true });
+  });
+  it('enemyIntent: 보스는 예고한 필살기, 예고한 필살기가 바닥나면 다른 공격', () => {
+    const e = makeFighter('dongzhuo', 10);
+    e.boss = true;
+    e.status.charging = 'dongzhuo_ult';
+    expect(enemyIntent(st([makeFighter('guanyu', 10)], e)).skillId).toBe('dongzhuo_ult');
+    e.uses.dongzhuo_ult = 0;
+    expect(enemyIntent(st([makeFighter('guanyu', 10)], e)).skillId).toBe('scheme');
+  });
+  it('enemyAction: 저체력 방어 분기에서만 난수를 한 번 쓴다', () => {
+    let calls = 0;
+    const count = () => { calls++; return 0.9; };
+    enemyAction(st([makeFighter('guanyu', 10)], makeFighter('zhangjiao', 10)), count);
+    expect(calls).toBe(0);
+    const e = makeFighter('zhangjiao', 10);
+    e.hp = Math.floor(e.maxHp * 0.2);
+    enemyAction(st([makeFighter('guanyu', 10)], e), count);
+    expect(calls).toBe(1);
+  });
+  it('damageRange: damageRoll의 난수 0.85/1.0 값과 같다(치명타 없음)', () => {
+    const a = makeFighter('guanyu', 10), d = makeFighter('zhaoyun', 10);
+    const r = damageRange(a, d, SKILLS.strike);
+    const seq = (xs: number[]) => { let i = 0; return () => xs[i++ % xs.length]; };
+    expect(r.min).toBe(damageRoll(a, d, SKILLS.strike, seq([0, 0.99])).amount);
+    expect(Math.abs(r.max - damageRoll(a, d, SKILLS.strike, seq([0.999999, 0.99])).amount)).toBeLessThanOrEqual(1);
+    expect(r.min).toBeLessThanOrEqual(r.max);
+    expect(damageRange(a, d, SKILLS.guard)).toEqual({ min: 0, max: 0 });
+  });
+  it('damageRange: 일갈·방어 태세를 반영한다', () => {
+    const a = makeFighter('guanyu', 10), d = makeFighter('zhaoyun', 10);
+    const base = damageRange(a, d, SKILLS.strike);
+    const shouted = makeFighter('guanyu', 10);
+    shouted.status.shouted = true;
+    expect(damageRange(shouted, d, SKILLS.strike).max).toBeLessThan(base.max);
+    const guarding = makeFighter('zhaoyun', 10);
+    guarding.status.guard = true;
+    expect(damageRange(a, guarding, SKILLS.strike).max).toBeLessThan(base.max);
+  });
+  it('effOf: 맹>기>지>맹', () => {
+    expect(effOf('맹장', '기장')).toBe('win');
+    expect(effOf('기장', '맹장')).toBe('lose');
+    expect(effOf('지장', '지장')).toBe('even');
   });
 });

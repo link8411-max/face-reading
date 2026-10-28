@@ -118,3 +118,13 @@ describe('보스 예고 중 도발·혼란 (charging이 남지 않고 필살기�
     expect(perTurn).toEqual([0, 1, 0]);
   });
 });
+
+describe('상성 문구 (1단계)', () => {
+  it('상성 문구: 좋다/나쁘다, 치명타 뒤에 온다', () => {
+    const win = resolveTurn(state([makeFighter('guanyu', 10)], makeFighter('zhaoyun', 10)), { type: 'skill', skillId: 'strike' }, ONE);
+    expect(win.log.find((e) => e.kind === 'hit' && e.who === 'player')).toMatchObject({ eff: 'win' });
+    expect(texts(win).some((t) => /^상성이 좋다! 조운에게 \d+의 피해!$/.test(t))).toBe(true);
+    const lose = resolveTurn(state([makeFighter('guanyu', 10)], makeFighter('zhouyu', 10)), { type: 'skill', skillId: 'strike' }, ONE);
+    expect(texts(lose).some((t) => /^상성이 나쁘다… 주유에게 \d+의 피해!$/.test(t))).toBe(true);
+  });
+});

@@ -2,7 +2,7 @@
 import { josa } from '@/lib/josa';
 import { BALANCE } from './balance';
 import { getDuelGeneral } from './generals';
-import { SKILLS } from './skills';
+import { SKILLS, SKILL_RULES } from './skills';
 import type { Rng } from './rng';
 import type { Action, BattleState, DuelGeneral, Fighter, GeneralKind, Skill, TurnEvent } from './types';
 
@@ -10,15 +10,6 @@ type Side = 'player' | 'enemy';
 
 /** 이기는 상대: 맹장 > 기장 > 지장 > 맹장 */
 const BEATS: Record<GeneralKind, GeneralKind> = { 맹장: '기장', 기장: '지장', 지장: '맹장' };
-
-const BURN_TURNS = 3;
-const CONFUSE_ACTIONS = 1;
-const CONFUSE_FAIL = 0.5;
-const TAUNT_ACTIONS = 2;
-const SHOUT_RATE = 0.8;
-const AMBUSH_RATE = 0.5;
-const LOW_HP = 0.3;
-const DEFEND_CHANCE = 0.3;
 
 function gen(f: Fighter): DuelGeneral {
   const g = getDuelGeneral(f.id);
@@ -52,11 +43,19 @@ export function makeFighter(id: string, level: number): Fighter {
   return { id, level, hp: maxHp, maxHp, uses, status: {}, bonus: { atk: 0, int: 0, speed: 0 } };
 }
 
+export type Eff = 'win' | 'lose' | 'even';
+
+/** 공격 유형 a가 방어 유형 d를 칠 때 유리·불리·보통 (matchup과 같은 판정) */
+export function effOf(a: GeneralKind, d: GeneralKind): Eff {
+  if (BEATS[a] === d) return 'win';
+  if (BEATS[d] === a) return 'lose';
+  return 'even';
+}
+
 /** 공격 유형 a가 방어 유형 d를 칠 때 배율 */
 export function matchup(a: GeneralKind, d: GeneralKind): number {
-  if (BEATS[a] === d) return BALANCE.matchWin;
-  if (BEATS[d] === a) return BALANCE.matchLose;
-  return 1;
+  const e = effOf(a, d);
+  return e === 'win' ? BALANCE.matchWin : e === 'lose' ? BALANCE.matchLose : 1;
 }
 
 export function speedOf(f: Fighter): number {
@@ -90,16 +89,37 @@ export function critChance(att: Fighter, def: Fighter): number {
  */
 export function damageRoll(att: Fighter, def: Fighter, sk: Skill, rng: Rng): { amount: number; crit: boolean } {
   if (sk.power <= 0) return { amount: 0, crit: false };
-  const a = gen(att);
-  const d = gen(def);
-  let v = sk.power * (attackStat(att) / d.stats.통솔) * matchup(sk.kind, d.kind) * (sk.kind === a.kind ? BALANCE.stab : 1);
-  v *= BALANCE.generalPower[att.id] ?? 1;
+  let v = baseDamage(att, def, sk);
   v *= 0.85 + 0.15 * rng();
   const crit = rng() < critChance(att, def);
   if (crit) v *= BALANCE.critMult;
-  if (att.status.shouted) v *= SHOUT_RATE;
+  return { amount: Math.max(1, Math.round(withGuardAndShout(v, att, def))), crit };
+}
+
+/** 난수·치명타 전의 피해: 위력 × (공격 능력치 / 상대 통솔) × 상성 × 자속 × 장수별 보정 */
+function baseDamage(att: Fighter, def: Fighter, sk: Skill): number {
+  const a = gen(att);
+  const d = gen(def);
+  const v = sk.power * (attackStat(att) / d.stats.통솔) * matchup(sk.kind, d.kind) * (sk.kind === a.kind ? BALANCE.stab : 1);
+  return v * (BALANCE.generalPower[att.id] ?? 1);
+}
+
+/** 공격자가 일갈을 들었으면 ×shoutRate, 상대가 방어 태세면 ×0.5 */
+function withGuardAndShout(v: number, att: Fighter, def: Fighter): number {
+  if (att.status.shouted) v *= SKILL_RULES.shoutRate;
   if (def.status.guard) v *= 0.5;
-  return { amount: Math.max(1, Math.round(v)), crit };
+  return v;
+}
+
+/**
+ * 미리보기용 피해 범위: damageRoll과 같은 식에 난수 계수 0.85(min)와 1.0(max), 치명타 없음.
+ * 위력 0 기술은 { min: 0, max: 0 }.
+ */
+export function damageRange(att: Fighter, def: Fighter, sk: Skill): { min: number; max: number } {
+  if (sk.power <= 0) return { min: 0, max: 0 };
+  const v = baseDamage(att, def, sk);
+  const at = (k: number) => Math.max(1, Math.round(withGuardAndShout(v * k, att, def)));
+  return { min: at(0.85), max: at(1) };
 }
 
 /** damageRoll의 피해만 */
@@ -124,21 +144,19 @@ const iga = (w: string) => josa(w, '이', '가');
 const eulreul = (w: string) => josa(w, '을', '를');
 
 /**
- * 적 AI: 체력 30% 이하면 30% 확률로 방어·회복, 아니면 상성·자속 고려해 가장 센 공격 기술.
- * 보스(Fighter.boss)는 필살기를 예고한 다음 턴에만 쓴다: 예고(status.charging)가 있으면 그 기술, 없으면 필살기는 빼고 고른다.
+ * 적이 이번 턴에 쓸 기술 (난수 없음). 도발 중이면 기본 공격, 예고한 필살기가 있고 쓸 수 있으면 그 기술,
+ * 아니면 상성·자속 고려해 가장 센 공격 기술(보스는 필살기 제외).
+ * sure=false: 체력이 lowHp 이하이고 쓸 수 있는 방어·회복 기술이 있어 enemyAction이 확률로 그쪽을 고를 수 있다.
  */
-export function enemyAction(state: BattleState, rng: Rng): Action {
+export function enemyIntent(state: BattleState): { skillId: string; sure: boolean } {
   const e = state.enemy;
   const g = gen(e);
   const basic = skillsOf(e)[0];
-  if (e.status.taunt) return { type: 'skill', skillId: basic };
-  if (e.status.charging && usable(e, e.status.charging)) return { type: 'skill', skillId: e.status.charging };
+  if (e.status.taunt) return { skillId: basic, sure: true };
+  if (e.status.charging && usable(e, e.status.charging)) return { skillId: e.status.charging, sure: true };
   const foeKind = gen(state.party[state.active]).kind;
   const avail = skillsOf(e).filter((id) => usable(e, id));
-  if (e.hp <= e.maxHp * LOW_HP) {
-    const defend = avail.filter((id) => skill(id).effect === 'guard' || skill(id).effect === 'heal');
-    if (defend.length > 0 && rng() < DEFEND_CHANCE) return { type: 'skill', skillId: defend[0] };
-  }
+  const sure = !(e.hp <= e.maxHp * SKILL_RULES.lowHp && defendSkills(avail).length > 0);
   let best = basic;
   let bestScore = -1;
   for (const id of avail) {
@@ -151,11 +169,27 @@ export function enemyAction(state: BattleState, rng: Rng): Action {
       bestScore = score;
     }
   }
-  return { type: 'skill', skillId: best };
+  return { skillId: best, sure };
+}
+
+const defendSkills = (ids: string[]) => ids.filter((id) => skill(id).effect === 'guard' || skill(id).effect === 'heal');
+
+/**
+ * 적 AI: enemyIntent의 기술을 쓰되, sure=false면 defendChance 확률로 방어·회복.
+ * 난수는 그 방어 판단에서만 한 번 쓴다.
+ */
+export function enemyAction(state: BattleState, rng: Rng): Action {
+  const { skillId, sure } = enemyIntent(state);
+  if (!sure) {
+    const e = state.enemy;
+    const defend = defendSkills(skillsOf(e).filter((id) => usable(e, id)));
+    if (rng() < SKILL_RULES.defendChance) return { type: 'skill', skillId: defend[0] };
+  }
+  return { type: 'skill', skillId };
 }
 
 /** 도발 중이면 기본 공격으로 바뀔 기술 (순서 계산용, 부작용 없음) */
-function plannedSkill(f: Fighter, id: string): string {
+export function plannedSkill(f: Fighter, id: string): string {
   return f.status.taunt ? skillsOf(f)[0] : id;
 }
 
@@ -191,7 +225,7 @@ export function resolveTurn(
     if (self.status.confuse) {
       self.status.confuse -= 1;
       if (self.status.confuse <= 0) delete self.status.confuse;
-      if (rng() < CONFUSE_FAIL) {
+      if (rng() < SKILL_RULES.confuseFail) {
         log.push({ who: side, kind: 'miss', text: `${eunneun(g.name)} 혼란에 빠져 허둥댔다!` });
         return;
       }
@@ -218,6 +252,7 @@ export function resolveTurn(
 
     if (sk.power > 0) {
       const { amount: dmg, crit } = damageRoll(self, foe, sk, rng);
+      const eff = effOf(sk.kind, gen(foe).kind);
       delete self.status.shouted;
       foe.hp = Math.max(0, foe.hp - dmg);
       log.push({
@@ -226,7 +261,8 @@ export function resolveTurn(
         skillId: id,
         amount: dmg,
         ...(crit ? { crit: true } : {}),
-        text: `${crit ? '회심의 일격! ' : ''}${name(foe)}에게 ${dmg}의 피해!`,
+        ...(eff !== 'even' ? { eff } : {}),
+        text: `${crit ? '회심의 일격! ' : ''}${eff === 'win' ? '상성이 좋다! ' : eff === 'lose' ? '상성이 나쁘다… ' : ''}${name(foe)}에게 ${dmg}의 피해!`,
       });
       if (foe.hp <= 0) {
         ko(foeSide);
@@ -234,7 +270,7 @@ export function resolveTurn(
       }
       if (foe.status.ambush) {
         delete foe.status.ambush;
-        const c = Math.max(1, Math.round(dmg * AMBUSH_RATE));
+        const c = Math.max(1, Math.round(dmg * SKILL_RULES.ambushRate));
         self.hp = Math.max(0, self.hp - c);
         log.push({ who: foeSide, kind: 'counter', amount: c, text: `매복한 ${name(foe)}의 반격! ${c}의 피해!` });
         if (self.hp <= 0) {
@@ -246,15 +282,15 @@ export function resolveTurn(
 
     switch (sk.effect) {
       case 'burn':
-        foe.status.burn = sk.burnTurns ?? BURN_TURNS;
+        foe.status.burn = sk.burnTurns ?? SKILL_RULES.burnTurns;
         log.push({ who: foeSide, kind: 'status', text: `${name(foe)}에게 불이 붙었다!` });
         break;
       case 'confuse':
-        foe.status.confuse = CONFUSE_ACTIONS;
+        foe.status.confuse = SKILL_RULES.confuseActions;
         log.push({ who: foeSide, kind: 'status', text: `${eunneun(name(foe))} 혼란에 빠졌다!` });
         break;
       case 'taunt':
-        foe.status.taunt = TAUNT_ACTIONS;
+        foe.status.taunt = SKILL_RULES.tauntActions;
         log.push({ who: foeSide, kind: 'status', text: `${eunneun(name(foe))} 도발에 넘어갔다!` });
         break;
       case 'shout':

@@ -82,6 +82,8 @@ export type TurnEvent = {
   amount?: number;
   /** hit: 치명타(회심의 일격)였다 */
   crit?: boolean;
+  /** hit: 기술 유형 대 맞는 쪽 유형의 상성 (유리·불리일 때만) */
+  eff?: 'win' | 'lose';
   text: string;
 };
 
@@ -141,6 +143,8 @@ export interface Reward {
   targets?: (run: RunState) => number[];
   /** 대상과 무관하게 지금 쓸 수 있는지 (없으면 true) */
   canUse?: (run: RunState) => boolean;
+  /** 능력치를 올리는 보상이면 어느 능력치인지 (오름 폭은 rewardEffect가 BALANCE에서 읽는다) */
+  effect?: { stat: 'atk' | 'int' | 'speed' };
   /** 대상이 필요한 보상에 잘못된 자리를 주면 throw */
   apply(run: RunState, targetIndex?: number): RunState;
 }
