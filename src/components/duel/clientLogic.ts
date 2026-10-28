@@ -1,5 +1,6 @@
 // 일기토 화면의 순수 함수: ?me= 잠금 해제, 투명 버튼 자리, 터치 영역 넓히기 (Phaser·React 없음)
 import { getDuelGeneral } from '@/lib/duel/generals';
+import { GAME_H, GAME_H_TALL, GAME_W, TALL_BELOW_CSS } from '@/game/duel/config';
 import {
   BATTLE_CONFIRM,
   BATTLE_MENU,
@@ -177,16 +178,30 @@ export function hitRects(rects: (Rect & { panel?: Rect })[], W: number, H: numbe
 
 /**
  * 캔버스 무대 크기(CSS px). 화소가 또렷하도록 기기 화소 기준 정수 배율(320×z)을 고른다.
+ * 폭(wrapperW)과 높이 여유(maxH)를 둘 다 넘지 않는 가장 큰 정수 배율. gameH는 설계 높이(240 또는 세로형 408).
  * 래퍼가 320px보다 좁을 때만 래퍼에 맞춘 소수 배율로 물러선다.
  */
-export function stageSize(wrapperW: number, dpr = 1): { w: number; h: number; zoom: number } {
+export function stageSize(wrapperW: number, dpr = 1, maxH = Infinity, gameH = GAME_H): { w: number; h: number; zoom: number } {
   const ratio = dpr > 0 ? dpr : 1;
-  if (wrapperW < 320) return { w: wrapperW, h: (wrapperW * 3) / 4, zoom: (wrapperW * ratio) / 320 };
-  // 1) 기기 화소 정수 배율(예: 2배 화면 480px 래퍼 → 960 기기px = 3배 → CSS 480px)
-  const zd = Math.floor((wrapperW * ratio) / 320);
-  const wd = (320 * zd) / ratio;
-  if (zd >= 1 && wd >= 320) return { w: wd, h: (240 * zd) / ratio, zoom: zd };
-  // 2) 그게 CSS 320px보다 작아지면(1.5배 화면 등) CSS 정수 배율
-  const zc = Math.max(1, Math.floor(wrapperW / 320));
-  return { w: 320 * zc, h: 240 * zc, zoom: zc * ratio };
+  if (wrapperW < GAME_W) return { w: wrapperW, h: (wrapperW * gameH) / GAME_W, zoom: (wrapperW * ratio) / GAME_W };
+  // 1) 기기 화소 정수 배율(예: 2배 화면 480px 래퍼 → 960 기기px = 3배 → CSS 480px), 높이도 넘지 않게
+  const zd = Math.floor(Math.min((wrapperW * ratio) / GAME_W, (maxH * ratio) / gameH));
+  const wd = (GAME_W * zd) / ratio;
+  if (zd >= 1 && wd >= GAME_W) return { w: wd, h: (gameH * zd) / ratio, zoom: zd };
+  // 2) 그게 CSS 320px보다 작아지면(1.5배 화면·낮은 창 등) CSS 정수 배율(최소 1배)
+  const zc = Math.max(1, Math.floor(Math.min(wrapperW / GAME_W, maxH / gameH)));
+  return { w: GAME_W * zc, h: gameH * zc, zoom: zc * ratio };
+}
+
+/**
+ * 무대 배치: 캔버스가 좁거나(CSS 폭 < 400) 터치 화면이면 세로형(320×408, 아래 큰 명령 패널),
+ * 아니면 가로형(320×240). 세로형이 화면 높이에 안 들어가면 가로형으로 물러선다.
+ */
+export function stageLayout(wrapperW: number, dpr: number, maxH: number, coarse: boolean): { w: number; h: number; zoom: number; tall: boolean } {
+  const wide = stageSize(wrapperW, dpr, maxH, GAME_H);
+  if (coarse || wide.w < TALL_BELOW_CSS) {
+    const tall = stageSize(wrapperW, dpr, maxH, GAME_H_TALL);
+    if (tall.h <= maxH) return { ...tall, tall: true };
+  }
+  return { ...wide, tall: false };
 }

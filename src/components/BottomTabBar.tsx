@@ -5,9 +5,15 @@ import { usePathname } from "next/navigation";
 import { TABS, tabForPath } from "@/content/navigation";
 import { Icon } from "@/components/icons";
 
+/** 탭바를 숨기는 경로(게임이 화면을 다 쓰는 곳) */
+export const HIDE_ON = ["/samguk/duel"];
+
 // 모든 페이지 공통 하단 탭바 (결과 이미지 캡처에서는 제외)
 export default function BottomTabBar() {
-  const current = tabForPath(usePathname() ?? "/");
+  const path = usePathname() ?? "/";
+  const current = tabForPath(path);
+  // 일기토 게임 화면에서는 숨긴다(캔버스·결과 화면 배너를 가리지 않게)
+  if (HIDE_ON.includes(path)) return null;
   return (
     <nav
       aria-label="하단 메뉴"

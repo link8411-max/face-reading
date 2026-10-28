@@ -26,7 +26,7 @@ export default function FeedbackForm({ wave, starter, cleared, runId, rating: ra
   const [status, setStatus] = useState<Status>("idle");
 
   if (status === "done") {
-    return <p className="text-center text-sm text-ink">고마워요!</p>;
+    return <p className="text-center text-sm text-paper">고마워요!</p>;
   }
 
   async function submit() {

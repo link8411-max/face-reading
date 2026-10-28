@@ -30,3 +30,10 @@
   font-style: normal;
   font-display: block;
 }
+
+/* 일기토 게임 영역 바탕: 캔버스 천과 같은 녹색 체커 디더. --px는 캔버스 CSS 배율(DuelClient가 정한다) */
+.duel-cloth {
+  background-color: var(--color-cloth);
+  background-image: repeating-conic-gradient(var(--color-cloth-2) 0 25%, var(--color-cloth) 0 50%);
+  background-size: calc(2px * var(--px, 1)) calc(2px * var(--px, 1));
+}

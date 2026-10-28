@@ -21,6 +21,7 @@ import CoupangBanner from "@/components/CoupangBanner";
 import FeedbackForm from "./FeedbackForm";
 import OverlayButtons, { type OverlayButton } from "./OverlayButtons";
 import { overlayLayout, resolveStarterUnlock, stageSize } from "./clientLogic";
+import { GAME_H, GAME_W } from "@/game/duel/config";
 import {
   nextSwitchIndex,
   pendingRecruit,
@@ -39,6 +40,8 @@ type DuelGame = Awaited<ReturnType<typeof createDuelGame>>;
 const BATTLE_ROWS: BattleFocusId[] = ["skill0", "skill1", "skill2", "skill3", "switch"];
 
 const FONT_WAIT_MS = 1500;
+/** 무대 아래 남길 여백(px) */
+const STAGE_BOTTOM_GAP = 12;
 /** anim:done이 오지 않을 때(장면이 없을 때) 입력을 다시 여는 여유 시간 */
 const ANIM_GRACE_MS = 3000;
 
@@ -69,15 +72,24 @@ export default function DuelClient() {
     if (!el) return;
     const measure = () => {
       const dpr = window.devicePixelRatio || 1;
-      const { w, h } = stageSize(el.clientWidth, dpr);
+      // 세로로도 넘치지 않게: 화면 높이 - 무대 위쪽(머리글) - 아래 여백
+      const top = el.getBoundingClientRect().top + window.scrollY;
+      const maxH = Math.max(GAME_H, window.innerHeight - top - STAGE_BOTTOM_GAP);
+      const { w, h } = stageSize(el.clientWidth, dpr, maxH);
       // 가운데 정렬도 기기 화소 경계에 맞춘다(반 화소 어긋나면 도트가 번진다)
       const left = Math.floor(((el.clientWidth - w) / 2) * dpr) / dpr;
       setStage((old) => (old && old.w === w && old.h === h && old.left === left ? old : { w, h, left }));
+      // 바깥 천 무늬의 체커 칸도 캔버스와 같은 배율로
+      el.closest<HTMLElement>(".duel-cloth")?.style.setProperty("--px", String(Math.max(1, Math.round(w / GAME_W))));
     };
     measure();
     const ro = new ResizeObserver(measure);
     ro.observe(el);
-    return () => ro.disconnect();
+    window.addEventListener("resize", measure);
+    return () => {
+      ro.disconnect();
+      window.removeEventListener("resize", measure);
+    };
   }, []);
   /** 만들어진 게임(무대 크기가 바뀌면 Phaser에 다시 재라고 알린다) */
   const gameRef = useRef<DuelGame | null>(null);
@@ -510,9 +522,9 @@ export default function DuelClient() {
   return (
     <div>
       {/* 무대는 기기 화소 정수 배율(320×z)로 맞춰 도트가 번지지 않게 한다. 투명 버튼도 무대 안에 둔다 */}
-      <div ref={outerRef} className="w-full max-w-[480px] mx-auto">
+      <div ref={outerRef} className="w-full px-2">
         <div
-          className="relative overflow-hidden rounded-sm bg-ink"
+          className="relative overflow-hidden bg-cloth"
           style={stage ? { width: stage.w, height: stage.h, marginLeft: stage.left } : { width: "100%", aspectRatio: "4 / 3" }}
         >
           <div ref={hostRef} className="absolute inset-0 [&_canvas]:[image-rendering:pixelated]" aria-hidden />
@@ -524,9 +536,9 @@ export default function DuelClient() {
         {screen === "battle" && run ? toBattleView(run)?.message.join(" ") : ""}
       </p>
       {screen === "result" && record && (
-        <div className="mt-4 flex flex-col gap-3">
-          {notice && <p role="status" className="text-xs text-center text-muted">{notice}</p>}
-          {busy && <p role="status" className="text-xs text-center text-muted">공유 준비 중…</p>}
+        <div className="mt-4 mx-auto px-4 max-w-lg flex flex-col gap-3">
+          {notice && <p role="status" className="text-xs text-center text-paper">{notice}</p>}
+          {busy && <p role="status" className="text-xs text-center text-paper">공유 준비 중…</p>}
           {stars > 0 && (
             // 판마다 한 번: 키는 판(선두·싸움 수·클리어·행군 기록 수), 별점은 캔버스와 폼이 같은 값을 쓴다
             <FeedbackForm
@@ -539,7 +551,7 @@ export default function DuelClient() {
               onRate={rate}
             />
           )}
-          <CoupangBanner subId="samguk-duel" />
+          <CoupangBanner subId="samguk-duel" tone="dark" />
         </div>
       )}
     </div>

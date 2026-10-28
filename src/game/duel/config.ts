@@ -1,6 +1,10 @@
 // 일기토 화면 상수: 320×240 한 장, 와꾸 v5의 팔레트·좌표 그대로
 export const GAME_W = 320;
 export const GAME_H = 240;
+/** 폰·터치 화면의 세로형 높이: 위 240은 그대로, 아래에 큰 명령 패널(2×2 기술 카드 + 교체) */
+export const GAME_H_TALL = 408;
+/** 세로형으로 바꾸는 캔버스 CSS 폭 기준(이보다 좁으면 세로형) */
+export const TALL_BELOW_CSS = 400;
 
 /** 벌판 띠(전투 장면) 자리 */
 export const FIELD = { x: 12, y: 78, w: 296, h: 70 } as const;
