@@ -33,6 +33,7 @@ function cardProps(r: AnimalTypeResult): ResultCardProps {
     reasons: [
       { label: "매력", text: r.data.charm },
       { label: "얼굴", text: `${r.features.눈} · 얼굴형 ${r.features.얼굴형}` },
+      ...(r.blend ? [{ label: "함께", text: `${animalTypeDB[r.blend].name} 기운도 함께 있어요` }] : []),
     ],
   };
 }

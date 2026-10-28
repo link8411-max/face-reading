@@ -13,10 +13,13 @@ export interface AnimalTypeResult {
   data: AnimalType
   matchScore: number // 70~98
   secondaryType?: AnimalKey
+  blend?: AnimalKey // 2등이 1등과 거의 같으면 "○○상 기운도 함께"로 같이 알려 준다
   features: { 눈: string; 얼굴형: string; 턱: string; 코: string }
 }
 
 const T = 0.5 // 이 정도 이상 벗어나야 특징으로 말한다
+// 1·2등 점수(거리+bias) 차이가 이보다 작으면 한 동물상으로 단정하지 않는다. 평범한 얼굴일수록 1·2등이 비슷하다
+const BLEND_GAP = 0.15
 
 // 특징 묘사: 한 특징의 한쪽 방향만 고르므로 '큰 가늘고 긴 눈' 같은 모순이 생기지 않는다. 표현은 모두 인상 위주로 쓴다.
 // profile을 주면, 매칭된 동물상의 대표 인상(같은 화면의 설명 글)과 반대 방향인 특징은 중립 표현으로 바꾼다.
@@ -49,6 +52,7 @@ export function matchAnimal(z: ZVector, bias: Record<string, number> = {}): Anim
     data: animalTypeDB[k],
     matchScore: Math.max(70, Math.min(98, Math.round(99 - 7 * d))),
     secondaryType: ranked[1].k,
+    blend: ranked[1].score - ranked[0].score < BLEND_GAP ? ranked[1].k : undefined,
     features: describe(z, animalProfiles[k]),
   }
 }

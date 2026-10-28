@@ -8,10 +8,11 @@ import { track, type TestName } from "@/lib/analytics";
 // 사진 테스트 결과 아래 "같은 사진으로 바로" 다른 사진 테스트 카드. 사진은 메모리로만 넘긴다(lib/photoHandoff).
 type PhotoTest = Extract<TestName, "samguk" | "animal" | "face">;
 
+// 순서가 추천 순서다. 관상은 해석 위주라 결과가 사진과 어긋나 보일 일이 적어 먼저 권한다.
 const TESTS: Record<PhotoTest, { href: string; question: string; icon: "fan" | "cat" | "face" }> = {
+  face: { href: "/face2", question: "관상으로는?", icon: "face" },
   samguk: { href: "/samguk", question: "삼국지에선 누구?", icon: "fan" },
   animal: { href: "/animal", question: "동물상으로는?", icon: "cat" },
-  face: { href: "/face2", question: "관상으로는?", icon: "face" },
 };
 
 export default function NextTests({ current, image }: { current: PhotoTest; image: string }) {
