@@ -44,6 +44,26 @@ export interface StartShow {
   history: string[];
   /** 고른 시작 장수 id */
   selected: string;
+  /** 진행 중인 판(있으면 이어하기 칸을 보인다) */
+  resume?: { starter: string; name: string; wave: number };
+}
+
+/** 항복 장면: 항복한 장수와 동행 칸 */
+export interface RecruitView {
+  /** 예: 마초가 항복했다! */
+  title: string;
+  /** 동행 칸 아래 한 줄(합류했다 / 누구를 보낼까) */
+  note: string;
+  id: string;
+  name: string;
+  kind: GeneralKind;
+  level: number;
+  /** 지금 동행(항복한 장수가 합류했으면 그 장수 포함) */
+  party: { id: string; name: string }[];
+  /** 동행 자리 수(3 또는 4) */
+  slots: number;
+  /** 자리가 없어 누군가를 보내야 하는지 */
+  full: boolean;
 }
 
 /** 카드 위에 띄우는 고르기 창(보상 대상·영입 교체) */
@@ -58,6 +78,8 @@ export interface RewardShow {
   party: string[];
   next: string;
   pick?: PickView;
+  /** 있으면 카드 대신 항복 창을 먼저 띄운다(고르기 줄은 pick) */
+  recruit?: RecruitView;
 }
 
 export interface ResultShow {
@@ -79,6 +101,7 @@ export type UiAction =
   | { type: 'rate'; stars: number }
   | { type: 'select'; starterId: string }
   | { type: 'sortie' }
+  | { type: 'resume' }
   | { type: 'pick'; index: number };
 
 export type SceneName = 'start' | 'battle' | 'reward' | 'result';

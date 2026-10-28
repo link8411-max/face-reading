@@ -33,9 +33,11 @@ describe('overlayLayout', () => {
     expect(noOverlap(l)).toBe(true);
     expect(l.every((b) => b.label.length > 0)).toBe(true);
   });
-  it('전투 메뉴 줄 자리(x12, y 174+11i, 높이 11)', () => {
+  it('전투 메뉴 줄 자리(x12, y 174+11i, 폭 146 — 넓힌 메뉴 상자 x10~160 안, 높이 11)', () => {
     const l = overlayLayout('battle');
-    l.slice(0, 4).forEach((b, i) => expect(b).toMatchObject({ x: 12, y: 174 + 11 * i, h: 11 }));
+    l.slice(0, 4).forEach((b, i) => expect(b).toMatchObject({ x: 12, y: 174 + 11 * i, w: 146, h: 11 }));
+    expect(l[4]).toMatchObject({ x: 12, y: 219, w: 146 });
+    l.forEach((b) => expect(b.x + b.w).toBeLessThanOrEqual(160));
   });
   it('결과: 버튼 3 + 별 5 = 8개', () => {
     const l = overlayLayout('result');
@@ -54,6 +56,17 @@ describe('overlayLayout', () => {
     expect(l).toHaveLength(10);
     expect(l[9].id).toBe('sortie');
     expect(noOverlap(l) && l.every((b) => inside(b))).toBe(true);
+  });
+  it('시작: 진행 중 판이 있으면 이어하기 + 새로 출진', () => {
+    const l = overlayLayout('start', 9, true);
+    expect(l.map((b) => b.id).slice(-2)).toEqual(['resume', 'sortie']);
+    expect(noOverlap(l) && l.every((b) => inside(b))).toBe(true);
+  });
+  it('항복 창: 동행 4명 + 데려가지 않는다 = 5줄', () => {
+    const l = overlayLayout('recruit', 5);
+    expect(l.map((b) => b.id)).toEqual(['opt0', 'opt1', 'opt2', 'opt3', 'opt4']);
+    expect(noOverlap(l) && l.every((b) => inside(b))).toBe(true);
+    expect(l[4].y + l[4].h).toBeLessThanOrEqual(16 + 214 - 2);
   });
   it('고르기 창: n줄', () => {
     const l = overlayLayout('pick', 5);
@@ -77,7 +90,7 @@ describe('hitRects', () => {
     ['start', 390],
   ] as const)('%s @%ipx: 래퍼 안, 서로 겹치지 않음, 원래 칸을 덮는다', (scene, W) => {
     const k = W / 320;
-    const base = scale(overlayLayout(scene, 9), k);
+    const base = scale(overlayLayout(scene, scene === 'recruit' ? 5 : 9), k);
     const out = hitRects(base, W, W * 0.75);
     expect(out.every((r) => inside(r, W, W * 0.75))).toBe(true);
     expect(noOverlap(out)).toBe(true);

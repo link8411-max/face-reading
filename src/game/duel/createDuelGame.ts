@@ -5,8 +5,11 @@ import type { DuelBridge } from './bridge';
 
 export async function createDuelGame(parent: HTMLElement, bridge: DuelBridge): Promise<Phaser.Game> {
   const { buildGame } = await import('./game');
-  return buildGame(parent, bridge);
+  const game = buildGame(parent, bridge);
+  // 개발 서버에서만: 브라우저 확인용으로 게임을 열어 둔다(연출 속도 늦추기 등)
+  if (process.env.NODE_ENV !== 'production') (window as unknown as { __duelGame?: Phaser.Game }).__duelGame = game;
+  return game;
 }
 
 export { DuelBridge } from './bridge';
-export type { BattleView, FighterView, SkillView, UiAction, FocusId, SceneName, StartShow, RewardShow, ResultShow, PickView } from './bridge';
+export type { BattleView, FighterView, SkillView, UiAction, FocusId, SceneName, StartShow, RewardShow, ResultShow, PickView, RecruitView } from './bridge';

@@ -6,11 +6,12 @@ import { getReward } from '@/lib/duel/rewards';
 import { SKILLS } from '@/lib/duel/skills';
 import { narrate } from '@/lib/duel/narrative';
 import { wrapText } from '@/game/duel/wrap';
+import { josa } from '@/lib/shareLinks';
 import type { Fighter, RunRecord, RunState, SaveData } from '@/lib/duel/types';
-import type { BattleView, FighterView, PickView, ResultShow, RewardShow, StartShow } from '@/game/duel/bridge';
+import type { BattleView, FighterView, PickView, RecruitView, ResultShow, RewardShow, StartShow } from '@/game/duel/bridge';
 
-/** 대사창 한 줄 글자 수(9px 글씨로 창 너비에 맞는 값) */
-export const MSG_CHARS = 18;
+/** 대사창 한 줄 글자 수(Galmuri9로 146px 대사창에 맞는 값) */
+export const MSG_CHARS = 15;
 const MSG_KEEP = 3;
 
 const nameOf = (id: string) => getDuelGeneral(id)?.name ?? id;
@@ -84,6 +85,9 @@ export function toStartShow(save: SaveData, selected: string): StartShow {
     clears: save.best.clears,
     history: save.history.slice(0, 5).map(historyLine),
     selected,
+    ...(save.current && (save.current.phase === 'battle' || save.current.phase === 'reward')
+      ? { resume: { starter: save.current.record.starter, name: nameOf(save.current.record.starter), wave: save.current.wave } }
+      : {}),
   };
 }
 
@@ -103,16 +107,16 @@ function nextLine(wave: number): string {
   return `제${n}전 — 누가 막아설지 모른다`;
 }
 
-/** 보상 화면 값. pick이 있으면 그 고르기 창을 카드 위에 띄운다 */
-export function toRewardShow(run: RunState, pick?: PickView): RewardShow {
+/** 보상 화면 값. recruit가 있으면 항복 창을, pick만 있으면 고르기 창을 카드 위에 띄운다 */
+export function toRewardShow(run: RunState, pick?: PickView, recruit?: RecruitView): RewardShow {
   const w = run.record.waves[run.record.waves.length - 1];
   const foe = w ? nameOf(w.enemy) : '';
   const joined = !!w?.recruited && run.party.some((f) => f.id === w.enemy);
   const headline = !w
     ? '보상 하나를 고르시오'
     : w.recruited
-      ? `제${run.wave}전 승리 — ${foe}이(가) 항복${joined ? '하여 합류하였다' : '하였다'}.`
-      : `제${run.wave}전 승리 — ${foe}을(를) 꺾었다.`;
+      ? `제${run.wave}전 승리 — ${josa(foe, '이', '가')} 항복${joined ? '하여 합류하였다' : '하였다'}.`
+      : `제${run.wave}전 승리 — ${josa(foe, '을', '를')} 꺾었다.`;
   return {
     headline,
     cards: run.rewardsOffered.map((id) => {
@@ -122,6 +126,7 @@ export function toRewardShow(run: RunState, pick?: PickView): RewardShow {
     party: run.party.map((f) => nameOf(f.id)),
     next: run.wave >= WAVES ? '' : nextLine(run.wave),
     ...(pick ? { pick } : {}),
+    ...(recruit ? { recruit } : {}),
   };
 }
 

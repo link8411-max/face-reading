@@ -46,9 +46,18 @@ export abstract class PanelScene extends Phaser.Scene {
     };
     this.events.once(Phaser.Scenes.Events.SHUTDOWN, cleanup);
     this.events.once(Phaser.Scenes.Events.DESTROY, cleanup);
+    this.onCreate();
     this.redraw();
     bridge.setAnimating(false);
-    bridge.emit('scene:changed', { scene: this.sceneName });
+    this.announce();
+  }
+
+  /** 장면이 (다시) 열릴 때 상태 비우기 */
+  protected onCreate(): void {}
+
+  /** 입력을 받을 준비가 됐다고 React에 알린다(연출이 있는 장면은 끝난 뒤에 부른다) */
+  protected announce(): void {
+    this.bridge.emit('scene:changed', { scene: this.sceneName });
   }
 
   protected redraw(): void {

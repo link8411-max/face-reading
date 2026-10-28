@@ -1,7 +1,7 @@
 // 전투 화면(와꾸 v5 draw1): 보이는 것은 전부 Phaser 오브젝트. 입력은 React의 투명 DOM 버튼이 bridge로 보낸다.
 import * as Phaser from 'phaser';
 import { SKILLS } from '@/lib/duel/skills';
-import { WAVES } from '@/lib/duel/run';
+import { BOSS_WAVES, WAVES } from '@/lib/duel/run';
 import { FIELD, KO_FAMILY, KO_PX, MUTED, PALETTE as S, SPRITE_PX, hex } from './config';
 import type { BattleFocusId, BattleView, DuelBridge, DuelEvents, FighterView } from './bridge';
 import { playSfx } from './sfx';
@@ -26,7 +26,9 @@ const MENU_STEP = 11;
 const SWITCH_Y = 219;
 const MSG_LINES = 3;
 /** 대사창 한 줄 글자 수 */
-const MSG_CHARS = 18;
+const MSG_CHARS = 15;
+/** 웨이브 진행 띠: 18칸, 보스(6·12·18)는 금색 긴 칸 */
+const STRIP = { x: 124, y: 30, cell: 4, w: 3, h: 5 } as const;
 const FOCUS_IDS: BattleFocusId[] = ['skill0', 'skill1', 'skill2', 'skill3', 'switch'];
 
 interface FighterObjs {
@@ -68,6 +70,7 @@ export class BattleScene extends Phaser.Scene {
   private f!: Record<Who, FighterObjs>;
   private wave!: Phaser.GameObjects.Text;
   private turn!: Phaser.GameObjects.Text;
+  private stripG!: Phaser.GameObjects.Graphics;
   private hpG!: Phaser.GameObjects.Graphics;
   private cursorG!: Phaser.GameObjects.Graphics;
   private fx!: Phaser.GameObjects.Graphics;
@@ -134,8 +137,9 @@ export class BattleScene extends Phaser.Scene {
     box(g, 10, 12, 50, 58);
     box(g, 260, 12, 50, 58);
     box(g, 10, 76, 300, 74, S.ink);
-    box(g, 10, 172, 118, 58, S.cream);
-    box(g, 134, 172, 176, 58, S.cream);
+    // 명령 메뉴는 넓게(기술 이름이 잘리지 않게), 대사창은 그 오른쪽
+    box(g, 10, 172, 150, 58, S.cream);
+    box(g, 164, 172, 146, 58, S.cream);
     this.add.image(FIELD.x, FIELD.y, 'field').setOrigin(0);
     // ▼ 깜빡임
     const more = text(this, 298, 218, '▼', { size: 8 });
@@ -163,18 +167,19 @@ export class BattleScene extends Phaser.Scene {
 
   private buildDynamic(): void {
     this.wave = text(this, 160, 12, '', { size: 7, color: S.gold, num: true }).setOrigin(0.5, 0);
-    this.turn = text(this, 160, 22, '', { size: 7, color: S.cream2, num: true }).setOrigin(0.5, 0);
+    this.turn = text(this, 160, 40, '', { size: 7, color: S.cream2, num: true }).setOrigin(0.5, 0);
+    this.stripG = this.add.graphics();
     this.hpG = this.add.graphics();
     this.cursorG = this.add.graphics();
     this.menu = [0, 1, 2, 3].map((i) => {
       const y = MENU_Y + i * MENU_STEP;
       return {
         name: text(this, 22, y, '', { ko: 9 }),
-        sub: text(this, 125, y + 2, '', { ko: 7, color: MUTED }).setOrigin(1, 0),
+        sub: text(this, 157, y + 2, '', { ko: 7, color: MUTED }).setOrigin(1, 0),
       };
     });
     this.switchLine = text(this, 22, SWITCH_Y, '', { ko: 7, color: MUTED });
-    this.msg = [0, 1, 2].map((i) => text(this, 140, 178 + i * 13, '', { ko: 9 }));
+    this.msg = [0, 1, 2].map((i) => text(this, 170, 178 + i * 13, '', { ko: 9 }));
     // 메뉴 위에 포인터를 올리면 커서만 옮긴다(누르기는 React DOM 버튼 몫)
     FOCUS_IDS.forEach((id, i) => {
       const y = i < 4 ? BATTLE_MENU.y + i * BATTLE_MENU.rowH : BATTLE_SWITCH.y;
@@ -194,6 +199,7 @@ export class BattleScene extends Phaser.Scene {
     this.view = v;
     this.wave.setText(`WAVE ${v.wave}/${WAVES}`);
     this.turn.setText(`TURN ${v.turn}`);
+    this.drawStrip(v.wave);
     this.applyFighter('player', v.player, `${v.player.kind} Lv${v.player.level}`);
     this.applyFighter('enemy', v.enemy, `${v.enemy.kind} Lv${v.enemy.level}${v.enemy.isBoss ? ' · 보스' : ''}`);
     this.shownHp = { player: v.player.hp, enemy: v.enemy.hp };
@@ -230,6 +236,19 @@ export class BattleScene extends Phaser.Scene {
     this.f.enemy.hpNum.setText(`${Math.max(0, this.shownHp.enemy)}/${enemy.maxHp}`);
   }
 
+  /** 웨이브 진행 띠: 지난 싸움은 크림, 지금은 빨강, 남은 싸움은 어두운 녹색. 보스 칸은 금색으로 길게 */
+  private drawStrip(wave: number): void {
+    const g = this.stripG.clear();
+    for (let w = 1; w <= WAVES; w++) {
+      const boss = (BOSS_WAVES as readonly number[]).includes(w);
+      const x = STRIP.x + (w - 1) * STRIP.cell;
+      const col = w === wave ? S.red : w < wave ? (boss ? S.gold : S.cream2) : boss ? S.gold2 : S.green3;
+      g.fillStyle(hex(col), 1);
+      if (boss) g.fillRect(x, STRIP.y - 2, STRIP.w, STRIP.h + 3);
+      else g.fillRect(x, STRIP.y, STRIP.w, STRIP.h);
+    }
+  }
+
   private drawMessages(): void {
     this.msg.forEach((t, i) => t.setText(this.messages[i] ?? ''));
   }
@@ -253,7 +272,7 @@ export class BattleScene extends Phaser.Scene {
       const desc = SKILLS[s.id]?.effect === 'guard' ? '피해 절반' : null;
       row.sub.setText(desc ?? `${mark}·${s.usesLeft === null ? '무제한' : `남은 ${s.usesLeft}`}`);
       // 기술 이름이 보조 글과 겹치면 작은 글꼴로
-      const room = 125 - row.sub.width - 4 - 22;
+      const room = 157 - row.sub.width - 4 - 22;
       const ko = (f: 7 | 9) => row.name.setFontFamily(`${KO_FAMILY[f]}, ${fonts.kr}`).setFontSize(KO_PX[f]);
       ko(9);
       if (row.name.width > room) ko(7);

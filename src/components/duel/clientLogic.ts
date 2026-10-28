@@ -4,10 +4,13 @@ import {
   BATTLE_MENU,
   BATTLE_SWITCH,
   PICK,
+  RECRUIT,
   RESULT_BTN,
   RESULT_STAR,
   REWARD_CARD,
   START_CELL,
+  START_NEW,
+  START_RESUME,
   START_SORTIE,
   startCellPos,
 } from '@/game/duel/layout';
@@ -24,7 +27,7 @@ export interface OverlaySlot extends Rect {
   label: string;
 }
 
-export type OverlayScene = 'start' | 'battle' | 'reward' | 'result' | 'pick';
+export type OverlayScene = 'start' | 'battle' | 'reward' | 'result' | 'pick' | 'recruit';
 
 /** 삼국지 닮은꼴 결과(?me=)가 시작·영입 장수면 장수록에 더한다. 그 밖(보스·졸개·명단 밖·쓰레기 값)은 그대로 */
 export function resolveStarterUnlock(me: string | null, roster: string[]): string[] {
@@ -34,8 +37,11 @@ export function resolveStarterUnlock(me: string | null, roster: string[]): strin
   return roster.includes(me) ? roster : [...roster, me];
 }
 
-/** 320×240 설계 좌표의 투명 버튼 자리. 라벨은 기본값이고 화면이 실제 이름으로 바꿔 단다 */
-export function overlayLayout(scene: OverlayScene, n = 0): OverlaySlot[] {
+/**
+ * 320×240 설계 좌표의 투명 버튼 자리. 라벨은 기본값이고 화면이 실제 이름으로 바꿔 단다.
+ * n: 시작 화면 장수 수·고르기 줄 수, resume: 시작 화면에 이어하기 칸이 있는지
+ */
+export function overlayLayout(scene: OverlayScene, n = 0, resume = false): OverlaySlot[] {
   switch (scene) {
     case 'battle':
       return [
@@ -95,8 +101,22 @@ export function overlayLayout(scene: OverlayScene, n = 0): OverlaySlot[] {
           w: START_CELL.w,
           h: START_CELL.h,
         })),
-        { id: 'sortie', label: '출진', ...START_SORTIE },
+        ...(resume
+          ? [
+              { id: 'resume', label: '이어서 출진', ...START_RESUME },
+              { id: 'sortie', label: '새로 출진', ...START_NEW },
+            ]
+          : [{ id: 'sortie', label: '출진', ...START_SORTIE }]),
       ];
+    case 'recruit':
+      return Array.from({ length: n }, (_, i) => ({
+        id: `opt${i}`,
+        label: `선택 ${i + 1}`,
+        x: RECRUIT.rowX,
+        y: RECRUIT.rowY0 + i * RECRUIT.rowStep,
+        w: RECRUIT.rowW,
+        h: RECRUIT.rowH,
+      }));
   }
 }
 

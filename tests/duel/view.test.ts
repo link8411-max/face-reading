@@ -3,7 +3,7 @@ import { createRng } from '@/lib/duel/rng';
 import { makeFighter } from '@/lib/duel/battle';
 import { playerTurn, startRun } from '@/lib/duel/run';
 import { defaultSave } from '@/lib/duel/save';
-import { messageLines, nextSwitchIndex, toBattleView, toRewardShow, toStartShow } from '@/components/duel/view';
+import { MSG_CHARS, messageLines, nextSwitchIndex, toBattleView, toRewardShow, toStartShow } from '@/components/duel/view';
 import { wrapText } from '@/game/duel/wrap';
 import type { RunState } from '@/lib/duel/types';
 
@@ -18,7 +18,7 @@ describe('wrapText', () => {
 });
 
 describe('messageLines', () => {
-  it('줄마다 18자 이하, 마지막 3줄', () => {
+  it('줄마다 MSG_CHARS(15)자 이하, 마지막 3줄', () => {
     const lines = messageLines([
       '관우의 일격!',
       '황건적 졸개에게 12의 피해!',
@@ -26,7 +26,8 @@ describe('messageLines', () => {
       '황건적 졸개은(는) 불길에 휩싸였다! 3의 피해!',
     ]);
     expect(lines).toHaveLength(3);
-    expect(lines.every((l) => l.length <= 18)).toBe(true);
+    expect(MSG_CHARS).toBe(15);
+    expect(lines.every((l) => l.length <= MSG_CHARS)).toBe(true);
     expect(lines[2]).toContain('피해!');
   });
 });
@@ -58,7 +59,7 @@ describe('toBattleView', () => {
     expect(v.enemy.isBoss).toBe(true);
     expect(v.player.skills[1].usesLeft).toBe(2);
     expect(v.message.length).toBeLessThanOrEqual(3);
-    expect(v.message.every((l) => l.length <= 18)).toBe(true);
+    expect(v.message.every((l) => l.length <= MSG_CHARS)).toBe(true);
   });
 
   it('전투가 아니면 null', () => {
