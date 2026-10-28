@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import PageGuide from "@/components/PageGuide";
+import HideOnPaths from "@/components/HideOnPaths";
 
 // 검색 결과 제목·설명 (클릭률 위주, 길이 상한은 tests/seo-snippets.test.tsx). og·트위터도 같은 문구
 const TITLE = "나는 삼국지 속 누구? 76명 영웅 닮은꼴 테스트 – 운명을 읽다";
@@ -69,7 +70,10 @@ export default function Layout({ children }: { children: React.ReactNode }) {
         dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }}
       />
       {children}
-      <PageGuide route="/samguk" />
+      {/* 일기토 아래에는 일기토 안내(/samguk/duel layout)만 보인다 */}
+      <HideOnPaths prefixes={["/samguk/duel"]}>
+        <PageGuide route="/samguk" />
+      </HideOnPaths>
     </>
   );
 }

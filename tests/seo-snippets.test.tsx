@@ -10,6 +10,9 @@ import { metadata as root } from '@/app/layout'
 import { metadata as face2 } from '@/app/face2/layout'
 import { metadata as animal } from '@/app/animal/layout'
 import { metadata as samguk } from '@/app/samguk/layout'
+import { metadata as duel } from '@/app/samguk/duel/layout'
+import { generateMetadata as duelGeneralMeta } from '@/app/samguk/duel/generals/[id]/page'
+import { DUEL_GENERALS } from '@/lib/duel/generals'
 import { metadata as fortune } from '@/app/fortune/layout'
 import { metadata as mbtiDaily } from '@/app/fortune/mbti/layout'
 import { generateMetadata as zodiacMeta } from '@/app/fortune/2027/[zodiac]/page'
@@ -24,7 +27,8 @@ const BANNED = [/2026/, /토정비결/, /하루 1회/, /Gemini/i, /AI가 당신�
 const BRAND = ' – 운명을 읽다'
 
 async function pages(): Promise<[string, Metadata][]> {
-  const list: [string, Metadata][] = [['/', root], ['/face2', face2], ['/animal', animal], ['/samguk', samguk], ['/fortune', fortune], ['/fortune/mbti', mbtiDaily]]
+  const list: [string, Metadata][] = [['/', root], ['/face2', face2], ['/animal', animal], ['/samguk', samguk], ['/fortune', fortune], ['/fortune/mbti', mbtiDaily], ['/samguk/duel', duel]]
+  for (const g of DUEL_GENERALS.filter((x) => x.role !== 'mob')) list.push([`/samguk/duel/generals/${g.id}`, await duelGeneralMeta({ params: Promise.resolve({ id: g.id }) })])
   for (const z of ZODIAC_SLUGS) list.push([`/fortune/2027/${z}`, await zodiacMeta({ params: Promise.resolve({ zodiac: z }) })])
   for (const t of MBTI_TYPES) list.push([`/mbti/${t.toLowerCase()}`, await mbtiMeta({ params: Promise.resolve({ type: t.toLowerCase() }) })])
   return list
