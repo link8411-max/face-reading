@@ -36,7 +36,16 @@ async function playTo(page: Page, minWave: number, onBattle?: () => Promise<void
     const s = (await state(page))!
     if (s.scene === 'result' || s.phase === 'lost' || s.phase === 'won') throw new Error(`웨이브 ${minWave} 전에 끝남 (${JSON.stringify(s)})`)
     if (s.phase === 'battle') {
-      if (!checked && onBattle) { checked = true; await onBattle() }
+      if (!checked && onBattle) {
+        // onBattle은 마지막에 한 턴을 결정까지 진행한다. 연출이 시작·끝날 때까지 기다리고 상태를 다시 읽는다
+        checked = true
+        await onBattle()
+        await page.waitForFunction(({ w, ph }) => {
+          const d = (window as unknown as { __duel?: DuelState }).__duel
+          return !!d && (d.animating || d.wave !== w || d.phase !== ph)
+        }, { w: s.wave, ph: s.phase }, { timeout: 3000 }).catch(() => {})
+        continue
+      }
       if ((s.wave ?? 0) >= minWave) return
       // 한 번 누르면 고르기, 같은 명령을 다시 누르면 결정
       await btn(page, 'skill0').click()
@@ -62,6 +71,11 @@ test.describe('데스크톱', () => {
       await expect(page.getByRole('navigation', { name: '하단 메뉴' })).toHaveCount(0)
       const over = await page.evaluate(() => document.documentElement.scrollWidth - document.documentElement.clientWidth)
       expect(over).toBeLessThanOrEqual(0)
+      // 공격 기술은 유불리 말이 라벨에 붙고, 한 번 누르면 고르기(결정 단추 라벨이 그 명령으로 바뀐다)
+      await expect(btn(page, 'skill0')).toHaveAttribute('aria-label', /유리|불리|비등/)
+      await btn(page, 'skill0').click()
+      await expect(btn(page, 'confirm')).toHaveAttribute('aria-label', /^결정: 일격/)
+      await btn(page, 'confirm').click() // 결정 단추로도 결정된다
     })
     expect((await state(page))?.wave).toBeGreaterThanOrEqual(3)
     expect(errors).toEqual([])
@@ -89,6 +103,17 @@ test.describe('모바일', () => {
         expect(box, name).not.toBeNull()
         expect(box!.height, name).toBeGreaterThanOrEqual(44)
       }
+      // 미리보기 중(일격) 다른 명령(방어 태세)을 탭하면 결정이 아니라 고르기: 결정 단추가 방어 태세로 바뀌고 전투는 그대로
+      await expect(btn(page, 'skill0')).toHaveAttribute('aria-label', /유리|불리|비등/)
+      await btn(page, 'skill0').click()
+      await expect(btn(page, 'confirm')).toHaveAttribute('aria-label', /^결정: 일격/)
+      const before = await state(page)
+      await btn(page, 'skill2').click()
+      await expect(btn(page, 'confirm')).toHaveAttribute('aria-label', /^결정: 방어 태세/)
+      expect(await state(page)).toMatchObject({ phase: 'battle', wave: before?.wave, animating: false })
+      // 고른 명령을 다시 누르면 결정: 고른 줄이 비워지고 연출이 돈다
+      await btn(page, 'skill2').click()
+      await expect(btn(page, 'confirm')).toHaveAttribute('aria-label', /먼저 메뉴/)
     })
     expect(errors).toEqual([])
   })

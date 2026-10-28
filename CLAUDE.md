@@ -236,7 +236,7 @@ public/
 | API | `/api/duel/feedback`(피드백), `/api/duel/run`(판 요약 통계). 환경변수 `SUPABASE_URL`·`SUPABASE_SERVICE_KEY`(없으면 조용히 건너뜀). 테이블 SQL은 `docs/duel-feedback.sql`·`docs/duel-runs.sql`을 Supabase SQL Editor에서 실행 |
 
 - **쿼리**: `?seed=<숫자>`로 같은 판 재현, `?me=<장수id>`로 시작 장수 미리 선택(열전의 "이 장수로 시작").
-- **입력**: 그림은 Phaser가, 입력은 DOM 투명 버튼이 받는다(`aria-label`은 장수·기술 이름으로 바뀌므로 E2E는 `button[data-duel-btn="skill0"]` 같은 고정 id로 찾는다). 명령을 한 번 누르면 고르기, 같은 명령(또는 결정 버튼)을 다시 누르면 결정. 터치·좁은 화면은 세로형 2x2 큰 카드(각 44px 이상). 게임 중에는 하단 탭바를 숨긴다.
+- **입력**: 그림은 Phaser가, 입력은 DOM 투명 버튼이 받는다(`aria-label`은 장수·기술 이름으로 바뀌므로 E2E는 `button[data-duel-btn="skill0"]` 같은 고정 id로 찾는다). 명령을 한 번 누르면 고르기, 같은 명령(또는 결정 버튼)을 다시 누르면 결정. 고르면 대사창에 미리보기(상성 유불리·예상 피해·효과)가 뜨고, 적의 다음 기술은 항상 표시(`enemyIntent`). 고른 줄(`pendingSel`)과 커서(`battleSel`, 포커스·호버)는 다르며, 고른 줄을 다시 누르면 결정(포커스가 click보다 먼저라 커서로 비교하면 안 된다, `tapRow`). 터치·좁은 화면은 세로형 2x2 큰 카드(각 44px 이상). 게임 중에는 하단 탭바를 숨긴다.
 - **디버그 훅**: `window.__duel = { scene, phase, wave, animating }`. E2E는 고정 sleep 대신 이것을 기다린다. 보상 화면은 연출이 끝나야 `scene`이 `reward`로 바뀐다(`phase`는 먼저 바뀜).
 - **밸런스 조정**: `docs/duel-balance.md`(측정법·표·결정 기록). 수치는 `src/lib/duel/balance.ts`, 검증은 `scripts/duel-balance.ts`·`scripts/duel-tune.ts`와 `tests/duel/balance.test.ts`. 수치를 바꾸면 판 요약의 `version`(수치 해시)이 바뀐다.
 - **에셋 스크립트**: 스프라이트 생성 기록 `docs/duel-sprites.md`, 초상 `scripts/duel-portraits.ts`·`docs/portrait-prompts.md`, 한글 도트 글꼴 서브셋 `scripts/duel-font-subset.mjs`.
