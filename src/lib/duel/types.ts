@@ -31,7 +31,7 @@ export interface DuelGeneral {
 // ── 전투 상태 ──
 
 export interface FighterStatus {
-  /** 남은 화상 턴 (턴 끝마다 maxHp 8% 피해) */
+  /** 남은 화상 턴 (턴 끝마다 maxHp × BALANCE.burnRate 피해) */
   burn?: number;
   /** 남은 혼란 행동 수 (행동할 때 50% 실패) */
   confuse?: number;

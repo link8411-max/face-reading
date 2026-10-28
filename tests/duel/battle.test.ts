@@ -424,6 +424,50 @@ describe('보스 필살기 예고 (Task 14b)', () => {
     expect(r.log.find((x) => x.text.includes('준비한다'))!.text).toBe('여포가 방천화극 난무를 준비한다!');
   });
 
+  // 불변식: 예고 중 도발·혼란이 걸려도 charging이 남지 않고, 필살기는 예고 다음 턴에 한 번만 나간다
+  it('불변식: 도발·혼란을 섞은 많은 판에서 charging은 그 턴의 예고와 같이만 남고, 필살기는 예고 바로 다음 턴에만 한 번', () => {
+    const prepared = (id: string) => (e: { kind: string; who: string; skillId?: string; text: string }) =>
+      e.who === 'enemy' && e.kind === 'status' && e.skillId === id && e.text.includes('준비한다');
+    let sawTauntedRelease = 0;
+    let sawConfusedRelease = 0;
+    for (let seed = 1; seed <= 300; seed++) {
+      const rng = createRng(seed);
+      const me = makeFighter('zhouyu', 30);
+      // 도발·혼란을 마음껏 쓰는 주유(체력은 넉넉히)
+      me.skills = ['scheme', 'taunt', 'confuse', 'guard'];
+      me.uses = {};
+      me.maxHp = me.hp = 100000;
+      const boss = { ...makeFighter('dongzhuo', 30), boss: true };
+      boss.maxHp = boss.hp = 100000;
+      let cur = state([me], boss);
+      let chargedLastTurn = false;
+      for (let t = 0; t < 14; t++) {
+        const pick = ['scheme', 'taunt', 'confuse', 'guard'][Math.floor(rng() * 4)];
+        const r = resolveTurn(cur, { type: 'skill', skillId: pick }, rng);
+        const ults = r.log.filter((e) => e.who === 'enemy' && e.kind === 'skill' && e.skillId === 'dongzhuo_ult');
+        // 필살기는 한 턴에 많아야 한 번, 그리고 지난 턴에 예고했을 때만
+        expect(ults.length).toBeLessThanOrEqual(1);
+        if (ults.length) expect(chargedLastTurn).toBe(true);
+        // charging은 이번 턴 끝에 예고했을 때만 남는다(도발·혼란으로 못 쓴 예고도 사라진다)
+        const telegraphed = r.log.some(prepared('dongzhuo_ult'));
+        expect(!!r.state.enemy.status.charging).toBe(telegraphed);
+        // 같은 턴에 쓰고 또 예고하지 않는다
+        if (ults.length) expect(telegraphed).toBe(false);
+        // 도발 중이면 예고하지 않는다
+        if (r.state.enemy.status.taunt) expect(telegraphed).toBe(false);
+        if (chargedLastTurn && !ults.length) {
+          if (r.log.some((e) => e.who === 'enemy' && e.text.includes('도발에 넘어가'))) sawTauntedRelease++;
+          if (r.log.some((e) => e.who === 'enemy' && e.kind === 'miss' && e.text.includes('혼란'))) sawConfusedRelease++;
+        }
+        chargedLastTurn = telegraphed;
+        cur = r.state;
+      }
+    }
+    // 실제로 "예고 중 도발·혼란" 경우를 지나갔는지
+    expect(sawTauntedRelease).toBeGreaterThan(0);
+    expect(sawConfusedRelease).toBeGreaterThan(0);
+  });
+
   it('결정적: 같은 시드·입력이면 예고·필살기 순서가 같다', () => {
     const play = () => {
       const rng = createRng(99);
