@@ -106,14 +106,21 @@ export default function RootLayout({
         <meta name="mobile-web-app-capable" content="yes" />
         <meta name="theme-color" content="#FBF6F1" />
         <link rel="apple-touch-icon" href="/icons/icon-192x192.svg" />
+        {/* 애드센스: 태그 위치는 그대로(심사 중). adsbygoogle.js가 하이드레이션 전에 이 태그 바로 뒤에 show_ads_impl 스크립트를 끼워 넣어
+            React가 아래 <script> 두 개를 한 칸씩 밀린 노드와 비교하며 하이드레이션 경고를 낸다(개발 서버 "1 Issue").
+            이 태그와 뒤따르는 <script> 두 개에 suppressHydrationWarning을 달아 경고만 끈다(DOM 내용은 서버 HTML 그대로) */}
+        <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-9670928093323234"
+          crossOrigin="anonymous" suppressHydrationWarning></script>
 
         <script
           type="application/ld+json"
+          suppressHydrationWarning
           dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
         />
 
         {/* 서비스 워커 등록 */}
         <script
+          suppressHydrationWarning
           dangerouslySetInnerHTML={{
             __html: `
               if ('serviceWorker' in navigator) {
@@ -172,14 +179,6 @@ export default function RootLayout({
         <Analytics />
         {/* Google 애널리틱스(GA4): 채널별 유입·완료율. 페이지 이동은 GA4 향상된 측정(브라우저 기록 변경)으로 잡힌다.
             운영 주소(unse-ai.com)가 아니면(로컬·E2E·Vercel 미리보기) gtag.js를 받지 않고 config도 하지 않아 실제 통계로 보내지 않는다(이벤트는 dataLayer에만 쌓임) */}
-        {/* 애드센스: <head>에 직접 두면 adsbygoogle.js가 하이드레이션 전에 <head>에 스크립트(show_ads_impl)를 끼워 넣어
-            React 하이드레이션 불일치 오류가 난다(개발 서버 "1 Issue"). 하이드레이션 뒤에 붙이도록 next/script로 옮겼다 */}
-        <Script
-          id="adsense"
-          strategy="afterInteractive"
-          src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-9670928093323234"
-          crossOrigin="anonymous"
-        />
         <Script id="ga4-init" strategy="afterInteractive">
           {`window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}window.gtag=gtag;gtag('js',new Date());
 if(new RegExp(${JSON.stringify(PROD_HOST_SOURCE)}).test(location.hostname)){var s=document.createElement('script');s.async=true;s.src='https://www.googletagmanager.com/gtag/js?id=${GA_ID}';document.head.appendChild(s);gtag('config','${GA_ID}');}`}
