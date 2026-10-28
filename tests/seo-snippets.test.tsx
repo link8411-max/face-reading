@@ -100,7 +100,7 @@ test('오늘의 MBTI 운세: 제목 앞에 핵심어, 설명에 가입 없이·M
 })
 
 test('삼국지 장수 수 문구는 실제 장수 수와 같다 (옛 52명이 남지 않음)', () => {
-  for (const f of ['src/app/samguk/layout.tsx', 'src/app/samguk/page.tsx', 'src/content/navigation.ts']) {
+  for (const f of ['src/app/samguk/layout.tsx', 'src/app/samguk/(match)/page.tsx', 'src/content/navigation.ts']) {
     const src = readFileSync(f, 'utf8')
     expect(src, f).not.toContain('52명')
     expect(src, f).not.toContain('간신')

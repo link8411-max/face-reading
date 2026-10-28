@@ -1,3 +1,4 @@
+import { readFileSync } from 'node:fs'
 import { DUEL_GENERAL_INTRO } from '@/content/duelGuide'
 import { DUEL_GENERALS } from '@/lib/duel/generals'
 import { SKILLS } from '@/lib/duel/skills'
@@ -26,6 +27,26 @@ test('사이트맵에 일기토와 장수 12개 페이지', () => {
     expect(LAST_MODIFIED[r]).toBe('2026-10-28')
   }
   expect(LAST_MODIFIED['/samguk/duel']).toBe('2026-10-28')
+})
+
+test('JSON-LD·안내문은 각 범위에만: samguk layout은 children만, duel layout·장수 페이지에 SoftwareApplication 없음', () => {
+  const samguk = readFileSync('src/app/samguk/layout.tsx', 'utf8')
+  expect(samguk).not.toContain('PageGuide')
+  expect(samguk).not.toContain('ld+json')
+  expect(samguk).not.toContain('SoftwareApplication')
+  for (const f of ['src/app/samguk/duel/layout.tsx', 'src/app/samguk/duel/generals/[id]/page.tsx', 'src/app/samguk/duel/(game)/layout.tsx']) {
+    expect(readFileSync(f, 'utf8'), f).not.toContain('SoftwareApplication')
+  }
+  expect(readFileSync('src/app/samguk/duel/layout.tsx', 'utf8')).not.toContain('PageGuide')
+  expect(readFileSync('src/app/samguk/duel/(game)/layout.tsx', 'utf8')).toContain('<PageGuide route="/samguk/duel" />')
+  expect(readFileSync('src/app/samguk/(match)/layout.tsx', 'utf8')).toContain('<PageGuide route="/samguk" />')
+})
+
+test('항복 확률을 절반이라고 단정하지 않는다', () => {
+  const text = JSON.stringify(DUEL_GENERAL_INTRO) + JSON.stringify(pageGuides['/samguk/duel'])
+  expect(text).not.toContain('절반 확률')
+  expect(text).not.toContain('절반쯤')
+  expect(text).toContain('매력')
 })
 
 test('/samguk/duel 가이드: 존재, related에 /samguk, 현재 규칙을 말함', () => {

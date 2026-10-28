@@ -1,6 +1,4 @@
 import type { Metadata } from "next";
-import PageGuide from "@/components/PageGuide";
-import HideOnPaths from "@/components/HideOnPaths";
 
 // 검색 결과 제목·설명 (클릭률 위주, 길이 상한은 tests/seo-snippets.test.tsx). og·트위터도 같은 문구
 const TITLE = "나는 삼국지 속 누구? 76명 영웅 닮은꼴 테스트 – 운명을 읽다";
@@ -28,52 +26,7 @@ export const metadata: Metadata = {
   },
 };
 
-const jsonLd = {
-  "@context": "https://schema.org",
-  "@type": "SoftwareApplication",
-  "name": "삼국지 닮은꼴 테스트",
-  "description": "AI가 분석하는 삼국지 영웅 닮은꼴 테스트",
-  "url": "https://unse-ai.com/samguk",
-  "applicationCategory": "EntertainmentApplication",
-  "operatingSystem": "Web",
-  "offers": { "@type": "Offer", "price": "0", "priceCurrency": "KRW" }
-};
-
-const breadcrumbJsonLd = {
-  "@context": "https://schema.org",
-  "@type": "BreadcrumbList",
-  "itemListElement": [
-    {
-      "@type": "ListItem",
-      "position": 1,
-      "name": "운명을 읽다",
-      "item": "https://unse-ai.com"
-    },
-    {
-      "@type": "ListItem",
-      "position": 2,
-      "name": "삼국지 닮은꼴",
-      "item": "https://unse-ai.com/samguk"
-    }
-  ]
-};
-
+// 메타데이터만 둔다. 구조화 데이터·안내문은 (match)/layout.tsx(닮은꼴)와 duel/layout.tsx(일기토)가 각자 가진다
 export default function Layout({ children }: { children: React.ReactNode }) {
-  return (
-    <>
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
-      />
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }}
-      />
-      {children}
-      {/* 일기토 아래에는 일기토 안내(/samguk/duel layout)만 보인다 */}
-      <HideOnPaths prefixes={["/samguk/duel"]}>
-        <PageGuide route="/samguk" />
-      </HideOnPaths>
-    </>
-  );
+  return <>{children}</>;
 }
