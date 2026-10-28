@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { passPose, koPose, cutinAlpha, eventsToTimeline, PASS_MS, type TimelineItem } from '@/game/duel/timeline';
+import { passPose, koPose, cutinAlpha, eventsToTimeline, HITSTOP_MS, PASS_MS, type TimelineItem } from '@/game/duel/timeline';
 import type { TurnEvent } from '@/lib/duel/types';
 
 const ev = (e: Partial<TurnEvent> & Pick<TurnEvent, 'who' | 'kind'>): TurnEvent => ({ text: '', ...e });
@@ -175,5 +175,40 @@ describe('eventsToTimeline', () => {
     const pass = tl.find((i) => i.kind === 'pass')!;
     expect(texts[0].at).toBeGreaterThanOrEqual(pass.at + pass.dur);
     expect(monotone(tl)).toBe(true);
+  });
+});
+
+describe('치명타·보스 예고 연출 (Task 14cd)', () => {
+  const sides = { player: 'left' as const };
+  it('crit 피해는 clash에 crit: true, 그 합은 히트스톱(HITSTOP_MS)만큼 가운데에 더 멈춘다', () => {
+    const plain = eventsToTimeline([ev({ who: 'player', kind: 'skill', skillId: 'strike' }), ev({ who: 'player', kind: 'hit', amount: 10 })], sides);
+    const crit = eventsToTimeline([ev({ who: 'player', kind: 'skill', skillId: 'strike' }), ev({ who: 'player', kind: 'hit', amount: 15, crit: true })], sides);
+    const c = crit.find((it) => it.kind === 'clash')!;
+    expect(c.crit).toBe(true);
+    expect(plain.find((it) => it.kind === 'clash')!.crit).toBeUndefined();
+    const pass = crit.find((it) => it.kind === 'pass')!;
+    expect(pass.hold).toBe(HITSTOP_MS);
+    expect(pass.dur).toBe(PASS_MS + HITSTOP_MS);
+    expect(HITSTOP_MS).toBe(120);
+  });
+  it('필살기 베기가 치명타면 strike에 crit: true', () => {
+    const tl = eventsToTimeline([ev({ who: 'player', kind: 'skill', skillId: 'guanyu_ult' }), ev({ who: 'player', kind: 'hit', amount: 40, crit: true })], sides);
+    expect(tl.find((it) => it.kind === 'strike')!.crit).toBe(true);
+  });
+  it('보스 필살기 예고(적 status + skillId)는 text 항목에 telegraph: true', () => {
+    const tl = eventsToTimeline(
+      [
+        ev({ who: 'player', kind: 'skill', skillId: 'strike' }),
+        ev({ who: 'player', kind: 'hit', amount: 10 }),
+        ev({ who: 'enemy', kind: 'status', skillId: 'dongzhuo_ult', text: '동탁이 폭정을 준비한다!' }),
+      ],
+      sides,
+    );
+    const t = tl.find((it) => it.kind === 'text')!;
+    expect(t.telegraph).toBe(true);
+    expect(t.skillId).toBe('dongzhuo_ult');
+    // 화상 같은 보통 상태 글은 예고가 아니다
+    const burn = eventsToTimeline([ev({ who: 'enemy', kind: 'status', amount: 5, text: '불길' })], sides);
+    expect(burn[0].telegraph).toBeUndefined();
   });
 });

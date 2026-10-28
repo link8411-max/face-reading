@@ -55,7 +55,7 @@ export function toBattleView(run: RunState): BattleView | null {
     wave: run.wave,
     turn: b.turn,
     player,
-    enemy: { ...enemy, isBoss: isBossWave(run.wave) },
+    enemy: { ...enemy, isBoss: isBossWave(run.wave), ...(b.enemy.status.charging ? { charging: true } : {}) },
     party: b.party.map((f) => ({ id: f.id, name: nameOf(f.id), hp: Math.max(0, f.hp), maxHp: f.maxHp })),
     message,
   };

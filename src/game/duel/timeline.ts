@@ -25,8 +25,12 @@ export interface TimelineItem {
   amount?: number;
   text?: string;
   skillId?: string;
-  /** pass 전용: 가운데에서 멈춰 있는 시간(필살기 컷인+베기) */
+  /** pass 전용: 가운데에서 멈춰 있는 시간(필살기 컷인+베기, 치명타 히트스톱) */
   hold?: number;
+  /** clash·strike: 치명타(히트스톱·흰 화면·흔들림·금색 숫자) */
+  crit?: boolean;
+  /** text: 보스 필살기 예고(초상 테두리 깜빡임) */
+  telegraph?: boolean;
   /** 이 항목이 속한 합이 끝난 뒤의 자리 */
   sidesAfter: { player: Side };
 }
@@ -38,6 +42,8 @@ export const CUTIN_MS = 900;
 export const STRIKE_MS = 400;
 export const KO_MS = 600;
 export const TEXT_MS = 400;
+/** 치명타 히트스톱: 둘이 맞닿은 채 멈추는 시간 */
+export const HITSTOP_MS = 120;
 
 export const LEFT_X = 0.02;
 export const RIGHT_X = 0.98;
@@ -98,7 +104,7 @@ interface ActionGroup {
   kind: 'skill' | 'switch' | 'miss';
   skillId?: string;
   /** 피해: 공격한 쪽 기준 */
-  hits: { who: Who; amount: number; counter: boolean }[];
+  hits: { who: Who; amount: number; counter: boolean; crit?: boolean }[];
 }
 
 interface PassGroup {
@@ -142,7 +148,7 @@ function groupPasses(events: TurnEvent[]): PassGroup[] {
       case 'hit':
       case 'counter': {
         if (!st.act) startAction({ who: e.who, kind: 'skill', skillId: e.skillId, hits: [] });
-        st.act!.hits.push({ who: e.who, amount: e.amount ?? 0, counter: e.kind === 'counter' });
+        st.act!.hits.push({ who: e.who, amount: e.amount ?? 0, counter: e.kind === 'counter', ...(e.crit ? { crit: true } : {}) });
         break;
       }
       case 'status':
@@ -166,14 +172,16 @@ export function eventsToTimeline(events: TurnEvent[], sides: { player: Side }): 
     const after = { player: moves ? otherSide(side) : side };
     if (moves) {
       const ult = g.actions.find((a) => a.kind === 'skill' && isUltimate(a.skillId));
-      const hold = ult ? CUTIN_MS + STRIKE_MS : 0;
+      // 보통 부딪힘 중 치명타가 있으면 그 합은 히트스톱만큼 가운데에 더 멈춘다
+      const critClash = g.actions.some((a) => a !== ult && a.hits.some((h) => h.crit));
+      const hold = (ult ? CUTIN_MS + STRIKE_MS : 0) + (critClash ? HITSTOP_MS : 0);
       out.push({ at: t, dur: PASS_MS + hold, kind: 'pass', ...(hold ? { hold } : {}), sidesAfter: after });
       // 보통 피해는 합의 한가운데에서 부딪힘
       const clashAt = t + PASS_MS / 2 - CLASH_MS / 2;
       for (const a of g.actions) {
         if (a === ult) continue;
         for (const h of a.hits) {
-          out.push({ at: clashAt, dur: CLASH_MS, kind: 'clash', who: h.who, amount: h.amount, skillId: a.skillId, sidesAfter: after });
+          out.push({ at: clashAt, dur: CLASH_MS, kind: 'clash', who: h.who, amount: h.amount, skillId: a.skillId, ...(h.crit ? { crit: true } : {}), sidesAfter: after });
         }
       }
       if (ult) {
@@ -186,6 +194,7 @@ export function eventsToTimeline(events: TurnEvent[], sides: { player: Side }): 
           kind: 'strike',
           who: ult.who,
           ...(main ? { amount: main.amount } : {}),
+          ...(main?.crit ? { crit: true } : {}),
           skillId: ult.skillId,
           sidesAfter: after,
         });
@@ -198,7 +207,18 @@ export function eventsToTimeline(events: TurnEvent[], sides: { player: Side }): 
       t += PASS_MS + hold;
     }
     for (const s of g.statuses) {
-      out.push({ at: t, dur: TEXT_MS, kind: 'text', who: s.who, text: s.text, ...(s.amount ? { amount: s.amount } : {}), sidesAfter: after });
+      // 적의 status에 기술 id가 있으면 보스 필살기 예고
+      const telegraph = s.who === 'enemy' && !!s.skillId;
+      out.push({
+        at: t,
+        dur: TEXT_MS,
+        kind: 'text',
+        who: s.who,
+        text: s.text,
+        ...(s.amount ? { amount: s.amount } : {}),
+        ...(telegraph ? { telegraph: true, skillId: s.skillId } : {}),
+        sidesAfter: after,
+      });
       t += TEXT_MS;
     }
     for (const who of g.kos) {

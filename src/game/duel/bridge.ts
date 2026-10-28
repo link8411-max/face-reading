@@ -28,7 +28,8 @@ export interface BattleView {
   wave: number;
   turn: number;
   player: FighterView;
-  enemy: FighterView & { isBoss: boolean };
+  /** charging: 보스가 필살기를 예고해 둔 상태(초상 테두리를 빨갛게) */
+  enemy: FighterView & { isBoss: boolean; charging?: boolean };
   party: { id: string; name: string; hp: number; maxHp: number }[];
   /** 대사창 줄들(최대 3줄을 보여 준다) */
   message: string[];

@@ -28,6 +28,10 @@ const MSG_TALL = { x: BATTLE_TALL.dialog.x + 6, y: BATTLE_TALL.dialog.y + 5, ste
 /** 웨이브 진행 띠: WAVES(36)칸 한 줄(가운데 맞춤), 보스(BOSS_WAVES)는 금색 긴 칸 */
 const STRIP = { x: 160 - (WAVES * 3 - 1) / 2, y: 30, cell: 3, w: 2, h: 5 } as const;
 const FOCUS_IDS: BattleFocusId[] = ['skill0', 'skill1', 'skill2', 'skill3', 'switch'];
+/** 치명타: 흰 화면 2프레임(약 33ms), 정수 4px 좌우 흔들림 3회(150ms에 걸쳐, 마지막은 제자리) */
+const FLASH_MS = 34;
+const SHAKE_MS = 150;
+const SHAKE_STEPS = [4, -4, 4, -4, 4, -4, 0];
 /** 처음 고를 때 대사창 안내 */
 const CONFIRM_HINT = '한 번 더 누르면 결정';
 
@@ -88,6 +92,8 @@ export class BattleScene extends Phaser.Scene {
   private switchLine!: Phaser.GameObjects.Text;
   private msg!: Phaser.GameObjects.Text[];
   private overlay!: Phaser.GameObjects.Rectangle;
+  /** 치명타 흰 화면 */
+  private flash!: Phaser.GameObjects.Rectangle;
   private cutinImg!: Phaser.GameObjects.Image;
   private cutinTitle!: Phaser.GameObjects.Text;
   private doneTimer: Phaser.Time.TimerEvent | null = null;
@@ -245,8 +251,9 @@ export class BattleScene extends Phaser.Scene {
     });
     this.fx = this.add.graphics();
     this.overlay = this.add.rectangle(0, 0, 320, this.tall ? GAME_H_TALL : GAME_H, hex(S.navy), 0.65).setOrigin(0).setVisible(false);
+    this.flash = this.add.rectangle(0, 0, 320, this.tall ? GAME_H_TALL : GAME_H, hex(S.white), 1).setOrigin(0).setDepth(10).setVisible(false);
     this.cutinImg = this.add.image(CENTER_X, 104, '__DEFAULT').setVisible(false);
-    this.cutinTitle = text(this, CENTER_X, 146, '', { ko: 11, color: S.gold, bold: true }).setOrigin(0.5, 0).setVisible(false);
+    this.cutinTitle = text(this, CENTER_X, 162, '', { ko: 11, color: S.gold, bold: true }).setOrigin(0.5, 0).setVisible(false);
     this.cutinTitle.setShadow(1, 1, S.ink, 0);
   }
 
@@ -260,6 +267,12 @@ export class BattleScene extends Phaser.Scene {
     this.applyFighter('player', v.player, `${v.player.kind} Lv${v.player.level}`);
     this.applyFighter('enemy', v.enemy, `${v.enemy.kind} Lv${v.enemy.level}`);
     this.f.enemy.boss?.setVisible(v.enemy.isBoss);
+    // 필살기 예고 중이면 적 초상에 빨간 테두리를 남긴다
+    const bg = this.f.enemy.border.clear();
+    if (v.enemy.charging) {
+      bg.lineStyle(2, hex(S.red), 1);
+      bg.strokeRect(259, 11, 52, 60);
+    }
     this.shownHp = { player: v.player.hp, enemy: v.enemy.hp };
     this.drawHp();
     this.placeIdle();
@@ -476,7 +489,10 @@ export class BattleScene extends Phaser.Scene {
           this.time.delayedCall(at, () => this.playKo(it, k));
           break;
         case 'text':
-          this.time.delayedCall(at, () => this.pushMessage(it.text ?? ''));
+          this.time.delayedCall(at, () => {
+            this.pushMessage(it.text ?? '');
+            if (it.telegraph) this.blinkBorder('enemy', k);
+          });
           break;
       }
     }
@@ -541,13 +557,42 @@ export class BattleScene extends Phaser.Scene {
     return CENTER_X + (defFrom === 'left' ? -MEET_GAP : MEET_GAP);
   }
 
-  private damage(attacker: Who, amount: number, x: number, k: number): void {
+  private damage(attacker: Who, amount: number, x: number, k: number, crit = false): void {
     const def = otherWho(attacker);
     this.shownHp[def] = Math.max(0, this.shownHp[def] - amount);
     this.drawHp();
-    const t = text(this, x, FIELD.y + 30, `-${amount}`, { size: 16, color: S.white, num: true }).setOrigin(0.5, 0);
+    // 치명타는 금색 큰 숫자(Silkscreen 16px) + 느낌표
+    const t = text(this, x, FIELD.y + (crit ? 24 : 30), `-${amount}${crit ? '!' : ''}`, { size: 16, color: crit ? S.gold : S.white, num: true }).setOrigin(0.5, 0);
     t.setShadow(1, 1, S.ink, 0);
-    this.tweens.add({ targets: t, y: t.y - 14, alpha: 0, duration: 600 * k, ease: 'Quad.easeOut', onComplete: () => t.destroy() });
+    this.tweens.add({ targets: t, y: t.y - 14, alpha: 0, duration: (crit ? 800 : 600) * k, ease: 'Quad.easeOut', onComplete: () => t.destroy() });
+  }
+
+  /**
+   * 치명타 연출: 흰 화면 2프레임 + 정수 4px 좌우 흔들림 3회 + 대사 "회심의 일격!".
+   * 히트스톱(둘이 맞닿은 채 120ms 멈춤)은 타임라인이 그 합의 hold로 넣는다. 움직임 줄이기 설정이면 흰 화면·흔들림은 뺀다
+   */
+  private critFx(k: number, reduce: boolean): void {
+    this.pushMessage('회심의 일격!');
+    playSfx('slash');
+    if (reduce) return;
+    this.flash.setVisible(true);
+    this.time.delayedCall(FLASH_MS, () => this.flash.setVisible(false));
+    const cam = this.cameras.main;
+    SHAKE_STEPS.forEach((dx, i) => this.time.delayedCall(((i + 1) * SHAKE_MS) / SHAKE_STEPS.length * k, () => cam.setScroll(dx, 0)));
+  }
+
+  /** 보스 필살기 예고: 적 초상 테두리를 빨강·금으로 깜빡인다 */
+  private blinkBorder(who: Who, k: number): void {
+    const g = this.f[who].border;
+    const x = who === 'player' ? 10 : 260;
+    const draw = (on: boolean, col: string) => {
+      g.clear();
+      if (!on) return;
+      g.lineStyle(2, hex(col), 1);
+      g.strokeRect(x - 1, 11, 52, 60);
+    };
+    for (let i = 0; i < 8; i++) this.time.delayedCall(i * 90 * k, () => draw(i % 2 === 0, i % 4 === 0 ? S.red : S.gold));
+    this.time.delayedCall(8 * 90 * k, () => draw(true, S.red));
   }
 
   /** 프레임 3장을 dur 동안 차례로 그리고 지운다 */
@@ -570,9 +615,10 @@ export class BattleScene extends Phaser.Scene {
       return;
     }
     playSfx('hit');
-    if (!reduce) this.cameras.main.shake(120, 0.004);
+    if (it.crit) this.critFx(k, reduce);
+    else if (!reduce) this.cameras.main.shake(120, 0.004);
     this.frames3(CLASH_MS * k, (g, i) => spark(g, CENTER_X, CLASH_Y, i));
-    this.damage(who, amount, this.hitPoint(who, it), k);
+    this.damage(who, amount, this.hitPoint(who, it), k, !!it.crit);
   }
 
   private playCutin(it: TimelineItem, k: number): void {
@@ -585,11 +631,9 @@ export class BattleScene extends Phaser.Scene {
     const pk = fv ? portraitKeyFor(this, fv.id) : null;
     const objs: Phaser.GameObjects.GameObject[] = [this.overlay, this.cutinTitle];
     if (pk) {
-      this.cutinImg.setTexture(pk).setDisplaySize(46, 54).setVisible(true).setAlpha(1);
-      const sx = this.cutinImg.scaleX;
-      const sy = this.cutinImg.scaleY;
-      this.cutinImg.setScale(sx * 0.5, sy * 0.5);
-      this.tweens.add({ targets: this.cutinImg, scaleX: sx * 1.4, scaleY: sy * 1.4, duration: 260 * k, ease: 'Back.easeOut' });
+      // 초상은 2배 정수 배율로 고정(소수 배율은 도트가 깨진다), 왼쪽 밖에서 120ms에 미끄러져 들어온다
+      this.cutinImg.setTexture(pk).setScale(2).setVisible(true).setAlpha(1).setX(-60);
+      this.tweens.add({ targets: this.cutinImg, x: CENTER_X, duration: 120 * k, ease: 'Linear' });
       objs.push(this.cutinImg);
     }
     const name = (it.skillId && SKILLS[it.skillId]?.name) || '';
@@ -612,7 +656,8 @@ export class BattleScene extends Phaser.Scene {
     const x = this.hitPoint(who, it);
     const dir: 1 | -1 = this.sideOf(who, { player: otherSide(it.sidesAfter.player) }) === 'left' ? 1 : -1;
     this.frames3(STRIKE_MS * k, (g, i) => slashArc(g, x, CLASH_Y - 6, i, dir));
-    if (it.amount) this.damage(who, it.amount, x, k);
+    if (it.crit) this.critFx(k, reducedMotion());
+    if (it.amount) this.damage(who, it.amount, x, k, !!it.crit);
   }
 
   private playKo(it: TimelineItem, k: number): void {
@@ -648,6 +693,8 @@ export class BattleScene extends Phaser.Scene {
     // 무한 반복(▼ 깜빡임)은 남기고 연출 트윈만 끝낸다
     for (const o of [this.f.player.sprite, this.f.enemy.sprite, this.overlay, this.cutinImg, this.cutinTitle]) this.tweens.killTweensOf(o);
     this.fx.clear();
+    this.flash.setVisible(false);
+    this.cameras.main.setScroll(0, 0);
     for (const d of this.dust) d.destroy();
     this.dust = [];
     this.overlay.setVisible(false);
