@@ -82,6 +82,8 @@ export type TurnEvent = {
   amount?: number;
   /** hit: 치명타(회심의 일격)였다 */
   crit?: boolean;
+  /** hit: 기술 유형 대 맞는 쪽 유형의 상성 (유리·불리일 때만) */
+  eff?: 'win' | 'lose';
   text: string;
 };
 

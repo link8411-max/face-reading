@@ -2,6 +2,18 @@
 import { BALANCE, onBalanceChange } from './balance';
 import type { Skill } from './types';
 
+/** 효과 규칙 상수: 화상 턴 수, 혼란 실패율, 도발 지속, 일갈·매복 배율, 적 AI의 방어 판단 */
+export const SKILL_RULES = {
+  burnTurns: 3,
+  confuseActions: 1,
+  confuseFail: 0.5,
+  tauntActions: 2,
+  shoutRate: 0.8,
+  ambushRate: 0.5,
+  lowHp: 0.3,
+  defendChance: 0.3,
+} as const;
+
 const list: Skill[] = [
   // 기본 공격 (위력 40, 무제한)
   { id: 'strike', name: '일격', kind: '맹장', power: 40, uses: null },
