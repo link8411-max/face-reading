@@ -45,7 +45,7 @@ const gwawa = (w: string) => josa(w, '과', '와');
 
 const isBoss = (id: string) => (BOSS_IDS as readonly string[]).includes(id);
 
-type Kind = 'open' | 'mob' | 'win' | 'plain' | 'boss' | 'flourish' | 'recruit' | 'reward' | 'final';
+type Kind = 'open' | 'mob' | 'win' | 'plain' | 'fold' | 'boss' | 'flourish' | 'recruit' | 'reward' | 'final';
 
 interface Item {
   kind: Kind;
@@ -62,7 +62,7 @@ const pick = <T>(list: T[], key: number) => list[((key % list.length) + list.len
 function mobSentence(startWave: number, n: number): string {
   const c = mobCount(n);
   return pick(
-    [`${MOB_NAME}을 ${c} 베고 나아가다.`, `${MOB_NAME} 무리를 ${c} 베어 길을 열다.`],
+    [`${MOB_NAME}을 ${c} 베고 나아가다.`, `${MOB_NAME}을 ${c} 베고 길을 열다.`],
     startWave - 1,
   );
 }
@@ -77,7 +77,9 @@ function winItems(w: RunWave, lead: string): Item[] {
 
   if (w.lostAlly) {
     const ally = nameOf(w.lostAlly);
-    const end = skill ? `${iga(by)} ${euro(skill)} 끝을 냈다.` : `${iga(by)} 끝을 냈다.`;
+    const how = skill ? `${euro(skill)} ` : '';
+    // 보스를 꺾었으면 전사가 있어도 사기 문구를 붙인다
+    const end = isBoss(w.enemy) ? `${iga(by)} ${how}끝을 내니 사기가 올랐다.` : `${iga(by)} ${how}끝을 냈다.`;
     items.push({ kind: 'win', text: `${ord} 싸움, ${enemy}에게 ${iga(ally)} 쓰러졌으나 ${end}` });
   } else if (isBoss(w.enemy)) {
     const how = skill ? `${euro(skill)} ` : '';
@@ -121,7 +123,7 @@ function winItems(w: RunWave, lead: string): Item[] {
       text: pick([`${iga(enemy)} 쓰러지자 적진이 흩어졌다.`, `${enemy}의 군세가 무너져 내렸다.`], w.wave),
     });
   }
-  if (w.recruited) items.push({ kind: 'recruit', text: `${iga(enemy)} 항복하여 합류하다.` });
+  if (w.recruited) items.push({ kind: 'recruit', text: `${iga(enemy)} 항복하여 합류하다.`, foe: enemy });
   return items;
 }
 
@@ -144,25 +146,32 @@ function finalItems(w: RunWave, lead: string, cleared: boolean): Item[] {
   return [meet, { kind: 'final', text: end }];
 }
 
+/** 이름이 조사와 맞지 않는 보상은 문장을 따로 둔다 ("동행 자리 +1", "병법서: 화공") */
+const REWARD_LINES: Record<string, string> = {
+  slot: '도중에 동행 자리를 하나 더 얻었다.',
+  book_fire: '도중에 화공의 병법서를 얻었다.',
+};
+
 function rareRewardItem(rewards: string[]): Item | undefined {
   for (const id of rewards) {
     const r = REWARDS.find((x) => x.id === id);
-    if (r && r.rarity === 'rare') return { kind: 'reward', text: `도중에 ${eulreul(r.name)} 얻었다.` };
+    if (r && r.rarity === 'rare') return { kind: 'reward', text: REWARD_LINES[r.id] ?? `도중에 ${eulreul(r.name)} 얻었다.` };
   }
   return undefined;
 }
 
-/** 'A다.' + 'B다.' → 'A고, B다.' */
-const join2 = (a: string, b: string) => `${a.replace(/다\.$/, '고,').replace(/\.$/, ',')} ${b}`;
-
 /** 'A다.' + 'B다.' → 'A(으)니, B다.' (항복 문장을 앞 승리 문장에 잇는다) */
 function joinNi(a: string, b: string): string {
-  if (!a.endsWith('다.')) return join2(a, b);
+  if (!a.endsWith('다.')) return `${a} ${b}`;
   const stem = a.slice(0, -2);
   const c = stem.charCodeAt(stem.length - 1) - 0xac00;
   const batchim = c >= 0 && c <= 11171 && c % 28 !== 0;
   return `${stem}${batchim ? '으니' : '니'}, ${b}`;
 }
+
+/** 'A, B, C' 또는 'A와 B' (마지막 이름에 조사를 붙여 넘긴다) */
+const listNames = (names: string[], last: string) =>
+  names.length === 1 ? last : names.length === 2 ? `${gwawa(names[0])} ${last}` : [...names.slice(0, -1), last].join(', ');
 
 const foldable = (it: Item) => it.kind === 'plain' || it.kind === 'mob';
 
@@ -181,28 +190,52 @@ function foldWins(items: Item[]): Item[] {
     if (run.length < 2 || !run.some((it) => it.kind === 'plain')) out.push(...run);
     else {
       const names = run.map((it) => it.foe!);
-      const list = [...names.slice(0, -1), eulreul(names[names.length - 1])].join(', ');
-      out.push({ kind: 'win', text: `${ordinal(run[0].from!)}부터 ${ordinal(run[run.length - 1].to!)} 싸움까지 ${list} 차례로 꺾다.` });
+      const from = run[0].from!;
+      const to = run[run.length - 1].to!;
+      const span = to === from + 1 ? `${ordinal(from)}와 ${ordinal(to)} 싸움에서` : `${ordinal(from)}부터 ${ordinal(to)} 싸움까지`;
+      out.push({ kind: 'fold', text: `${span} ${listNames(names, eulreul(names[names.length - 1]))} 차례로 꺾다.` });
     }
     i = j;
   }
   return out;
 }
 
-/** 항복 문장을 바로 앞 문장에 잇는다 */
+/**
+ * 항복이 하나면 바로 앞 승리 문장에 잇고(그 문장은 영입 문장이 되어 빠지지 않는다),
+ * 여럿이면 마지막 항복 자리에 "그사이 A, B가 차례로 항복하여 합류하다." 한 문장으로.
+ */
 function mergeRecruits(items: Item[]): Item[] {
-  const out: Item[] = [];
-  for (const it of items) {
-    const prev = out[out.length - 1];
-    if (it.kind === 'recruit' && prev && prev.kind !== 'open') out[out.length - 1] = { kind: 'win', text: joinNi(prev.text, it.text) };
-    else out.push(it);
+  const recruits = items.filter((it) => it.kind === 'recruit');
+  if (recruits.length === 0) return items;
+  if (recruits.length === 1) {
+    const out: Item[] = [];
+    for (const it of items) {
+      const prev = out[out.length - 1];
+      if (it.kind === 'recruit' && prev && prev.kind !== 'open') out[out.length - 1] = { kind: 'recruit', text: joinNi(prev.text, it.text) };
+      else out.push(it);
+    }
+    return out;
   }
-  return out;
+  const names = [...new Set(recruits.map((it) => it.foe!))];
+  const text = `그사이 ${listNames(names, iga(names[names.length - 1]))} 차례로 항복하여 합류하다.`;
+  const lastAt = items.lastIndexOf(recruits[recruits.length - 1]);
+  return items.flatMap((it, i) => (i === lastAt ? [{ kind: 'recruit' as Kind, text }] : it.kind === 'recruit' ? [] : [it]));
 }
 
+/** 첫 문장과 마지막 싸움 두 문장을 빼고, kinds에 드는 문장을 앞에서부터 하나씩 뺀다 */
+const dropEarliest = (kinds: Kind[] | null) => (xs: Item[]): Item[] => {
+  const out = [...xs];
+  for (let i = 1; i < out.length - 2 && out.length > MAX_LINES; ) {
+    if (kinds === null || kinds.includes(out[i].kind)) out.splice(i, 1);
+    else i++;
+  }
+  return out;
+};
+
 /**
- * 8문장을 넘으면: 보상 → 보스 여운 문장을 빼고, 이어진 승리를 묶고, 항복을 앞 문장에 잇고,
- * 그래도 많으면 첫 문장과 마지막 싸움 두 문장을 뺀 이웃 문장 중 가장 짧은 쌍부터 합친다.
+ * 8문장을 넘으면 차례로: 보상 → 보스 여운 문장을 빼고, 이어진 승리를 묶고, 항복을 잇거나 모으고,
+ * 그래도 많으면 덜 중요한 문장(졸개 → 묶은·평범한 승리 → 전사 있는 승리 → 그 밖)을 앞에서부터 뺀다.
+ * 문장을 억지로 이어 붙이지 않는다.
  */
 function fit(items: Item[]): Item[] {
   let out = items;
@@ -211,19 +244,14 @@ function fit(items: Item[]): Item[] {
     (xs) => xs.filter((it) => it.kind !== 'flourish'),
     foldWins,
     mergeRecruits,
+    dropEarliest(['mob']),
+    dropEarliest(['fold', 'plain']),
+    dropEarliest(['win']),
+    dropEarliest(null),
   ];
   for (const step of steps) {
     if (out.length <= MAX_LINES) return out;
     out = step(out);
-  }
-  while (out.length > MAX_LINES) {
-    // 첫 문장은 되도록 그대로 둔다 (첫 쌍은 다른 쌍이 없을 때만)
-    let best = out.length > 4 ? -1 : 0;
-    for (let i = 1; i + 1 < out.length - 2; i++) {
-      if (best < 0 || out[i].text.length + out[i + 1].text.length < out[best].text.length + out[best + 1].text.length) best = i;
-    }
-    if (best < 0) break;
-    out = [...out.slice(0, best), { kind: 'win', text: join2(out[best].text, out[best + 1].text) }, ...out.slice(best + 2)];
   }
   return out;
 }
@@ -270,6 +298,7 @@ export function narrate(record: RunRecord): { title: string; lines: string[]; he
   let fitted = fit(items);
   if (fitted.length < MIN_LINES) fitted = [opening, ...fitted];
   const lines = fitted.map((it) => it.text);
-  if (!lines[0].startsWith(lead)) lines[0] = `${lead}, ${lines[0]}`;
+  // 첫 문장에 선두가 없으면 "<선두>, "를 붙인다. "<서수> 싸움, "은 쉼표가 겹치지 않게 "<서수> 싸움에서 "로
+  if (!lines[0].includes(lead)) lines[0] = `${lead}, ${lines[0].replace(/^(\S+) 싸움, /, '$1 싸움에서 ')}`;
   return { title, lines, headline };
 }
