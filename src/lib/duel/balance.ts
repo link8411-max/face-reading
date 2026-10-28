@@ -57,6 +57,8 @@ export interface Balance {
   speedAdj: Record<string, number>;
   /** 장수 id → 주는 피해 배율(캐릭터 균형용, 없으면 1). 적으로 나올 때도 같다 */
   generalPower: Record<string, number>;
+  /** 장수 id → 최대 체력 배율(캐릭터 균형용, 없으면 1). 적으로 나올 때도 같다 */
+  generalHp: Record<string, number>;
 }
 
 /** [쓰러뜨리는 합, 쓰러지는 합] 줄임 */
@@ -65,8 +67,8 @@ const d = (hitsToKillEnemy: number, hitsToKillPlayer: number): WaveDesign => ({ 
 export const BALANCE: Balance = {
   hpPerLead: 2,
   hpPerLevel: 40,
-  matchWin: 1.3,
-  matchLose: 0.77,
+  matchWin: 1.2,
+  matchLose: 0.83,
   stab: 1.2,
   healRate: 0.3,
   burnRate: 0.08,
@@ -74,11 +76,11 @@ export const BALANCE: Balance = {
   // prettier-ignore
   waveDesign: [
     d(5, 56), d(5, 56), d(6, 56), d(7, 45), d(7, 45), d(10, 40), // 1~6 장각
-    d(11, 28), d(11, 28), d(11, 28), d(11, 28), d(11, 28), d(17, 13), // 7~12 하후돈
-    d(13, 20), d(13, 20), d(13, 20), d(13, 20), d(13, 20), d(20, 8), // 13~18 동탁
-    d(14, 16), d(14, 16), d(14, 16), d(14, 16), d(14, 16), d(20, 5), // 19~24 허저
-    d(14, 14), d(14, 14), d(14, 14), d(14, 14), d(14, 14), d(21, 7), // 25~30 마초
-    d(15, 13), d(15, 13), d(15, 13), d(15, 13), d(15, 13), d(22, 5), // 31~36 여포
+    d(12, 31), d(12, 31), d(12, 31), d(12, 31), d(12, 31), d(17, 13), // 7~12 하후돈
+    d(14, 22), d(14, 22), d(14, 22), d(14, 22), d(14, 22), d(20, 8), // 13~18 동탁
+    d(15, 17), d(15, 17), d(15, 17), d(15, 17), d(15, 17), d(20, 5), // 19~24 허저
+    d(15, 15), d(15, 15), d(15, 15), d(15, 15), d(15, 15), d(21, 7), // 25~30 마초
+    d(16, 14), d(16, 14), d(16, 14), d(16, 14), d(16, 14), d(22, 5), // 31~36 여포
   ],
   refGeneral: 'guanyu',
   refAtkPerWave: 1,
@@ -102,7 +104,8 @@ export const BALANCE: Balance = {
     breathe: { uses: 3 },
   },
   speedAdj: {},
-  generalPower: { zhaoyun: 0.65 },
+  generalPower: {},
+  generalHp: { zhangfei: 1.08, zhaoyun: 0.55 },
 };
 
 /** 일부만 덮어쓰는 값 (중첩 객체·배열도 일부만) */

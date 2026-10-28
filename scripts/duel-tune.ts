@@ -4,7 +4,8 @@
 import { readFileSync } from 'node:fs';
 import { simulateRun, summarizeRuns } from '../src/lib/duel/autoplay';
 import { applyBalance, BALANCE, type BalanceOverride } from '../src/lib/duel/balance';
-import { makeFighter, matchup } from '../src/lib/duel/battle';
+import { makeFighter, matchup, skillsOf } from '../src/lib/duel/battle';
+import { SKILLS } from '../src/lib/duel/skills';
 import { basicHit, designedEnemy, makeDesignedEnemy, refFighter, refLevel } from '../src/lib/duel/design';
 import { BOSS_IDS, getDuelGeneral, MOB_ID, STARTER_IDS } from '../src/lib/duel/generals';
 import { BOSS_WAVES, WAVES } from '../src/lib/duel/run';
@@ -39,8 +40,10 @@ for (let w = 1; w <= WAVES; w++) {
 console.log(`설계 합 수 합계(36웨이브, 기본 공격만): ${total}\n`);
 
 // 2) 시작 장수별: 보스 웨이브에서 같은 레벨일 때 실제 상성으로 몇 합인가
-console.log('시작 장수 × 보스: 쓰러뜨리는 합 / 쓰러지는 합 (같은 레벨·보상 가정, 실제 상성)');
+console.log('시작 장수 × 보스: 쓰러뜨리는 합 / 쓰러지는 합 (같은 레벨·보상 가정, 실제 상성, 숨 고르기 회복 포함), 끝은 쓰러뜨림÷쓰러짐의 기하평균');
+const geo: Record<string, number> = {};
 for (const s of STARTER_IDS) {
+  let logSum = 0;
   const cells = BOSS_WAVES.map((w, i) => {
     const me = makeFighter(s, refLevel(w));
     me.bonus.atk = me.bonus.int = refFighter(w).bonus.atk;
@@ -48,10 +51,20 @@ for (const s of STARTER_IDS) {
     const m1 = matchup(kind(s), kind(foe.id));
     const m2 = matchup(kind(foe.id), kind(s));
     const kill = foe.maxHp / (basicHit(me, foe) * m1);
-    const die = me.maxHp / (basicHit(foe, me) * m2);
+    // 숨 고르기가 있으면 남은 횟수만큼 체력을 더 가진 셈(횟수 × 회복률)
+    const heal = skillsOf(me).includes('breathe') ? 1 + BALANCE.healRate * (SKILLS.breathe.uses ?? 0) : 1;
+    const die = (me.maxHp * heal) / (basicHit(foe, me) * m2);
+    logSum += Math.log(kill / die);
     return `${w}:${kill.toFixed(1)}/${die.toFixed(1)}`;
   });
-  console.log(`  ${s.padEnd(8)} ${cells.join('  ')}`);
+  geo[s] = Math.exp(logSum / BOSS_WAVES.length);
+  console.log(`  ${s.padEnd(8)} ${cells.join('  ')}  기하평균 ${geo[s].toFixed(2)}`);
+}
+// 쓰러지는 합은 체력에 비례: 기준 장수와 기하평균이 같아지는 체력 배율(지금 배율에 곱한다)
+for (const s of STARTER_IDS) {
+  if (s === BALANCE.refGeneral) continue;
+  const now = BALANCE.generalHp[s] ?? 1;
+  console.log(`  ${s} 체력 배율 제안: ${now} × ${(geo[s] / geo[BALANCE.refGeneral]).toFixed(2)} = ${(now * (geo[s] / geo[BALANCE.refGeneral])).toFixed(2)}`);
 }
 
 // 3) 검증

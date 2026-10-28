@@ -31,11 +31,11 @@ function skill(id: string): Skill {
   return s;
 }
 
-/** 이 장수·레벨의 최대 체력: round(통솔 × hpPerLead + level × hpPerLevel) (BALANCE) */
+/** 이 장수·레벨의 최대 체력: round((통솔 × hpPerLead + level × hpPerLevel) × generalHp) (BALANCE) */
 export function maxHpFor(id: string, level: number): number {
   const g = getDuelGeneral(id);
   if (!g) throw new Error(`없는 장수: ${id}`);
-  return Math.round(g.stats.통솔 * BALANCE.hpPerLead + level * BALANCE.hpPerLevel);
+  return Math.round((g.stats.통솔 * BALANCE.hpPerLead + level * BALANCE.hpPerLevel) * (BALANCE.generalHp[id] ?? 1));
 }
 
 /** maxHp는 maxHpFor. uses는 횟수 제한 있는 기술만 넣는다(키 없음 = 무제한). */
