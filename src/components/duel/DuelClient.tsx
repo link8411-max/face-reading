@@ -8,11 +8,12 @@ import { eventsToTimeline, timelineLength, type Side } from "@/game/duel/timelin
 import { createRng, type Rng } from "@/lib/duel/rng";
 import { pickReward, playerTurn, startRun } from "@/lib/duel/run";
 import { getReward } from "@/lib/duel/rewards";
-import { getDuelGeneral, STARTER_IDS } from "@/lib/duel/generals";
+import { BOSS_WAVES, getDuelGeneral, STARTER_IDS } from "@/lib/duel/generals";
 import { defaultSave, loadSave, recordRunEnd, writeSave } from "@/lib/duel/save";
 import { narrate } from "@/lib/duel/narrative";
 import { encodeRunKey } from "@/lib/duel/shareKey";
 import { makeRunId, newRunNonce } from "@/lib/duel/feedback";
+import { advancePlayed, buildRunLog, endEventId, waveEventId } from "@/lib/duel/runLog";
 import { duelShareUrl, ogImageUrl } from "@/lib/shareLinks";
 import type { RunRecord, RunState, SaveData } from "@/lib/duel/types";
 import { track } from "@/lib/analytics";
@@ -54,6 +55,15 @@ const storage = (): Storage | null => {
     return window.localStorage;
   } catch {
     return null;
+  }
+};
+
+/** 기기 종류(플레이 데이터용). 터치 화면이면 모바일 */
+const deviceKind = (): "mobile" | "desktop" => {
+  try {
+    return window.matchMedia("(pointer: coarse)").matches ? "mobile" : "desktop";
+  } catch {
+    return "desktop";
   }
 };
 
@@ -123,6 +133,12 @@ export default function DuelClient() {
   const [run, setRun] = useState<RunState | null>(null);
   /** 판마다 새로 만드는 무작위 값(피드백 runId용). 공유 시드 링크로 같은 판이 되어도 겹치지 않게 한다 */
   const [runNonce, setRunNonce] = useState("");
+  /** finishRun이 읽는 runNonce */
+  const runNonceRef = useRef("");
+  /** 플레이 데이터: 진행 시간 시계(저장 사이 시간을 쌓는다), 이어하기 판인지, 이번 판에서 이미 보낸 보스 도달 */
+  const clockRef = useRef({ startedAt: 0, playedMs: 0, lastAt: 0 });
+  const resumedRef = useRef(false);
+  const firedWavesRef = useRef<Set<number>>(new Set());
   const [screen, setScreen] = useState<SceneName>("start");
   const [readyScene, setReadyScene] = useState<SceneName | null>(null);
   const [animating, setAnimating] = useState(false);
@@ -147,6 +163,14 @@ export default function DuelClient() {
 
   // ── 저장 ──
   const persist = useCallback((data: SaveData) => {
+    // 진행 중인 판이면 시작 시각과 지금까지 진행한 시간을 함께 적는다(이어하기 때 이어서 쌓는다)
+    if (data.current) {
+      const now = Date.now();
+      const c = clockRef.current;
+      c.playedMs = advancePlayed(c.playedMs, c.lastAt, now);
+      c.lastAt = now;
+      data = { ...data, current: { ...data.current, startedAt: c.startedAt, playedMs: c.playedMs } };
+    }
     writeSave(storage(), data);
     setSave(data);
   }, []);
@@ -181,6 +205,24 @@ export default function DuelClient() {
     setStars(0);
     setResultPage(0);
     track("result_view", { test_name: "duel", result_id: r.record.starter });
+    track("duel_end", { test_name: "duel", result_id: endEventId(r.record.starter, r.record.cleared, r.wave) });
+    // 판 요약 1회 전송(실패·서버 꺼짐은 무시, 게임에는 영향 없음). 개인정보는 보내지 않는다
+    const c = clockRef.current;
+    const nonce = runNonceRef.current;
+    if (nonce) {
+      const playedMs = advancePlayed(c.playedMs, c.lastAt, Date.now());
+      const log = buildRunLog(r, {
+        runId: makeRunId(nonce, r.seed, r.record.starter, r.record.waves.length),
+        device: deviceKind(),
+        resumed: resumedRef.current,
+        playedMs,
+      });
+      try {
+        fetch("/api/duel/run", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(log), keepalive: true }).catch(() => {});
+      } catch {
+        // 보내지 못해도 결과 화면은 그대로
+      }
+    }
     bridge.emit("result:show", { ...toResultShow(r.record, next), stars: 0 });
     go("result");
   }, [bridge, go, persist]);
@@ -267,6 +309,14 @@ export default function DuelClient() {
     return () => { bridge.off("scene:changed", onChanged); };
   }, [bridge]);
 
+  // 보스 웨이브에 처음 들어가면 한 번 알린다(GA 퍼널: 몇 번째 보스까지 오는지)
+  useEffect(() => {
+    if (!run || run.phase !== "battle") return;
+    if (!(BOSS_WAVES as readonly number[]).includes(run.wave) || firedWavesRef.current.has(run.wave)) return;
+    firedWavesRef.current.add(run.wave);
+    track("duel_wave", { test_name: "duel", result_id: waveEventId(run.wave) });
+  }, [run]);
+
   // 언마운트 때 남은 턴 안전 타이머를 지운다
   useEffect(() => () => {
     if (turnTimerRef.current) clearTimeout(turnTimerRef.current);
@@ -311,13 +361,21 @@ export default function DuelClient() {
   }, [bridge, enterReward, finishRun, persist, save]);
 
   const startNewRun = useCallback(() => {
+    // 진행 중인 판을 두고 새로 출진하면 그 판은 버려진다
+    if (save.current && (save.current.phase === "battle" || save.current.phase === "reward")) track("duel_abandon", { test_name: "duel" });
     const seed = seedFrom(seedParamRef.current);
     const r = startRun(selected, seed);
     rngRef.current = createRng(seed);
     sidesRef.current = { player: "left" };
     track("test_start", { test_name: "duel" });
+    const now = Date.now();
+    clockRef.current = { startedAt: now, playedMs: 0, lastAt: now };
+    resumedRef.current = false;
+    firedWavesRef.current = new Set();
+    const nonce = newRunNonce();
+    runNonceRef.current = nonce;
     setRun(r);
-    setRunNonce(newRunNonce());
+    setRunNonce(nonce);
     setRecord(null);
     persist({ ...save, current: r });
     showBattle(r);
@@ -366,8 +424,16 @@ export default function DuelClient() {
         const turns = cur.record.waves.reduce((n, w) => n + w.turns, 0);
         rngRef.current = createRng((cur.seed + turns * 7919) >>> 0);
         sidesRef.current = { player: "left" };
+        track("duel_resume", { test_name: "duel" });
+        const now = Date.now();
+        clockRef.current = { startedAt: cur.startedAt ?? now, playedMs: cur.playedMs ?? 0, lastAt: now };
+        resumedRef.current = true;
+        // 이 웨이브까지의 보스 도달은 이미 보냈다
+        firedWavesRef.current = new Set(BOSS_WAVES.filter((w) => w <= cur.wave));
+        const nonce = newRunNonce();
+        runNonceRef.current = nonce;
         setRun(cur);
-        setRunNonce(newRunNonce());
+        setRunNonce(nonce);
         if (cur.phase === "battle") showBattle(cur);
         else enterReward(cur);
         return;

@@ -646,3 +646,28 @@ zhouyu   | roster | basic | 100%/100% | 100%/ 35% |  31%/  0% |   0%/  0% |   0%
   - 관우 7%p는 통과다.
   - 장비 8.5%p, 조운 9%p, 주유 17.5%p는 todo다. 주유는 공격 먼저 30%로, 병법서 지력이 바로 피해가 된다.
 - **novice·expert 주유 클리어**: novice 6%, expert 49%
+
+
+## 실제 데이터로 다시 맞추는 법
+
+판이 끝날 때마다 요약이 Supabase `duel_runs`에 쌓인다(`docs/duel-runs.sql`로 테이블을 만들고 `SUPABASE_URL`·`SUPABASE_SERVICE_KEY`를 Vercel에 넣어야 쌓인다. 없으면 조용히 꺼진다). 개인정보·IP는 없고, 시작 장수·도달 웨이브·결과·보상 id·기기 종류·시간 구간뿐이다.
+
+1. 실제 표 보기: `npx tsx --tsconfig tsconfig.json scripts/duel-real-stats.ts [--version 해시8자]`
+   - 버전(= `balanceHash()`, BALANCE 수치의 해시 8자)마다 따로 나온다. **현재 버전 표만** 보고 맞춘다. 수치를 바꾸면 해시가 바뀌어 새 표가 시작된다.
+   - 칸: 시작 장수별 12·18·24 생존, 클리어, 보스별 패배 비율, 평균 턴, 시간 구간 분포.
+   - 한 칸이 30판 미만이면 참고만 한다.
+2. 봇 표 뽑기: `scripts/duel-balance.ts --only dist`의 `average` 줄이 실제 사람과 가장 가깝다(`novice`·`expert`는 양끝).
+3. 비교해서 어느 칸을 고칠지 정한다. 실제 표가 봇 `average`보다 낮으면 사람이 더 어렵게 느끼는 것이다.
+
+| 실제 표에서 보이는 것 | 고칠 곳(`BALANCE.waveDesign`) | 얼마나 |
+|---|---|---|
+| 특정 보스 패배 비율이 25%를 넘는다(예: 동탁 18) | 그 보스 웨이브의 `hitsToKillPlayer`(쓰러지는 합) 올림, 또는 `hitsToKillEnemy` 내림 | 한 번에 1~2합 |
+| 12 생존이 봇보다 10%p 넘게 낮다 | 7~11 보통 웨이브의 `hitsToKillPlayer` | 각 +1합 |
+| 18·24 생존이 목표(18 약 50%, 24 약 30%)에서 벗어난다 | 그 구간 바로 앞 블록(13~17, 19~23)의 `hitsToKillPlayer` | 각 +-1합 |
+| 클리어가 15%를 넘는다 | 30~36 블록의 `hitsToKillPlayer`, 여포(36) `hitsToKillEnemy` | 한 번에 1합 |
+| 평균 턴이 봇보다 훨씬 길다 | `hitsToKillEnemy`가 큰 블록(보스 칸)부터 내림 | 보스 -1~2합 |
+| 한 시작 장수만 크게 낮다 | 설계표가 아니라 `generalPower`·`generalHp`(그 장수) | 5% 안팎 |
+| 시간 구간이 `>90m`에 몰린다 | 한 판이 너무 길다: `hitsToKillEnemy`를 보스 칸에서 내림 | 1~2합 |
+
+4. 고친 뒤에는 `scripts/duel-tune.ts`로 설계표 검증, `scripts/duel-balance.ts --only dist`로 봇 표를 다시 확인한다. 설계표를 바꾸면 해시가 바뀌므로 실제 표는 새 버전으로 다시 쌓인다(옛 버전 표는 비교용으로만).
+5. 플레이어 분포를 해석할 때 주의: 포기한 판(`duel_abandon`)은 `duel_runs`에 없다. 일찍 그만둔 사람은 GA의 `duel_wave`·`duel_end` 퍼널과 함께 본다.

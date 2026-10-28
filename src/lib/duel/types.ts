@@ -126,6 +126,10 @@ export interface RunState {
   rewardsOffered: string[];
   /** 마지막 playerTurn의 사건(연출·대사창용). 새 웨이브에서 비운다. 옛 저장에는 없다 */
   lastEvents?: TurnEvent[];
+  /** 판을 시작한 때(ms). 플레이 데이터용, 옛 저장에는 없다 */
+  startedAt?: number;
+  /** 지금까지 진행한 시간(ms): 저장 사이 시간을 5분까지만 쌓는다. 이어하기 때 이어서 쌓는다 */
+  playedMs?: number;
 }
 
 export interface Reward {

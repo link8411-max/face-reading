@@ -57,6 +57,7 @@ export default function PrivacyPage() {
                 </p>
                 <ul className="list-disc ml-6 mt-2 space-y-1">
                     <li>테스트 시작·결과 보기·공유 버튼 누름 같은 이용 흐름과 결과 유형 이름(예: 여우상)만 기록합니다.</li>
+                    <li>삼국지 일기토(게임)는 한 판이 끝나면 플레이 기록(시작 장수, 도달 단계, 결과, 고른 보상, 기기 종류)을 저장합니다. 개인을 식별할 수 없는 정보이며 게임 난이도를 조정하는 데에만 씁니다. IP 주소는 저장하지 않습니다.</li>
                     <li>얼굴 사진과 생년월일, 얼굴 측정값은 수집하지 않으며 Google 애널리틱스로 보내지 않습니다.</li>
                     <li>Google 애널리틱스 수집을 원하지 않으면 브라우저의 쿠키 차단이나 Google 애널리틱스 차단 부가 기능(tools.google.com/dlpage/gaoptout)을 이용할 수 있습니다.</li>
                 </ul>
@@ -66,7 +67,7 @@ export default function PrivacyPage() {
                 <p className="text-sm text-muted">
                     공고일자: 2026년 1월 15일<br />
                     시행일자: 2026년 1월 15일<br />
-                    개정일자: 2026년 10월 26일 (Google 애널리틱스 항목 추가)
+                    개정일자: 2026년 10월 28일 (삼국지 일기토 플레이 기록 항목 추가)
                 </p>
             </section>
         </div>
