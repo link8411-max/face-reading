@@ -12,6 +12,7 @@ import { getDuelGeneral, STARTER_IDS } from "@/lib/duel/generals";
 import { defaultSave, loadSave, recordRunEnd, writeSave } from "@/lib/duel/save";
 import { narrate } from "@/lib/duel/narrative";
 import { encodeRunKey } from "@/lib/duel/shareKey";
+import { makeRunId } from "@/lib/duel/feedback";
 import { duelShareUrl, ogImageUrl } from "@/lib/shareLinks";
 import type { RunRecord, RunState, SaveData } from "@/lib/duel/types";
 import { track } from "@/lib/analytics";
@@ -529,6 +530,7 @@ export default function DuelClient() {
               wave={record.waves.length}
               starter={record.starter}
               cleared={record.cleared}
+              runId={run ? makeRunId(run.seed, record.starter, record.waves.length) : undefined}
               rating={stars}
               onRate={rate}
             />

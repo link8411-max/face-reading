@@ -1,5 +1,6 @@
-import { describe, it, expect, vi, afterEach } from 'vitest';
-import { validateFeedback } from '@/lib/duel/feedback';
+import { describe, it, expect, vi, afterEach, beforeEach } from 'vitest';
+import { validateFeedback, makeRunId } from '@/lib/duel/feedback';
+import { __resetFeedbackLimits } from '@/lib/duel/feedbackGuard';
 import { POST } from '@/app/api/duel/feedback/route';
 
 const ok = { rating: 4, note: '재밌어요', wave: 5, starter: 'guanyu', cleared: false, device: 'mobile' };
@@ -44,9 +45,19 @@ describe('validateFeedback', () => {
   });
 });
 
-const req = (body: string) => new Request('http://localhost/api/duel/feedback', { method: 'POST', body });
+describe('makeRunId', () => {
+  it('같은 입력은 같은 id, 다르면 다른 id, 영문·숫자 32자 이하', () => {
+    expect(makeRunId(123, 'guanyu', 9)).toBe(makeRunId(123, 'guanyu', 9));
+    expect(makeRunId(123, 'guanyu', 9)).not.toBe(makeRunId(124, 'guanyu', 9));
+    expect(makeRunId(123, 'guanyu', 9)).toMatch(/^[A-Za-z0-9]{1,32}$/);
+  });
+});
+
+const req = (body: string, headers: Record<string, string> = {}) =>
+  new Request('http://localhost/api/duel/feedback', { method: 'POST', body, headers });
 
 describe('POST /api/duel/feedback', () => {
+  beforeEach(() => __resetFeedbackLimits());
   afterEach(() => {
     vi.unstubAllEnvs();
     vi.unstubAllGlobals();
@@ -78,5 +89,63 @@ describe('POST /api/duel/feedback', () => {
     expect((await POST(req(JSON.stringify(ok)))).status).toBe(502);
     f.mockRejectedValue(new Error('boom'));
     expect((await POST(req(JSON.stringify(ok)))).status).toBe(502);
+  });
+
+  describe('보호 장치', () => {
+    const stubUpstream = () => {
+      vi.stubEnv('SUPABASE_URL', 'https://x.supabase.co');
+      vi.stubEnv('SUPABASE_SERVICE_KEY', 'k');
+      const f = vi.fn().mockImplementation(async () => new Response(null, { status: 201 }));
+      vi.stubGlobal('fetch', f);
+      return f;
+    };
+
+    it('Content-Length가 2KB 넘으면 413', async () => {
+      const f = stubUpstream();
+      const big = JSON.stringify({ ...ok, note: 'a'.repeat(3000) });
+      const res = await POST(req(big, { 'content-length': String(big.length) }));
+      expect(res.status).toBe(413);
+      expect(f).not.toHaveBeenCalled();
+    });
+    it('Content-Length 헤더가 없어도 읽다가 2KB에서 끊고 413', async () => {
+      const f = stubUpstream();
+      const big = JSON.stringify({ ...ok, note: 'a'.repeat(3000) });
+      expect((await POST(req(big))).status).toBe(413);
+      expect(f).not.toHaveBeenCalled();
+    });
+    it('같은 IP 6번째 요청은 429, 다른 IP는 영향 없음', async () => {
+      stubUpstream();
+      const h = { 'x-forwarded-for': '1.1.1.1, 9.9.9.9' };
+      for (let i = 0; i < 5; i++) expect((await POST(req(JSON.stringify(ok), h))).status).toBe(201);
+      expect((await POST(req(JSON.stringify(ok), h))).status).toBe(429);
+      expect((await POST(req(JSON.stringify(ok), { 'x-forwarded-for': '2.2.2.2' }))).status).toBe(201);
+    });
+    it('x-forwarded-for가 없으면 x-real-ip로 제한한다', async () => {
+      stubUpstream();
+      const h = { 'x-real-ip': '3.3.3.3' };
+      for (let i = 0; i < 5; i++) await POST(req(JSON.stringify(ok), h));
+      expect((await POST(req(JSON.stringify(ok), h))).status).toBe(429);
+    });
+    it('같은 runId는 한 번만 insert, 두 번째는 409', async () => {
+      const f = stubUpstream();
+      const body = JSON.stringify({ ...ok, runId: 'abc123' });
+      expect((await POST(req(body))).status).toBe(201);
+      expect((await POST(req(body))).status).toBe(409);
+      expect(f).toHaveBeenCalledTimes(1);
+    });
+    it('잘못된 runId(특수문자·33자)는 400, upstream으로 runId를 보내지 않는다', async () => {
+      const f = stubUpstream();
+      expect((await POST(req(JSON.stringify({ ...ok, runId: 'a-b' })))).status).toBe(400);
+      expect((await POST(req(JSON.stringify({ ...ok, runId: 'a'.repeat(33) })))).status).toBe(400);
+      expect((await POST(req(JSON.stringify({ ...ok, runId: 'okId1' })))).status).toBe(201);
+      expect(JSON.parse(f.mock.calls[0][1].body)).toEqual(ok);
+    });
+    it('업스트림 실패한 runId는 재시도 가능', async () => {
+      const f = stubUpstream();
+      f.mockResolvedValueOnce(new Response(null, { status: 500 }));
+      const body = JSON.stringify({ ...ok, runId: 'retry1' });
+      expect((await POST(req(body))).status).toBe(502);
+      expect((await POST(req(body))).status).toBe(201);
+    });
   });
 });

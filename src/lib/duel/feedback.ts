@@ -30,3 +30,14 @@ export function validateFeedback(body: unknown): DuelFeedback | null {
 
   return { rating: rating as DuelFeedback['rating'], note, wave, starter, cleared, device };
 }
+
+// 한 판의 식별자(영문·숫자 8자 안팎): 시드 + 시작 장수 + 웨이브 수의 FNV-1a 해시.
+// 같은 판을 두 번 보내지 않게 서버가 runId로 거른다. 개인 정보는 들어가지 않는다.
+export function makeRunId(seed: number, starter: string, waves: number): string {
+  let h = 0x811c9dc5;
+  for (const ch of `${seed >>> 0}.${starter}.${waves}`) {
+    h ^= ch.charCodeAt(0);
+    h = Math.imul(h, 0x01000193) >>> 0;
+  }
+  return h.toString(36);
+}

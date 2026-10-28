@@ -1,10 +1,17 @@
 import { NextResponse } from 'next/server';
 import { validateFeedback } from '@/lib/duel/feedback';
+import { allowRequest, claimRunId, clientIp, parseRunId, readLimitedBody, releaseRunId } from '@/lib/duel/feedbackGuard';
 
 export async function POST(request: Request) {
+  // IP는 속도 제한 판단에만 쓰고 저장·로그·전송하지 않는다
+  if (!allowRequest(clientIp(request.headers))) return NextResponse.json({ ok: false }, { status: 429 });
+
+  const text = await readLimitedBody(request);
+  if (text === null) return NextResponse.json({ ok: false }, { status: 413 });
+
   let body: unknown;
   try {
-    body = await request.json();
+    body = JSON.parse(text);
   } catch {
     return NextResponse.json({ ok: false }, { status: 400 });
   }
@@ -12,13 +19,20 @@ export async function POST(request: Request) {
   const feedback = validateFeedback(body);
   if (!feedback) return NextResponse.json({ ok: false }, { status: 400 });
 
-  const url = process.env.SUPABASE_URL;
+  const runId = parseRunId(body);
+  if (runId === 'invalid') return NextResponse.json({ ok: false }, { status: 400 });
+
+  // 끝 슬래시는 정규화한다
+  const url = process.env.SUPABASE_URL?.replace(/\/+$/, '');
   const key = process.env.SUPABASE_SERVICE_KEY;
   // 설정이 없으면 피드백만 꺼진다(게임 흐름에는 영향 없음)
   if (!url || !key) return NextResponse.json({ ok: false, reason: 'disabled' }, { status: 503 });
 
+  // 같은 판(runId)은 이 인스턴스 안에서 한 번만 보낸다
+  if (runId && !claimRunId(runId)) return NextResponse.json({ ok: false }, { status: 409 });
+
   try {
-    // IP·UA는 저장하지 않는다. 본문·키는 로그에 남기지 않는다.
+    // IP·UA·runId는 저장하지 않는다. 본문·키는 로그에 남기지 않는다.
     const res = await fetch(`${url}/rest/v1/duel_feedback`, {
       method: 'POST',
       headers: {
@@ -30,9 +44,13 @@ export async function POST(request: Request) {
       body: JSON.stringify(feedback),
       signal: AbortSignal.timeout(5000),
     });
-    if (!res.ok) return NextResponse.json({ ok: false }, { status: 502 });
+    if (!res.ok) {
+      if (runId) releaseRunId(runId);
+      return NextResponse.json({ ok: false }, { status: 502 });
+    }
     return NextResponse.json({ ok: true }, { status: 201 });
   } catch {
+    if (runId) releaseRunId(runId);
     return NextResponse.json({ ok: false }, { status: 502 });
   }
 }
