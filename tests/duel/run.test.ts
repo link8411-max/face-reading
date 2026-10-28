@@ -312,11 +312,59 @@ describe('afterWin', () => {
     const next = afterWin(base, () => 0);
     expect(next.record.waves[0].recruited).toBe(true);
     expect(next.party.map((f) => f.id)).toEqual(['guanyu', 'zhangfei', 'zhaoyun']);
-    const swapped = swapInRecruit(next, 'machao', 1);
+    const swapped = swapInRecruit(next, 'machao', 1, createRng(1));
     expect(swapped.party.map((f) => f.id)).toEqual(['guanyu', 'machao', 'zhaoyun']);
     expect(swapped.party[1].level).toBe(4);
-    expect(() => swapInRecruit(next, 'xuchu', 1)).toThrow();
-    expect(() => swapInRecruit(next, 'machao', 5)).toThrow();
+    expect(() => swapInRecruit(next, 'xuchu', 1, createRng(1))).toThrow();
+    expect(() => swapInRecruit(next, 'machao', 5, createRng(1))).toThrow();
+  });
+});
+
+describe('swapInRecruit 뒤', () => {
+  /** 웨이브 4에서 마초가 항복, 동행 꽉 참 */
+  function fullRecruit(party: string[]): RunState {
+    const base = structuredClone(atWave(startRun('guanyu', 1), 4, 'machao'));
+    base.party.push(...party.map((id) => makeFighter(id, 1)));
+    base.battle!.party = base.party;
+    base.battle!.enemy.hp = 0;
+    const next = afterWin(base, () => 0);
+    expect(next.record.waves[0].recruited).toBe(true);
+    return next;
+  }
+
+  it.each(SEEDS)('시드 %i: 시작 장수를 내보내도 7웨이브 이후 적으로 나오지 않는다', (seed) => {
+    const swapped = swapInRecruit(fullRecruit(['xuchu', 'zhouyu']), 'machao', 0, createRng(seed));
+    expect(swapped.party.map((f) => f.id)).not.toContain('guanyu');
+    const rng = createRng(seed);
+    for (let w = 7; w <= 17; w++) {
+      if (w === 12) continue;
+      for (let k = 0; k < 30; k++) expect(nextEnemyId({ ...swapped, wave: w }, rng)).not.toBe('guanyu');
+    }
+  });
+
+  it('대상이 빠져 못 쓰게 된 보상 카드는 교체 뒤 다시 채워지고 pickReward가 된다', () => {
+    const run = fullRecruit(['huangzhong', 'zhaoyun']);
+    run.party[0].hp = 10; // 다친 장수는 관우뿐
+    // 관우를 내보내면 셋 다 대상이 없다: 청룡언월도(관우 전용), 회복약(다친 장수 없음), 매복(모두 앎)
+    run.rewardsOffered = ['greendragon', 'potion', 'learn_ambush'];
+    const swapped = swapInRecruit(run, 'machao', 0, createRng(4));
+    expect(swapped.party.map((f) => f.id)).toEqual(['machao', 'huangzhong', 'zhaoyun']);
+    expect(swapped.rewardsOffered).toHaveLength(3);
+    expect(new Set(swapped.rewardsOffered).size).toBe(3);
+    for (const id of ['greendragon', 'potion', 'learn_ambush']) expect(swapped.rewardsOffered).not.toContain(id);
+    for (const id of swapped.rewardsOffered) {
+      const next = pickReward(swapped, id, createRng(4), firstTarget(swapped, id));
+      expect(next.phase).toBe('battle');
+      expect(next.wave).toBe(5);
+    }
+  });
+
+  it('교체 뒤에도 쓸 수 있는 카드는 그대로 남는다', () => {
+    const run = fullRecruit(['huangzhong', 'zhaoyun']);
+    run.rewardsOffered = ['sword', 'greendragon', 'steed'];
+    const swapped = swapInRecruit(run, 'machao', 0, createRng(4));
+    expect(swapped.rewardsOffered.slice(0, 2)).toEqual(['sword', 'steed']);
+    expect(swapped.rewardsOffered[2]).not.toBe('greendragon');
   });
 });
 
@@ -482,6 +530,13 @@ describe('보상 적용', () => {
     expect(skillsOf(fireGuy)).toContain('fire');
     expect(fireGuy.uses.fire).toBe(SKILLS.fire.uses);
     expect(skillsOf(fireGuy)[0]).toBe('strike');
+    // 셋째 칸(방어 태세)을 바꾸고 넷째 칸(일갈)은 남긴다
+    expect(skillsOf(fireGuy)).toEqual(['strike', 'guanyu_ult', 'fire', 'shout']);
+    expect(fireGuy.uses.shout).toBe(SKILLS.shout.uses);
+    // 기장은 숨 고르기를 잃지 않는다
+    const zyRun = structuredClone(run);
+    zyRun.party[0] = makeFighter('zhaoyun', 1);
+    expect(skillsOf(getReward('learn_taunt').apply(zyRun, 0).party[0])).toEqual(['thrust', 'zhaoyun_ult', 'taunt', 'breathe']);
     expect(skillsOf(fireGuy)).toContain('guanyu_ult');
     expect(skillsOf(g('learn_ambush', 0).party[0])).toContain('ambush');
     expect(skillsOf(g('learn_taunt', 0).party[0])).toContain('taunt');

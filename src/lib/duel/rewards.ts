@@ -8,8 +8,8 @@ const RARE_CHANCE = 0.25;
 const DRAW = 3;
 const POTION_RATE = 0.5;
 const REVIVE_RATE = 0.5;
-/** 새 기술은 마지막 칸(공용 기술 자리)을 바꾼다 */
-const LEARN_SLOT = 3;
+/** 새 기술은 셋째 칸(첫 공용 기술 자리)을 바꾼다. 넷째 칸의 숨 고르기·일갈은 남긴다 */
+const LEARN_SLOT = 2;
 
 const indices = (run: RunState, ok: (f: Fighter) => boolean) =>
   run.party.flatMap((f, i) => (ok(f) ? [i] : []));
@@ -54,7 +54,7 @@ function learnReward(id: string, skillId: string, name: string, rarity: Reward['
   const r: Reward = {
     id,
     name,
-    desc: `장수 1명이 ${sk.name}을(를) 배운다 (마지막 공용 기술 자리를 바꾼다)`,
+    desc: `장수 1명이 ${sk.name}을(를) 배운다 (셋째 기술 자리를 바꾼다)`,
     rarity,
     targets: (run) => indices(run, (f) => !skillsOf(f).includes(skillId)),
     apply: (run, t) =>
@@ -130,8 +130,16 @@ export function usableReward(r: Reward, run: RunState): boolean {
 
 /** 3장, 중복 없음, 쓸 수 없는 카드 제외. 장마다 25% 확률로 rare (rare가 바닥나면 common, 반대도) */
 export function drawRewards(run: RunState, rng: Rng): Reward[] {
-  const pool = REWARDS.filter((r) => usableReward(r, run));
-  const out: Reward[] = [];
+  return topUpRewards(run, [], rng);
+}
+
+/**
+ * keep 중 지금도 쓸 수 있는 카드는 그대로 두고, 모자란 장수만 drawRewards와 같은 규칙으로 채운다.
+ * (동행이 바뀌어 대상이 사라진 카드를 걸러낼 때 쓴다)
+ */
+export function topUpRewards(run: RunState, keep: string[], rng: Rng): Reward[] {
+  const out = keep.map(getReward).filter((r) => usableReward(r, run));
+  const pool = REWARDS.filter((r) => usableReward(r, run) && !out.includes(r));
   while (out.length < DRAW && pool.length > 0) {
     const want = rng() < RARE_CHANCE ? 'rare' : 'common';
     let cands = pool.filter((r) => r.rarity === want);

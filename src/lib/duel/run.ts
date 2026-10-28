@@ -2,7 +2,7 @@
 // 난수는 RunState에 두지 않고 인자로 받는다(UI가 seed로 만들어 들고 있는다).
 import { makeFighter, resolveTurn, skillsOf } from './battle';
 import { BOSS_IDS, DUEL_GENERALS, getDuelGeneral, MOB_ID } from './generals';
-import { drawRewards, getReward } from './rewards';
+import { drawRewards, getReward, topUpRewards } from './rewards';
 import { SKILLS } from './skills';
 import { createRng, type Rng } from './rng';
 import type { Action, BattleState, Fighter, RunState, RunWave, TurnEvent } from './types';
@@ -53,14 +53,18 @@ export function enemyLevel(wave: number): number {
 
 /**
  * 1~3 졸개, 4~5 영입 장수, 보스 웨이브는 장각·동탁·여포, 나머지는 영입·시작 장수.
- * 동행 중인 장수와 이번 판에 이미 나온 장수는 빼고, 남은 장수가 없으면 졸개.
+ * 동행 중인 장수, 이번 판 장수록(시작 장수 포함, 교체로 내보낸 장수도), 이번 판에 이미 나온 장수는 빼고, 남은 장수가 없으면 졸개.
  */
 export function nextEnemyId(run: RunState, rng: Rng): string {
   const w = run.wave;
   const b = bossIndex(w);
   if (b >= 0) return BOSS_IDS[b];
   if (w <= MOB_WAVES) return MOB_ID;
-  const used = new Set([...run.party.map((f) => f.id), ...run.record.waves.map((x) => x.enemy)]);
+  const used = new Set([
+    ...run.roster,
+    ...run.party.map((f) => f.id),
+    ...run.record.waves.map((x) => x.enemy),
+  ]);
   const roles = w <= RECRUIT_ONLY_UNTIL ? ['recruit'] : ['recruit', 'starter'];
   const pool = DUEL_GENERALS.filter((g) => roles.includes(g.role) && !used.has(g.id));
   if (pool.length === 0) return MOB_ID;
@@ -232,8 +236,11 @@ export function pickReward(run: RunState, rewardId: string, rng: Rng, targetInde
   );
 }
 
-/** 동행이 꽉 찼을 때 이번 웨이브에 항복한 장수를 outIndex 자리와 바꾼다 (적 레벨, 체력 가득) */
-export function swapInRecruit(run: RunState, recruitId: string, outIndex: number): RunState {
+/**
+ * 동행이 꽉 찼을 때 이번 웨이브에 항복한 장수를 outIndex 자리와 바꾼다 (적 레벨, 체력 가득).
+ * 바뀐 동행으로 쓸 수 없게 된 보상 카드(대상이 빠진 청룡언월도·부활약·회복약 등)는 빼고 새로 채운다.
+ */
+export function swapInRecruit(run: RunState, recruitId: string, outIndex: number, rng: Rng): RunState {
   if (run.phase !== 'reward' || !run.enemy) throw new Error(`보상 단계가 아니다: ${run.phase}`);
   const w = currentWave(run);
   if (!w.recruited || w.enemy !== recruitId) throw new Error(`이번에 항복한 장수가 아니다: ${recruitId}`);
@@ -241,5 +248,6 @@ export function swapInRecruit(run: RunState, recruitId: string, outIndex: number
   if (outIndex < 0 || outIndex >= run.party.length) throw new Error(`없는 자리: ${outIndex}`);
   const party = [...run.party];
   party[outIndex] = makeFighter(recruitId, run.enemy.level);
-  return { ...run, party };
+  const next = { ...run, party };
+  return { ...next, rewardsOffered: topUpRewards(next, run.rewardsOffered, rng).map((r) => r.id) };
 }
