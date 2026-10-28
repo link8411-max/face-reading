@@ -189,7 +189,7 @@ export function enemyAction(state: BattleState, rng: Rng): Action {
 }
 
 /** 도발 중이면 기본 공격으로 바뀔 기술 (순서 계산용, 부작용 없음) */
-function plannedSkill(f: Fighter, id: string): string {
+export function plannedSkill(f: Fighter, id: string): string {
   return f.status.taunt ? skillsOf(f)[0] : id;
 }
 

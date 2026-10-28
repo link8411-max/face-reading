@@ -1,10 +1,12 @@
 import { describe, it, expect } from 'vitest';
 import { createRng } from '@/lib/duel/rng';
 import { makeFighter } from '@/lib/duel/battle';
+import { getDuelGeneral } from '@/lib/duel/generals';
 import { afterWin, playerTurn, startRun } from '@/lib/duel/run';
 import { defaultSave } from '@/lib/duel/save';
 import {
   MSG_CHARS,
+  battlePreview,
   messageLines,
   nextSwitchIndex,
   pendingRecruit,
@@ -171,5 +173,95 @@ describe('항복 창 상태(pendingRecruit · resolveRecruitPick)', () => {
 
   it('항복이 없거나 전투 중이면 null', () => {
     expect(pendingRecruit(startRun('guanyu', 1))).toBeNull();
+  });
+});
+
+describe('화면 값: 상성·의도·미리보기·능력치 줄', () => {
+  it('toBattleView: 상성·의도·기술 유불리·설명', () => {
+    const run = startRun('guanyu', 7); // 적 졸개(맹장)
+    const v = toBattleView(run)!;
+    expect(v.matchup).toBe('even');
+    expect(v.enemy.intent).toMatchObject({ skillId: 'strike', name: '일격', eff: 'even', sure: true, ult: false });
+    expect(v.enemy.intent.dmg!.min).toBeGreaterThan(0);
+    expect(v.player.skills[0]).toMatchObject({ eff: 'even', desc: { long: '기본 공격' } });
+    expect(v.player.skills[2]).toMatchObject({ eff: null, dmg: null, desc: { long: '이번 턴 피해 절반' } });
+    expect(v.player.stats.무력).toBe(getDuelGeneral('guanyu')!.stats.무력);
+    expect(v.message).toContain('상성 맹>기>지>맹');
+    expect(v.message.every((l) => l.length <= MSG_CHARS)).toBe(true);
+  });
+
+  it('toBattleView: 지장 상대면 불리, 적 의도는 나에게 win', () => {
+    const run = structuredClone(startRun('guanyu', 7));
+    run.battle!.enemy = makeFighter('zhouyu', 1);
+    run.enemy = run.battle!.enemy;
+    const v = toBattleView(run)!;
+    expect(v.matchup).toBe('lose');
+    expect(v.enemy.intent).toMatchObject({ skillId: 'zhouyu_ult', eff: 'win', ult: true });
+    expect(v.player.skills[0].eff).toBe('lose');
+  });
+
+  it('toBattleView: 교체 줄과 상태 표', () => {
+    const run = structuredClone(startRun('guanyu', 7));
+    run.battle!.party.push(makeFighter('zhouyu', 1));
+    run.party = run.battle!.party;
+    run.battle!.enemy = makeFighter('zhaoyun', 1);
+    run.enemy = run.battle!.enemy;
+    run.battle!.party[0].status = { taunt: 2, burn: 1 };
+    const v = toBattleView(run)!;
+    expect(v.switchTo).toMatchObject({ index: 1, name: '주유', eff: 'lose', hurt: false });
+    expect(v.player.status).toEqual(['도발', '화상']);
+  });
+
+  it('toBattleView: eff·status 없는 옛 사건도 그린다', () => {
+    const run = structuredClone(startRun('guanyu', 7));
+    run.lastEvents = [{ who: 'player', kind: 'hit', amount: 3, text: '졸개에게 3의 피해!' }];
+    expect(() => toBattleView(run)).not.toThrow();
+    const old = structuredClone(startRun('guanyu', 7));
+    expect(toBattleView(old)!.player.status).toEqual([]);
+  });
+
+  it('battlePreview', () => {
+    const run = startRun('guanyu', 7);
+    const p = battlePreview(run, 'skill0', true);
+    expect(p[0]).toBe('▶일격');
+    expect(p[1]).toMatch(/^비등 예상 \d+~\d+$/);
+    expect(p[2]).toBe('한 번 더 누르면 결정');
+    expect(battlePreview(run, 'skill0', false)).toHaveLength(2);
+    expect(battlePreview(run, 'skill2', true)[1]).toMatch(/^피해 절반 ~\d+$/);
+    expect(battlePreview(run, 'switch', true)).toEqual([]);
+    const r2 = structuredClone(run);
+    r2.battle!.party[0].uses.guanyu_ult = 0;
+    expect(battlePreview(r2, 'skill1', true)).toEqual([]);
+    const r3 = structuredClone(run);
+    r3.battle!.party[0].status.taunt = 1;
+    expect(battlePreview(r3, 'skill1', false)).toEqual(['▶일격', expect.stringMatching(/^도발 중 비등 \d+~\d+$/)]);
+    for (const id of ['skill0', 'skill1', 'skill2', 'skill3'] as const) {
+      for (const l of battlePreview(run, id, true)) expect(l.length).toBeLessThanOrEqual(MSG_CHARS);
+    }
+    expect(battlePreview(run, 'skill0', true)[0].length).toBeLessThanOrEqual(9);
+  });
+
+  it('battlePreview: 교체는 들어올 장수 입장의 유불리', () => {
+    const run = structuredClone(startRun('guanyu', 7));
+    run.battle!.party.push(makeFighter('zhouyu', 1));
+    run.party = run.battle!.party;
+    run.battle!.enemy = makeFighter('zhaoyun', 1);
+    run.enemy = run.battle!.enemy;
+    const p = battlePreview(run, 'switch', true);
+    expect(p[0]).toBe('▶교체 주유');
+    expect(p).toHaveLength(3);
+    expect(p[1]).toMatch(/에 (유리|불리|비등)$/);
+    expect(p[1].length).toBeLessThanOrEqual(MSG_CHARS);
+  });
+
+  it('능력치 줄: 시작 화면·항복 창·보상 대상', () => {
+    expect(toStartShow(defaultSave(), 'guanyu').leadStats).toMatch(/^관우 무\d+ 지\d+ 통\d+ 속\d+$/);
+    const run = startRun('guanyu', 7);
+    const rv = recruitView(run, { kind: 'recruit', recruitId: 'machao', full: false })!;
+    expect(rv.stats).toMatch(/^무\d+ 지\d+ 통\d+$/);
+    const pv = pickView(run, { kind: 'target', rewardId: 'sword', targets: [0] })!;
+    expect(pv.options[0].sub).toMatch(/^Lv1 \d+\/\d+ 무\d+\+8$/);
+    const book = pickView(run, { kind: 'target', rewardId: 'book', targets: [0] })!;
+    expect(book.options[0].sub).toMatch(/^Lv1 \d+\/\d+ 지\d+\+10$/);
   });
 });
