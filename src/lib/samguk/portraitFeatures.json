@@ -118,6 +118,40 @@
     "chinLength": 0.2352,
     "midfaceRatio": 0.4068
   },
+  "chengong": {
+    "eyeAspect": 0.3387,
+    "eyeTilt": 6.7164,
+    "eyeWidth": 0.4664,
+    "eyeSpacing": 0.2555,
+    "browGap": 0.35,
+    "browTilt": -3.6505,
+    "noseLength": 0.271,
+    "noseWidth": 0.6667,
+    "mouthWidth": 0.8533,
+    "lipFullness": 0.3101,
+    "mouthCornerLift": -0.0148,
+    "faceAspect": 1.2139,
+    "jawWidth": 0.8729,
+    "chinLength": 0.2276,
+    "midfaceRatio": 0.4167
+  },
+  "chengpu": {
+    "eyeAspect": 0.3236,
+    "eyeTilt": 5.1745,
+    "eyeWidth": 0.4404,
+    "eyeSpacing": 0.298,
+    "browGap": 0.3001,
+    "browTilt": -4.7297,
+    "noseLength": 0.2962,
+    "noseWidth": 0.6403,
+    "mouthWidth": 0.7478,
+    "lipFullness": 0.3142,
+    "mouthCornerLift": 0.0114,
+    "faceAspect": 1.1532,
+    "jawWidth": 0.8467,
+    "chinLength": 0.1619,
+    "midfaceRatio": 0.4527
+  },
   "chengyu": null,
   "daqiao": {
     "eyeAspect": 0.3332,
@@ -255,6 +289,23 @@
     "jawWidth": 0.8441,
     "chinLength": 0.2524,
     "midfaceRatio": 0.4264
+  },
+  "gaoshun": {
+    "eyeAspect": 0.3395,
+    "eyeTilt": 3.6487,
+    "eyeWidth": 0.4387,
+    "eyeSpacing": 0.2762,
+    "browGap": 0.3487,
+    "browTilt": -6.2857,
+    "noseLength": 0.2779,
+    "noseWidth": 0.6942,
+    "mouthWidth": 0.7964,
+    "lipFullness": 0.2881,
+    "mouthCornerLift": -0.0546,
+    "faceAspect": 1.1849,
+    "jawWidth": 0.8861,
+    "chinLength": 0.2464,
+    "midfaceRatio": 0.4254
   },
   "gongsunzan": {
     "eyeAspect": 0.3086,
@@ -410,6 +461,7 @@
     "chinLength": 0.2072,
     "midfaceRatio": 0.4362
   },
+  "huaxiong": null,
   "jiangwei": {
     "eyeAspect": 0.3346,
     "eyeTilt": 11.5112,
@@ -444,6 +496,7 @@
     "chinLength": 0.2392,
     "midfaceRatio": 0.4057
   },
+  "liru": null,
   "liubei": {
     "eyeAspect": 0.2774,
     "eyeTilt": 8.7565,
@@ -734,6 +787,23 @@
     "chinLength": 0.2366,
     "midfaceRatio": 0.3965
   },
+  "sunjian": {
+    "eyeAspect": 0.3416,
+    "eyeTilt": 5.6681,
+    "eyeWidth": 0.4753,
+    "eyeSpacing": 0.2517,
+    "browGap": 0.3388,
+    "browTilt": -1.0731,
+    "noseLength": 0.2836,
+    "noseWidth": 0.7201,
+    "mouthWidth": 0.7991,
+    "lipFullness": 0.2678,
+    "mouthCornerLift": -0.0277,
+    "faceAspect": 1.1585,
+    "jawWidth": 0.8542,
+    "chinLength": 0.2169,
+    "midfaceRatio": 0.429
+  },
   "sunquan": {
     "eyeAspect": 0.3569,
     "eyeTilt": 9.7813,
@@ -819,6 +889,7 @@
     "chinLength": 0.2084,
     "midfaceRatio": 0.4557
   },
+  "wenchou": null,
   "wuguotai": {
     "eyeAspect": 0.3622,
     "eyeTilt": 7.8681,
@@ -939,6 +1010,7 @@
     "chinLength": 0.2044,
     "midfaceRatio": 0.4464
   },
+  "yanliang": null,
   "yuanshao": {
     "eyeAspect": 0.3125,
     "eyeTilt": 8.4001,
@@ -1093,6 +1165,7 @@
     "chinLength": 0.2339,
     "midfaceRatio": 0.432
   },
+  "zhangzhao": null,
   "zhaoyun": {
     "eyeAspect": 0.4103,
     "eyeTilt": 8.9455,
@@ -1109,6 +1182,23 @@
     "jawWidth": 0.8682,
     "chinLength": 0.2178,
     "midfaceRatio": 0.4237
+  },
+  "zhaozhong": {
+    "eyeAspect": 0.3304,
+    "eyeTilt": 6.6311,
+    "eyeWidth": 0.4471,
+    "eyeSpacing": 0.2487,
+    "browGap": 0.4109,
+    "browTilt": -5.8091,
+    "noseLength": 0.2836,
+    "noseWidth": 0.7072,
+    "mouthWidth": 1.0399,
+    "lipFullness": 0.2075,
+    "mouthCornerLift": 0.0881,
+    "faceAspect": 1.0926,
+    "jawWidth": 0.8471,
+    "chinLength": 0.2298,
+    "midfaceRatio": 0.4501
   },
   "zhenji": {
     "eyeAspect": 0.3545,
@@ -1144,6 +1234,7 @@
     "chinLength": 0.2241,
     "midfaceRatio": 0.4394
   },
+  "zhoutai": null,
   "zhouyu": {
     "eyeAspect": 0.3662,
     "eyeTilt": 9.3261,
@@ -1160,6 +1251,23 @@
     "jawWidth": 0.8512,
     "chinLength": 0.2404,
     "midfaceRatio": 0.4437
+  },
+  "zhugejin": {
+    "eyeAspect": 0.3242,
+    "eyeTilt": 4.9948,
+    "eyeWidth": 0.4349,
+    "eyeSpacing": 0.2703,
+    "browGap": 0.3566,
+    "browTilt": -7.1597,
+    "noseLength": 0.2774,
+    "noseWidth": 0.6553,
+    "mouthWidth": 0.8611,
+    "lipFullness": 0.3072,
+    "mouthCornerLift": 0.0034,
+    "faceAspect": 1.1425,
+    "jawWidth": 0.8663,
+    "chinLength": 0.2161,
+    "midfaceRatio": 0.4289
   },
   "zhugeliang": {
     "eyeAspect": 0.3786,

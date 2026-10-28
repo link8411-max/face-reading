@@ -295,6 +295,36 @@ export const handProfiles: Record<string, CharacterProfile> = {
     z: { faceAspect: 1.4, jawWidth: -1.2, eyeAspect: -1.2, mouthCornerLift: -1, chinLength: 1 },
     weight: { faceAspect: 1.5, eyeAspect: 1.5 },
   },
+  // 주태: 흉터 가득한 넓고 각진 얼굴, 굳게 다문 입
+  zhoutai: {
+    z: { jawWidth: 1.3, faceAspect: -0.8, mouthCornerLift: -1.1, eyeAspect: -0.8, noseWidth: 0.9 },
+    weight: { jawWidth: 1.5, mouthCornerLift: 1.3 },
+  },
+  // 장소: 흰 눈썹의 깐깐한 노신, 긴 얼굴에 내려간 입꼬리
+  zhangzhao: {
+    z: { faceAspect: 1.1, chinLength: 1.2, mouthCornerLift: -1.3, eyeAspect: -1, noseLength: 0.9 },
+    weight: { chinLength: 1.5, mouthCornerLift: 1.4 },
+  },
+  // 화웅: 이를 드러낸 사나운 얼굴, 넓은 턱과 큰 입
+  huaxiong: {
+    z: { jawWidth: 1.5, faceAspect: -1.1, mouthWidth: 1.3, browGap: -1.2, eyeTilt: 0.9 },
+    weight: { jawWidth: 1.6, mouthWidth: 1.5 },
+  },
+  // 안량: 투구 아래 치켜 올라간 매서운 눈, 콧수염
+  yanliang: {
+    z: { eyeTilt: 1.3, noseWidth: 1.1, jawWidth: 0.9, lipFullness: -0.8, eyeWidth: 0.8 },
+    weight: { eyeTilt: 1.6, noseWidth: 1.3 },
+  },
+  // 문추: 미간을 잔뜩 찌푸린 짙은 눈썹, 다문 입
+  wenchou: {
+    z: { browGap: -1.4, eyeAspect: -1.1, mouthCornerLift: -1.2, jawWidth: 1, midfaceRatio: 0.8 },
+    weight: { browGap: 1.6, eyeAspect: 1.3 },
+  },
+  // 이유: 가늘게 뜬 눈과 비뚜름한 웃음, 갸름한 얼굴
+  liru: {
+    z: { eyeAspect: -1.4, mouthCornerLift: 1, faceAspect: 1.2, jawWidth: -1, eyeTilt: 1 },
+    weight: { eyeAspect: 1.6, mouthCornerLift: 1.3 },
+  },
   // 황개: 풍상을 겪은 노장, 회색 수염, 전장에서 단련된 매서운 눈썹
   huanggai: {
     z: { browTilt: 1.4, browGap: -1.2, mouthCornerLift: -1.4, jawWidth: 1.2, noseWidth: 1 },
