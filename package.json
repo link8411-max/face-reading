@@ -19,6 +19,7 @@
     "korean-lunar-calendar": "0.4.0",
     "modern-screenshot": "^4.6.7",
     "next": "16.0.10",
+    "phaser": "3.90.0",
     "react": "19.2.1",
     "react-dom": "19.2.1"
   },

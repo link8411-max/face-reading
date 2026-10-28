@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { passPose, koPose, cutinAlpha, eventsToTimeline, PASS_MS, type TimelineItem } from '@/components/duel/animations';
+import { passPose, koPose, cutinAlpha, eventsToTimeline, PASS_MS, type TimelineItem } from '@/game/duel/timeline';
 import type { TurnEvent } from '@/lib/duel/types';
 
 const ev = (e: Partial<TurnEvent> & Pick<TurnEvent, 'who' | 'kind'>): TurnEvent => ({ text: '', ...e });
