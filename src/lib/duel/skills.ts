@@ -59,3 +59,57 @@ function applySkillBalance(): void {
 }
 applySkillBalance();
 onBalanceChange(applySkillBalance);
+
+/** 효과 하나의 짧은 이름 (필살기 설명 뒤에 붙는다) */
+function effectShort(sk: Skill): string {
+  switch (sk.effect) {
+    case 'guard':
+      return '피해 절반';
+    case 'shout':
+      return '기 꺾기';
+    case 'heal':
+      return `회복 ${Math.round(BALANCE.healRate * 100)}%`;
+    case 'burn':
+      return `불 ${sk.burnTurns ?? SKILL_RULES.burnTurns}턴`;
+    case 'confuse':
+      return '혼란';
+    case 'ambush':
+      return '반격';
+    case 'taunt':
+      return '도발';
+    default:
+      return '';
+  }
+}
+
+/**
+ * 기술 한 줄 설명. short는 카드 위 작은 칸(6자 이하), long은 설명 줄(14자 이하).
+ * 숫자는 SKILLS·BALANCE·SKILL_RULES에서 읽으므로 밸런스를 바꾸면 같이 바뀐다.
+ */
+export function skillDesc(id: string): { short: string; long: string } {
+  const sk = SKILLS[id];
+  if (!sk) throw new Error(`없는 기술: ${id}`);
+  const ult = id.endsWith('_ult');
+  const eff = effectShort(sk);
+  if (ult) {
+    return { short: '큰 한 방', long: eff ? `큰 한 방 + ${eff}` : '큰 한 방' };
+  }
+  switch (sk.effect) {
+    case undefined:
+      return { short: '기본', long: '기본 공격' };
+    case 'guard':
+      return { short: '피해 절반', long: '이번 턴 피해 절반' };
+    case 'shout':
+      return { short: '기 꺾기', long: `상대 다음 피해 ${SKILL_RULES.shoutRate}배` };
+    case 'heal':
+      return { short: eff, long: `체력 ${Math.round(BALANCE.healRate * 100)}% 회복` };
+    case 'burn':
+      return { short: eff, long: `피해 + ${eff}` };
+    case 'confuse':
+      return { short: '혼란', long: `피해 + 혼란 ${SKILL_RULES.confuseActions}회` };
+    case 'ambush':
+      return { short: '반격', long: '다음 피격 때 반격' };
+    case 'taunt':
+      return { short: '도발', long: `상대 ${SKILL_RULES.tauntActions}턴 기본만` };
+  }
+}

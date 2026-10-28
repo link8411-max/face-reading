@@ -143,6 +143,8 @@ export interface Reward {
   targets?: (run: RunState) => number[];
   /** 대상과 무관하게 지금 쓸 수 있는지 (없으면 true) */
   canUse?: (run: RunState) => boolean;
+  /** 능력치를 올리는 보상이면 어느 능력치인지 (오름 폭은 rewardEffect가 BALANCE에서 읽는다) */
+  effect?: { stat: 'atk' | 'int' | 'speed' };
   /** 대상이 필요한 보상에 잘못된 자리를 주면 throw */
   apply(run: RunState, targetIndex?: number): RunState;
 }

@@ -1,7 +1,7 @@
 import { describe, it, expect } from 'vitest';
 import { samgukCharacters } from '@/lib/samgukDB';
 import { DUEL_GENERALS, getDuelGeneral, STARTER_IDS, BOSS_IDS, MOB_ID } from '@/lib/duel/generals';
-import { SKILLS } from '@/lib/duel/skills';
+import { SKILLS, skillDesc } from '@/lib/duel/skills';
 
 describe('일기토 장수 데이터', () => {
   const real = DUEL_GENERALS.filter((g) => g.id !== MOB_ID);
@@ -44,5 +44,23 @@ describe('일기토 장수 데이터', () => {
     for (const k of ['맹장', '기장', '지장'] as const) {
       expect(DUEL_GENERALS.filter((g) => g.kind === k).length).toBeGreaterThanOrEqual(2);
     }
+  });
+});
+
+describe('skillDesc', () => {
+  it('14자 이하, 효과 설명', () => {
+    for (const id of Object.keys(SKILLS)) {
+      const d = skillDesc(id);
+      expect(d.short.length).toBeLessThanOrEqual(6);
+      expect(d.long.length).toBeLessThanOrEqual(14);
+    }
+    expect(skillDesc('strike')).toEqual({ short: '기본', long: '기본 공격' });
+    expect(skillDesc('guard')).toEqual({ short: '피해 절반', long: '이번 턴 피해 절반' });
+    expect(skillDesc('breathe')).toEqual({ short: '회복 30%', long: '체력 30% 회복' });
+    expect(skillDesc('fire').long).toBe('피해 + 불 3턴');
+    expect(skillDesc('zhouyu_ult').long).toBe('큰 한 방 + 불 1턴');
+    expect(skillDesc('guanyu_ult')).toEqual({ short: '큰 한 방', long: '큰 한 방' });
+    expect(skillDesc('zhangfei_ult').long).toBe('큰 한 방 + 기 꺾기');
+    expect(skillDesc('taunt').long).toBe('상대 2턴 기본만');
   });
 });
