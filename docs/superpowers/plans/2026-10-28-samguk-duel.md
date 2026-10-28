@@ -367,3 +367,22 @@ public/images/samguk/sprites/*.png
 - 스펙 대응: 5절(기존 자산) → T8·T9 사용; 6절(흐름·포케로그 규칙·적 풀) → T3; 7절(데이터·상성·명단) → T1·T2(화웅→장각 결정 명시); 8절 전투 → T2; 9절 화면·연출 → T7·T8; 10절 영입 → T3; 11절 보상 → T3; 12절 열전·공유·행군 기록 → T5·T6·T8(StartScreen 행군 기록 탭)·T4; 13절 연결 → T8(lead·companion)·T9(메뉴); 14절 쿠팡 → T8; 15절 SEO → T9·T12; 16절 피드백 → T10; 17절 저장 → T4; 18절 그림 → T11; 19절 기술 선택 → 전체.
 - 타입 일관성: `Fighter`·`BattleState`·`TurnEvent`(T2) ↔ `RunState`·`RunRecord`(T3) ↔ `SaveData`(T4) ↔ `narrate`(T5) ↔ `encodeRunKey`(T6) ↔ `eventsToTimeline`(T7) ↔ DuelClient(T8). 이름은 위 Interfaces 블록 그대로 쓴다.
 - Review Focus 1→T8, 2·4→T4, 3→T6, 5→T12 테스트에 각각 들어 있다.
+
+---
+
+### Task 13: 밸런스 조정 (의뢰인 요청, 2026-10-28 추가)
+
+**Files:**
+- Create: `src/lib/duel/autoplay.ts`(휴리스틱 자동 플레이, 순수), `scripts/duel-balance.ts`(시드 N개 돌려 도달 웨이브 분포·평균 턴 수 출력), `docs/duel-balance.md`(조정 전/후 분포 기록)
+- Modify: `src/lib/duel/run.ts`·`battle.ts`·`rewards.ts`·`generals.ts`의 **상수만**(적 레벨 곡선, 경험치, maxHp 공식, 상성 배수, 보상 등장 확률, 장수 속도·기술 위력). 구조 변경 금지.
+- Test: `tests/duel/balance.test.ts`
+
+**Interfaces:**
+- `autoplay.ts`: `heuristicAction(run: RunState, rng): Action` — 상성 유리 기술 우선(기술 유형 vs 적 유형이 1.5면 선택, 필살기는 uses가 남고 적 hp ≥ 40%일 때 우선), 선두 hp ≤ 40%면 guard/breathe/회복 우선, 동행 중 상성 유리한 장수가 있고 선두가 불리하면 교체; `heuristicReward(run, offered): { rewardId, targetIndex? }` — 회복약(쓰러진/부상 대상 있으면) > 부활약 > 명마 > 명기 > 병법서 > 기타; `simulateRun(starterId, seed, maxTurns = 400): { reachedWave: number; cleared: boolean; turns: number; roster: string[] }`
+- `scripts/duel-balance.ts`: `npx tsx --tsconfig tsconfig.json scripts/duel-balance.ts [seeds=200]` → 시작 장수 3명 × 시드로 돌려 "보스1 통과율 / 보스2 도달·통과율 / 클리어율 / 평균 턴 수 / 중앙값 도달 웨이브"를 표로 출력(장수록이 비어 있는 첫 판 기준과, 장수록에 2~3명(조운·마초·주유) 있는 판 기준 둘 다).
+- 목표(의뢰인): 첫 판 — 장각(6) 통과율 ≥ 80%, 동탁(12) 도달 후 승리율 ≈ 50%, 여포 클리어율 ≤ 10%; 장수록 2~3명 판 — 클리어율 25~40%. 평균 턴 수는 한 판 10~20분이 되도록 60~140턴(연출 1합 ≈ 3초 가정 + 선택 시간).
+- [ ] **Step 1: 실패하는 테스트** — `tests/duel/balance.test.ts`: 시드 60개(관우 시작, 빈 장수록)에서 `simulateRun`의 장각 통과율 ≥ 0.8, 동탁 도달 시 승리율 0.35~0.65, 클리어율 ≤ 0.10; 시드 60개(장수록 조운·마초·주유)에서 클리어율 0.25~0.40; 평균 턴 60~140. (처음엔 실패해야 정상 — 현재 수치는 기본 공격만으로 4~6웨이브 패배)
+- [ ] **Step 2: 실패 확인** — `npx vitest run tests/duel/balance.test.ts`
+- [ ] **Step 3: 조정** — 스크립트로 분포를 보며 상수 조정(한 번에 하나씩, 각 조정의 전/후 수치를 `docs/duel-balance.md`에 기록). 기존 run/battle 테스트가 상수에 의존하면 그 테스트의 기대값만 갱신(논리 변경 금지).
+- [ ] **Step 4: 통과 확인** — `npx vitest run tests/duel` 전체 + `npx tsc --noEmit`
+- [ ] **Step 5: 커밋** — `"일기토: 밸런스 조정(휴리스틱 자동 플레이 기준)"`
