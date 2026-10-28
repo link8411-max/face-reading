@@ -193,16 +193,23 @@ export function playerTurn(run: RunState, action: Action, rng: Rng): RunState {
 }
 
 /**
- * 항복 확률. 이름 있는 적(졸개·보스 아님)만, 0.25 + (선두 매력−50)/200 − (적 level−wave)/20 을 0.05~0.8로. 그 외 0.
- * 보스 웨이브에 보스로 나온 영입 장수는 그 값의 절반.
+ * 항복 확률. 이름 있는 적(졸개·보스 아님)만,
+ * surrenderBase + (선두 매력−50)/200 − (적 level − 기준 레벨) × surrenderPerLevel 을 0.05~0.8로. 그 외 0.
+ * 기준 레벨은 surrenderRefLevel(보통 웨이브의 설계 레벨). 보스로 나온 영입 장수는 그 값 × bossSurrenderFactor.
  */
+/** 항복 판정의 기준 레벨: 이 장수가 이 웨이브의 보통 설계 줄(보스 웨이브면 바로 앞 줄)로 나왔을 때의 레벨 */
+export function surrenderRefLevel(wave: number, id: string): number {
+  return designedEnemy(isBossWave(wave) ? Math.max(1, wave - 1) : wave, id).level;
+}
+
 export function surrenderChance(run: RunState): number {
   const e = run.enemy;
   if (!e) return 0;
   const role = gen(e.id).role;
   if (role === 'mob' || role === 'boss') return 0;
   const lead = run.battle ? run.battle.party[run.battle.active] : run.party[0];
-  const p = BALANCE.surrenderBase + (gen(lead.id).stats.매력 - 50) / 200 - (e.level - run.wave) / 20;
+  const p =
+    BALANCE.surrenderBase + (gen(lead.id).stats.매력 - 50) / 200 - (e.level - surrenderRefLevel(run.wave, e.id)) * BALANCE.surrenderPerLevel;
   const c = Math.min(SURRENDER_MAX, Math.max(SURRENDER_MIN, p));
   return isBossWave(run.wave) ? c * BALANCE.bossSurrenderFactor : c;
 }

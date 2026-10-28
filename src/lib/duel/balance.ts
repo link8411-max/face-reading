@@ -36,8 +36,9 @@ export interface Balance {
   expBase: number;
   expPerWave: number;
   expPerLevel: number;
-  /** 항복 = surrenderBase + (매력−50)/200 − (적 level−wave)/20, 보스로 나온 영입 장수는 × bossSurrenderFactor */
+  /** 항복 = surrenderBase + (매력−50)/200 − (적 level − 기준 레벨) × surrenderPerLevel, 보스로 나온 영입 장수는 × bossSurrenderFactor */
   surrenderBase: number;
+  surrenderPerLevel: number;
   bossSurrenderFactor: number;
 
   // ── 보상 (rewards.ts) ──
@@ -75,12 +76,12 @@ export const BALANCE: Balance = {
 
   // prettier-ignore
   waveDesign: [
-    d(5, 56), d(5, 56), d(6, 56), d(7, 45), d(7, 45), d(10, 40), // 1~6 장각
+    d(5, 56), d(5, 56), d(6, 56), d(7, 45), d(7, 45), d(9, 30), // 1~6 장각
     d(12, 31), d(12, 31), d(12, 31), d(12, 31), d(12, 31), d(17, 13), // 7~12 하후돈
     d(14, 22), d(14, 22), d(14, 22), d(14, 22), d(14, 22), d(20, 8), // 13~18 동탁
-    d(15, 17), d(15, 17), d(15, 17), d(15, 17), d(15, 17), d(20, 5), // 19~24 허저
-    d(15, 15), d(15, 15), d(15, 15), d(15, 15), d(15, 15), d(21, 7), // 25~30 마초
-    d(16, 14), d(16, 14), d(16, 14), d(16, 14), d(16, 14), d(22, 5), // 31~36 여포
+    d(15, 17), d(15, 17), d(15, 17), d(15, 17), d(15, 17), d(20, 6), // 19~24 허저
+    d(15, 15), d(15, 15), d(15, 15), d(15, 15), d(15, 15), d(21, 8), // 25~30 마초
+    d(16, 14), d(16, 14), d(16, 14), d(16, 14), d(16, 14), d(22, 7), // 31~36 여포
   ],
   refGeneral: 'guanyu',
   refAtkPerWave: 1,
@@ -88,6 +89,7 @@ export const BALANCE: Balance = {
   expPerWave: 0,
   expPerLevel: 100,
   surrenderBase: 0.25,
+  surrenderPerLevel: 0.015,
   bossSurrenderFactor: 0.5,
 
   rareChance: 0.25,
@@ -147,7 +149,10 @@ export function applyBalance(override: BalanceOverride): () => void {
   };
 }
 
-/** override를 적용한 채로 fn을 돌리고 되돌린다 (동기 함수만) */
+/**
+ * override를 적용한 채로 fn을 돌리고 되돌린다. 동기 함수만: BALANCE는 모듈 전역이라
+ * await를 사이에 두면 다른 작업이 덮어쓴 값을 보게 된다(withBalance를 await 너머로 쓰지 말 것).
+ */
 export function withBalance<T>(override: BalanceOverride | undefined, fn: () => T): T {
   if (!override || Object.keys(override).length === 0) return fn();
   const restore = applyBalance(override);
@@ -157,3 +162,16 @@ export function withBalance<T>(override: BalanceOverride | undefined, fn: () => 
     restore();
   }
 }
+
+/**
+ * 실력 단계별 목표(첫 판, 시작 장수 셋 각각). [최소, 최대] 비율. 설계표(waveDesign)는 average를 기준으로 맞춘다.
+ * dongzhuo는 동탁(18)에 닿았을 때 이길 확률. novice는 거기까지 가는 판이 적어 목표를 두지 않는다.
+ */
+export const SKILL_TARGETS: Record<
+  'novice' | 'average' | 'expert',
+  { zhangjiao: [number, number]; dongzhuo: [number, number] | null; clear: [number, number] }
+> = {
+  novice: { zhangjiao: [0.55, 0.75], dongzhuo: null, clear: [0, 0.02] },
+  average: { zhangjiao: [0.8, 0.92], dongzhuo: [0.4, 0.6], clear: [0.03, 0.1] },
+  expert: { zhangjiao: [0.9, 1], dongzhuo: [0.6, 0.8], clear: [0.15, 0.3] },
+};

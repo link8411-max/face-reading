@@ -56,6 +56,3 @@ next-env.d.ts
 # claude 워크트리·sdd 작업 폴더
 /.claude/worktrees/
 /.superpowers/
-
-# 일기토 튜너 출력
-/.tune-out/

@@ -2,7 +2,7 @@ import { describe, it, expect } from 'vitest';
 import { createRng, type Rng } from '@/lib/duel/rng';
 import { makeFighter, maxHpFor, skillsOf } from '@/lib/duel/battle';
 import { BALANCE } from '@/lib/duel/balance';
-import { getDuelGeneral, MOB_ID } from '@/lib/duel/generals';
+import { BOSS_IDS, getDuelGeneral, MOB_ID } from '@/lib/duel/generals';
 import { SKILLS } from '@/lib/duel/skills';
 import { REWARDS, drawRewards, getReward } from '@/lib/duel/rewards';
 import {
@@ -17,6 +17,7 @@ import {
   pickReward,
   swapInRecruit,
   surrenderChance,
+  surrenderRefLevel,
   freshForBattle,
   markRecruitHandled,
 } from '@/lib/duel/run';
@@ -115,7 +116,7 @@ describe('자동 플레이', () => {
     while (run.phase === 'battle' || run.phase === 'reward') {
       if (run.phase === 'battle') {
         enemies.push(run.enemy!.id);
-        if ((BOSS_WAVES as readonly number[]).includes(run.wave)) bosses[run.wave] = run.enemy!.id;
+        if ((BOSS_WAVES as readonly number[]).includes(run.wave) && !(run.wave in bosses)) bosses[run.wave] = run.enemy!.id;
         run = playerTurn(run, basicAttack(run), rng);
         turns += 1;
       } else {
@@ -128,11 +129,8 @@ describe('자동 플레이', () => {
     expect(run.record.cleared).toBe(true);
     expect(run.record.waves).toHaveLength(36);
     expect(run.record.rewards).toHaveLength(35);
-    // 하후돈·허저·마초는 항복하지 않았으면 자기 보스 웨이브에 나온다(항복했으면 대신할 장수)
-    expect(bosses[6]).toBe('zhangjiao');
-    expect(bosses[18]).toBe('dongzhuo');
-    expect(bosses[36]).toBe('lvbu');
-    for (const w of [12, 24, 30]) expect(['recruit', 'starter', 'mob']).toContain(getDuelGeneral(bosses[w])!.role);
+    // 하후돈·허저·마초는 자기 보스 웨이브에서만 나오고 영입도 그때만 되므로, 시작 장수가 관우면 여섯 보스가 그대로 나온다
+    expect(bosses).toEqual({ 6: 'zhangjiao', 12: 'xiaohoudun', 18: 'dongzhuo', 24: 'xuchu', 30: 'machao', 36: 'lvbu' });
     const named = enemies.filter((id) => id !== MOB_ID);
     expect(new Set(named).size).toBe(named.length);
   });
@@ -194,9 +192,7 @@ describe('nextEnemyId', () => {
     autoPlay(seed, (_prev, next) => {
       if (next.phase !== 'battle') return;
       const boss = (BOSS_WAVES as readonly number[]).indexOf(next.wave);
-      if (boss === 0 || boss === 2 || boss === 5) {
-        expect(next.enemy!.id).toBe(['zhangjiao', '', 'dongzhuo', '', '', 'lvbu'][boss]);
-      }
+      if (boss >= 0) expect(next.enemy!.id).toBe(BOSS_IDS[boss]);
       expect(next.enemy!.level).toBe(enemyLevel(next.wave, next.enemy!.id));
     });
   });
@@ -395,11 +391,15 @@ describe('surrenderChance', () => {
     expect(surrenderChance(atWave(base, 1, MOB_ID))).toBe(0);
   });
 
-  it('식: 0.25 + (선두 매력−50)/200 − (적 level−wave)/20', () => {
-    const run = atWave(startRun('guanyu', 1), 4, 'machao', 4);
+  it('식: surrenderBase + (선두 매력−50)/200 − (적 level − 기준 레벨) × surrenderPerLevel', () => {
+    const ref = surrenderRefLevel(4, 'machao');
     const 매력 = getDuelGeneral('guanyu')!.stats.매력;
-    const raw = 0.25 + (매력 - 50) / 200;
-    expect(surrenderChance(run)).toBeCloseTo(Math.min(0.8, Math.max(0.05, raw)));
+    const raw = BALANCE.surrenderBase + (매력 - 50) / 200;
+    const clamp = (p: number) => Math.min(0.8, Math.max(0.05, p));
+    expect(surrenderChance(atWave(startRun('guanyu', 1), 4, 'machao', ref))).toBeCloseTo(clamp(raw));
+    expect(surrenderChance(atWave(startRun('guanyu', 1), 4, 'machao', ref + 10))).toBeCloseTo(
+      clamp(raw - 10 * BALANCE.surrenderPerLevel),
+    );
   });
 
   it('보스는 난수 0이어도 항복하지 않는다', () => {
@@ -628,9 +628,13 @@ describe('36웨이브 보스 구조', () => {
 
   it('보스로 나온 영입 장수의 항복 확률은 보통의 절반, 이기면 전원 회복', () => {
     const base = startRun('guanyu', 1);
-    const boss = atWave(base, 12, 'xiaohoudun', 13);
-    const normal = atWave(base, 11, 'xiaohoudun', 12);
-    expect(surrenderChance(boss)).toBeCloseTo(surrenderChance(normal) / 2);
+    // 보스 웨이브의 기준 레벨은 바로 앞 보통 줄이라 같은 레벨이면 기준도 같다
+    const boss = atWave(base, 12, 'xiaohoudun', 20);
+    const normal = atWave(base, 11, 'xiaohoudun', 20);
+    expect(surrenderChance(boss)).toBeCloseTo(surrenderChance(normal) * BALANCE.bossSurrenderFactor);
+    // 설계 레벨 그대로면 10~20% 안팎 (바닥 0.05×0.5에 붙지 않는다)
+    const real = atWave(base, 12, 'xiaohoudun', enemyLevel(12, 'xiaohoudun'));
+    expect(surrenderChance(real)).toBeGreaterThan(0.1);
     boss.party[0].hp = 1;
     boss.battle!.enemy.hp = 0;
     const next = afterWin(boss, () => 0.99);

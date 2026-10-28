@@ -54,7 +54,9 @@ export function designedEnemy(wave: number, id: string): { level: number; bonus:
   const me = refFighter(wave);
   const probe = makeFighter(id, 1);
   const hp = des.hitsToKillEnemy * basicHit(me, probe);
-  const level = Math.max(1, Math.round((hp - gen(id).stats.통솔 * BALANCE.hpPerLead) / BALANCE.hpPerLevel));
+  // 장수 체력 배율(generalHp)은 아군 쪽 균형용이라 적의 설계 합 수는 바꾸지 않게 나눠 둔다
+  const gh = BALANCE.generalHp[id] ?? 1;
+  const level = Math.max(1, Math.round((hp / gh - gen(id).stats.통솔 * BALANCE.hpPerLead) / BALANCE.hpPerLevel));
   // 기본 공격 피해는 공격 능력치에 비례: 원하는 피해 / 지금 피해 만큼 능력치를 키운다
   const want = me.maxHp / des.hitsToKillPlayer;
   const now = basicHit(probe, me);

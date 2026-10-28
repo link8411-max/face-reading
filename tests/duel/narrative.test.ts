@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { narrate, ORDINALS, koreanCount } from '@/lib/duel/narrative';
+import { narrate, ordinal, ORDINALS, koreanCount } from '@/lib/duel/narrative';
 import type { RunRecord, RunWave } from '@/lib/duel/types';
 
 const mob = (wave: number, turns = 2): RunWave => ({ wave, enemy: 'mob', turns, finisher: 'strike', finisherBy: 'guanyu' });
@@ -115,6 +115,8 @@ describe('열전 생성', () => {
     expect(ORDINALS[0]).toBe('첫째');
     expect(ORDINALS[16]).toBe('열일곱째');
     expect(ORDINALS[19]).toBe('스무째');
+    // 21~36번째 싸움(36웨이브)은 숫자 서수
+    for (let w = 21; w <= 36; w++) expect(ordinal(w)).toBe(`${w}번째`);
     expect(koreanCount(1)).toBe('한');
     expect(koreanCount(3)).toBe('세');
     expect(koreanCount(9)).toBe('아홉');
