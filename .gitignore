@@ -52,3 +52,7 @@ next-env.d.ts
 
 # git worktrees
 .worktrees/
+
+# claude 워크트리·sdd 작업 폴더
+/.claude/worktrees/
+/.superpowers/
