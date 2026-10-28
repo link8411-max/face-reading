@@ -8,6 +8,7 @@ import { REWARDS, drawRewards, getReward } from '@/lib/duel/rewards';
 import {
   WAVES,
   BOSS_WAVES,
+  PRE_BOSS_WAVES,
   bossIdFor,
   enemyLevel,
   startRun,
@@ -173,7 +174,9 @@ describe('nextEnemyId', () => {
   it('1~3 졸개, 4~5 영입급, 보스 웨이브는 장각·하후돈·동탁·황충·마초·여포', () => {
     const base = startRun('guanyu', 5);
     for (const w of [1, 2, 3]) expect(nextEnemyId({ ...base, wave: w }, rng)).toBe(MOB_ID);
-    for (const w of [4, 5]) expect(getDuelGeneral(nextEnemyId({ ...base, wave: w }, rng))!.role).toBe('recruit');
+    expect(getDuelGeneral(nextEnemyId({ ...base, wave: 4 }, rng))!.role).toBe('recruit');
+    // 5는 장각 직전: 장각(지장)을 잡는 기장 조운(시작 장수)을 영입 후보로 띄운다
+    expect(nextEnemyId({ ...base, wave: 5 }, rng)).toBe('zhaoyun');
     expect(nextEnemyId({ ...base, wave: 6 }, rng)).toBe('zhangjiao');
     expect(nextEnemyId({ ...base, wave: 12 }, rng)).toBe('xiaohoudun');
     expect(nextEnemyId({ ...base, wave: 18 }, rng)).toBe('dongzhuo');
@@ -194,6 +197,8 @@ describe('nextEnemyId', () => {
       const boss = (BOSS_WAVES as readonly number[]).indexOf(next.wave);
       if (boss >= 0) expect(next.enemy!.id).toBe(BOSS_IDS[boss]);
       expect(next.enemy!.level).toBe(enemyLevel(next.wave, next.enemy!.id));
+      // 보스 웨이브의 적만 boss 표시(필살기 예고·치명타 절반)
+      expect(next.enemy!.boss === true).toBe(boss >= 0);
     });
   });
 });
@@ -641,5 +646,70 @@ describe('36웨이브 보스 구조', () => {
     boss.battle!.enemy.hp = 0;
     const next = afterWin(boss, () => 0.99);
     for (const f of next.party) expect(f.hp).toBe(f.maxHp);
+  });
+});
+
+describe('보스 직전 영입 후보 (Task 14b)', () => {
+  const kind = (id: string) => getDuelGeneral(id)!.kind;
+  /** 이 웨이브까지 나온 적 목록을 가진 판 */
+  const withSeen = (run: RunState, wave: number, seen: string[] = []): RunState => ({
+    ...run,
+    wave,
+    record: { ...run.record, waves: seen.map((enemy, i) => ({ wave: i + 4, enemy, turns: 1 })) },
+  });
+
+  it('PRE_BOSS_WAVES는 보스 웨이브 바로 앞(5·11·17·23·29·35)', () => {
+    expect([...PRE_BOSS_WAVES]).toEqual(BOSS_WAVES.map((w) => w - 1));
+  });
+
+  it.each([
+    [5, 'zhangjiao', '기장'],
+    [11, 'xiaohoudun', '지장'],
+    [17, 'dongzhuo', '기장'],
+    [23, 'huangzhong', '맹장'],
+    [29, 'machao', '맹장'],
+    [35, 'lvbu', '지장'],
+  ] as const)('웨이브 %i: 다음 보스 %s를 상성으로 잡는 %s 이름 있는 장수가 나온다(남아 있으면)', (w, boss, beats) => {
+    const base = startRun('guanyu', 3);
+    for (let seed = 1; seed <= 30; seed++) {
+      const run = withSeen(base, w);
+      expect(bossIdFor({ ...run, wave: w + 1 }, w + 1)).toBe(boss);
+      const id = nextEnemyId(run, createRng(seed));
+      expect(kind(id)).toBe(beats);
+      expect(['recruit', 'starter']).toContain(getDuelGeneral(id)!.role);
+      expect(id).not.toBe('guanyu');
+      expect(BOSS_IDS as readonly string[]).not.toContain(id);
+    }
+  });
+
+  it('후보가 여럿이면 rng로 고르고(결정적), 이미 쓴 장수는 빼며, 없으면 기존 규칙', () => {
+    const base = startRun('guanyu', 3);
+    // 하후돈(맹장) 앞: 지장 주유·강유
+    const seen = new Set<string>();
+    for (let seed = 1; seed <= 40; seed++) seen.add(nextEnemyId(withSeen(base, 11), createRng(seed)));
+    expect([...seen].sort()).toEqual(['jiangwei', 'zhouyu']);
+    expect(nextEnemyId(withSeen(base, 11), createRng(9))).toBe(nextEnemyId(withSeen(base, 11), createRng(9)));
+    // 강유가 이미 나왔으면 주유만
+    for (let seed = 1; seed <= 10; seed++) expect(nextEnemyId(withSeen(base, 11, ['jiangwei']), createRng(seed))).toBe('zhouyu');
+    // 조운으로 시작하면 웨이브 5에 남은 기장이 없다(마초·황충은 보스 예약) → 기존 규칙(영입 장수)
+    const zy = startRun('zhaoyun', 3);
+    for (let seed = 1; seed <= 10; seed++) {
+      const id = nextEnemyId(withSeen(zy, 5), createRng(seed));
+      expect(getDuelGeneral(id)!.role).toBe('recruit');
+      expect(['xuchu', 'jiangwei']).toContain(id);
+    }
+  });
+
+  it('다음 보스가 대신 나오는 장수면 그 장수는 후보에서 빼고, 후보를 고른 뒤에도 보스는 그대로다', () => {
+    const base = startRun('guanyu', 3);
+    // 하후돈이 장수록에 있으면 12의 보스는 허저(맹장) → 11의 후보는 지장, 허저는 아니다
+    const run = { ...withSeen(base, 11), roster: ['guanyu', 'xiaohoudun'] };
+    expect(bossIdFor({ ...run, wave: 12 }, 12)).toBe('xuchu');
+    for (let seed = 1; seed <= 20; seed++) {
+      const id = nextEnemyId(run, createRng(seed));
+      expect(kind(id)).toBe('지장');
+      const after = { ...run, wave: 12, record: { ...run.record, waves: [...run.record.waves, { wave: 11, enemy: id, turns: 1 }] } };
+      expect(bossIdFor(after, 12)).toBe('xuchu');
+    }
   });
 });

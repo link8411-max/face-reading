@@ -24,6 +24,13 @@ export interface Balance {
   healRate: number;
   /** 화상: 턴 끝마다 maxHp 비율 */
   burnRate: number;
+  /** 치명타 확률 = critBase (+ critKiBonus 기장) + 속도 보너스(명마) × critPerSpeed, 보스가 치면 × bossCritFactor. 방어 태세인 상대에겐 0 */
+  critBase: number;
+  critKiBonus: number;
+  critPerSpeed: number;
+  bossCritFactor: number;
+  /** 치명타 피해 배수 */
+  critMult: number;
 
   // ── 한 판 (run.ts·design.ts) ──
   /** 웨이브 1~36의 설계 합 수 */
@@ -68,20 +75,27 @@ const d = (hitsToKillEnemy: number, hitsToKillPlayer: number): WaveDesign => ({ 
 export const BALANCE: Balance = {
   hpPerLead: 2,
   hpPerLevel: 40,
-  matchWin: 1.2,
-  matchLose: 0.83,
+  matchWin: 1.4,
+  matchLose: 0.75,
   stab: 1.2,
   healRate: 0.3,
-  burnRate: 0.08,
+  burnRate: 0.05,
+  critBase: 0.06,
+  critKiBonus: 0.06,
+  critPerSpeed: 0.002,
+  bossCritFactor: 0.5,
+  critMult: 1.5,
 
+  // 2라운드: 보통 웨이브 5~7합 / 13~8합(뒤로 갈수록 7/8 쪽), 보스 11~14 / 7~10.
+  // 1~5는 혼자 싸우고 회복이 회복약뿐이라 쓰러지는 합을 넉넉히, 장각(6)은 혼자 맞는 상성 천적(맹장 시작)이라 8/26.
   // prettier-ignore
   waveDesign: [
-    d(5, 56), d(5, 56), d(6, 56), d(7, 45), d(7, 45), d(10, 22), // 1~6 장각
-    d(12, 31), d(12, 31), d(12, 31), d(12, 31), d(12, 31), d(17, 13), // 7~12 하후돈
-    d(14, 22), d(14, 22), d(14, 22), d(14, 22), d(14, 22), d(19, 9), // 13~18 동탁
-    d(15, 17), d(15, 17), d(15, 17), d(15, 17), d(15, 17), d(19, 10), // 19~24 허저
-    d(15, 15), d(15, 15), d(15, 15), d(15, 15), d(15, 15), d(21, 9), // 25~30 마초
-    d(16, 14), d(16, 14), d(16, 14), d(16, 14), d(16, 14), d(22, 8), // 31~36 여포
+    d(4, 21), d(4, 21), d(4, 21), d(5, 18), d(5, 18), d(8, 26), // 1~6 장각
+    d(5, 13), d(5, 13), d(5, 13), d(5, 13), d(5, 13), d(11, 10), // 7~12 하후돈
+    d(6, 11), d(6, 11), d(6, 11), d(6, 11), d(6, 11), d(13, 10), // 13~18 동탁
+    d(7, 9), d(7, 9), d(7, 9), d(7, 9), d(7, 9), d(13, 9), // 19~24 황충
+    d(7, 9), d(7, 9), d(7, 9), d(7, 9), d(7, 9), d(14, 7), // 25~30 마초
+    d(7, 8), d(7, 8), d(7, 8), d(7, 8), d(7, 8), d(14, 8), // 31~36 여포
   ],
   refGeneral: 'guanyu',
   refAtkPerWave: 1,
@@ -106,8 +120,8 @@ export const BALANCE: Balance = {
     breathe: { uses: 3 },
   },
   speedAdj: {},
-  generalPower: {},
-  generalHp: { zhangfei: 1.08, zhaoyun: 0.6, zhouyu: 0.65 },
+  generalPower: { zhouyu: 0.7 },
+  generalHp: { zhangfei: 1.3, zhaoyun: 1.05, zhouyu: 0.9 },
 };
 
 /** 일부만 덮어쓰는 값 (중첩 객체·배열도 일부만) */
@@ -163,15 +177,24 @@ export function withBalance<T>(override: BalanceOverride | undefined, fn: () => 
   }
 }
 
+/** [최소, 최대] 비율 */
+export type Range = [number, number];
+
 /**
- * 실력 단계별 목표(첫 판, 시작 장수 셋 각각). [최소, 최대] 비율. 설계표(waveDesign)는 average를 기준으로 맞춘다.
- * dongzhuo는 동탁(18)에 닿았을 때 이길 확률. novice는 거기까지 가는 판이 적어 목표를 두지 않는다.
+ * 밸런스 2라운드 목표(첫 판, 시작 장수 넷 각각). 설계표(waveDesign)는 average를 기준으로 맞춘다.
+ * survive: 그 웨이브까지 이긴 판 비율. worstBossShare: 전체 패배 중 한 보스에게 진 비율의 최댓값.
+ * normalHpLoss: 보통 웨이브 싸움에서 나선 장수가 잃는 체력 비율의 평균. novice·expert는 참고용(클리어만).
  */
-export const SKILL_TARGETS: Record<
-  'novice' | 'average' | 'expert',
-  { zhangjiao: [number, number]; dongzhuo: [number, number] | null; clear: [number, number] }
-> = {
-  novice: { zhangjiao: [0.55, 0.75], dongzhuo: null, clear: [0, 0.02] },
-  average: { zhangjiao: [0.8, 0.92], dongzhuo: [0.4, 0.6], clear: [0.03, 0.1] },
-  expert: { zhangjiao: [0.9, 1], dongzhuo: [0.6, 0.8], clear: [0.15, 0.3] },
+export const DIST_TARGETS = {
+  average: {
+    diedBeforeFirstBoss: [0, 0.1] as Range,
+    survive: { 12: [0.65, 0.85], 18: [0.4, 0.6], 24: [0.22, 0.38] } as Record<number, Range>,
+    clear: [0.08, 0.15] as Range,
+    worstBossShare: [0, 0.25] as Range,
+    normalHpLoss: [0.25, 0.4] as Range,
+    /** 시작 장수 클리어율 최대 − 최소 */
+    starterClearSpread: 0.1,
+  },
+  novice: { clear: [0, 0.03] as Range },
+  expert: { clear: [0.2, 0.4] as Range },
 };

@@ -10,6 +10,8 @@ export const STARTER_IDS = ['guanyu', 'zhangfei', 'zhaoyun', 'zhouyu'] as const;
  */
 export const BOSS_IDS = ['zhangjiao', 'xiaohoudun', 'dongzhuo', 'huangzhong', 'machao', 'lvbu'] as const;
 export const MOB_ID = 'mob';
+/** 보스 웨이브 (BOSS_IDS와 같은 순서). run.ts가 다시 내보낸다 */
+export const BOSS_WAVES = [6, 12, 18, 24, 30, 36] as const;
 
 // 유형별 기본 속도: 기장 70 / 맹장 55 / 지장 45
 const BASE_SPEED: Record<GeneralKind, number> = { 기장: 70, 맹장: 55, 지장: 45 };

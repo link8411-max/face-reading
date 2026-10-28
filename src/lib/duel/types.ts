@@ -41,6 +41,8 @@ export interface FighterStatus {
   guard?: boolean;
   /** 상대의 일갈을 들음: 다음에 주는 피해 0.8배 (한 번 주면 풀림) */
   shouted?: boolean;
+  /** 보스가 다음 턴에 쓰겠다고 예고한 필살기 id (enemyAction이 다음 턴에 그대로 쓰고 지운다) */
+  charging?: string;
 }
 
 export interface Fighter {
@@ -57,6 +59,8 @@ export interface Fighter {
   exp?: number;
   /** 보상으로 배운 기술이 있으면 장수 기본 기술 대신 이 4개를 쓴다 */
   skills?: [string, string, string, string];
+  /** 보스 웨이브의 적: 필살기를 한 턴 전에 예고하고, 치는 치명타 확률이 bossCritFactor배 */
+  boss?: boolean;
 }
 
 export interface BattleState {
@@ -74,6 +78,8 @@ export type TurnEvent = {
   kind: 'skill' | 'switch' | 'hit' | 'miss' | 'status' | 'ko' | 'counter';
   skillId?: string;
   amount?: number;
+  /** hit: 치명타(회심의 일격)였다 */
+  crit?: boolean;
   text: string;
 };
 

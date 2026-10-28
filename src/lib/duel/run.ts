@@ -3,14 +3,19 @@
 import { makeFighter, maxHpFor, resolveTurn, skillsOf } from './battle';
 import { BALANCE } from './balance';
 import { designedEnemy, makeDesignedEnemy } from './design';
-import { BOSS_IDS, DUEL_GENERALS, getDuelGeneral, MOB_ID } from './generals';
+import { BOSS_IDS, BOSS_WAVES, DUEL_GENERALS, getDuelGeneral, MOB_ID } from './generals';
 import { drawRewards, getReward, topUpRewards } from './rewards';
 import { SKILLS } from './skills';
 import { createRng, type Rng } from './rng';
-import type { Action, BattleState, Fighter, RunState, RunWave, TurnEvent } from './types';
+import type { Action, BattleState, Fighter, GeneralKind, RunState, RunWave, TurnEvent } from './types';
 
 export const WAVES = 36;
-export const BOSS_WAVES = [6, 12, 18, 24, 30, 36] as const;
+export { BOSS_WAVES };
+/** 보스 웨이브 바로 앞(5·11·17·23·29·35): 다음 보스를 상성으로 잡는 장수가 영입 후보로 나온다 */
+export const PRE_BOSS_WAVES = BOSS_WAVES.map((w) => w - 1);
+
+/** 이기는 상대: 맹장 > 기장 > 지장 > 맹장 (battle.ts와 같다) */
+const BEATS: Record<GeneralKind, GeneralKind> = { 맹장: '기장', 기장: '지장', 지장: '맹장' };
 
 const MOB_WAVES = 3;
 const RECRUIT_ONLY_UNTIL = 5;
@@ -75,6 +80,8 @@ export function enemyLevel(wave: number, id: string): number {
 
 /**
  * 1~3 졸개, 4~5 영입 장수, 보스 웨이브는 bossIdFor(장각·하후돈·동탁·황충·마초·여포), 나머지는 영입·시작 장수.
+ * 보스 직전 웨이브(PRE_BOSS_WAVES)는 다음 보스를 상성으로 잡는 유형의 영입·시작 장수가 남아 있으면 그중에서 고른다
+ * (다음 보스로 나올 장수는 빼고, 없으면 보통 규칙).
  * 보스 웨이브에 예약된 영입 장수(하후돈·황충·마초)는 보통 웨이브에 나오지 않는다.
  * 동행 중인 장수, 이번 판 장수록(시작 장수 포함, 교체로 내보낸 장수도), 이번 판에 이미 나온 장수는 빼고, 남은 장수가 없으면 졸개.
  */
@@ -85,6 +92,16 @@ export function nextEnemyId(run: RunState, rng: Rng): string {
   if (w <= MOB_WAVES) return MOB_ID;
   const used = usedIds(run);
   for (const id of BOSS_IDS) used.add(id);
+  if (PRE_BOSS_WAVES.includes(w)) {
+    const nextBoss = bossIdFor({ ...run, wave: w + 1 }, w + 1);
+    if (nextBoss && nextBoss !== MOB_ID) {
+      const bk = gen(nextBoss).kind;
+      const counters = DUEL_GENERALS.filter(
+        (g) => (g.role === 'recruit' || g.role === 'starter') && !used.has(g.id) && g.id !== nextBoss && BEATS[g.kind] === bk,
+      );
+      if (counters.length > 0) return counters[Math.floor(rng() * counters.length)].id;
+    }
+  }
   const roles = w <= RECRUIT_ONLY_UNTIL ? ['recruit'] : ['recruit', 'starter'];
   const pool = DUEL_GENERALS.filter((g) => roles.includes(g.role) && !used.has(g.id));
   if (pool.length === 0) return MOB_ID;

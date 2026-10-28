@@ -1,8 +1,9 @@
 // 웨이브 설계표(BALANCE.waveDesign) → 그 웨이브 적의 레벨·능력치 보정. 피해 공식(battle.ts damage)을 거꾸로 푼다.
-// 기준 아군 = BALANCE.refGeneral이 경험치 곡선대로 자란 모습(+ 웨이브마다 refAtkPerWave 공격). 상성 1, 평균 난수 0.925.
+// 기준 아군 = BALANCE.refGeneral이 경험치 곡선대로 자란 모습(+ 웨이브마다 refAtkPerWave 공격). 상성 1, 평균 난수 0.925,
+// 치명타는 기대 배율 1 + p × (critMult − 1)로 넣는다(보스 웨이브의 적은 boss라 p가 절반).
 import { BALANCE } from './balance';
-import { attackStat, makeFighter, skillsOf } from './battle';
-import { getDuelGeneral } from './generals';
+import { attackStat, critChance, makeFighter, skillsOf } from './battle';
+import { BOSS_WAVES, getDuelGeneral } from './generals';
 import { SKILLS } from './skills';
 import type { Fighter } from './types';
 
@@ -37,11 +38,14 @@ export function refFighter(wave: number): Fighter {
   return f;
 }
 
-/** a가 d를 기본 공격으로 칠 때 평균 피해(상성 1, 자속 반영, 장수 피해 배율 반영) */
+const isBossWave = (wave: number) => (BOSS_WAVES as readonly number[]).includes(wave);
+
+/** a가 d를 기본 공격으로 칠 때 평균 피해(상성 1, 자속·장수 피해 배율·치명타 기대 배율 반영) */
 export function basicHit(a: Fighter, d: Fighter): number {
   const sk = SKILLS[skillsOf(a)[0]];
   const stab = sk.kind === gen(a.id).kind ? BALANCE.stab : 1;
-  return (sk.power * attackStat(a) / gen(d.id).stats.통솔) * stab * AVG_ROLL * (BALANCE.generalPower[a.id] ?? 1);
+  const crit = 1 + critChance(a, d) * (BALANCE.critMult - 1);
+  return (sk.power * attackStat(a) / gen(d.id).stats.통솔) * stab * AVG_ROLL * (BALANCE.generalPower[a.id] ?? 1) * crit;
 }
 
 /**
@@ -53,6 +57,7 @@ export function designedEnemy(wave: number, id: string): { level: number; bonus:
   const des = BALANCE.waveDesign[Math.min(BALANCE.waveDesign.length, Math.max(1, wave)) - 1];
   const me = refFighter(wave);
   const probe = makeFighter(id, 1);
+  if (isBossWave(wave)) probe.boss = true;
   const hp = des.hitsToKillEnemy * basicHit(me, probe);
   // 장수 체력 배율(generalHp)은 아군 쪽 균형용이라 적의 설계 합 수는 바꾸지 않게 나눠 둔다
   const gh = BALANCE.generalHp[id] ?? 1;
@@ -65,11 +70,12 @@ export function designedEnemy(wave: number, id: string): { level: number; bonus:
   return { level, bonus };
 }
 
-/** 설계대로 만든 적 */
+/** 설계대로 만든 적 (보스 웨이브면 boss 표시: 필살기 예고·치명타 절반) */
 export function makeDesignedEnemy(wave: number, id: string): Fighter {
   const { level, bonus } = designedEnemy(wave, id);
   const f = makeFighter(id, level);
   f.bonus.atk = bonus;
   f.bonus.int = bonus;
+  if (isBossWave(wave)) f.boss = true;
   return f;
 }

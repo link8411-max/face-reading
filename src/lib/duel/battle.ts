@@ -71,19 +71,39 @@ export function attackStat(f: Fighter): number {
 }
 
 /**
+ * 치명타 확률: critBase, 기장이면 + critKiBonus(정교한 무예), 속도 보너스(명마) × critPerSpeed.
+ * 보스가 치면 × bossCritFactor(보스전이 운으로 끝나지 않게), 상대가 방어 태세면 0. (BALANCE)
+ */
+export function critChance(att: Fighter, def: Fighter): number {
+  if (def.status.guard) return 0;
+  let p = BALANCE.critBase + Math.max(0, att.bonus.speed) * BALANCE.critPerSpeed;
+  if (gen(att).kind === '기장') p += BALANCE.critKiBonus;
+  if (att.boss) p *= BALANCE.bossCritFactor;
+  return Math.min(1, Math.max(0, p));
+}
+
+/**
  * 위력 × (공격 능력치 / 상대 통솔) × 상성(기술 유형 → 상대 장수 유형) × 자속(기술 유형 = 내 유형이면 1.2) × 난수(0.85~1.0)
  * 공격자가 일갈을 들었으면 ×0.8, 상대가 방어 태세면 ×0.5. 위력 0 기술은 0, 그 외 최소 1.
+ * 난수는 두 번 뽑는다: 첫째는 0.85~1.0 계수, 둘째가 critChance보다 작으면 치명타(× critMult).
  */
-export function damage(att: Fighter, def: Fighter, sk: Skill, rng: Rng): number {
-  if (sk.power <= 0) return 0;
+export function damageRoll(att: Fighter, def: Fighter, sk: Skill, rng: Rng): { amount: number; crit: boolean } {
+  if (sk.power <= 0) return { amount: 0, crit: false };
   const a = gen(att);
   const d = gen(def);
   let v = sk.power * (attackStat(att) / d.stats.통솔) * matchup(sk.kind, d.kind) * (sk.kind === a.kind ? BALANCE.stab : 1);
   v *= BALANCE.generalPower[att.id] ?? 1;
   v *= 0.85 + 0.15 * rng();
+  const crit = rng() < critChance(att, def);
+  if (crit) v *= BALANCE.critMult;
   if (att.status.shouted) v *= SHOUT_RATE;
   if (def.status.guard) v *= 0.5;
-  return Math.max(1, Math.round(v));
+  return { amount: Math.max(1, Math.round(v)), crit };
+}
+
+/** damageRoll의 피해만 */
+export function damage(att: Fighter, def: Fighter, sk: Skill, rng: Rng): number {
+  return damageRoll(att, def, sk, rng).amount;
 }
 
 /** 이 장수가 지금 쓰는 기술 4개 (보상으로 배운 기술 반영) */
@@ -95,12 +115,24 @@ function usable(f: Fighter, id: string): boolean {
   return !(id in f.uses) || f.uses[id] > 0;
 }
 
-/** 적 AI: 체력 30% 이하면 30% 확률로 방어·회복, 아니면 상성·자속 고려해 가장 센 공격 기술 */
+const isUlt = (id: string) => id.endsWith('_ult');
+
+/** 받침 있으면 a, 없으면 b (한글이 아니면 b) */
+function josa(word: string, a: string, b: string): string {
+  const c = word.charCodeAt(word.length - 1) - 0xac00;
+  return c >= 0 && c <= 11171 && c % 28 !== 0 ? a : b;
+}
+
+/**
+ * 적 AI: 체력 30% 이하면 30% 확률로 방어·회복, 아니면 상성·자속 고려해 가장 센 공격 기술.
+ * 보스(Fighter.boss)는 필살기를 예고한 다음 턴에만 쓴다: 예고(status.charging)가 있으면 그 기술, 없으면 필살기는 빼고 고른다.
+ */
 export function enemyAction(state: BattleState, rng: Rng): Action {
   const e = state.enemy;
   const g = gen(e);
   const basic = skillsOf(e)[0];
   if (e.status.taunt) return { type: 'skill', skillId: basic };
+  if (e.status.charging && usable(e, e.status.charging)) return { type: 'skill', skillId: e.status.charging };
   const foeKind = gen(state.party[state.active]).kind;
   const avail = skillsOf(e).filter((id) => usable(e, id));
   if (e.hp <= e.maxHp * LOW_HP) {
@@ -112,6 +144,7 @@ export function enemyAction(state: BattleState, rng: Rng): Action {
   for (const id of avail) {
     const s = skill(id);
     if (s.power <= 0) continue;
+    if (e.boss && isUlt(id)) continue;
     const score = s.power * matchup(s.kind, foeKind) * (s.kind === g.kind ? BALANCE.stab : 1);
     if (score > bestScore) {
       best = id;
@@ -135,6 +168,9 @@ export function resolveTurn(
   const log: TurnEvent[] = [];
   const enemyAct = enemyAction(state, rng);
   if (enemyAct.type !== 'skill') throw new Error('적은 교체하지 않는다');
+  // 예고한 필살기는 이번 턴의 행동으로 소모된다(이번 턴 끝에는 다시 예고하지 않는다)
+  const released = !!s.enemy.status.charging;
+  delete s.enemy.status.charging;
 
   const fighter = (side: Side): Fighter => (side === 'player' ? s.party[s.active] : s.enemy);
   const other = (side: Side): Side => (side === 'player' ? 'enemy' : 'player');
@@ -181,10 +217,17 @@ export function resolveTurn(
     log.push({ who: side, kind: 'skill', skillId: id, text: `${note}${g.name}의 ${sk.name}!` });
 
     if (sk.power > 0) {
-      const dmg = damage(self, foe, sk, rng);
+      const { amount: dmg, crit } = damageRoll(self, foe, sk, rng);
       delete self.status.shouted;
       foe.hp = Math.max(0, foe.hp - dmg);
-      log.push({ who: side, kind: 'hit', skillId: id, amount: dmg, text: `${name(foe)}에게 ${dmg}의 피해!` });
+      log.push({
+        who: side,
+        kind: 'hit',
+        skillId: id,
+        amount: dmg,
+        ...(crit ? { crit: true } : {}),
+        text: `${crit ? '회심의 일격! ' : ''}${name(foe)}에게 ${dmg}의 피해!`,
+      });
       if (foe.hp <= 0) {
         ko(foeSide);
         return;
@@ -271,6 +314,18 @@ export function resolveTurn(
     f.status.burn -= 1;
     if (f.status.burn <= 0) delete f.status.burn;
     if (f.hp <= 0) ko(side);
+  }
+
+  // 보스 필살기 예고: 이번 턴에 필살기를 쓰지 않았고 다음 턴에 쓸 수 있으면(도발 중이 아니면) 턴 끝에 알린다
+  const e = s.enemy;
+  if (e.boss && !released && alive('player') && alive('enemy') && !e.status.taunt) {
+    const ult = skillsOf(e).find((id) => isUlt(id) && usable(e, id));
+    if (ult) {
+      e.status.charging = ult;
+      const n = name(e);
+      const u = skill(ult).name;
+      log.push({ who: 'enemy', kind: 'status', skillId: ult, text: `${n}${josa(n, '이', '가')} ${u}${josa(u, '을', '를')} 준비한다!` });
+    }
   }
 
   // 방어 태세는 그 턴에만

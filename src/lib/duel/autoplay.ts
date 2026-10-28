@@ -12,8 +12,11 @@ import type { Action, Fighter, GeneralKind, RunState, Skill } from './types';
 const LOW = 0.4;
 /** 기대 피해용 난수(0.85~1.0의 가운데) */
 const MID: Rng = () => 0.5;
-/** 확실히 쓰러뜨리는지 볼 때(가장 약한 난수) */
-const LOWEST: Rng = () => 0;
+/** 확실히 쓰러뜨리는지 볼 때: 가장 약한 난수, 치명타 없음 (damageRoll은 계수·치명타 순으로 두 번 뽑는다) */
+const lowest = (): Rng => {
+  let n = 0;
+  return () => (n++ % 2 === 0 ? 0 : 0.999999);
+};
 
 const kindOf = (f: Fighter): GeneralKind => getDuelGeneral(f.id)!.kind;
 const usable = (f: Fighter, id: string) => !(id in f.uses) || f.uses[id] > 0;
@@ -98,10 +101,18 @@ export function heuristicAction(run: RunState, rng?: Rng, skill: SkillProfile = 
   if (prof.mistake > 0 && mistakeBattle(run) < prof.mistake) return { type: 'skill', skillId: skillsOf(me)[0] };
 
   // 1) 지금 확실히 쓰러뜨릴 수 있으면: 무제한 기술 먼저
-  const killers = skills.filter((id) => SKILLS[id].power > 0 && damage(me, foe, SKILLS[id], LOWEST) >= foe.hp);
+  const killers = skills.filter((id) => SKILLS[id].power > 0 && damage(me, foe, SKILLS[id], lowest()) >= foe.hp);
   if (killers.length > 0) {
     const pick = killers.find((id) => !(id in me.uses)) ?? killers[0];
     return { type: 'skill', skillId: pick };
+  }
+
+  // 보스가 필살기를 예고했으면: 방어 태세(맹장), 아니면 매복(기장)으로 받는다
+  if (foe.status.charging) {
+    const guard = skills.find((id) => SKILLS[id].effect === 'guard');
+    if (guard) return { type: 'skill', skillId: guard };
+    const ambush = skills.find((id) => SKILLS[id].effect === 'ambush');
+    if (ambush && !me.status.ambush) return { type: 'skill', skillId: ambush };
   }
 
   const others = b.party.map((f, i) => ({ f, i })).filter(({ f, i }) => i !== b.active && f.hp > f.maxHp * LOW);
@@ -221,6 +232,8 @@ export interface SimResult {
   bossResults: Record<number, 'win' | 'loss' | 'unreached'>;
   /** 한 싸움이 battleTurnCap을 넘겨(서로 회복만 하는 교착) 패배로 친 판 */
   stalled: boolean;
+  /** 보통 웨이브 싸움마다 [웨이브, 나섰던 장수들이 잃은 체력 비율(싸움 전 hp/maxHp − 싸움 뒤, maxHp 가중)]. 진 싸움도 넣는다 */
+  normalHpLoss: [number, number][];
 }
 
 export type SimMode = 'smart' | 'basic';
@@ -271,17 +284,20 @@ export function playBattle(
   mode: SimMode = 'smart',
   cap = 150,
   skill: SkillProfile = 'average',
-): { run: RunState; turns: number; stalled: boolean } {
+): { run: RunState; turns: number; stalled: boolean; fielded: number[] } {
   let turns = 0;
+  const fielded = new Set<number>();
   while (run.phase === 'battle') {
-    if (run.battle!.turn > cap) return { run, turns, stalled: true };
     const b = run.battle!;
+    fielded.add(b.active);
+    if (b.turn > cap) return { run, turns, stalled: true, fielded: [...fielded] };
     const act: Action =
       mode === 'basic' ? { type: 'skill', skillId: skillsOf(b.party[b.active])[0] } : heuristicAction(run, rng, skill);
+    if (act.type === 'switch') fielded.add(act.toIndex);
     run = playerTurn(run, act, rng);
     turns += 1;
   }
-  return { run, turns, stalled: false };
+  return { run, turns, stalled: false, fielded: [...fielded] };
 }
 
 /** 보상 단계: (smart면) 항복한 장수 교체 판단 → 보상 고르기 → 다음 웨이브 */
@@ -324,11 +340,26 @@ export function simulateRun(starterId: string, seed: number, opts: SimOptions = 
     let run = newSimRun(starterId, seed, opts.roster);
     let turns = 0;
     let stalled = false;
+    const normalHpLoss: [number, number][] = [];
     while ((run.phase === 'battle' || run.phase === 'reward') && turns < maxTurns) {
       if (run.phase === 'battle') {
+        const before = run.party;
+        const wave = run.wave;
         const r = playBattle(run, rng, mode, opts.battleTurnCap, opts.skill);
         run = r.run;
         turns += r.turns;
+        if (!(BOSS_WAVES as readonly number[]).includes(wave)) {
+          let lost = 0;
+          let weight = 0;
+          for (const i of r.fielded) {
+            const a = before[i];
+            const z = run.party[i];
+            const after = run.phase === 'lost' || !z ? 0 : z.hp / z.maxHp;
+            lost += (a.hp / a.maxHp - after) * a.maxHp;
+            weight += a.maxHp;
+          }
+          if (weight > 0) normalHpLoss.push([wave, lost / weight]);
+        }
         if (r.stalled) {
           stalled = true;
           break;
@@ -342,7 +373,7 @@ export function simulateRun(starterId: string, seed: number, opts: SimOptions = 
       bossResults[bw] =
         bw < reachedWave || (bw === reachedWave && cleared) ? 'win' : bw === reachedWave ? 'loss' : 'unreached';
     }
-    return { reachedWave, cleared, turns, roster: run.roster, bossResults, stalled };
+    return { reachedWave, cleared, turns, roster: run.roster, bossResults, stalled, normalHpLoss };
   });
 }
 
@@ -363,7 +394,19 @@ export interface RunSummary {
   meanTurns: number;
   /** 교착으로 끝난 판 비율 */
   stalled: number;
+  /** 웨이브 w까지 이긴(살아남은) 판 비율: survive[w] (w = 1..36) */
+  survive: Record<number, number>;
+  /** 웨이브 1~5에서 진 판 비율(첫 보스 전 사망) */
+  diedBeforeFirstBoss: number;
+  /** 보스 웨이브마다 전체 패배 중 그 보스에게 진 비율 */
+  deathShare: { wave: number; share: number }[];
+  /** 보통 웨이브 싸움의 평균 체력 손실 비율 */
+  normalHpLoss: number;
+  /** 보스 구간(1~5, 7~11, …, 31~35)마다 보통 웨이브 평균 체력 손실 */
+  normalHpLossByBlock: number[];
 }
+
+const mean = (xs: number[]) => (xs.length ? xs.reduce((a, x) => a + x, 0) / xs.length : 0);
 
 export function summarizeRuns(rs: SimResult[]): RunSummary {
   const boss = BOSS_WAVES.map((wave) => {
@@ -379,5 +422,17 @@ export function summarizeRuns(rs: SimResult[]): RunSummary {
     iqr: quantile(waves, 0.75) - quantile(waves, 0.25),
     meanTurns: rs.reduce((a, r) => a + r.turns, 0) / rs.length,
     stalled: rs.filter((r) => r.stalled).length / rs.length,
+    survive: Object.fromEntries(
+      Array.from({ length: 36 }, (_, i) => i + 1).map((w) => [w, rs.filter((r) => r.cleared || r.reachedWave > w).length / rs.length]),
+    ),
+    diedBeforeFirstBoss: rs.filter((r) => !r.cleared && r.reachedWave < BOSS_WAVES[0]).length / rs.length,
+    deathShare: BOSS_WAVES.map((wave) => {
+      const lost = rs.filter((r) => !r.cleared);
+      return { wave, share: lost.length ? lost.filter((r) => r.reachedWave === wave).length / lost.length : 0 };
+    }),
+    normalHpLoss: mean(rs.flatMap((r) => r.normalHpLoss.map(([, x]) => x))),
+    normalHpLossByBlock: BOSS_WAVES.map((bw) =>
+      mean(rs.flatMap((r) => r.normalHpLoss.filter(([w]) => w < bw && w > bw - 6).map(([, x]) => x))),
+    ),
   };
 }

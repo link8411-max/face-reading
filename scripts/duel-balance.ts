@@ -1,10 +1,10 @@
 // 일기토 밸런스 측정표. 시뮬레이션은 worker_threads로 나눠 돌린다.
 // 사용: npx tsx --tsconfig tsconfig.json scripts/duel-balance.ts [seeds=500] [--only 표이름,...]
-// 표: main(기본 표), skill(실력 단계), combo(시작 장수 × 동행 조합), reward(보상 성향), recruit(영입 장수 하나 더하기)
+// 표: dist(생존 분포·보스별 패배 비율·보통 웨이브 체력 손실), crit(치명타 전후 IQR), main(기본 표), skill(실력 단계), combo(시작 장수 × 동행 조합), reward(보상 성향), recruit(영입 장수 하나 더하기)
 import { availableParallelism } from 'node:os';
 import { Worker, isMainThread, parentPort } from 'node:worker_threads';
 import { simulateRun, summarizeRuns, type RunSummary, type SimOptions } from '../src/lib/duel/autoplay';
-import { SKILL_TARGETS } from '../src/lib/duel/balance';
+
 import { BOSS_WAVES } from '../src/lib/duel/run';
 
 interface Job {
@@ -67,6 +67,35 @@ async function main() {
 
   console.log(`seeds=${N}  (보스 칸: 도달률/도달 시 승률, smart는 실력 average·보상 heal)`);
 
+  if (want('dist')) {
+    console.log('\n## 생존 분포 (첫 판, 실력별): 5까지 사망 | 6·12·18·24·30까지 생존 | 클리어 | 가장 많이 진 보스(패배 중 비율) | 보통 웨이브 체력 손실 | 중앙값 / IQR');
+    console.log('   목표(average): 사망≤10% | 12 ≈75%(65~85) 18 ≈50%(40~60) 24 ≈30%(22~38) | 클리어 8~15% | 한 보스 ≤25% | 손실 25~40%');
+    const profiles = ['novice', 'average', 'expert'] as const;
+    const cases = profiles.flatMap((skill) => STARTERS.map((s) => ({ s, skill })));
+    const res = await runAll(cases.map((c) => ({ starter: c.s, opts: { skill: c.skill } })));
+    cases.forEach((c, i) => {
+      const m = res[i].sum;
+      const worst = [...m.deathShare].sort((a, b) => b.share - a.share)[0];
+      console.log(
+        `  ${c.skill.padEnd(7)} ${c.s.padEnd(8)} ${pct(m.diedBeforeFirstBoss)} | ${[6, 12, 18, 24, 30].map((w) => pct(m.survive[w])).join(' ')} | ${pct(m.clear)} | ${String(worst.wave).padStart(2)} ${pct(worst.share)} (${m.deathShare.map((d) => pct(d.share).trim()).join('/')}) | ${pct(m.normalHpLoss)} (${m.normalHpLossByBlock.map((x) => pct(x).trim()).join('/')}) | ${m.median} / ${m.iqr}`,
+      );
+    });
+  }
+
+  if (want('crit')) {
+    console.log('\n## 치명타 전후 (average, 첫 판): 도달 웨이브 중앙값 / IQR / 클리어   (끔 = critBase·critKiBonus·critPerSpeed 0)');
+    const off = { critBase: 0, critKiBonus: 0, critPerSpeed: 0 };
+    const cases = STARTERS.flatMap((s) => [false, true].map((noCrit) => ({ s, noCrit })));
+    const res = await runAll(cases.map((c) => ({ starter: c.s, opts: c.noCrit ? { balance: off } : {} })));
+    STARTERS.forEach((s, si) => {
+      const on = res[si * 2].sum;
+      const offS = res[si * 2 + 1].sum;
+      console.log(
+        `  ${s.padEnd(8)} 켬 ${on.median} / ${on.iqr} / ${pct(on.clear)}   끔 ${offS.median} / ${offS.iqr} / ${pct(offS.clear)}   IQR 차 ${(on.iqr - offS.iqr).toFixed(1)}`,
+      );
+    });
+  }
+
   if (want('main')) {
     console.log('\n## 기본 표');
     console.log(
@@ -96,16 +125,14 @@ async function main() {
   }
 
   if (want('skill')) {
-    console.log('\n## 실력 단계 (첫 판): 장각 통과 / 동탁 승률(도달 시) / 클리어 / 중앙값 / 평균 턴   [목표]');
+    console.log('\n## 실력 단계 (첫 판): 장각 통과 / 동탁 승률(도달 시) / 클리어 / 중앙값 / 평균 턴');
     const profiles = ['novice', 'average', 'expert'] as const;
     const cases = profiles.flatMap((skill) => STARTERS.map((s) => ({ s, skill })));
     const res = await runAll(cases.map((c) => ({ starter: c.s, opts: { skill: c.skill } })));
     cases.forEach((c, i) => {
       const m = res[i].sum;
-      const t = SKILL_TARGETS[c.skill];
-      const goal = `[장각 ${t.zhangjiao.join('~')} 동탁 ${t.dongzhuo ? t.dongzhuo.join('~') : '-'} 클리어 ${t.clear.join('~')}]`;
       console.log(
-        `  ${c.skill.padEnd(7)} ${c.s.padEnd(8)} ${pct(pass(m, 6).pass)} / ${pct(pass(m, 18).pass)} / ${pct(m.clear)} / ${String(m.median).padStart(2)} / ${m.meanTurns.toFixed(0).padStart(3)}   ${goal}`,
+        `  ${c.skill.padEnd(7)} ${c.s.padEnd(8)} ${pct(pass(m, 6).pass)} / ${pct(pass(m, 18).pass)} / ${pct(m.clear)} / ${String(m.median).padStart(2)} / ${m.meanTurns.toFixed(0).padStart(3)}`,
       );
     });
   }

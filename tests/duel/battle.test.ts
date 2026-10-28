@@ -1,7 +1,8 @@
 import { describe, it, expect } from 'vitest';
-import { BALANCE } from '@/lib/duel/balance';
+import { BALANCE, withBalance } from '@/lib/duel/balance';
+import { basicHit } from '@/lib/duel/design';
 import { createRng } from '@/lib/duel/rng';
-import { makeFighter, matchup, damage, resolveTurn, enemyAction } from '@/lib/duel/battle';
+import { makeFighter, matchup, damage, damageRoll, critChance, resolveTurn, enemyAction } from '@/lib/duel/battle';
 import { SKILLS } from '@/lib/duel/skills';
 import type { BattleState, Fighter, Skill } from '@/lib/duel/types';
 
@@ -86,9 +87,11 @@ describe('damage', () => {
     const def = makeFighter('zhouyu', 10);
     const max = 40 * (97 / 95) * BALANCE.matchLose * 1.2;
     for (let seed = 1; seed <= 100; seed++) {
-      const d = damage(att, def, SKILLS.strike, createRng(seed));
-      expect(d).toBeGreaterThanOrEqual(Math.floor(max * 0.85));
-      expect(d).toBeLessThanOrEqual(Math.ceil(max));
+      // 치명타면 × critMult
+      const { amount: d, crit } = damageRoll(att, def, SKILLS.strike, createRng(seed));
+      const m = crit ? BALANCE.critMult : 1;
+      expect(d).toBeGreaterThanOrEqual(Math.floor(max * 0.85 * m));
+      expect(d).toBeLessThanOrEqual(Math.ceil(max * m));
     }
     const weak = { ...att, bonus: { ...att.bonus, atk: -1000 } };
     expect(damage(weak, def, SKILLS.strike, ONE)).toBe(1);
@@ -278,5 +281,161 @@ describe('enemyAction', () => {
     const s = state([makeFighter('guanyu', 5)], { ...e, hp: Math.floor(e.maxHp * 0.3) });
     expect(enemyAction(s, () => 0.1)).toEqual({ type: 'skill', skillId: 'breathe' });
     expect(enemyAction(s, () => 0.9)).toEqual({ type: 'skill', skillId: 'zhangjiao_ult' });
+  });
+});
+
+/** 정해진 값을 차례로 내는 난수 (끝나면 마지막 값을 되풀이) */
+function seq(...xs: number[]) {
+  let i = 0;
+  return () => xs[Math.min(i++, xs.length - 1)];
+}
+
+describe('치명타 (Task 14b)', () => {
+  it('확률: 기본 critBase, 기장 +critKiBonus, 속도 보너스(명마) × critPerSpeed, 보스가 칠 때는 × bossCritFactor', () => {
+    const guanyu = makeFighter('guanyu', 5);
+    const zhaoyun = makeFighter('zhaoyun', 5);
+    const def = makeFighter('lvbu', 5);
+    expect(critChance(guanyu, def)).toBeCloseTo(BALANCE.critBase, 9);
+    expect(critChance(zhaoyun, def)).toBeCloseTo(BALANCE.critBase + BALANCE.critKiBonus, 9);
+    const fast = { ...zhaoyun, bonus: { ...zhaoyun.bonus, speed: 15 } };
+    expect(critChance(fast, def)).toBeCloseTo(BALANCE.critBase + BALANCE.critKiBonus + 15 * BALANCE.critPerSpeed, 9);
+    const boss = { ...makeFighter('dongzhuo', 5), boss: true };
+    expect(critChance(boss, guanyu)).toBeCloseTo(BALANCE.critBase * BALANCE.bossCritFactor, 9);
+    expect(BALANCE.critBase).toBeCloseTo(0.06, 9);
+    expect(BALANCE.critKiBonus).toBeCloseTo(0.06, 9);
+    expect(BALANCE.critMult).toBeCloseTo(1.5, 9);
+    expect(BALANCE.bossCritFactor).toBeCloseTo(0.5, 9);
+  });
+
+  it('방어 태세인 상대에게는 치명타가 없다', () => {
+    const att = makeFighter('zhaoyun', 5);
+    const def = { ...makeFighter('lvbu', 5), status: { guard: true } };
+    expect(critChance(att, def)).toBe(0);
+    expect(damageRoll(att, def, SKILLS.thrust, seq(0.999999, 0)).crit).toBe(false);
+  });
+
+  it('두 번째 난수가 확률보다 작으면 치명타: 피해 × critMult', () => {
+    const att = makeFighter('guanyu', 10);
+    const def = makeFighter('lvbu', 10);
+    const plain = damageRoll(att, def, SKILLS.strike, seq(0.999999, 0.999999));
+    const crit = damageRoll(att, def, SKILLS.strike, seq(0.999999, 0));
+    expect(plain.crit).toBe(false);
+    expect(crit.crit).toBe(true);
+    expect(Math.abs(crit.amount - plain.amount * BALANCE.critMult)).toBeLessThanOrEqual(1);
+    expect(damage(att, def, SKILLS.strike, seq(0.999999, 0))).toBe(crit.amount);
+  });
+
+  it('결정적: 같은 시드면 같은 치명타, 빈도는 확률 근처', () => {
+    const att = makeFighter('guanyu', 10);
+    const def = makeFighter('lvbu', 10);
+    const roll = () => {
+      const rng = createRng(77);
+      return Array.from({ length: 4000 }, () => damageRoll(att, def, SKILLS.strike, rng).crit);
+    };
+    const a = roll();
+    expect(a).toEqual(roll());
+    const rate = a.filter(Boolean).length / a.length;
+    expect(rate).toBeGreaterThan(BALANCE.critBase - 0.02);
+    expect(rate).toBeLessThan(BALANCE.critBase + 0.02);
+  });
+
+  it('치명타 hit 이벤트는 crit: true, 대사 "회심의 일격!"', () => {
+    const s = state([makeFighter('guanyu', 10)], makeFighter('zhangfei', 30)); // 동속: 플레이어 먼저
+    const { log } = resolveTurn(s, { type: 'skill', skillId: 'strike' }, seq(0.999999, 0, 0.999999, 0.999999));
+    const mine = log.find((e) => e.who === 'player' && e.kind === 'hit')!;
+    expect(mine.crit).toBe(true);
+    expect(mine.text).toContain('회심의 일격!');
+    const theirs = log.find((e) => e.who === 'enemy' && e.kind === 'hit')!;
+    expect(theirs.crit).toBeUndefined();
+    expect(theirs.text).not.toContain('회심');
+  });
+
+  it('design.ts 평균 피해는 치명타 기대 배율 1 + p×(mult−1)을 반영한다', () => {
+    const a = makeFighter('zhaoyun', 5);
+    const d = makeFighter('lvbu', 5);
+    const p = critChance(a, d);
+    const off = withBalance({ critBase: 0, critKiBonus: 0, critPerSpeed: 0 }, () => basicHit(a, d));
+    expect(basicHit(a, d) / off).toBeCloseTo(1 + p * (BALANCE.critMult - 1), 9);
+  });
+});
+
+describe('보스 필살기 예고 (Task 14b)', () => {
+  const bossState = (hp?: number) => {
+    const e = { ...makeFighter('dongzhuo', 10), boss: true };
+    if (hp !== undefined) e.hp = hp;
+    return state([makeFighter('guanyu', 10), makeFighter('zhaoyun', 10)], e);
+  };
+
+  it('보스는 예고 없이 필살기를 쓰지 않는다: 첫 턴은 다른 기술, 턴 끝에 예고 이벤트와 charging', () => {
+    const s = bossState();
+    expect(enemyAction(s, ONE)).not.toEqual({ type: 'skill', skillId: 'dongzhuo_ult' });
+    const { state: next, log } = resolveTurn(s, { type: 'skill', skillId: 'strike' }, ONE);
+    expect(log.some((e) => e.who === 'enemy' && e.kind === 'skill' && e.skillId === 'dongzhuo_ult')).toBe(false);
+    expect(next.enemy.status.charging).toBe('dongzhuo_ult');
+    const last = log[log.length - 1];
+    expect(last).toMatchObject({ who: 'enemy', kind: 'status' });
+    expect(last.text).toBe('동탁이 폭정을 준비한다!');
+  });
+
+  it('예고한 다음 턴에는 실제로 필살기를 쓰고, 그 턴 끝엔 다시 예고하지 않는다', () => {
+    const t1 = resolveTurn(bossState(), { type: 'skill', skillId: 'strike' }, ONE).state;
+    expect(enemyAction(t1, ONE)).toEqual({ type: 'skill', skillId: 'dongzhuo_ult' });
+    const t2 = resolveTurn(t1, { type: 'skill', skillId: 'guard' }, ONE);
+    expect(t2.log.some((e) => e.who === 'enemy' && e.kind === 'skill' && e.skillId === 'dongzhuo_ult')).toBe(true);
+    expect(t2.state.enemy.status.charging).toBeUndefined();
+    expect(t2.log.some((e) => e.kind === 'status' && e.text.includes('준비한다'))).toBe(false);
+    expect(t2.state.enemy.uses.dongzhuo_ult).toBe(2);
+    // 그다음 턴 끝에 다시 예고
+    const t3 = resolveTurn(t2.state, { type: 'skill', skillId: 'strike' }, ONE);
+    expect(t3.state.enemy.status.charging).toBe('dongzhuo_ult');
+  });
+
+  it('예고 뒤 교체해도 적의 공짜 행동은 예고한 필살기다(새로 나온 장수가 맞는다)', () => {
+    const t1 = resolveTurn(bossState(), { type: 'skill', skillId: 'strike' }, ONE).state;
+    const t2 = resolveTurn(t1, { type: 'switch', toIndex: 1 }, ONE);
+    expect(t2.log.find((e) => e.who === 'enemy' && e.kind === 'skill')!.skillId).toBe('dongzhuo_ult');
+    expect(t2.state.party[1].hp).toBeLessThan(t2.state.party[1].maxHp);
+  });
+
+  it('체력이 낮아도 예고한 필살기가 방어·회복보다 먼저다', () => {
+    const t1 = resolveTurn(bossState(), { type: 'skill', skillId: 'strike' }, ONE).state;
+    const low = { ...t1, enemy: { ...t1.enemy, hp: Math.floor(t1.enemy.maxHp * 0.2) } };
+    expect(enemyAction(low, () => 0.01)).toEqual({ type: 'skill', skillId: 'dongzhuo_ult' });
+  });
+
+  it('필살기가 바닥나면 예고하지 않는다', () => {
+    const s = bossState();
+    const used = { ...s, enemy: { ...s.enemy, uses: { ...s.enemy.uses, dongzhuo_ult: 0 } } };
+    const r = resolveTurn(used, { type: 'skill', skillId: 'strike' }, ONE);
+    expect(r.state.enemy.status.charging).toBeUndefined();
+    expect(r.log.some((e) => e.text.includes('준비한다'))).toBe(false);
+  });
+
+  it('보스가 아닌 적은 예고 없이 바로 필살기를 쓴다', () => {
+    const s = state([makeFighter('guanyu', 10)], makeFighter('dongzhuo', 10));
+    const r = resolveTurn(s, { type: 'skill', skillId: 'strike' }, ONE);
+    expect(r.log.some((e) => e.who === 'enemy' && e.skillId === 'dongzhuo_ult')).toBe(true);
+    expect(r.state.enemy.status.charging).toBeUndefined();
+  });
+
+  it('조사: 받침 없는 이름은 "가" (여포가 방천화극 난무를 준비한다!)', () => {
+    const e = { ...makeFighter('lvbu', 10), boss: true };
+    const r = resolveTurn(state([makeFighter('zhouyu', 10)], e), { type: 'skill', skillId: 'scheme' }, ONE);
+    expect(r.log.find((x) => x.text.includes('준비한다'))!.text).toBe('여포가 방천화극 난무를 준비한다!');
+  });
+
+  it('결정적: 같은 시드·입력이면 예고·필살기 순서가 같다', () => {
+    const play = () => {
+      const rng = createRng(99);
+      let cur = bossState();
+      const out: string[] = [];
+      for (let i = 0; i < 8 && cur.enemy.hp > 0 && cur.party[cur.active].hp > 0; i++) {
+        const r = resolveTurn(cur, { type: 'skill', skillId: 'strike' }, rng);
+        out.push(...r.log.map((e) => `${e.kind}:${e.text}`));
+        cur = r.state;
+      }
+      return out;
+    };
+    expect(play()).toEqual(play());
   });
 });
