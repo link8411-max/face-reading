@@ -1981,15 +1981,10 @@ export const allSamgukCharacters: SamgukCharacter[] = [
 // 그림을 public/images/samguk/<이름>.jpg로 넣으면 여기서 지우고, scripts/measure-portraits.mjs와 calibrate-samguk.ts를 다시 돌린다.
 export const PENDING_PORTRAIT_IDS = new Set([
   'jiachong',
-  'fushiren',
   'yangyi',
   'liyan',
   'cenhun',
   'sunchen',
-  'jianshuo',
-  'duangui',
-  'zhangyun',
-  'yangsong',
   'guotu',
   'fengji',
   'xuyou',

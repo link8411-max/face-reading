@@ -239,6 +239,7 @@
     "chinLength": 0.2461,
     "midfaceRatio": 0.4171
   },
+  "duangui": null,
   "fazheng": {
     "eyeAspect": 0.3617,
     "eyeTilt": 8.5882,
@@ -256,6 +257,7 @@
     "chinLength": 0.232,
     "midfaceRatio": 0.4252
   },
+  "fushiren": null,
   "ganfuren": {
     "eyeAspect": 0.2985,
     "eyeTilt": 10.2512,
@@ -478,6 +480,23 @@
     "jawWidth": 0.8109,
     "chinLength": 0.2368,
     "midfaceRatio": 0.4581
+  },
+  "jianshuo": {
+    "eyeAspect": 0.3127,
+    "eyeTilt": 10.1613,
+    "eyeWidth": 0.4457,
+    "eyeSpacing": 0.251,
+    "browGap": 0.4166,
+    "browTilt": 0.4847,
+    "noseLength": 0.2703,
+    "noseWidth": 0.6676,
+    "mouthWidth": 0.8922,
+    "lipFullness": 0.2546,
+    "mouthCornerLift": 0.0555,
+    "faceAspect": 1.1454,
+    "jawWidth": 0.8365,
+    "chinLength": 0.2466,
+    "midfaceRatio": 0.4418
   },
   "jiaxu": {
     "eyeAspect": 0.368,
@@ -1010,6 +1029,7 @@
     "chinLength": 0.2044,
     "midfaceRatio": 0.4464
   },
+  "yangsong": null,
   "yanliang": null,
   "yuanshao": {
     "eyeAspect": 0.3125,
@@ -1164,6 +1184,23 @@
     "jawWidth": 0.8206,
     "chinLength": 0.2339,
     "midfaceRatio": 0.432
+  },
+  "zhangyun": {
+    "eyeAspect": 0.1895,
+    "eyeTilt": 6.0014,
+    "eyeWidth": 0.4246,
+    "eyeSpacing": 0.2621,
+    "browGap": 0.416,
+    "browTilt": -6.3124,
+    "noseLength": 0.261,
+    "noseWidth": 0.7338,
+    "mouthWidth": 0.9924,
+    "lipFullness": 0.2845,
+    "mouthCornerLift": 0.021,
+    "faceAspect": 1.1315,
+    "jawWidth": 0.8459,
+    "chinLength": 0.2333,
+    "midfaceRatio": 0.4134
   },
   "zhangzhao": null,
   "zhaoyun": {

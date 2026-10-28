@@ -325,6 +325,21 @@ export const handProfiles: Record<string, CharacterProfile> = {
     z: { eyeAspect: -1.4, mouthCornerLift: 1, faceAspect: 1.2, jawWidth: -1, eyeTilt: 1 },
     weight: { eyeAspect: 1.6, mouthCornerLift: 1.3 },
   },
+  // 단규: 넓은 미간과 긴 코, 치켜뜬 눈에 능청스러운 웃음
+  duangui: {
+    z: { browGap: 1.1, noseLength: 1.1, midfaceRatio: 1, eyeTilt: 1.1, mouthCornerLift: 0.9 },
+    weight: { browGap: 1.5, noseLength: 1.3 },
+  },
+  // 부사인: 겁에 질려 휘둥그레진 눈, 일그러진 입
+  fushiren: {
+    z: { eyeAspect: 1.4, mouthWidth: 1.1, mouthCornerLift: -1.2, browGap: 0.8, lipFullness: -0.8 },
+    weight: { eyeAspect: 1.6, mouthCornerLift: 1.3 },
+  },
+  // 양송: 둥글고 넓은 얼굴에 함박웃음, 콧수염
+  yangsong: {
+    z: { jawWidth: 1.3, faceAspect: -1.2, mouthCornerLift: 1.5, mouthWidth: 1.2, eyeAspect: -1 },
+    weight: { mouthCornerLift: 1.6, faceAspect: 1.3 },
+  },
   // 황개: 풍상을 겪은 노장, 회색 수염, 전장에서 단련된 매서운 눈썹
   huanggai: {
     z: { browTilt: 1.4, browGap: -1.2, mouthCornerLift: -1.4, jawWidth: 1.2, noseWidth: 1 },
