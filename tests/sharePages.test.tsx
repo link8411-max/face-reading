@@ -1,5 +1,6 @@
 import { shareMetadata } from '@/components/share/SharePage'
 import { SITEMAP_ROUTES } from '@/app/sitemap'
+import { generateMetadata as duelShareMeta } from '@/app/samguk/duel/r/[key]/page'
 
 const run = (kind: 'animal' | 'samguk' | 'face', key: string, s?: string) =>
   shareMetadata(kind, Promise.resolve({ key }), Promise.resolve(s ? { s } : {}))
@@ -20,6 +21,13 @@ test('삼국지·관상 메타 문구', async () => {
 test('잘못된 값이면 결과 메타를 만들지 않는다', async () => {
   expect((await run('animal', 'unicorn', '87')).openGraph).toBeUndefined()
   expect((await run('samguk', 'zhaoyun', 'abc')).openGraph).toBeUndefined()
+})
+
+test('일기토 공유 링크도 검색 제외·canonical은 /samguk/duel', async () => {
+  const m = await duelShareMeta({ params: Promise.resolve({ key: 'zhaoyun.lvbu.36.c.12' }) })
+  expect(m.robots).toEqual({ index: false, follow: true })
+  expect(m.alternates?.canonical).toBe('https://unse-ai.com/samguk/duel')
+  expect((m.openGraph as { url?: string }).url).toBe('https://unse-ai.com/samguk/duel/r/zhaoyun.lvbu.36.c.12')
 })
 
 test('결과 공유 페이지는 사이트맵에 없다', () => {

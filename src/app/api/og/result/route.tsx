@@ -6,6 +6,8 @@ import { buildTeam } from '@/lib/samguk/team';
 import { REL_NAME } from '@/lib/faceMatch/compat';
 import { ogQueryOk, OG_CACHE_CONTROL } from '@/lib/ogQuery';
 import { parseMbtiDailyKey } from '@/lib/shareLinks';
+import { duelShared } from '@/lib/duel/share';
+import { decodeRunKey } from '@/lib/duel/shareKey';
 import { mbtiProfiles } from '@/content/mbtiTypes';
 
 export const runtime = 'edge';
@@ -20,6 +22,16 @@ export async function GET(request: NextRequest) {
   let big = '', score = '', phrase = '', label = '';
   let image: ArrayBuffer | undefined;
   let portraitMissing = false; // 초상화를 못 받았으면 잠깐만 캐시해 다음 요청에 다시 그린다
+  // 초상화를 먼저 받아 둔다. 실패하면 초상화 없이 그린다(그리는 도중 실패하면 깨진 이미지가 오래 캐시될 수 있음)
+  const loadPortrait = async (src: string) => {
+    try {
+      const res = await fetch(new URL(encodeURI(src), request.url), { signal: AbortSignal.timeout(1500) });
+      if (res.ok) image = await res.arrayBuffer();
+    } catch {
+      image = undefined;
+    }
+    portraitMissing = !image;
+  };
   if (kind === 'mbti') {
     const m = mbtiShared(q.get('a') ?? '', q.get('b') ?? '');
     if (!m) return new Response('bad request', { status: 400 });
@@ -47,16 +59,14 @@ export async function GET(request: NextRequest) {
     if (!r) return new Response('bad request', { status: 400 });
     big = r.name; score = r.score !== null ? `닮음 ${r.score}%` : ''; phrase = r.phrase;
     label = kind === 'animal' ? '동물상 테스트' : kind === 'samguk' ? '나는 삼국지 속 누구?' : 'AI 관상 테스트';
-    if (r.image) {
-      // 초상화를 먼저 받아 둔다. 실패하면 초상화 없이 그린다(그리는 도중 실패하면 깨진 이미지가 오래 캐시될 수 있음)
-      try {
-        const res = await fetch(new URL(encodeURI(r.image), request.url), { signal: AbortSignal.timeout(1500) });
-        if (res.ok) image = await res.arrayBuffer();
-      } catch {
-        image = undefined;
-      }
-      portraitMissing = !image;
-    }
+    if (r.image) await loadPortrait(r.image);
+  } else if (kind === 'duel') {
+    const key = q.get('key') ?? '';
+    const d = duelShared(key);
+    const k = decodeRunKey(key);
+    if (!d || !k) return new Response('bad request', { status: 400 });
+    big = d.starterName; score = k.cleared ? '여포를 꺾다' : `${k.wave}번째 싸움까지`; phrase = d.headline; label = '삼국지 일기토';
+    await loadPortrait(d.image);
   } else {
     return new Response('bad request', { status: 400 });
   }

@@ -172,7 +172,9 @@ public/
 - 측정 ID `G-L99JPMPT9D` (`src/lib/analytics.ts`), `layout.tsx`의 `ga4-init` 스크립트. 운영 주소(unse-ai.com, `PROD_HOST_SOURCE`)가 아니면(로컬·Vercel 미리보기) gtag.js를 받지 않고 config도 안 해서 실제 통계에 안 섞인다(E2E는 `dataLayer`로 검사).
 - 이벤트는 `track()`만 쓴다: `photo_selected`, `test_start`, `result_view(result_id)`, `share_click(method: link·save_image·share)`, `fortune_submit`, `shared_landing`. GA 준비 전 이벤트는 잠시 모았다가 보낸다. / `test_name`: face·animal·samguk·fortune·daily·mbti_match
 - **사진·생년월일·얼굴 수치는 보내지 않는다.** `track()`은 허용 키(test_name, result_id, method)와 유형 키 형식(한글·영문·숫자 24자 이내, 숫자 4자리 연속 금지)만 통과시킨다. 결과는 유형 키만(fox, caocao, 재물상, 띠, INFP_ENTJ).
-- 개인정보처리방침 5항에 GA 수집 안내.
+- 일기토 퍼널(값은 `result_id`에 인코딩, 키 추가 없음): `duel_wave`(보스 웨이브 도달, `w06`~`w36`), `duel_end`(`<시작장수>_<c|l>_<마지막으로 넘은 보스>` 예 `guanyu_l_w18`), `duel_resume`, `duel_abandon`.
+- 일기토 판 요약은 GA와 별도로 `/api/duel/run` -> Supabase `duel_runs`(`docs/duel-runs.sql`)에 판마다 1회 저장. 시작 장수·도달 웨이브·결과·보상 id·기기 종류·시간 구간만, IP·runId는 저장하지 않는다. 리포트는 `scripts/duel-real-stats.ts`.
+- 개인정보처리방침 5항에 GA 수집 안내와 일기토 플레이 기록 안내.
 
 ## API Keys
 없음 (Gemini 제거됨). `/face`는 `next.config.ts`에서 `/face2`로 308 리디렉션.
@@ -218,6 +220,27 @@ public/
 - `manifest.ts` → Next.js가 자동으로 `/manifest.webmanifest` 생성
 - `sw.js` - 서비스 워커 (캐싱, 오프라인 지원)
 - 홈화면 추가 가능 (iOS Safari, Android Chrome)
+
+---
+
+## 삼국지 일기토 (/samguk/duel)
+
+삼국지3 감성 도트 턴제 로그라이크. 36웨이브, 보스는 6·12·18·24·30·36웨이브(장각·하후돈·동탁·황충·마초·여포). 시작 장수는 관우·장비·조운·주유. 설계: `docs/superpowers/specs/2026-10-28-samguk-duel-design.md`.
+
+| 위치 | 내용 |
+|------|------|
+| `src/lib/duel/` | 규칙(순수 TS, 난수는 `rng.ts` 시드 기반). `battle.ts` 전투·`run.ts` 판 진행·`rewards.ts`·`skills.ts`·`generals.ts` 명단·`balance.ts` 밸런스 수치(설계표 `design.ts`)·`save.ts` 저장·`shareKey.ts` 공유 키·`narrative.ts` 열전·`autoplay.ts` 자동 플레이 |
+| `src/game/duel/` | Phaser 장면(Start·Battle·Reward·Result), `bridge.ts`(React↔Phaser 이벤트·디버그 훅), `layout.ts`·`config.ts` |
+| `src/components/duel/` | `DuelMount`(천 무늬 배경), `DuelClient`(상태·입력), `OverlayButtons`(캔버스 위 투명 DOM 버튼), `clientLogic.ts`(`overlayLayout` 버튼 배치) |
+| 라우트 | `/samguk/duel`(게임, 라우트 그룹 `(game)`), `/samguk/duel/generals/[id]`(열전 12장 정적), `/samguk/duel/r/[key]`(공유 랜딩, noindex, 잘못된 키는 게임으로 리디렉션. 키 예: `guanyu.lvbu.30.l.9`) |
+| API | `/api/duel/feedback`(피드백), `/api/duel/run`(판 요약 통계). 환경변수 `SUPABASE_URL`·`SUPABASE_SERVICE_KEY`(없으면 조용히 건너뜀). 테이블 SQL은 `docs/duel-feedback.sql`·`docs/duel-runs.sql`을 Supabase SQL Editor에서 실행 |
+
+- **쿼리**: `?seed=<숫자>`로 같은 판 재현, `?me=<장수id>`로 시작 장수 미리 선택(열전의 "이 장수로 시작").
+- **입력**: 그림은 Phaser가, 입력은 DOM 투명 버튼이 받는다(`aria-label`은 장수·기술 이름으로 바뀌므로 E2E는 `button[data-duel-btn="skill0"]` 같은 고정 id로 찾는다). 명령을 한 번 누르면 고르기, 같은 명령(또는 결정 버튼)을 다시 누르면 결정. 터치·좁은 화면은 세로형 2x2 큰 카드(각 44px 이상). 게임 중에는 하단 탭바를 숨긴다.
+- **디버그 훅**: `window.__duel = { scene, phase, wave, animating }`. E2E는 고정 sleep 대신 이것을 기다린다. 보상 화면은 연출이 끝나야 `scene`이 `reward`로 바뀐다(`phase`는 먼저 바뀜).
+- **밸런스 조정**: `docs/duel-balance.md`(측정법·표·결정 기록). 수치는 `src/lib/duel/balance.ts`, 검증은 `scripts/duel-balance.ts`·`scripts/duel-tune.ts`와 `tests/duel/balance.test.ts`. 수치를 바꾸면 판 요약의 `version`(수치 해시)이 바뀐다.
+- **에셋 스크립트**: 스프라이트 생성 기록 `docs/duel-sprites.md`, 초상 `scripts/duel-portraits.ts`·`docs/portrait-prompts.md`, 한글 도트 글꼴 서브셋 `scripts/duel-font-subset.mjs`.
+- **E2E**: `e2e/duel.spec.ts`(데스크톱·모바일 390x844 플레이, 공유 랜딩, 열전).
 
 ---
 

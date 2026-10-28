@@ -38,6 +38,7 @@ export const CATEGORIES: Category[] = [
     items: [
       { title: '나는 삼국지 속 누구?', desc: '93명 영웅 중 닮은 장수와 회사생활 스탯', href: '/samguk', thumb: { image: '/images/samguk/관우.jpg' }, chip: '93명 영웅' },
       { title: '우리 팀 삼국지', desc: '팀원 얼굴로 보는 세력과 역할', href: '/samguk/team', thumb: { icon: 'users', bg: '#E8EEE6' }, chip: '2~6명' },
+      { title: '삼국지 일기토', desc: '관우·여포와 벌이는 로그라이크 일기토', href: '/samguk/duel', thumb: { image: '/images/samguk/여포.jpg' }, chip: '미니게임' },
       { title: '동물상 테스트', desc: '강아지상? 고양이상? 8가지 중 하나', href: '/animal', thumb: { icon: 'cat', bg: '#F3EBDD' }, chip: '친구랑 비교' },
       { title: 'AI 관상 테스트', desc: '초년·중년·말년운과 재물운', href: '/face2', thumb: { icon: 'face', bg: '#F1EBE2' }, chip: '무제한 무료' },
     ],

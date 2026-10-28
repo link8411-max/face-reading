@@ -1,5 +1,6 @@
 import { readFileSync } from 'node:fs'
 import { track, GA_ID } from '@/lib/analytics'
+import { LAST_MODIFIED } from '@/app/sitemap'
 
 type W = { gtag?: (...a: unknown[]) => void }
 const calls: unknown[][] = []
@@ -49,6 +50,33 @@ test('개인정보처리방침에 GA 수집 항목과 사진·생년월일 미�
   const src = readFileSync('src/app/privacy/page.tsx', 'utf8')
   expect(src).toContain('Google 애널리틱스')
   expect(src).toMatch(/사진[^<]*생년월일[^<]*수집하지 않/)
+})
+
+test('개인정보처리방침에 일기토 플레이 기록 수집 항목을 밝힌다', () => {
+  const src = readFileSync('src/app/privacy/page.tsx', 'utf8')
+  expect(src).toMatch(/일기토[^<]*플레이 기록[^<]*시작 장수[^<]*도달 단계[^<]*기기 종류/)
+  expect(src).toContain('IP 주소는 저장하지 않습니다')
+})
+
+test('개인정보처리방침에 일기토 피드백(별점·한 줄 의견·시작 장수·도달 단계·기기 종류)을 밝힌다', () => {
+  const src = readFileSync('src/app/privacy/page.tsx', 'utf8')
+  expect(src).toMatch(/일기토 피드백[^<]*별점[^<]*한 줄 의견[^<]*시작 장수[^<]*도달 단계[^<]*기기 종류/)
+  // 개정한 날을 사이트맵 lastModified에도
+  expect(src).toContain('개정일자: 2026년 10월 28일')
+  expect(LAST_MODIFIED['/privacy']).toBe('2026-10-28')
+})
+
+test('일기토 퍼널 이벤트는 result_id로만 값을 보내고 허용 키 밖의 값은 버린다', () => {
+  track('duel_wave', { test_name: 'duel', result_id: 'w06' })
+  track('duel_end', { test_name: 'duel', result_id: 'guanyu_l_w18' })
+  track('duel_resume', { test_name: 'duel' })
+  track('duel_abandon', { test_name: 'duel' })
+  expect(calls.slice(-4)).toEqual([
+    ['event', 'duel_wave', { test_name: 'duel', result_id: 'w06' }],
+    ['event', 'duel_end', { test_name: 'duel', result_id: 'guanyu_l_w18' }],
+    ['event', 'duel_resume', { test_name: 'duel' }],
+    ['event', 'duel_abandon', { test_name: 'duel' }],
+  ])
 })
 
 test('GA가 아직 준비 전이면 이벤트를 모아 두었다가 준비되면 보낸다 (첫 화면 이벤트 유실 방지)', async () => {

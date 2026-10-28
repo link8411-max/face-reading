@@ -2,8 +2,8 @@ import { renderToStaticMarkup } from 'react-dom/server'
 import TeamCard from '@/components/samguk/TeamCard'
 import { buildTeam } from '@/lib/samguk/team'
 import { samgukCharacters } from '@/lib/samgukDB'
-import { metadata as teamMeta } from '@/app/samguk/team/page'
-import { generateMetadata as teamShareMeta } from '@/app/samguk/team/r/[ids]/page'
+import { metadata as teamMeta } from '@/app/samguk/(match)/team/page'
+import { generateMetadata as teamShareMeta } from '@/app/samguk/(match)/team/r/[ids]/page'
 import { SITEMAP_ROUTES } from '@/app/sitemap'
 
 const c = (id: string) => samgukCharacters.find((x) => x.id === id)!

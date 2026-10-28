@@ -38,7 +38,7 @@ test('인상 풀이에도 외모 지적 표현이 없다', () => {
 })
 
 test('삼국지 결과 화면에 영어 라벨이 없다', () => {
-  const src = readFileSync('src/app/samguk/page.tsx', 'utf8')
+  const src = readFileSync('src/app/samguk/(match)/page.tsx', 'utf8')
   for (const w of ['Visual Features', 'Neural Impression', 'Eye/Nose/Mouth', 'Overall Impression', 'Lifestyle Index']) expect(src).not.toContain(w)
 })
 

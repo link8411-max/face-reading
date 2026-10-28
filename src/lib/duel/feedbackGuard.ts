@@ -1,0 +1,124 @@
+// 피드백·판 기록 API 보호: 본문 크기, IP별 속도 제한, 같은 판 중복 제출 방지.
+// 상태는 서버 인스턴스 메모리에만 둔다(서버리스면 인스턴스별). IP는 저장·로그하지 않고 DB로도 보내지 않는다.
+
+/** 본문 최대 바이트 */
+export const MAX_BODY_BYTES = 2048;
+/** 속도 제한 창: 10분. 허용 횟수는 API마다 다르다(피드백 5회, 판 기록 10회) */
+export const RATE_WINDOW_MS = 10 * 60 * 1000;
+export const RATE_MAX = 5;
+const MAX_TRACKED = 5000;
+
+export interface Guard {
+  /** 요청 1건을 센다. 한도를 넘으면 false */
+  allowRequest(ip: string, now?: number): boolean;
+  /** 방금 센 요청 1건을 돌려준다(서비스가 꺼진 503처럼 처리하지 못한 요청용) */
+  refundRequest(ip: string): void;
+  /** runId 선점. 이미 있으면 false(중복) */
+  claimRunId(id: string): boolean;
+  /** 업스트림 실패 시 재시도할 수 있게 선점을 되돌린다 */
+  releaseRunId(id: string): void;
+  /** 테스트 전용: 기록을 비운다 */
+  reset(): void;
+}
+
+/** API마다 따로 쓰는 보호 장치(속도 제한·runId 기록을 서로 나누어 갖는다) */
+export function createGuard(rateMax: number = RATE_MAX): Guard {
+  const hits = new Map<string, number[]>();
+  const runIds = new Set<string>();
+  return {
+    allowRequest(ip, now = Date.now()) {
+      const recent = (hits.get(ip) ?? []).filter((t) => now - t < RATE_WINDOW_MS);
+      if (recent.length >= rateMax) {
+        hits.set(ip, recent);
+        return false;
+      }
+      recent.push(now);
+      hits.set(ip, recent);
+      if (hits.size > MAX_TRACKED) {
+        // 오래된 항목 정리: 창을 벗어난 IP부터 지우고, 그래도 넘치면 가장 오래된 것부터
+        for (const [k, v] of hits) if (now - v[v.length - 1] >= RATE_WINDOW_MS) hits.delete(k);
+        for (const k of hits.keys()) {
+          if (hits.size <= MAX_TRACKED) break;
+          hits.delete(k);
+        }
+      }
+      return true;
+    },
+    refundRequest(ip) {
+      const v = hits.get(ip);
+      if (v) v.pop();
+    },
+    claimRunId(id) {
+      if (runIds.has(id)) return false;
+      if (runIds.size >= MAX_TRACKED) runIds.delete(runIds.values().next().value as string);
+      runIds.add(id);
+      return true;
+    },
+    releaseRunId(id) {
+      runIds.delete(id);
+    },
+    reset() {
+      hits.clear();
+      runIds.clear();
+    },
+  };
+}
+
+// 피드백 API가 쓰는 기본 보호 장치
+const feedbackGuard = createGuard();
+export const allowRequest = feedbackGuard.allowRequest;
+export const refundRequest = feedbackGuard.refundRequest;
+export const claimRunId = feedbackGuard.claimRunId;
+export const releaseRunId = feedbackGuard.releaseRunId;
+// 테스트 전용: 속도 제한·runId 기록을 비운다
+export const __resetFeedbackLimits = feedbackGuard.reset;
+
+/** 판 요약 API의 보호 장치: 10분에 10회(피드백보다 넉넉히, 판 끝마다 자동으로 한 번 간다) */
+export const RUN_RATE_MAX = 10;
+export const runGuard = createGuard(RUN_RATE_MAX);
+
+/**
+ * 요청 헤더에서 클라이언트 IP: x-forwarded-for 첫 값, 없으면 x-real-ip.
+ * 첫 값을 믿는 이유: Vercel은 들어온 x-forwarded-for를 덮어써서 클라이언트가 위조할 수 없다.
+ * 다른 호스트(직접 호스팅 등)에서는 신뢰하는 프록시가 값을 덮어쓰는지 확인할 것.
+ * 두 헤더가 모두 없으면 'unknown' 한 칸을 모두가 나눠 쓴다(헤더 없는 요청끼리 한도를 공유, 로컬·테스트 환경).
+ */
+export function clientIp(headers: Headers): string {
+  const xff = headers.get('x-forwarded-for')?.split(',')[0]?.trim();
+  return xff || headers.get('x-real-ip')?.trim() || 'unknown';
+}
+
+/** 선택 항목 runId 검증: 없으면 null(통과), 영문·숫자 32자 이하만 허용, 그 외는 'invalid' */
+export function parseRunId(body: unknown): string | null | 'invalid' {
+  if (typeof body !== 'object' || body === null) return null;
+  const v = (body as Record<string, unknown>).runId;
+  if (v === undefined) return null;
+  return typeof v === 'string' && /^[A-Za-z0-9]{1,32}$/.test(v) ? v : 'invalid';
+}
+
+/** 본문을 읽되 MAX_BODY_BYTES를 넘으면 null(413). Content-Length가 있으면 먼저 거른다 */
+export async function readLimitedBody(request: Request): Promise<string | null> {
+  const len = request.headers.get('content-length');
+  if (len !== null && Number(len) > MAX_BODY_BYTES) return null;
+  if (!request.body) return '';
+  const reader = request.body.getReader();
+  const chunks: Uint8Array[] = [];
+  let total = 0;
+  for (;;) {
+    const { done, value } = await reader.read();
+    if (done) break;
+    total += value.byteLength;
+    if (total > MAX_BODY_BYTES) {
+      await reader.cancel().catch(() => {});
+      return null;
+    }
+    chunks.push(value);
+  }
+  const all = new Uint8Array(total);
+  let off = 0;
+  for (const c of chunks) {
+    all.set(c, off);
+    off += c.byteLength;
+  }
+  return new TextDecoder().decode(all);
+}

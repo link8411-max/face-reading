@@ -4,7 +4,10 @@
 import { animalTypeDB, animalTypeList } from '@/lib/animalTypeDB'
 import { samgukCharacters } from '@/lib/samgukDB'
 
-export type GuideRoute = '/face2' | '/animal' | '/samguk' | '/fortune' | '/fortune/daily' | '/fortune/mbti'
+export type GuideRoute = '/face2' | '/animal' | '/samguk' | '/samguk/duel' | '/fortune' | '/fortune/daily' | '/fortune/mbti'
+
+// 가이드가 없어도 관련 링크로 걸 수 있는 페이지
+export type RelatedRoute = GuideRoute | '/samguk/team'
 
 export interface PageGuideData {
   heading: string
@@ -12,13 +15,15 @@ export interface PageGuideData {
   intro: string[]
   highlights: { title: string; body: string }[]
   faqs: { q: string; a: string }[]
-  related: GuideRoute[]
+  related: RelatedRoute[]
 }
 
-export const TEST_LINKS: Record<GuideRoute, { label: string }> = {
+export const TEST_LINKS: Record<RelatedRoute, { label: string }> = {
   '/face2': { label: 'AI 관상 테스트' },
   '/animal': { label: '동물상 테스트' },
   '/samguk': { label: '나는 삼국지 속 누구?' },
+  '/samguk/duel': { label: '삼국지 일기토' },
+  '/samguk/team': { label: '우리 팀 삼국지' },
   '/fortune': { label: '사주 신년운세' },
   '/fortune/daily': { label: '띠별 오늘의 운세' },
   '/fortune/mbti': { label: '오늘의 MBTI 운세' },
@@ -115,7 +120,31 @@ export const pageGuides: Record<GuideRoute, PageGuideData> = {
       { q: '여성도 할 수 있나요?', a: '네, 초선이나 손상향 같은 여성 인물도 함께 등장해요.' },
       { q: '무료인가요?', a: '네, 무료이고 회원가입도 필요 없어요.' },
     ],
-    related: ['/face2', '/animal', '/fortune'],
+    related: ['/samguk/duel', '/face2', '/animal', '/fortune'],
+  },
+
+  '/samguk/duel': {
+    heading: '삼국지 일기토, 이렇게 즐겨요',
+    summary: '관우·장비·조운·주유 중 한 명으로 출진해 36웨이브를 돌파하고 여포에게 도전하는 도트 로그라이크예요.',
+    intro: [
+      '일기토는 삼국지에서 두 장수가 일대일로 겨루는 승부를 말해요. 운명을 읽다의 삼국지 일기토는 이 장면을 도트 그래픽의 턴제 로그라이크로 옮긴 무료 웹게임이에요. 시작 장수 네 명 가운데 한 명을 골라 출진하면 36번의 웨이브가 이어지고, 6웨이브마다 장각, 하후돈, 동탁, 황충, 마초, 여포가 차례로 보스로 기다리고 있어요.',
+      '장수는 맹장, 기장, 지장 세 가지 유형으로 나뉘고 맹장은 기장에게, 기장은 지장에게, 지장은 맹장에게 강한 가위바위보 같은 상성이 있어요. 싸움에서 이기면 적장이 항복해 동료가 되기도 하고, 웨이브 사이에는 보상을 골라 장수를 키워요. 하후돈, 황충, 마초는 보스로 나왔다가 이기면 일정 확률로 항복해 영입할 수 있고(이끄는 장수의 매력이 높을수록 잘 넘어오고, 보스일 때는 그 확률이 절반이에요), 장각, 동탁, 여포는 끝까지 적으로 남아요.',
+      '한 판은 한 시간이 넘게 걸리는 긴 여정이에요. 진행 상황은 브라우저에 저장되어 닫았다가 다시 열어도 이어서 할 수 있고, 한 판이 끝나면 함께한 장수들의 열전이 정리돼요. 장수마다 능력치와 기술, 보스와의 상성을 정리한 소개 페이지도 있으니 출진 전에 살펴보세요.',
+    ],
+    highlights: [
+      { title: '36웨이브와 여섯 보스', body: '6웨이브마다 보스가 나와요. 장각, 하후돈, 동탁, 황충, 마초를 차례로 넘으면 마지막 36웨이브에서 천하제일 무장 여포가 기다려요.' },
+      { title: '맹장·기장·지장 상성', body: '맹장은 기장에게, 기장은 지장에게, 지장은 맹장에게 강해요. 보스의 유형을 보고 어떤 장수를 앞세울지 정하는 것이 공략의 핵심이에요.' },
+      { title: '영입과 보상', body: '이긴 적장이 항복하면 동료로 맞이할 수 있어요. 웨이브 사이에는 보상을 골라 능력과 기술을 키우고, 클리어하면 함께한 장수들의 열전이 남아요.' },
+    ],
+    faqs: [
+      { q: '한 판은 얼마나 걸리나요?', a: '36웨이브를 모두 넘으려면 한 시간 이상 걸려요. 중간에 닫아도 괜찮으니 시간이 날 때마다 나눠서 즐기세요.' },
+      { q: '저장하고 이어서 할 수 있나요?', a: '네. 진행 상황이 이 기기의 브라우저에 자동으로 저장돼서 다시 열면 이어서 할 수 있어요. 브라우저 데이터를 지우거나 다른 기기에서 열면 이어지지 않아요.' },
+      { q: '상성은 어떻게 되나요?', a: '맹장은 기장에게, 기장은 지장에게, 지장은 맹장에게 강해요. 장수 소개 페이지에서 각 장수의 유형과 보스별 유불리를 확인할 수 있어요.' },
+      { q: '어떤 장수로 시작하면 좋을까요?', a: '처음이라면 정직한 맹장 관우를 추천해요. 빠르게 움직이는 기장 조운, 불을 쓰는 지장 주유도 개성이 뚜렷해요. 영입한 장수는 다음 판부터 시작 장수로도 고를 수 있어요.' },
+      { q: '모바일에서도 되나요?', a: '네. 스마트폰과 태블릿, 컴퓨터 브라우저에서 모두 되고 설치할 필요가 없어요. 화면을 눌러 조작하도록 만들었어요.' },
+      { q: '무료인가요?', a: '네, 무료이고 회원가입도 필요 없어요.' },
+    ],
+    related: ['/samguk', '/samguk/team'],
   },
 
   '/fortune': {

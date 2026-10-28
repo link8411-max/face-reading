@@ -1,0 +1,45 @@
+/* 일기토 캔버스 글꼴: Galmuri (SIL OFL 1.1, public/fonts/galmuri/LICENSE.txt). DuelClient만 불러온다 */
+@font-face {
+  font-family: "Galmuri7";
+  src: url("/fonts/galmuri/Galmuri7.woff2") format("woff2");
+  font-weight: 400;
+  font-style: normal;
+  font-display: block;
+}
+
+@font-face {
+  font-family: "Galmuri9";
+  src: url("/fonts/galmuri/Galmuri9.woff2") format("woff2");
+  font-weight: 400;
+  font-style: normal;
+  font-display: block;
+}
+
+@font-face {
+  font-family: "Galmuri11";
+  src: url("/fonts/galmuri/Galmuri11.woff2") format("woff2");
+  font-weight: 400;
+  font-style: normal;
+  font-display: block;
+}
+
+@font-face {
+  font-family: "Galmuri11";
+  src: url("/fonts/galmuri/Galmuri11-Bold.woff2") format("woff2");
+  font-weight: 700;
+  font-style: normal;
+  font-display: block;
+}
+
+/* 일기토 게임 화면은 하단 탭바를 숨긴다(BottomTabBar HIDE_ON) → 탭바 자리 여백(4rem)을 빼 바닥글 아래 빈 띠가 없게.
+   게임 천(.duel-cloth)이 있는 페이지에서만 맞는다(다른 페이지는 그대로) */
+.app-shell:has(.duel-cloth) {
+  padding-bottom: env(safe-area-inset-bottom);
+}
+
+/* 일기토 게임 영역 바탕: 캔버스 천과 같은 녹색 체커 디더. --px는 캔버스 CSS 배율(DuelClient가 정한다) */
+.duel-cloth {
+  background-color: var(--color-cloth);
+  background-image: repeating-conic-gradient(var(--color-cloth-2) 0 25%, var(--color-cloth) 0 50%);
+  background-size: calc(2px * var(--px, 1)) calc(2px * var(--px, 1));
+}

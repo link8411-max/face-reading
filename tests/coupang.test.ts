@@ -23,7 +23,7 @@ test('고객 관심 기반 추천 배너 + 페이지별 subId + 수수료 고지
 
 test.each([
   ['src/app/page.tsx', 'home'], ['src/app/face2/page.tsx', 'face'], ['src/app/animal/page.tsx', 'animal'],
-  ['src/app/samguk/page.tsx', 'samguk'], ['src/app/fortune/FortuneClient.tsx', 'fortune'], ['src/app/fortune/daily/page.tsx', 'daily'],
+  ['src/app/samguk/(match)/page.tsx', 'samguk'], ['src/app/fortune/FortuneClient.tsx', 'fortune'], ['src/app/fortune/daily/page.tsx', 'daily'],
 ])('%s 에 배너가 있다', (file, subId) => {
   expect(readFileSync(file, 'utf8')).toContain(`<CoupangBanner subId="${subId}"`)
 })

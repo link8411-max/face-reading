@@ -106,16 +106,21 @@ export default function RootLayout({
         <meta name="mobile-web-app-capable" content="yes" />
         <meta name="theme-color" content="#FBF6F1" />
         <link rel="apple-touch-icon" href="/icons/icon-192x192.svg" />
+        {/* 애드센스: 태그 위치는 그대로(심사 중). adsbygoogle.js가 하이드레이션 전에 이 태그 바로 뒤에 show_ads_impl 스크립트를 끼워 넣어
+            React가 아래 <script> 두 개를 한 칸씩 밀린 노드와 비교하며 하이드레이션 경고를 낸다(개발 서버 "1 Issue").
+            이 태그와 뒤따르는 <script> 두 개에 suppressHydrationWarning을 달아 경고만 끈다(DOM 내용은 서버 HTML 그대로) */}
         <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-9670928093323234"
-          crossOrigin="anonymous"></script>
+          crossOrigin="anonymous" suppressHydrationWarning></script>
 
         <script
           type="application/ld+json"
+          suppressHydrationWarning
           dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
         />
 
         {/* 서비스 워커 등록 */}
         <script
+          suppressHydrationWarning
           dangerouslySetInnerHTML={{
             __html: `
               if ('serviceWorker' in navigator) {
@@ -137,8 +142,8 @@ export default function RootLayout({
       <body
         className={`${notoSans.variable} ${gowunBatang.variable} ${silkscreen.variable} font-sans antialiased bg-paper text-ink`}
       >
-        {/* 하단 탭바(h-16)에 내용이 가리지 않도록 아래 여백 */}
-        <div className="flex flex-col min-h-screen pb-[calc(4rem+env(safe-area-inset-bottom))]">
+        {/* 하단 탭바(h-16)에 내용이 가리지 않도록 아래 여백. 탭바를 숨기는 일기토 화면은 duel.css가 app-shell 여백을 줄인다 */}
+        <div className="app-shell flex flex-col min-h-screen pb-[calc(4rem+env(safe-area-inset-bottom))]">
           <main className="flex-grow">
             {children}
           </main>

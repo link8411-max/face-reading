@@ -12,6 +12,9 @@
   --color-blush: #E9BCA8;
   --color-navy-game: #23263A;
   --color-gold-game: #E8B547;
+  /* 일기토 천 바탕(캔버스 틀과 같은 녹색 체커 디더) */
+  --color-cloth: #1E3A24;
+  --color-cloth-2: #27482C;
 }
 
 @theme inline {

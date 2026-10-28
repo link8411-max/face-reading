@@ -9,6 +9,7 @@ import TestHeader from "@/components/test/TestHeader";
 import TestStart from "@/components/test/TestStart";
 import SamgukGameCard from "@/components/samguk/SamgukGameCard";
 import ResultActions from "@/components/result/ResultActions";
+import { duelCta } from "@/lib/duel/cta";
 import NextTests from "@/components/result/NextTests";
 import { useHandedPhoto } from "@/hooks/useHandedPhoto";
 import { useResultShare } from "@/hooks/useResultShare";
@@ -216,7 +217,8 @@ export default function SamgukPage() {
 
               <ResultActions
                 onShare={shareCard}
-                lead={{ label: "우리 팀 삼국지 만들기", href: "/samguk/team" }}
+                lead={duelCta(result.character.id)}
+                companion={{ label: "우리 팀 삼국지 만들기", href: "/samguk/team" }}
                 onSave={() => { track("share_click", { test_name: "samguk", method: "save_image" }); download(getShareOptions()); }}
                 onRetry={resetAll}
                 busy={busy || isCapturing}

@@ -7,8 +7,11 @@ import { samgukCharacters } from '@/lib/samgukDB'
 import { compatSummary, isMbti, type MbtiType } from '@/lib/mbti/compat'
 import { faceMatch, REL, REL_NAME, type Rel } from '@/lib/faceMatch/compat'
 import type { AnimalKey } from '@/lib/animal/matcher'
+import { josa } from '@/lib/josa'
+import { SITE, UTM } from '@/lib/shareBase'
 
-export const SITE = 'https://unse-ai.com'
+// 기존 호출처를 위해 다시 내보낸다. 일기토 공유 링크는 @/lib/duel/share (일기토 규칙이 다른 페이지에 실리지 않게)
+export { josa, SITE }
 export type ShareKind = 'animal' | 'samguk' | 'face'
 
 const FACE_TYPES: Record<string, string> = { wealth: '재물상', blessing: '복덕상', leader: '리더상', noble: '귀인상', scholar: '학자상', artist: '예술가상' }
@@ -22,12 +25,6 @@ export function faceSlug(type: string): string | null {
 export function clampScore(s: unknown): number | null {
   const n = typeof s === 'number' ? s : typeof s === 'string' && s.trim() !== '' ? Number(s) : NaN
   return Number.isFinite(n) ? Math.max(50, Math.min(99, Math.round(n))) : null
-}
-
-// 받침 유무로 조사 고르기
-export const josa = (w: string, withB: string, without: string) => {
-  const c = w.charCodeAt(w.length - 1) - 0xac00
-  return w + (c >= 0 && c <= 11171 && c % 28 !== 0 ? withB : without)
 }
 
 export interface SharedResult {
@@ -58,8 +55,6 @@ export function parseShared(kind: ShareKind, key: string, s?: unknown): SharedRe
   if (!c) return null
   return { ...base, score, name: c.name, image: `/images/samguk/${c.name}.jpg`, phrase: `나는 ${josa(c.name, '이랑', '랑')} ${score}% 닮았대. 너는 삼국지 속 누구야?` }
 }
-
-const UTM = (campaign: string) => `utm_source=share&utm_medium=friend_link&utm_campaign=${campaign}`
 
 export function shareUrl(kind: ShareKind, key: string, score?: number): string {
   const s = kind === 'face' || score === undefined ? null : clampScore(score)

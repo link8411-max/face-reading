@@ -2,7 +2,7 @@
 // 개인정보 원칙: 사진·생년월일 원값·얼굴 수치는 절대 보내지 않는다. 결과는 유형 키(fox, caocao, 재물상, INFP_ENTJ 등)만.
 export const GA_ID = 'G-L99JPMPT9D'
 
-export type TestName = 'face' | 'animal' | 'samguk' | 'fortune' | 'daily' | 'mbti_match' | 'face_match' | 'team_samguk' | 'mbti_daily'
+export type TestName = 'face' | 'animal' | 'samguk' | 'fortune' | 'daily' | 'mbti_match' | 'face_match' | 'team_samguk' | 'mbti_daily' | 'duel'
 export type ShareMethod = 'save_image' | 'share' | 'link' | 'kakao'
 
 type Events = {
@@ -15,6 +15,11 @@ type Events = {
   coupang_click: { slot: string; keyword: string }
   coupang_banner_view: { slot: string }
   next_test_click: { test_name: TestName }
+  // 일기토 퍼널. 값은 result_id에 인코딩한다(허용 키를 늘리지 않는다): duel_wave는 'w06', duel_end는 'guanyu_l_w18'
+  duel_wave: { test_name: TestName; result_id: string }
+  duel_end: { test_name: TestName; result_id: string }
+  duel_resume: { test_name: TestName }
+  duel_abandon: { test_name: TestName }
 }
 
 const ALLOWED_KEYS = new Set(['test_name', 'result_id', 'method', 'slot', 'keyword'])
