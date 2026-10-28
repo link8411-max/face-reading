@@ -5,7 +5,7 @@ import { BattleScene } from './BattleScene';
 import { StartScene } from './StartScene';
 import { RewardScene } from './RewardScene';
 import { ResultScene } from './ResultScene';
-import { GAME_H, GAME_W, PALETTE } from './config';
+import { GAME_H, GAME_H_TALL, GAME_W, PALETTE } from './config';
 import { SCENE_KEY } from './sceneKeys';
 import type { DuelBridge, DuelEvents } from './bridge';
 
@@ -21,8 +21,25 @@ function attachSceneController(game: Phaser.Game, bridge: DuelBridge): void {
     if (game.scene.isActive(key)) game.scene.stop(key);
     game.scene.start(key);
   };
+  // 가로형 ↔ 세로형: 게임 높이를 바꾸고 떠 있는 장면을 다시 연다(장면은 bridge.tall을 읽어 배치를 고른다)
+  const onTall = ({ tall }: DuelEvents['layout:tall']) => {
+    const h = tall ? GAME_H_TALL : GAME_H;
+    if (game.scale.gameSize.height === h) return;
+    game.scale.setGameSize(GAME_W, h);
+    if (!game.registry.get('booted')) return;
+    for (const k of Object.values(SCENE_KEY)) {
+      if (game.scene.isActive(k)) {
+        game.scene.stop(k);
+        game.scene.start(k);
+      }
+    }
+  };
   bridge.on('scene:go', onGo);
-  game.events.once(Phaser.Core.Events.DESTROY, () => bridge.off('scene:go', onGo));
+  bridge.on('layout:tall', onTall);
+  game.events.once(Phaser.Core.Events.DESTROY, () => {
+    bridge.off('scene:go', onGo);
+    bridge.off('layout:tall', onTall);
+  });
 }
 
 export function buildGame(parent: HTMLElement, bridge: DuelBridge): Phaser.Game {
@@ -30,7 +47,7 @@ export function buildGame(parent: HTMLElement, bridge: DuelBridge): Phaser.Game 
     type: Phaser.AUTO,
     parent,
     width: GAME_W,
-    height: GAME_H,
+    height: bridge.tall ? GAME_H_TALL : GAME_H,
     pixelArt: true,
     roundPixels: true,
     scale: { mode: Phaser.Scale.FIT, autoCenter: Phaser.Scale.CENTER_BOTH, zoom: Phaser.Scale.MAX_ZOOM },

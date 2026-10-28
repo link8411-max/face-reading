@@ -1,6 +1,7 @@
 import { describe, it, expect } from 'vitest';
 import { FONT_KO_7, FONT_KO_9, FONT_KO_11, FONT_NUM_PX, KO_FAMILY, KO_PX } from '@/game/duel/config';
-import { BODY_CHARS, BODY_MAX, bodyLines } from '@/game/duel/wrap';
+import { bodyPages } from '@/game/duel/wrap';
+import { BODY_CHARS_11 } from '@/game/duel/layout';
 import { stageLayout, stageSize } from '@/components/duel/clientLogic';
 import { GAME_H, GAME_H_TALL, GAME_W } from '@/game/duel/config';
 
@@ -65,16 +66,22 @@ describe('stageLayout: 폰·터치는 세로형, 넓은 마우스 화면은 가�
   });
 });
 
-describe('열전 본문 bodyLines', () => {
-  it('7줄을 넘지 않고 첫 문장·마지막 문장은 남긴다', () => {
-    const first = '관우, 황건적을 셋 베고 나아가다.';
-    const last = '관우가 여포를 꺾으니, 천하에 이름을 떨치다.';
-    const mid = Array.from({ length: 8 }, (_, i) => `열${i}째 싸움, 누군가를 꺾고 앞으로 나아가니 사기가 올랐다.`);
-    const out = bodyLines([first, ...mid, last]);
-    expect(out.length).toBeLessThanOrEqual(BODY_MAX);
-    expect(out.every((l) => l.length <= BODY_CHARS)).toBe(true);
-    const joined = out.join(' ');
+describe('열전 본문 bodyPages: 쪽 나눔(문장을 빼지 않는다)', () => {
+  const first = '관우, 황건적을 셋 베고 나아가다.';
+  const last = '관우가 여포를 꺾으니, 천하에 이름을 떨치다.';
+  const mid = Array.from({ length: 8 }, (_, i) => `열${i}째 싸움, 누군가를 꺾고 앞으로 나아가니 사기가 올랐다.`);
+  it('쪽마다 perPage줄 이하, 줄은 BODY_CHARS_11자 이하, 모든 글이 순서대로 남는다', () => {
+    const pages = bodyPages([first, ...mid, last], 6);
+    expect(pages.length).toBeGreaterThan(1);
+    expect(pages.every((p) => p.length >= 1 && p.length <= 6)).toBe(true);
+    expect(pages.flat().every((l) => l.length <= BODY_CHARS_11)).toBe(true);
+    const joined = pages.flat().join(' ');
     expect(joined.startsWith('관우, 황건적을')).toBe(true);
     expect(joined.endsWith('떨치다.')).toBe(true);
+    for (const m of mid) expect(joined.replace(/\s+/g, '')).toContain(m.replace(/\s+/g, ''));
+  });
+  it('짧으면 한 쪽, 비면 빈 한 쪽', () => {
+    expect(bodyPages([first], 6)).toHaveLength(1);
+    expect(bodyPages([], 6)).toEqual([[]]);
   });
 });

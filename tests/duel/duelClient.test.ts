@@ -1,6 +1,7 @@
 import { describe, it, expect } from 'vitest';
 import { hitRects, overlayLayout, resolveStarterUnlock, type Rect } from '@/components/duel/clientLogic';
-import { DIALOG_BOX, FIELD_BOX, MENU_BOX } from '@/game/duel/layout';
+import { DIALOG_BOX, FIELD_BOX, MENU_BOX, RESULT_TALL, RESULT_WIDE } from '@/game/duel/layout';
+import { GAME_H_TALL } from '@/game/duel/config';
 
 const inside = (r: Rect, W = 320, H = 240) => r.x >= 0 && r.y >= 0 && r.x + r.w <= W && r.y + r.h <= H;
 // 배율 곱의 소수 오차(1e-12 수준)는 겹침으로 치지 않는다
@@ -34,10 +35,11 @@ describe('overlayLayout', () => {
     expect(noOverlap(l)).toBe(true);
     expect(l.every((b) => b.label.length > 0)).toBe(true);
   });
-  it('전투 메뉴 줄 자리(메뉴 상자 x10~160 안, y 174+11i, 높이 11), 결정 단추는 대사창 전체', () => {
+  it('전투 메뉴 줄 자리(메뉴 상자 x10~160 안, y 173+10i, 높이 10, 교체 줄은 상자 아래 테두리 안), 결정 단추는 대사창 전체', () => {
     const l = overlayLayout('battle');
-    l.slice(0, 4).forEach((b, i) => expect(b).toMatchObject({ x: 10, y: 174 + 11 * i, w: 150, h: 11, panel: MENU_BOX }));
-    expect(l[4]).toMatchObject({ x: 10, y: 219, w: 150, panel: MENU_BOX });
+    l.slice(0, 4).forEach((b, i) => expect(b).toMatchObject({ x: 10, y: 173 + 10 * i, w: 150, h: 10, panel: MENU_BOX }));
+    expect(l[4]).toMatchObject({ x: 10, y: 213, w: 150, panel: MENU_BOX });
+    expect(l[4].y + l[4].h).toBeLessThanOrEqual(MENU_BOX.y + MENU_BOX.h - 2);
     l.slice(0, 5).forEach((b) => expect(b.x + b.w).toBeLessThanOrEqual(160));
     expect(l[5]).toMatchObject({ id: 'confirm', ...DIALOG_BOX });
   });
@@ -68,7 +70,7 @@ describe('overlayLayout', () => {
     const l = overlayLayout('recruit', 5);
     expect(l.map((b) => b.id)).toEqual(['opt0', 'opt1', 'opt2', 'opt3', 'opt4']);
     expect(noOverlap(l) && l.every((b) => inside(b))).toBe(true);
-    expect(l[4].y + l[4].h).toBeLessThanOrEqual(16 + 214 - 2);
+    expect(l[4].y + l[4].h).toBeLessThanOrEqual(10 + 222 - 2);
   });
   it('고르기 창: n줄', () => {
     const l = overlayLayout('pick', 5);
@@ -153,5 +155,75 @@ describe('hitRects', () => {
     const k = 390 / 320;
     const out = hitRects(scale(overlayLayout('result'), k), 390, 292.5);
     expect(out.slice(0, 3).every((r) => r.h >= 44)).toBe(true);
+  });
+});
+
+// ── 세로형(폰·터치, 320×408) ──
+describe('세로형 배치: 1배(폰)에서도 누를 칸이 44px 이상', () => {
+  const H = GAME_H_TALL;
+  const tall = { tall: true } as const;
+  const at1x = (l: Rect[]) => hitRects(l, 320, H);
+  const all44 = (rs: Rect[]) => rs.every((r) => r.w >= 44 && r.h >= 44);
+
+  it('전투: 2×2 기술 카드 + 교체 단추 + 결정(대사창), 서로 겹치지 않고 320×408 안', () => {
+    const l = overlayLayout('battle', 0, false, tall);
+    expect(l.map((b) => b.id)).toEqual(['skill0', 'skill1', 'skill2', 'skill3', 'switch', 'confirm']);
+    expect(l.every((b) => inside(b, 320, H))).toBe(true);
+    expect(noOverlap(l)).toBe(true);
+    // 카드는 2열 2행
+    expect(l[0].y).toBe(l[1].y);
+    expect(l[2].y).toBe(l[3].y);
+    expect(l[0].x).toBe(l[2].x);
+    expect(l[2].y).toBeGreaterThan(l[0].y);
+    // 카드·교체는 벌판(가로형 240 위쪽)보다 아래
+    l.slice(0, 5).forEach((b) => expect(b.y).toBeGreaterThanOrEqual(240));
+  });
+  it('전투 카드·교체·결정은 1배에서 그대로 44px 이상(넓힐 필요 없음)', () => {
+    const l = overlayLayout('battle', 0, false, tall);
+    expect(all44(l)).toBe(true);
+    expect(all44(at1x(l))).toBe(true);
+  });
+  it.each([
+    ['start', 9, false],
+    ['start', 9, true],
+    ['result', 0, false],
+    ['recruit', 5, false],
+    ['pick', 5, false],
+    ['reward', 0, false],
+  ] as const)('%s(n=%i, 이어하기 %s): 1배 터치 영역이 모두 44px 이상, 겹치지 않음', (scene, n, resume) => {
+    const l = overlayLayout(scene, n, resume, tall);
+    expect(l.every((b) => inside(b, 320, H))).toBe(true);
+    const out = at1x(l);
+    expect(noOverlap(out)).toBe(true);
+    out.forEach((r, i) => expect(r.w >= 44 && r.h >= 44, `${l[i].id} ${r.w}x${r.h}`).toBe(true));
+  });
+  it('결과 별 5개는 각각 44px 이상(세로형 1배)', () => {
+    const stars = overlayLayout('result', 0, false, tall).filter((b) => b.id.startsWith('star'));
+    expect(stars).toHaveLength(5);
+    expect(all44(stars)).toBe(true);
+  });
+});
+
+describe('가로형 2배(데스크톱 640)에서 별·영입·고르기 줄 44px', () => {
+  it.each([
+    ['result', 0],
+    ['recruit', 5],
+    ['pick', 5],
+  ] as const)('%s', (scene, n) => {
+    const l = overlayLayout(scene, n).filter((b) => b.id !== 'page');
+    const out = hitRects(l.map((r) => ({ x: r.x * 2, y: r.y * 2, w: r.w * 2, h: r.h * 2 })), 640, 480);
+    out.forEach((r, i) => expect(r.h >= 44 && r.w >= 44, `${l[i].id} ${r.w}x${r.h}`).toBe(true));
+  });
+});
+
+describe('결과 열전 쪽 넘김 단추', () => {
+  it('쪽이 2쪽 이상이면 본문 창 자리에 page 단추가 생긴다', () => {
+    expect(overlayLayout('result').some((b) => b.id === 'page')).toBe(false);
+    const l = overlayLayout('result', 0, false, { pages: 2 });
+    const page = l.find((b) => b.id === 'page')!;
+    expect(page).toMatchObject(RESULT_WIDE.body);
+    expect(noOverlap(l)).toBe(true);
+    const lt = overlayLayout('result', 0, false, { pages: 3, tall: true });
+    expect(lt.find((b) => b.id === 'page')).toMatchObject(RESULT_TALL.body);
   });
 });

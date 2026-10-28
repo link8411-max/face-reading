@@ -74,10 +74,10 @@ export function paintField(ctx: Ctx, w: number, h: number): void {
   }
 }
 
-/** 바탕: 녹색 천 + 체커 디더 + 용 문양처럼 보이는 곡선 (320×240) */
-export function paintCloth(ctx: Ctx): void {
-  px(ctx, S.green1, 0, 0, GAME_W, GAME_H);
-  for (let y = 0; y < GAME_H; y++) for (let i = y % 2; i < GAME_W; i += 2) px(ctx, S.green2, i, y);
+/** 바탕: 녹색 천 + 체커 디더 + 용 문양처럼 보이는 곡선 (320×h, 세로형은 아래에 곡선 둘을 더) */
+export function paintCloth(ctx: Ctx, h: number = GAME_H): void {
+  px(ctx, S.green1, 0, 0, GAME_W, h);
+  for (let y = 0; y < h; y++) for (let i = y % 2; i < GAME_W; i += 2) px(ctx, S.green2, i, y);
   ctx.strokeStyle = S.green3;
   ctx.lineWidth = 1;
   const seeds = [
@@ -86,6 +86,7 @@ export function paintCloth(ctx: Ctx): void {
     [70, 190, 30],
     [250, 200, 36],
     [160, 120, 60],
+    ...(h > GAME_H ? [[60, 320, 44], [260, 360, 40]] : []),
   ];
   for (const [cx, cy, rad] of seeds) {
     for (let k = 0; k < 3; k++) {
@@ -96,25 +97,26 @@ export function paintCloth(ctx: Ctx): void {
   }
 }
 
-/** 장식 틀: 금-적-금 삼중선 + 네 모서리 문양 (320×240, 나머지는 투명) */
-export function paintFrame(ctx: Ctx): void {
+/** 장식 틀: 금-적-금 삼중선 + 네 모서리 문양 (320×h, 나머지는 투명) */
+export function paintFrame(ctx: Ctx, h: number = GAME_H): void {
+  const b = h - GAME_H;
   px(ctx, S.gold, 2, 2, 316, 1);
-  px(ctx, S.gold, 2, 237, 316, 1);
-  px(ctx, S.gold, 2, 2, 1, 236);
-  px(ctx, S.gold, 317, 2, 1, 236);
+  px(ctx, S.gold, 2, 237 + b, 316, 1);
+  px(ctx, S.gold, 2, 2, 1, 236 + b);
+  px(ctx, S.gold, 317, 2, 1, 236 + b);
   px(ctx, S.red, 4, 4, 312, 1);
-  px(ctx, S.red, 4, 235, 312, 1);
-  px(ctx, S.red, 4, 4, 1, 232);
-  px(ctx, S.red, 315, 4, 1, 232);
+  px(ctx, S.red, 4, 235 + b, 312, 1);
+  px(ctx, S.red, 4, 4, 1, 232 + b);
+  px(ctx, S.red, 315, 4, 1, 232 + b);
   px(ctx, S.gold2, 6, 6, 308, 1);
-  px(ctx, S.gold2, 6, 233, 308, 1);
-  px(ctx, S.gold2, 6, 6, 1, 228);
-  px(ctx, S.gold2, 313, 6, 1, 228);
+  px(ctx, S.gold2, 6, 233 + b, 308, 1);
+  px(ctx, S.gold2, 6, 6, 1, 228 + b);
+  px(ctx, S.gold2, 313, 6, 1, 228 + b);
   for (const [cx, cy] of [
     [0, 0],
     [306, 0],
-    [0, 226],
-    [306, 226],
+    [0, 226 + b],
+    [306, 226 + b],
   ]) {
     px(ctx, S.gold, cx + 3, cy + 3, 11, 11);
     px(ctx, S.red, cx + 5, cy + 5, 7, 7);

@@ -20,8 +20,10 @@ import { useResultShare } from "@/hooks/useResultShare";
 import CoupangBanner from "@/components/CoupangBanner";
 import FeedbackForm from "./FeedbackForm";
 import OverlayButtons, { type OverlayButton } from "./OverlayButtons";
-import { overlayLayout, resolveStarterUnlock, stageSize } from "./clientLogic";
+import { overlayLayout, resolveStarterUnlock, stageLayout } from "./clientLogic";
 import { GAME_H, GAME_W } from "@/game/duel/config";
+import { resultLayout } from "@/game/duel/layout";
+import { bodyPages } from "@/game/duel/wrap";
 import {
   nextSwitchIndex,
   pendingRecruit,
@@ -40,6 +42,8 @@ type DuelGame = Awaited<ReturnType<typeof createDuelGame>>;
 const BATTLE_ROWS: BattleFocusId[] = ["skill0", "skill1", "skill2", "skill3", "switch"];
 
 const FONT_WAIT_MS = 1500;
+/** "한 번 더 누르면 결정" 안내를 본 표시 */
+const HINT_KEY = "duel.confirmHint";
 /** 무대 아래 남길 여백(px) */
 const STAGE_BOTTOM_GAP = 12;
 /** anim:done이 오지 않을 때(장면이 없을 때) 입력을 다시 여는 여유 시간 */
@@ -66,7 +70,8 @@ export default function DuelClient() {
   const hostRef = useRef<HTMLDivElement>(null);
   /** 캔버스 무대를 담는 바깥 칸(폭을 재서 정수 배율 무대 크기를 정한다) */
   const outerRef = useRef<HTMLDivElement>(null);
-  const [stage, setStage] = useState<{ w: number; h: number; left: number } | null>(null);
+  const [stage, setStage] = useState<{ w: number; h: number; left: number; tall: boolean } | null>(null);
+  const [bridge] = useState(() => new DuelBridge());
   useEffect(() => {
     const el = outerRef.current;
     if (!el) return;
@@ -75,10 +80,19 @@ export default function DuelClient() {
       // 세로로도 넘치지 않게: 화면 높이 - 무대 위쪽(머리글) - 아래 여백
       const top = el.getBoundingClientRect().top + window.scrollY;
       const maxH = Math.max(GAME_H, window.innerHeight - top - STAGE_BOTTOM_GAP);
-      const { w, h } = stageSize(el.clientWidth, dpr, maxH);
+      // 폰·터치는 세로형(아래 큰 명령 패널), 넓은 마우스 화면은 가로형
+      let coarse = false;
+      try {
+        coarse = window.matchMedia("(pointer: coarse)").matches;
+      } catch {
+        // matchMedia가 없으면 폭으로만
+      }
+      const { w, h, tall } = stageLayout(el.clientWidth, dpr, maxH, coarse);
+      // 게임이 만들어지기 전이면 처음 크기로, 뒤라면 크기를 바꾸고 장면을 다시 연다
+      if (bridge.tall !== tall) bridge.emit("layout:tall", { tall });
       // 가운데 정렬도 기기 화소 경계에 맞춘다(반 화소 어긋나면 도트가 번진다)
       const left = Math.floor(((el.clientWidth - w) / 2) * dpr) / dpr;
-      setStage((old) => (old && old.w === w && old.h === h && old.left === left ? old : { w, h, left }));
+      setStage((old) => (old && old.w === w && old.h === h && old.left === left && old.tall === tall ? old : { w, h, left, tall }));
       // 바깥 천 무늬의 체커 칸도 캔버스와 같은 배율로
       el.closest<HTMLElement>(".duel-cloth")?.style.setProperty("--px", String(Math.max(1, Math.round(w / GAME_W))));
     };
@@ -90,14 +104,14 @@ export default function DuelClient() {
       ro.disconnect();
       window.removeEventListener("resize", measure);
     };
-  }, []);
+  }, [bridge]);
+  const tall = !!stage?.tall;
   /** 만들어진 게임(무대 크기가 바뀌면 Phaser에 다시 재라고 알린다) */
   const gameRef = useRef<DuelGame | null>(null);
   useEffect(() => {
     // Phaser는 창 resize 때만 부모 크기를 다시 잰다 → React가 무대 크기를 바꾼 뒤 직접 알린다
     gameRef.current?.scale.refresh();
   }, [stage]);
-  const [bridge] = useState(() => new DuelBridge());
   const rngRef = useRef<Rng>(createRng(1));
   const sidesRef = useRef<{ player: Side }>({ player: "left" });
   const seedParamRef = useRef<string | null>(null);
@@ -118,6 +132,12 @@ export default function DuelClient() {
   const turnTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const [record, setRecord] = useState<RunRecord | null>(null);
   const [stars, setStars] = useState(0);
+  /** 결과 열전 쪽 */
+  const [resultPage, setResultPage] = useState(0);
+  /** 이 브라우저에 저장할 수 있는지(시작 화면 안내) */
+  const [storageOk, setStorageOk] = useState(true);
+  /** "한 번 더 누르면 결정" 안내를 이미 봤는지(한 번 결정하면 끈다, 이 기기에 기억) */
+  const [hintDone, setHintDone] = useState(false);
   const [booted, setBooted] = useState(false);
   /** 첫 장면이 그려졌는지(그전에는 불러오는 중 문구) */
   const [painted, setPainted] = useState(false);
@@ -135,8 +155,9 @@ export default function DuelClient() {
     bridge.emit("scene:go", { scene });
   }, [bridge]);
 
+  const storageOkRef = useRef(true);
   const showStart = useCallback((data: SaveData, sel: string) => {
-    bridge.emit("start:show", toStartShow(data, sel));
+    bridge.emit("start:show", { ...toStartShow(data, sel), storageOk: storageOkRef.current });
   }, [bridge]);
 
   const showBattle = useCallback((r: RunState) => {
@@ -155,6 +176,7 @@ export default function DuelClient() {
     persist(next);
     setRecord(r.record);
     setStars(0);
+    setResultPage(0);
     track("result_view", { test_name: "duel", result_id: r.record.starter });
     bridge.emit("result:show", { ...toResultShow(r.record, next), stars: 0 });
     go("result");
@@ -174,9 +196,15 @@ export default function DuelClient() {
     const me = q.get("me");
     let data = loadSave(storage());
     const roster = resolveStarterUnlock(me, data.roster);
-    if (roster !== data.roster) {
-      data = { ...data, roster };
-      writeSave(storage(), data);
+    if (roster !== data.roster) data = { ...data, roster };
+    // 한 번 써 보아 저장이 되는지 안다(인앱·사생활 보호 모드면 시작 화면에 안내)
+    const ok = writeSave(storage(), data);
+    storageOkRef.current = ok;
+    setStorageOk(ok);
+    try {
+      setHintDone(window.localStorage.getItem(HINT_KEY) === "1");
+    } catch {
+      // 못 읽으면 안내를 보인다
     }
     setSave(data);
     const sel = me && roster.includes(me) ? me : data.history[0]?.starter && roster.includes(data.history[0].starter) ? data.history[0].starter : STARTER_IDS[0];
@@ -307,6 +335,16 @@ export default function DuelClient() {
     if (shown) bridge.emit("result:show", { ...shown, stars: n });
   }, [bridge]);
 
+  /** 열전 다음 쪽(끝이면 처음으로) */
+  const turnPage = useCallback(() => {
+    const shown = bridge.shown.result;
+    if (!shown) return;
+    const n = bodyPages(shown.lines, resultLayout(bridge.tall).bodyLines).length;
+    const next = ((shown.page ?? 0) + 1) % Math.max(1, n);
+    setResultPage(next);
+    bridge.emit("result:show", { ...shown, page: next });
+  }, [bridge]);
+
   const handle = useCallback((a: UiAction) => {
     switch (a.type) {
       case "select": {
@@ -417,15 +455,23 @@ export default function DuelClient() {
     const act = rowInfo(battleSel).action;
     if (!act) return;
     setPending(false);
+    if (!hintDone) {
+      setHintDone(true);
+      try {
+        window.localStorage.setItem(HINT_KEY, "1");
+      } catch {
+        // 저장 못 해도 이번 판에서는 끈다
+      }
+    }
     bridge.emit("ui:action", act);
-  }, [battleSel, bridge, rowInfo]);
+  }, [battleSel, bridge, hintDone, rowInfo]);
 
-  // 대사창 안내 줄: 결정 대기 중이면 "▶ 일격" / "탭하여 결정" 두 줄
+  // 대사창 안내 줄: 결정 대기 중이면 "▶ 일격"(+ 금색 결정 단추), 처음에는 "한 번 더 누르면 결정"
   useEffect(() => {
     const name = battleChoice?.label.replace(/ (무제한|남은 \d+회)$/, "") ?? "";
-    const text = screen === "battle" && pending && !animating && battleChoice?.action ? `▶ ${name}\n탭하여 결정` : null;
-    bridge.emit("battle:prompt", { text });
-  }, [animating, battleChoice, bridge, pending, screen]);
+    const text = screen === "battle" && pending && !animating && battleChoice?.action ? `▶ ${name}` : null;
+    bridge.emit("battle:prompt", { text, hint: !hintDone });
+  }, [animating, battleChoice, bridge, hintDone, pending, screen]);
 
   // 새 싸움(웨이브)이 열리면 커서를 첫 줄로, 결정 대기는 끈다
   const battleKey = run?.battle ? `${run.wave}` : "";
@@ -453,7 +499,7 @@ export default function DuelClient() {
   const buttons: OverlayButton[] = useMemo(() => {
     if (screen === "start") {
       const res = startShow.resume;
-      return overlayLayout("start", startShow.roster.length, !!res).map((s, i) => {
+      return overlayLayout("start", startShow.roster.length, !!res, { tall }).map((s, i) => {
         if (s.id === "sortie") return { ...s, label: `${nameOf(selected)}와 함께 ${res ? "새로 " : ""}출진` };
         if (s.id === "resume") return { ...s, label: `이어하기: ${res!.name} 제${res!.wave}전` };
         const g = startShow.roster[i];
@@ -463,18 +509,21 @@ export default function DuelClient() {
     if (screen === "battle") {
       // 고르기 → 결정: 줄은 커서만 옮기고(작아도 됨), 실행은 대사창 위의 큰 "결정" 단추
       const choice = battleChoice;
-      return overlayLayout("battle").map((s) => {
+      return overlayLayout("battle", 0, false, { tall }).map((s) => {
         if (s.id === "confirm") {
           return { ...s, label: choice && pending ? `결정: ${choice.label}` : "먼저 메뉴에서 명령을 고르세요", disabled: !pending || !choice?.action };
         }
         const row = rowInfo(s.id as BattleFocusId);
-        return { ...s, label: `${row.label}${row.action ? "" : " (쓸 수 없음)"} 고르기`, pressed: battleSel === s.id };
+        // 동행이 없으면 교체는 누를 수 없다(흐리게 + "동행 없음")
+        if (s.id === "switch" && !row.action) return { ...s, label: "교체: 동행 없음", disabled: true };
+        const again = battleSel === s.id && pending ? " (한 번 더 누르면 결정)" : " 고르기";
+        return { ...s, label: `${row.label}${row.action ? "" : " (쓸 수 없음)"}${again}`, pressed: battleSel === s.id };
       });
     }
     if (screen === "reward") {
       if (run && pick) {
         const pv = pickView(run, pick)!;
-        return overlayLayout(pick.kind === "recruit" ? "recruit" : "pick", pv.options.length).map((s, i) => ({ ...s, label: pv.options[i].label }));
+        return overlayLayout(pick.kind === "recruit" ? "recruit" : "pick", pv.options.length, false, { tall }).map((s, i) => ({ ...s, label: pv.options[i].label }));
       }
       const cards = run?.rewardsOffered ?? [];
       return overlayLayout("reward").slice(0, cards.length).map((s, i) => {
@@ -482,8 +531,9 @@ export default function DuelClient() {
         return { ...s, label: `${r.rarity === "rare" ? "희귀" : "보통"} ${r.name}: ${r.desc}` };
       });
     }
-    return overlayLayout("result");
-  }, [battleChoice, battleSel, pending, pick, rowInfo, run, screen, selected, startShow]);
+    const pages = record ? bodyPages(narrate(record).lines, resultLayout(tall).bodyLines).length : 1;
+    return overlayLayout("result", 0, false, { tall, pages }).map((s) => (s.id === "page" ? { ...s, label: `열전 다음 쪽 (${resultPage + 1}/${pages})` } : s));
+  }, [battleChoice, battleSel, pending, pick, record, resultPage, rowInfo, run, screen, selected, startShow, tall]);
 
   const onAction = useCallback((id: string) => {
     let a: UiAction | null = null;
@@ -494,6 +544,9 @@ export default function DuelClient() {
     } else if (screen === "battle" && run?.battle) {
       if (id === "confirm") {
         if (pending) confirmBattle();
+      } else if (id === battleSel && pending) {
+        // 같은 줄(카드)을 다시 누르면 결정
+        confirmBattle();
       } else selectRow(id as BattleFocusId, true);
     } else if (screen === "reward") {
       if (id.startsWith("opt")) a = { type: "pick", index: Number(id.slice(3)) };
@@ -502,11 +555,12 @@ export default function DuelClient() {
         if (rid) a = { type: "reward", rewardId: rid };
       }
     } else if (screen === "result") {
-      if (id.startsWith("star")) a = { type: "rate", stars: Number(id.slice(4)) };
+      if (id === "page") turnPage();
+      else if (id.startsWith("star")) a = { type: "rate", stars: Number(id.slice(4)) };
       else a = { type: "result", action: id as "share" | "retry" | "samguk" };
     }
     if (a) bridge.emit("ui:action", a);
-  }, [bridge, confirmBattle, pending, run, screen, selectRow, startShow]);
+  }, [battleSel, bridge, confirmBattle, pending, run, screen, selectRow, startShow, turnPage]);
 
   const onFocus = useCallback((id: string) => {
     if (screen === "battle") {
@@ -533,7 +587,7 @@ export default function DuelClient() {
         </div>
       </div>
       <p className="sr-only" aria-live="polite">
-        {screen === "battle" && run ? toBattleView(run)?.message.join(" ") : ""}
+        {screen === "battle" && run ? toBattleView(run)?.message.join(" ") : screen === "start" && !storageOk ? "이 브라우저에서는 이어하기가 저장되지 않아요" : ""}
       </p>
       {screen === "result" && record && (
         <div className="mt-4 mx-auto px-4 max-w-lg flex flex-col gap-3">

@@ -1,11 +1,11 @@
 // 결과 화면(와꾸 v5 draw3): 초상 + 열전 제목·한 줄 + 열전 본문 창 + 단추 3 + 별점 줄
 import type * as Phaser from 'phaser';
 import { PALETTE as S, MUTED } from './config';
-import { RESULT_BTN, RESULT_STAR } from './layout';
+import { resultLayout } from './layout';
 import { PanelScene } from './PanelScene';
 import { portraitKeyFor } from './textures';
-import { box, cursor } from './ui';
-import { bodyLines, wrapText } from './wrap';
+import { box, cursor, starIcon } from './ui';
+import { bodyPages, wrapText } from './wrap';
 import type { ResultShow } from './bridge';
 
 /** 한 줄 요약 줄당 글자 수 */
@@ -24,7 +24,7 @@ export class ResultScene extends PanelScene {
   }
 
   protected accepts(id: string): boolean {
-    return BUTTONS.some((b) => b.id === id) || /^star[1-5]$/.test(id);
+    return BUTTONS.some((b) => b.id === id) || id === 'page' || /^star[1-5]$/.test(id);
   }
 
   protected listen(on: Parameters<PanelScene['listen']>[0]): void {
@@ -44,28 +44,46 @@ export class ResultScene extends PanelScene {
     shown.forEach((l, i) => this.t(66, 30 + i * 12, l, { ko: 9, color: S.cream, shadow: true }));
     this.t(66, 58, `BEST ${v.best}  CLEAR ${v.clears}`, { color: S.cream2, num: true, shadow: true });
 
-    // 열전 본문: Galmuri9로 26자씩 7줄까지. 넘치면 첫 문장과 마지막 문장을 남기고 가운데 문장을 뺀다(글꼴은 줄이지 않는다)
-    box(g, 10, 76, 300, 96, S.cream);
-    bodyLines(v.lines).forEach((l, i) => this.t(16, 80 + i * 12, l, { ko: 9 }));
+    // 열전 본문: Galmuri11로 쪽을 나눠 보인다(창 하나에 6줄, 세로형 10줄). 쪽이 더 있으면 ▼, 창을 누르면 넘긴다
+    const L = resultLayout(this.tall);
+    const pages = bodyPages(v.lines, L.bodyLines);
+    const page = (v.page ?? 0) % pages.length;
+    box(g, L.body.x, L.body.y, L.body.w, L.body.h, S.cream);
+    pages[page].forEach((l, i) => this.t(L.body.x + 6, L.body.y + 5 + i * 14, l, { ko: 11 }));
+    if (pages.length > 1) {
+      this.t(L.body.x + L.body.w - 40, L.body.y + L.body.h - 13, `${page + 1}/${pages.length}`, { num: true, color: MUTED }).setOrigin(1, 0);
+      this.more(L.body.x + L.body.w - 12, L.body.y + L.body.h - 14);
+    }
 
     BUTTONS.forEach((b, i) => {
-      const x = RESULT_BTN.x0 + i * RESULT_BTN.step;
+      const x = L.btn.x0 + i * L.btn.step;
       const on = this.focus === b.id;
-      box(g, x, RESULT_BTN.y, RESULT_BTN.w, RESULT_BTN.h, i === 0 ? S.gold : S.cream);
-      const t = this.t(x + RESULT_BTN.w / 2 + 3, RESULT_BTN.y + 5, b.label, { ko: 9, color: on ? S.red : S.ink }).setOrigin(0.5, 0);
-      this.fit(t, RESULT_BTN.w - 16);
-      if (t.height < 11) t.setY(RESULT_BTN.y + 7);
-      if (on) cursor(g, x + 4, RESULT_BTN.y + 8);
+      box(g, x, L.btn.y, L.btn.w, L.btn.h, i === 0 ? S.gold : S.cream);
+      const ko = this.tall ? 11 : 9;
+      const ty = L.btn.y + Math.floor((L.btn.h - (this.tall ? 12 : 10)) / 2) - 1;
+      const t = this.t(x + L.btn.w / 2 + 3, ty, b.label, { ko, color: on ? S.red : S.ink }).setOrigin(0.5, 0);
+      this.fit(t, L.btn.w - 16);
+      if (on) cursor(g, x + 4, ty + 3);
     });
 
-    box(g, 10, 208, 300, 22, S.cream2);
-    this.t(16, 213, '이 판 어땠어요?', { ko: 9 });
+    // 별점 줄: 가로형은 한 줄(별 24px 간격 → 2배에서 48×44), 세로형은 제목 아래 별 5개(각 52×44)
+    const sb = L.starBox;
+    box(g, sb.x, sb.y, sb.w, sb.h, S.cream2);
     const stars = v.stars ?? 0;
-    for (let s = 1; s <= 5; s++) {
-      const x = RESULT_STAR.x0 + (s - 1) * RESULT_STAR.step + RESULT_STAR.w / 2;
-      const on = this.focus === `star${s}`;
-      this.t(x, 212, s <= stars ? '★' : '☆', { ko: 9, color: s <= stars || on ? S.red : S.ink }).setOrigin(0.5, 0);
+    const tail = stars ? '아래에 남기기' : '한 줄 남기기 ▷';
+    if (this.tall) {
+      this.t(sb.x + 6, sb.y + 5, '이 판 어땠어요?', { ko: 11 });
+      this.t(sb.x + sb.w - 6, sb.y + 5, tail, { ko: 11, color: MUTED }).setOrigin(1, 0);
+    } else {
+      this.t(16, sb.y + 5, '이 판 어땠어요?', { ko: 9 });
+      this.t(304, sb.y + 5, tail, { ko: 9, color: MUTED }).setOrigin(1, 0);
     }
-    this.t(304, 213, stars ? '아래에 남기기' : '한 줄 남기기 ▷', { ko: 9, color: MUTED }).setOrigin(1, 0);
+    for (let s = 1; s <= 5; s++) {
+      const x = L.star.x0 + (s - 1) * L.star.step + L.star.w / 2;
+      const on = this.focus === `star${s}`;
+      // 세로형은 별마다 누를 칸을 상자로 보인다
+      if (this.tall) box(g, L.star.x0 + (s - 1) * L.star.step + 2, L.star.y, L.star.w - 4, L.star.h, on || s <= stars ? S.cream : S.cream2);
+      starIcon(g, x, L.star.y + L.star.h / 2, s <= stars || on, this.tall ? 2 : 1);
+    }
   }
 }

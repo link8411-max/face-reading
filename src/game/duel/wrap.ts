@@ -1,3 +1,4 @@
+import { BODY_CHARS_11 } from './layout';
 // 글자 수로 줄 나누기(Phaser 없음). 띄어쓰기에서 끊고, 한 낱말이 max보다 길면 그 자리에서 자른다.
 export function wrapText(text: string, max: number): string[] {
   const out: string[] = [];
@@ -24,14 +25,11 @@ export function wrapText(text: string, max: number): string[] {
   return out;
 }
 
-/** 열전 본문 한 줄 글자 수·최대 줄 수(결과 화면 Galmuri9) */
-export const BODY_CHARS = 26;
-export const BODY_MAX = 7;
-
-/** 문장들을 26자 줄로. 7줄이 넘으면 첫 문장·마지막 문장은 남기고 가운데 문장부터 뺀다(글꼴은 줄이지 않는다) */
-export function bodyLines(sentences: string[]): string[] {
-  const keep = [...sentences];
-  const wrap = () => wrapText(keep.join(' '), BODY_CHARS);
-  while (wrap().length > BODY_MAX && keep.length > 2) keep.splice(1, 1);
-  return wrap().slice(0, BODY_MAX);
+/** 열전 본문을 쪽으로 나눈다: Galmuri11 한 줄 BODY_CHARS_11자, 쪽마다 perPage줄(문장은 빼지 않는다, ▼로 넘긴다) */
+export function bodyPages(sentences: string[], perPage: number, chars = BODY_CHARS_11): string[][] {
+  const lines = wrapText(sentences.join(' '), chars);
+  if (lines.length === 0) return [[]];
+  const out: string[][] = [];
+  for (let i = 0; i < lines.length; i += perPage) out.push(lines.slice(i, i + perPage));
+  return out;
 }

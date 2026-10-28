@@ -1,9 +1,13 @@
 // 정적 그림을 HTMLCanvas에 한 번 그려 Phaser 텍스처로 올린다
 import type * as Phaser from 'phaser';
 import { paintCloth, paintField, paintFrame } from './fieldPainter';
-import { FIELD, GAME_H, GAME_W, PALETTE, SPRITE_PX } from './config';
+import { FIELD, GAME_H, GAME_H_TALL, GAME_W, PALETTE, SPRITE_PX } from './config';
 
 export type Who = 'player' | 'enemy';
+
+/** 높이별 천 바탕·장식 틀 텍스처 키(가로형 240, 세로형 408) */
+export const clothKey = (h: number) => `cloth:${h}`;
+export const frameKey = (h: number) => `frame:${h}`;
 
 /** 스프라이트 그림이 없을 때 쓰는 색 사각형 키 */
 export const fallbackSpriteKey = (who: Who) => `sprite:fallback:${who}`;
@@ -38,8 +42,10 @@ function paintFallbackSprite(ctx: CanvasRenderingContext2D, body: string) {
 /** 벌판·천 바탕·장식 틀·폴백 스프라이트·흰 1px 텍스처를 만든다(이미 있으면 건너뜀) */
 export function makeTextures(scene: Phaser.Scene): void {
   canvasTexture(scene, 'field', FIELD.w, FIELD.h, (ctx) => paintField(ctx, FIELD.w, FIELD.h));
-  canvasTexture(scene, 'cloth', GAME_W, GAME_H, paintCloth);
-  canvasTexture(scene, 'frame', GAME_W, GAME_H, paintFrame);
+  for (const h of [GAME_H, GAME_H_TALL]) {
+    canvasTexture(scene, clothKey(h), GAME_W, h, (ctx) => paintCloth(ctx, h));
+    canvasTexture(scene, frameKey(h), GAME_W, h, (ctx) => paintFrame(ctx, h));
+  }
   canvasTexture(scene, fallbackSpriteKey('player'), SPRITE_PX, SPRITE_PX, (ctx) => paintFallbackSprite(ctx, PALETTE.blue));
   canvasTexture(scene, fallbackSpriteKey('enemy'), SPRITE_PX, SPRITE_PX, (ctx) => paintFallbackSprite(ctx, PALETTE.red));
 }

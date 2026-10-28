@@ -2,7 +2,8 @@
 // 움직임이 거의 없는 화면이라 바뀔 때마다 오브젝트를 다 지우고 새로 그린다(320×240에 오브젝트 수십 개).
 import * as Phaser from 'phaser';
 import type { DuelBridge, DuelEvents, SceneName } from './bridge';
-import { KO_FAMILY, KO_PX } from './config';
+import { GAME_H, GAME_H_TALL, KO_FAMILY, KO_PX } from './config';
+import { clothKey, frameKey } from './textures';
 import { playSfx } from './sfx';
 import { fonts, text, type TextOpt } from './ui';
 
@@ -52,6 +53,16 @@ export abstract class PanelScene extends Phaser.Scene {
     this.announce();
   }
 
+  /** 세로형(320×408, 폰·터치) 배치인지 */
+  protected get tall(): boolean {
+    return !!this.bridge?.tall;
+  }
+
+  /** 지금 설계 높이(240 또는 408) */
+  protected get H(): number {
+    return this.tall ? GAME_H_TALL : GAME_H;
+  }
+
   /** 장면이 (다시) 열릴 때 상태 비우기 */
   protected onCreate(): void {}
 
@@ -63,8 +74,8 @@ export abstract class PanelScene extends Phaser.Scene {
   protected redraw(): void {
     this.tweens.killAll();
     this.children.removeAll(true);
-    this.add.image(0, 0, 'cloth').setOrigin(0);
-    this.add.image(0, 0, 'frame').setOrigin(0);
+    this.add.image(0, 0, clothKey(this.H)).setOrigin(0);
+    this.add.image(0, 0, frameKey(this.H)).setOrigin(0);
     const g = this.add.graphics();
     this.draw(g);
   }

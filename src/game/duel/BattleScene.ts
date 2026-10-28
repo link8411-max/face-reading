@@ -2,13 +2,13 @@
 import * as Phaser from 'phaser';
 import { SKILLS } from '@/lib/duel/skills';
 import { BOSS_WAVES, WAVES } from '@/lib/duel/run';
-import { FIELD, MUTED, PALETTE as S, SPRITE_PX, hex } from './config';
+import { FIELD, GAME_H, GAME_H_TALL, MUTED, PALETTE as S, SPRITE_PX, hex } from './config';
 import type { BattleFocusId, BattleView, DuelBridge, DuelEvents, FighterView } from './bridge';
 import { playSfx } from './sfx';
 import { otherSide, otherWho, timelineLength, CLASH_MS, PASS_MS, STRIKE_MS, KO_MS, type Side, type TimelineItem, type Who } from './timeline';
-import { portraitKeyFor, spriteKeyFor } from './textures';
-import { KIND_MARK, box, cursor, hpBar, slashArc, spark, tag, text } from './ui';
-import { BATTLE_MENU, BATTLE_SWITCH, MSG_CHARS } from './layout';
+import { clothKey, frameKey, portraitKeyFor, spriteKeyFor } from './textures';
+import { KIND_MARK, box, cursor, hpBar, slashArc, spark, text } from './ui';
+import { BATTLE_MENU, BATTLE_SWITCH, BATTLE_TALL, DIALOG_BOX, MENU_BOX, MSG_CHARS, battleCardRect } from './layout';
 import { wrapText } from './wrap';
 
 // ── 배치(와꾸 v5 좌표) ──
@@ -21,13 +21,15 @@ const CLASH_Y = FIELD.y + 50;
 /** 돌진 끝·충돌 정지 끝(timeline.ts passPose와 같은 비율) */
 const T_MEET = 0.45;
 const T_LEAVE = 0.55;
-const MENU_Y = 173;
-const MENU_STEP = 11;
-const SWITCH_Y = 219;
 const MSG_LINES = 3;
+/** 대사창 줄 자리: 가로형(Galmuri9, 13 간격) / 세로형(Galmuri11, 14 간격) */
+const MSG_WIDE = { x: DIALOG_BOX.x + 6, y: DIALOG_BOX.y + 6, step: 13 } as const;
+const MSG_TALL = { x: BATTLE_TALL.dialog.x + 6, y: BATTLE_TALL.dialog.y + 5, step: 14 } as const;
 /** 웨이브 진행 띠: WAVES(36)칸 한 줄(가운데 맞춤), 보스(BOSS_WAVES)는 금색 긴 칸 */
 const STRIP = { x: 160 - (WAVES * 3 - 1) / 2, y: 30, cell: 3, w: 2, h: 5 } as const;
 const FOCUS_IDS: BattleFocusId[] = ['skill0', 'skill1', 'skill2', 'skill3', 'switch'];
+/** 처음 고를 때 대사창 안내 */
+const CONFIRM_HINT = '한 번 더 누르면 결정';
 
 interface FighterObjs {
   sprite: Phaser.GameObjects.Image;
@@ -35,9 +37,11 @@ interface FighterObjs {
   portrait: Phaser.GameObjects.Image;
   noPortrait: Phaser.GameObjects.Text;
   name: Phaser.GameObjects.Text;
-  str: Phaser.GameObjects.Text;
-  lead: Phaser.GameObjects.Text;
   info: Phaser.GameObjects.Text;
+  /** 보스 표찰(적만) */
+  boss: Phaser.GameObjects.Text | null;
+  /** 초상 테두리 깜빡임(보스 필살기 예고) */
+  border: Phaser.GameObjects.Graphics;
   hpNum: Phaser.GameObjects.Text;
 }
 
@@ -62,6 +66,12 @@ export class BattleScene extends Phaser.Scene {
   private messages: string[] = [];
   /** 결정 대기 중인 명령 안내 줄(대사창 아래쪽에 빨갛게) */
   private prompt: string[] | null = null;
+  /** 결정을 기다리는 중(고른 카드를 금색으로, 대사창에 결정 단추) */
+  private pending = false;
+  /** 대사창 결정 단추(금색 베벨)와 ▼ */
+  private chipG!: Phaser.GameObjects.Graphics;
+  private chipT!: Phaser.GameObjects.Text;
+  private moreT!: Phaser.GameObjects.Text;
   /** 이번 연출에서 쓰러진 쪽 */
   private koed = new Set<Who>();
   /** 이번 연출이 끝난 뒤의 자리 */
@@ -96,6 +106,7 @@ export class BattleScene extends Phaser.Scene {
     this.doneTimer = null;
     this.dust = [];
     this.prompt = null;
+    this.pending = false;
     this.bridge = this.registry.get('bridge') as DuelBridge;
     this.buildStatic();
     this.buildDynamic();
@@ -113,9 +124,11 @@ export class BattleScene extends Phaser.Scene {
     this.bridge.on('anim:play', onPlay);
     this.bridge.on('ui:focus', onFocus);
     const onPrompt = (p: DuelEvents['battle:prompt']) => {
-      // 줄바꿈(\n)으로 나눈 뒤 줄마다 MSG_CHARS로 감싼다(최대 2줄)
-      this.prompt = p.text ? p.text.split('\n').flatMap((l) => wrapText(l, MSG_CHARS)).slice(0, 2) : null;
+      // 고른 명령 한 줄(+ 처음 몇 번은 "한 번 더 누르면 결정" 안내)
+      this.prompt = p.text ? [...wrapText(p.text, MSG_CHARS).slice(0, 1), ...(p.hint ? [CONFIRM_HINT] : [])] : null;
+      this.pending = !!p.text;
       this.drawMessages();
+      this.drawMenu();
     };
     this.bridge.on('battle:prompt', onPrompt);
     // game.destroy(true)는 SHUTDOWN이 아니라 DESTROY만 보낸다 → 둘 다에서 뗀다(다리는 게임보다 오래 산다)
@@ -138,37 +151,51 @@ export class BattleScene extends Phaser.Scene {
 
   // ── 한 번 그리는 것 ──
 
+  /** 세로형(320×408, 폰·터치) 배치인지 */
+  private get tall(): boolean {
+    return !!this.bridge?.tall;
+  }
+
   private buildStatic(): void {
-    this.add.image(0, 0, 'cloth').setOrigin(0);
-    this.add.image(0, 0, 'frame').setOrigin(0);
+    const H = this.tall ? GAME_H_TALL : GAME_H;
+    this.add.image(0, 0, clothKey(H)).setOrigin(0);
+    this.add.image(0, 0, frameKey(H)).setOrigin(0);
     const g = this.add.graphics();
     box(g, 10, 12, 50, 58);
     box(g, 260, 12, 50, 58);
     box(g, 10, 76, 300, 74, S.ink);
-    // 명령 메뉴는 넓게(기술 이름이 잘리지 않게), 대사창은 그 오른쪽
-    box(g, 10, 172, 150, 58, S.cream);
-    box(g, 164, 172, 146, 58, S.cream);
+    if (this.tall) {
+      // 세로형: 넓은 대사창, 그 아래 기술 카드(drawMenu가 그린다)
+      const d = BATTLE_TALL.dialog;
+      box(g, d.x, d.y, d.w, d.h, S.cream);
+    } else {
+      // 명령 메뉴는 넓게(기술 이름이 잘리지 않게), 대사창은 그 오른쪽
+      box(g, MENU_BOX.x, MENU_BOX.y, MENU_BOX.w, MENU_BOX.h, S.cream);
+      box(g, DIALOG_BOX.x, DIALOG_BOX.y, DIALOG_BOX.w, DIALOG_BOX.h, S.cream);
+    }
     this.add.image(FIELD.x, FIELD.y, 'field').setOrigin(0);
-    // ▼ 깜빡임
-    const more = text(this, 298, 218, '▼', { size: 8 });
-    this.tweens.add({ targets: more, alpha: 0, duration: 400, yoyo: true, repeat: -1, hold: 300 });
-    this.buildFighterTexts(g);
+    // ▼ 깜빡임(대사창 오른쪽 아래)
+    const d = this.tall ? BATTLE_TALL.dialog : DIALOG_BOX;
+    this.moreT = text(this, d.x + d.w - 12, d.y + d.h - 12, '▼', { size: 8 });
+    this.tweens.add({ targets: this.moreT, alpha: 0, duration: 400, yoyo: true, repeat: -1, hold: 300 });
+    this.buildFighterTexts();
   }
 
-  private buildFighterTexts(g: Phaser.GameObjects.Graphics): void {
+  private buildFighterTexts(): void {
     const make = (who: Who): FighterObjs => {
       const left = who === 'player';
       const px = left ? 12 : 262;
       const portrait = this.add.image(px, 14, '__DEFAULT').setOrigin(0).setVisible(false);
       const noPortrait = text(this, px + 23, 41, '?', { size: 16, color: S.gold2, bold: true }).setOrigin(0.5);
-      const tagX = left ? 64 : 212;
-      const str = tag(this, g, tagX, 28, '무력');
-      const lead = tag(this, g, tagX, 42, '통솔');
+      const border = this.add.graphics();
+      // 무력·통솔 표찰은 뺐다(1배 폰에서 읽히지 않음): 이름, 유형·레벨(Galmuri11), 적이 보스면 표찰
       const name = text(this, left ? 64 : 256, 14, '', { ko: 11, color: S.cream, bold: true, shadow: true }).setOrigin(left ? 0 : 1, 0);
-      const info = text(this, left ? 64 : 256, 56, '', { ko: 9, color: S.gold, shadow: true }).setOrigin(left ? 0 : 1, 0);
-      const hpNum = text(this, left ? 12 : 308, 160, '', { color: S.cream2, num: true, shadow: true }).setOrigin(left ? 0 : 1, 0);
+      const info = text(this, left ? 64 : 256, 56, '', { ko: 11, color: S.gold, shadow: true }).setOrigin(left ? 0 : 1, 0);
+      const boss = left ? null : text(this, 256, 30, '보스', { ko: 11, bold: true, color: S.red, shadow: true }).setOrigin(1, 0).setVisible(false);
+      // HP 숫자: 세로형(1배 폰)은 Silkscreen 16px
+      const hpNum = text(this, left ? 12 : 308, 160, '', { color: S.cream2, num: true, shadow: true, size: this.tall ? 16 : 8 }).setOrigin(left ? 0 : 1, 0);
       const sprite = this.add.image(SIDE_X[left ? 'left' : 'right'], SPR_BOTTOM, '__DEFAULT').setOrigin(0.5, 1);
-      return { sprite, baseScale: 1, portrait, noPortrait, name, str, lead, info, hpNum };
+      return { sprite, baseScale: 1, portrait, noPortrait, name, info, boss, border, hpNum };
     };
     this.f = { player: make('player'), enemy: make('enemy') };
   }
@@ -179,23 +206,45 @@ export class BattleScene extends Phaser.Scene {
     this.stripG = this.add.graphics();
     this.hpG = this.add.graphics();
     this.cursorG = this.add.graphics();
-    this.menu = [0, 1, 2, 3].map((i) => {
-      const y = MENU_Y + i * MENU_STEP;
-      return {
-        name: text(this, 22, y, '', { ko: 9 }),
-        sub: text(this, 157, y, '', { ko: 9, color: MUTED }).setOrigin(1, 0),
-      };
-    });
-    this.switchLine = text(this, 22, SWITCH_Y - 3, '', { ko: 9, color: MUTED });
-    this.msg = [0, 1, 2].map((i) => text(this, 170, 178 + i * 13, '', { ko: 9 }));
+    if (this.tall) {
+      // 세로형: 2×2 기술 카드(이름 Galmuri11 굵게, 아래 줄 유형·남은 횟수 Galmuri11)
+      this.menu = [0, 1, 2, 3].map((i) => {
+        const r = battleCardRect(i);
+        return {
+          name: text(this, r.x + 12, r.y + 8, '', { ko: 11, bold: true }),
+          sub: text(this, r.x + 12, r.y + 28, '', { ko: 11, color: MUTED }),
+        };
+      });
+      const sw = BATTLE_TALL.switch;
+      this.switchLine = text(this, sw.x + sw.w / 2, sw.y + 17, '', { ko: 11, bold: true }).setOrigin(0.5, 0);
+    } else {
+      this.menu = [0, 1, 2, 3].map((i) => {
+        const y = BATTLE_MENU.y + i * BATTLE_MENU.rowH;
+        return {
+          name: text(this, 22, y, '', { ko: 9 }),
+          sub: text(this, 157, y, '', { ko: 9, color: MUTED }).setOrigin(1, 0),
+        };
+      });
+      this.switchLine = text(this, 22, BATTLE_SWITCH.y + 2, '', { ko: 9, color: MUTED });
+    }
+    const M = this.tall ? MSG_TALL : MSG_WIDE;
+    this.msg = [0, 1, 2].map((i) => text(this, M.x, M.y + i * M.step, '', { ko: this.tall ? 11 : 9 }));
+    this.chipG = this.add.graphics();
+    this.chipT = text(this, 0, 0, '결정', { ko: this.tall ? 11 : 9, bold: this.tall }).setVisible(false);
     // 메뉴 위에 포인터를 올리면 커서만 옮긴다(누르기는 React DOM 버튼 몫)
     FOCUS_IDS.forEach((id, i) => {
-      const y = i < 4 ? BATTLE_MENU.y + i * BATTLE_MENU.rowH : BATTLE_SWITCH.y;
-      const zone = this.add.zone(BATTLE_MENU.x, y, BATTLE_MENU.w, i < 4 ? BATTLE_MENU.rowH : BATTLE_SWITCH.h).setOrigin(0).setInteractive();
+      const r = this.tall
+        ? i < 4
+          ? battleCardRect(i)
+          : BATTLE_TALL.switch
+        : i < 4
+          ? { x: BATTLE_MENU.x, y: BATTLE_MENU.y + i * BATTLE_MENU.rowH, w: BATTLE_MENU.w, h: BATTLE_MENU.rowH }
+          : BATTLE_SWITCH;
+      const zone = this.add.zone(r.x, r.y, r.w, r.h).setOrigin(0).setInteractive();
       zone.on('pointerover', () => this.setFocus(id, true));
     });
     this.fx = this.add.graphics();
-    this.overlay = this.add.rectangle(0, 0, 320, 240, hex(S.navy), 0.65).setOrigin(0).setVisible(false);
+    this.overlay = this.add.rectangle(0, 0, 320, this.tall ? GAME_H_TALL : GAME_H, hex(S.navy), 0.65).setOrigin(0).setVisible(false);
     this.cutinImg = this.add.image(CENTER_X, 104, '__DEFAULT').setVisible(false);
     this.cutinTitle = text(this, CENTER_X, 146, '', { ko: 11, color: S.gold, bold: true }).setOrigin(0.5, 0).setVisible(false);
     this.cutinTitle.setShadow(1, 1, S.ink, 0);
@@ -209,7 +258,8 @@ export class BattleScene extends Phaser.Scene {
     this.turn.setText(`TURN ${v.turn}`);
     this.drawStrip(v.wave);
     this.applyFighter('player', v.player, `${v.player.kind} Lv${v.player.level}`);
-    this.applyFighter('enemy', v.enemy, `${v.enemy.kind} Lv${v.enemy.level}${v.enemy.isBoss ? ' · 보스' : ''}`);
+    this.applyFighter('enemy', v.enemy, `${v.enemy.kind} Lv${v.enemy.level}`);
+    this.f.enemy.boss?.setVisible(v.enemy.isBoss);
     this.shownHp = { player: v.player.hp, enemy: v.enemy.hp };
     this.drawHp();
     this.placeIdle();
@@ -221,8 +271,6 @@ export class BattleScene extends Phaser.Scene {
   private applyFighter(who: Who, fv: FighterView, info: string): void {
     const o = this.f[who];
     o.name.setText(fv.name);
-    o.str.setText(String(fv.stats.무력));
-    o.lead.setText(String(fv.stats.통솔));
     o.info.setText(info);
     const pk = portraitKeyFor(this, fv.id);
     if (pk) o.portrait.setTexture(pk).setDisplaySize(46, 54).setVisible(true);
@@ -258,17 +306,53 @@ export class BattleScene extends Phaser.Scene {
   }
 
   private drawMessages(): void {
-    // 결정 대기 중이면 마지막 대사 1줄 + 안내 줄(빨강), 아니면 대사 3줄
+    // 결정 대기 중이면 마지막 대사 + "▶ 기술" 줄(빨강, 오른쪽에 금색 결정 단추) + 처음엔 안내 줄, 아니면 대사 3줄
     const p = this.animating ? null : this.prompt;
     const lines = p ? [...this.messages.slice(-(MSG_LINES - p.length)), ...p] : this.messages;
     const firstPrompt = p ? lines.length - p.length : MSG_LINES;
     this.msg.forEach((t, i) => t.setText(lines[i] ?? '').setColor(i >= firstPrompt ? S.red : S.ink));
+    const g = this.chipG.clear();
+    this.chipT.setVisible(!!p);
+    this.moreT.setVisible(!p);
+    if (!p) return;
+    const M = this.tall ? MSG_TALL : MSG_WIDE;
+    const y = M.y + firstPrompt * M.step;
+    const d = this.tall ? BATTLE_TALL.dialog : DIALOG_BOX;
+    const w = this.tall ? 56 : 42;
+    const h = this.tall ? 17 : 14;
+    const x = d.x + d.w - w - 6;
+    box(g, x, y - (this.tall ? 3 : 2), w, h, S.gold);
+    this.chipT.setPosition(Math.round(x + (w - this.chipT.width) / 2), y - (this.tall ? 1 : 0));
   }
 
   private drawMenu(): void {
     const v = this.view;
     const g = this.cursorG.clear();
     if (!v) return;
+    // 교체는 "다음에 나설 장수"로 간다
+    const me = v.party.findIndex((p) => p.id === v.player.id);
+    const n = v.party.length;
+    let nextUp: (typeof v.party)[number] | null = null;
+    for (let k = 1; k < n; k++) {
+      const p = v.party[(me + k) % n];
+      if (p.hp > 0) {
+        nextUp = p;
+        break;
+      }
+    }
+    const switchText = nextUp ? `교체 ▷ ${nextUp.name}${nextUp.hp < nextUp.maxHp / 2 ? '(부상)' : ''}` : '교체 · 동행 없음';
+    if (this.tall) this.drawCards(g, v, switchText, !nextUp);
+    else this.drawList(g, v, switchText);
+  }
+
+  /** 기술 보조 글: 방어는 효과, 나머지는 유형 한 글자 · 남은 횟수 */
+  private skillSub(s: BattleView['player']['skills'][number]): string {
+    if (SKILLS[s.id]?.effect === 'guard') return '피해 절반';
+    return `${KIND_MARK[s.kind] ?? ''}·${s.usesLeft === null ? '무제한' : `남은 ${s.usesLeft}`}`;
+  }
+
+  /** 가로형: 메뉴 상자 안 다섯 줄(Galmuri9) */
+  private drawList(g: Phaser.GameObjects.Graphics, v: BattleView, switchText: string): void {
     this.menu.forEach((row, i) => {
       const s = v.player.skills[i];
       const on = this.focus === `skill${i}`;
@@ -280,27 +364,56 @@ export class BattleScene extends Phaser.Scene {
       const empty = s.usesLeft === 0;
       row.name.setText(s.name);
       row.name.setColor(empty ? MUTED : on ? S.red : S.ink);
-      const mark = KIND_MARK[s.kind] ?? '';
-      const desc = SKILLS[s.id]?.effect === 'guard' ? '피해 절반' : null;
-      row.sub.setText(desc ?? `${mark}·${s.usesLeft === null ? '무제한' : `남은 ${s.usesLeft}`}`);
+      row.sub.setText(this.skillSub(s));
       // 기술 이름이 보조 글과 겹치면 보조 글을 남은 횟수만으로 줄인다(글꼴은 줄이지 않는다)
       if (row.name.width > 157 - row.sub.width - 4 - 22 && s.usesLeft !== null) row.sub.setText(`${s.usesLeft}회`);
-      if (on) cursor(g, 15, MENU_Y + i * MENU_STEP + 2);
+      if (on) cursor(g, 15, BATTLE_MENU.y + i * BATTLE_MENU.rowH + 2);
     });
-    // 교체 줄은 Galmuri9 한 줄에 들어가게 "다음에 나설 장수"만 보인다(교체는 그 장수로 간다)
-    const me = v.party.findIndex((p) => p.id === v.player.id);
-    const n = v.party.length;
-    let nextUp: (typeof v.party)[number] | null = null;
-    for (let k = 1; k < n; k++) {
-      const p = v.party[(me + k) % n];
-      if (p.hp > 0) {
-        nextUp = p;
-        break;
-      }
-    }
-    this.switchLine.setText(`교체 ▷ ${nextUp ? `${nextUp.name}${nextUp.hp < nextUp.maxHp / 2 ? '(부상)' : ''}` : '없음'}`);
+    this.switchLine.setText(switchText);
     this.switchLine.setColor(this.focus === 'switch' ? S.red : MUTED);
-    if (this.focus === 'switch') cursor(g, 15, SWITCH_Y);
+    if (this.focus === 'switch') cursor(g, 15, BATTLE_SWITCH.y + 4);
+  }
+
+  /** 세로형: 2×2 기술 카드 + 교체 단추. 고른 카드는 빨간 테두리, 결정 대기 중이면 금색 */
+  private drawCards(g: Phaser.GameObjects.Graphics, v: BattleView, switchText: string, noSwitch: boolean): void {
+    const frame = (r: { x: number; y: number; w: number; h: number }, on: boolean, fill: string) => {
+      if (on) {
+        g.fillStyle(hex(S.red), 1);
+        g.fillRect(r.x - 2, r.y - 2, r.w + 4, r.h + 4);
+      }
+      box(g, r.x, r.y, r.w, r.h, fill);
+    };
+    this.menu.forEach((row, i) => {
+      const s = v.player.skills[i];
+      const r = battleCardRect(i);
+      const on = this.focus === `skill${i}`;
+      if (!s) {
+        frame(r, false, S.cream2);
+        row.name.setText('');
+        row.sub.setText('');
+        return;
+      }
+      const empty = s.usesLeft === 0;
+      frame(r, on, empty ? S.cream2 : on && this.pending ? S.gold : S.cream);
+      row.name.setText(s.name).setColor(empty ? MUTED : on ? S.red : S.ink);
+      this.fitText(row.name, r.w - 18);
+      row.sub.setText(this.skillSub(s)).setColor(empty ? MUTED : S.ink);
+      if (on) cursor(g, r.x + 5, r.y + 11);
+    });
+    const sw = BATTLE_TALL.switch;
+    const onS = this.focus === 'switch';
+    frame(sw, onS && !noSwitch, noSwitch ? S.cream2 : onS && this.pending ? S.gold : S.cream);
+    this.switchLine.setText(switchText).setColor(noSwitch ? MUTED : onS ? S.red : S.ink);
+    this.switchLine.setY(sw.y + Math.floor((sw.h - 12) / 2) - 1);
+  }
+
+  /** 글이 maxW보다 넓으면 끝을 말줄임(글꼴은 줄이지 않는다) */
+  private fitText(t: Phaser.GameObjects.Text, maxW: number): void {
+    let s = t.text;
+    while (t.width > maxW && s.length > 1) {
+      s = s.slice(0, -1);
+      t.setText(`${s}…`);
+    }
   }
 
   private setFocus(id: BattleFocusId, sound: boolean): void {

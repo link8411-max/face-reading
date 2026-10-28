@@ -5,16 +5,18 @@ import {
   BATTLE_CONFIRM,
   BATTLE_MENU,
   BATTLE_SWITCH,
+  BATTLE_TALL,
   MENU_BOX,
-  PICK,
-  RECRUIT,
-  RESULT_BTN,
-  RESULT_STAR,
   REWARD_CARD,
   START_CELL,
   START_NEW,
   START_RESUME,
   START_SORTIE,
+  START_TALL,
+  battleCardRect,
+  pickLayout,
+  recruitLayout,
+  resultLayout,
   startCellPos,
 } from '@/game/duel/layout';
 
@@ -42,13 +44,28 @@ export function resolveStarterUnlock(me: string | null, roster: string[]): strin
   return roster.includes(me) ? roster : [...roster, me];
 }
 
+export interface OverlayOpts {
+  /** 세로형(320×408) 배치 */
+  tall?: boolean;
+  /** 결과 열전 쪽 수(2 이상이면 본문 창이 쪽 넘김 단추) */
+  pages?: number;
+}
+
 /**
- * 320×240 설계 좌표의 투명 버튼 자리. 라벨은 기본값이고 화면이 실제 이름으로 바꿔 단다.
+ * 설계 좌표(가로형 320×240, 세로형 320×408)의 투명 버튼 자리. 라벨은 기본값이고 화면이 실제 이름으로 바꿔 단다.
  * n: 시작 화면 장수 수·고르기 줄 수, resume: 시작 화면에 이어하기 칸이 있는지
  */
-export function overlayLayout(scene: OverlayScene, n = 0, resume = false): OverlaySlot[] {
+export function overlayLayout(scene: OverlayScene, n = 0, resume = false, opts: OverlayOpts = {}): OverlaySlot[] {
+  const tall = !!opts.tall;
   switch (scene) {
     case 'battle':
+      if (tall) {
+        return [
+          ...[0, 1, 2, 3].map((i) => ({ id: `skill${i}`, label: `기술 ${i + 1}`, ...battleCardRect(i) })),
+          { id: 'switch', label: '장수 교체', ...BATTLE_TALL.switch },
+          { id: 'confirm', label: '결정', ...BATTLE_TALL.dialog },
+        ];
+      }
       return [
         ...[0, 1, 2, 3].map((i) => ({
           id: `skill${i}`,
@@ -71,34 +88,39 @@ export function overlayLayout(scene: OverlayScene, n = 0, resume = false): Overl
         w: REWARD_CARD.w,
         h: REWARD_CARD.h,
       }));
-    case 'pick':
+    case 'pick': {
+      const P = pickLayout(tall);
       return Array.from({ length: n }, (_, i) => ({
         id: `opt${i}`,
         label: `선택 ${i + 1}`,
-        x: PICK.rowX,
-        y: PICK.rowY0 + i * PICK.rowStep,
-        w: PICK.rowW,
-        h: PICK.rowH,
+        x: P.rowX,
+        y: P.rowY0 + i * P.rowStep,
+        w: P.rowW,
+        h: P.rowH,
       }));
-    case 'result':
+    }
+    case 'result': {
+      const L = resultLayout(tall);
       return [
         ...(['share', 'retry', 'samguk'] as const).map((id, i) => ({
           id,
           label: ['공유하기', '다시 출진', '내 얼굴은 어떤 장수?'][i],
-          x: RESULT_BTN.x0 + i * RESULT_BTN.step,
-          y: RESULT_BTN.y,
-          w: RESULT_BTN.w,
-          h: RESULT_BTN.h,
+          x: L.btn.x0 + i * L.btn.step,
+          y: L.btn.y,
+          w: L.btn.w,
+          h: L.btn.h,
         })),
         ...[1, 2, 3, 4, 5].map((s) => ({
           id: `star${s}`,
           label: `별 ${s}개`,
-          x: RESULT_STAR.x0 + (s - 1) * RESULT_STAR.step,
-          y: RESULT_STAR.y,
-          w: RESULT_STAR.w,
-          h: RESULT_STAR.h,
+          x: L.star.x0 + (s - 1) * L.star.step,
+          y: L.star.y,
+          w: L.star.w,
+          h: L.star.h,
         })),
+        ...((opts.pages ?? 1) > 1 ? [{ id: 'page', label: '열전 다음 쪽', ...L.body }] : []),
       ];
+    }
     case 'start':
       return [
         ...Array.from({ length: n }, (_, i) => ({
@@ -110,20 +132,22 @@ export function overlayLayout(scene: OverlayScene, n = 0, resume = false): Overl
         })),
         ...(resume
           ? [
-              { id: 'resume', label: '이어서 출진', ...START_RESUME },
-              { id: 'sortie', label: '새로 출진', ...START_NEW },
+              { id: 'resume', label: '이어서 출진', ...(tall ? START_TALL.resume : START_RESUME) },
+              { id: 'sortie', label: '새로 출진', ...(tall ? START_TALL.fresh : START_NEW) },
             ]
-          : [{ id: 'sortie', label: '출진', ...START_SORTIE }]),
+          : [{ id: 'sortie', label: '출진', ...(tall ? START_TALL.sortie : START_SORTIE) }]),
       ];
-    case 'recruit':
+    case 'recruit': {
+      const R = recruitLayout(tall);
       return Array.from({ length: n }, (_, i) => ({
         id: `opt${i}`,
         label: `선택 ${i + 1}`,
-        x: RECRUIT.rowX,
-        y: RECRUIT.rowY0 + i * RECRUIT.rowStep,
-        w: RECRUIT.rowW,
-        h: RECRUIT.rowH,
+        x: R.rowX,
+        y: R.rowY0 + i * R.rowStep,
+        w: R.rowW,
+        h: R.rowH,
       }));
+    }
   }
 }
 

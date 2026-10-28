@@ -4,7 +4,7 @@
 // 대상 고르기(보검을 누구에게)는 카드 위에 작은 창.
 import * as Phaser from 'phaser';
 import { MUTED, PALETTE as S, hex } from './config';
-import { PICK, RECRUIT, REWARD_CARD, pickWindowH } from './layout';
+import { REWARD_CARD, pickLayout, pickWindowH, recruitLayout } from './layout';
 import { PanelScene } from './PanelScene';
 import { playSfx } from './sfx';
 import { portraitKeyFor } from './textures';
@@ -193,9 +193,9 @@ export class RewardScene extends PanelScene {
   // ── 항복 창 ──
 
   private drawRecruit(r: RecruitView, p?: PickView): void {
-    this.add.rectangle(0, 0, 320, 240, hex(S.navy), 0.7).setOrigin(0).setDepth(1);
+    this.add.rectangle(0, 0, 320, this.H, hex(S.navy), 0.7).setOrigin(0).setDepth(1);
     const g = this.add.graphics().setDepth(2);
-    const R = RECRUIT;
+    const R = recruitLayout(this.tall);
     box(g, R.x, R.y, R.w, R.h, S.cream);
     this.t(R.x + 10, R.y + 6, r.title, { ko: 11, bold: true, color: S.red }).setDepth(3);
 
@@ -231,35 +231,30 @@ export class RewardScene extends PanelScene {
     }
     this.fit(this.t(R.portX, R.slotY + R.slotH + 3, r.note, { ko: 9, color: r.full ? S.red : S.ink }).setDepth(3), R.w - 24);
 
-    p?.options.forEach((o, i) => {
-      const y = R.rowY0 + i * R.rowStep;
-      const on = this.focus === `opt${i}`;
-      g.fillStyle(hex(on ? S.cream2 : S.cream), 1);
-      g.fillRect(R.rowX, y, R.rowW, R.rowH);
-      g.fillStyle(hex(S.gold2), 1);
-      g.fillRect(R.rowX, y + R.rowH, R.rowW, 1);
-      if (on) cursor(g, R.rowX + 3, y + 6);
-      this.t(R.rowX + 10, y + 4, o.label, { ko: 9, color: on ? S.red : S.ink }).setDepth(3);
-      if (o.sub) this.t(R.rowX + R.rowW - 4, y + 4, o.sub, { ko: 9, color: MUTED }).setOrigin(1, 0).setDepth(3);
-    });
+    p?.options.forEach((o, i) => this.row(g, R.rowX, R.rowY0 + i * R.rowStep, R.rowW, R.rowH, R.rowStep, o, this.focus === `opt${i}`));
   }
 
   private drawPick(p: PickView): void {
-    this.add.rectangle(0, 0, 320, 240, hex(S.navy), 0.6).setOrigin(0).setDepth(1);
+    this.add.rectangle(0, 0, 320, this.H, hex(S.navy), 0.6).setOrigin(0).setDepth(1);
     const g = this.add.graphics().setDepth(2);
-    box(g, PICK.x, PICK.y, PICK.w, pickWindowH(p.options.length), S.cream);
-    this.fit(this.t(PICK.x + 8, PICK.y + 6, p.title, { ko: 9, color: S.red }).setDepth(3), PICK.w - 16);
-    p.options.forEach((o, i) => {
-      const y = PICK.rowY0 + i * PICK.rowStep;
-      const on = this.focus === `opt${i}`;
-      g.fillStyle(hex(on ? S.cream2 : S.cream), 1);
-      g.fillRect(PICK.rowX, y, PICK.rowW, PICK.rowH);
-      g.fillStyle(hex(S.gold2), 1);
-      g.fillRect(PICK.rowX, y + PICK.rowH, PICK.rowW, 1);
-      if (on) cursor(g, PICK.rowX + 3, y + 7);
-      const col = o.disabled ? MUTED : on ? S.red : S.ink;
-      this.t(PICK.rowX + 10, y + 5, o.label, { ko: 9, color: col }).setDepth(3);
-      if (o.sub) this.t(PICK.rowX + PICK.rowW - 4, y + 5, o.sub, { ko: 9, color: MUTED }).setOrigin(1, 0).setDepth(3);
-    });
+    const P = pickLayout(this.tall);
+    box(g, P.x, P.y, P.w, pickWindowH(p.options.length, this.tall), S.cream);
+    this.fit(this.t(P.x + 8, P.y + 6, p.title, { ko: this.tall ? 11 : 9, color: S.red }).setDepth(3), P.w - 16);
+    p.options.forEach((o, i) => this.row(g, P.rowX, P.rowY0 + i * P.rowStep, P.rowW, P.rowH, P.rowStep, o, this.focus === `opt${i}`));
+  }
+
+  /** 고르기 줄 하나: 바탕(맞닿으면 1px 띄움) + 아래 진금 선 + 글(세로형은 Galmuri11, 가운데 높이) */
+  private row(g: Phaser.GameObjects.Graphics, x: number, y: number, w: number, h: number, step: number, o: PickView['options'][number], on: boolean): void {
+    const fillH = step <= h ? h - 1 : h;
+    g.fillStyle(hex(on ? S.cream2 : S.cream), 1);
+    g.fillRect(x, y, w, fillH);
+    g.fillStyle(hex(S.gold2), 1);
+    g.fillRect(x, y + fillH, w, 1);
+    const ko = this.tall ? 11 : 9;
+    const ty = y + Math.floor((fillH - (this.tall ? 12 : 10)) / 2);
+    if (on) cursor(g, x + 3, ty + 2);
+    const col = o.disabled ? MUTED : on ? S.red : S.ink;
+    this.t(x + 10, ty, o.label, { ko, color: col }).setDepth(3);
+    if (o.sub) this.t(x + w - 4, ty, o.sub, { ko, color: MUTED }).setOrigin(1, 0).setDepth(3);
   }
 }

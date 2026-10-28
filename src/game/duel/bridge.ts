@@ -46,6 +46,8 @@ export interface StartShow {
   selected: string;
   /** 진행 중인 판(있으면 이어하기 칸을 보인다) */
   resume?: { starter: string; name: string; wave: number };
+  /** false면 이 브라우저에 저장할 수 없다(시작 화면에 한 줄 안내) */
+  storageOk?: boolean;
 }
 
 /** 항복 장면: 항복한 장수와 동행 칸 */
@@ -91,6 +93,8 @@ export interface ResultShow {
   clears: number;
   /** 고른 별 수(0 = 아직) */
   stars?: number;
+  /** 열전 본문 쪽(0부터, 끝을 넘으면 처음으로) */
+  page?: number;
 }
 
 export type UiAction =
@@ -118,9 +122,11 @@ export interface DuelEvents {
   'anim:play': { timeline: TimelineItem[]; sides: { player: Side }; view?: BattleView };
   'ui:focus': { id: FocusId };
   /** 전투: 고른 명령을 대사창에 띄운다("▶ 일격\n탭하여 결정"). null이면 대사만 */
-  'battle:prompt': { text: string | null };
+  'battle:prompt': { text: string | null; hint?: boolean };
   /** 장면 바꾸기(게임의 작은 컨트롤러가 받는다) */
   'scene:go': { scene: SceneName };
+  /** 가로형(320×240) ↔ 세로형(320×408) 바꾸기. 게임 크기를 바꾸고 지금 장면을 다시 연다 */
+  'layout:tall': { tall: boolean };
   'start:show': StartShow;
   'reward:show': RewardShow;
   'result:show': ResultShow;
@@ -193,6 +199,8 @@ export class DuelBridge extends Emitter<DuelEvents> {
   shown: { start?: StartShow; reward?: RewardShow; result?: ResultShow } = {};
   /** 마지막으로 요청된 장면(부팅이 끝나면 여기로 간다) */
   wantScene: SceneName = 'start';
+  /** 세로형 배치인지(폰·터치). 장면이 그릴 때 읽는다 */
+  tall = false;
   private debug: DuelDebug = { scene: 'start', animating: false };
 
   override emit<K extends keyof DuelEvents>(name: K, payload: DuelEvents[K]): boolean {
@@ -202,6 +210,8 @@ export class DuelBridge extends Emitter<DuelEvents> {
       const p = payload as DuelEvents['run:update'];
       if (p.view) this.view = p.view;
       this.patchDebug({ phase: p.run?.phase, wave: p.run?.wave });
+    } else if (name === 'layout:tall') {
+      this.tall = (payload as DuelEvents['layout:tall']).tall;
     } else if (name === 'scene:go') {
       this.wantScene = (payload as DuelEvents['scene:go']).scene;
     } else if (name === 'start:show') {

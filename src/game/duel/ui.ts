@@ -1,4 +1,4 @@
-// 캔버스 UI 그리기 헬퍼(와꾸 v5의 box·tag·hp·cursor·fire를 Phaser Graphics/Text로)
+// 캔버스 UI 그리기 헬퍼(와꾸 v5의 box·hp·cursor·fire를 Phaser Graphics/Text로)
 import type * as Phaser from 'phaser';
 import { FONT_KR, FONT_NUM, FONT_NUM_PX, KO_FAMILY, KO_PX, MUTED, PALETTE as S, hex, type KoFont } from './config';
 
@@ -89,14 +89,19 @@ export function text(scene: Phaser.Scene, x: number, y: number, s: string, opt: 
   return t;
 }
 
-/** 표찰(예: 무력 73). 값 글씨를 돌려준다 */
-export function tag(scene: Phaser.Scene, g: G, x: number, y: number, label: string): Phaser.GameObjects.Text {
-  box(g, x, y, 44, 12, S.cream);
-  text(scene, x + 3, y + 1, label, { ko: 9, color: S.red });
-  return text(scene, x + 25, y + 2, '', { num: true });
+/** 별 도트(9×9). 별점 줄에 쓴다 */
+const STAR = ['....#....', '....#....', '...###...', '#########', '.#######.', '..#####..', '..##.##..', '.##...##.', '.#.....#.'];
+
+/** 별 하나를 (cx,cy) 가운데에 정수 배율 k로 그린다. 고른 별은 빨강, 아니면 회색 */
+export function starIcon(g: G, cx: number, cy: number, filled: boolean, k = 1): void {
+  const x0 = Math.round(cx - (9 * k) / 2);
+  const y0 = Math.round(cy - (9 * k) / 2);
+  STAR.forEach((row, y) => {
+    for (let x = 0; x < 9; x++) if (row[x] === '#') px(g, filled ? S.red : MUTED, x0 + x * k, y0 + y * k, k, k);
+  });
 }
 
-/** 유형 한 글자(猛·騎·智) */
-export const KIND_MARK: Record<string, string> = { 맹장: '猛', 기장: '騎', 지장: '智' };
+/** 유형 한 글자(맹장·기장·지장). 한자는 Galmuri에 없어 기준선이 어긋나므로 한글로 */
+export const KIND_MARK: Record<string, string> = { 맹장: '맹', 기장: '기', 지장: '지' };
 
 export { MUTED };
