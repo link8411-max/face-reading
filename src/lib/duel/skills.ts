@@ -41,6 +41,8 @@ function applySkillBalance(): void {
     const s = SKILLS[base.id];
     s.power = o?.power ?? base.power;
     s.uses = o && o.uses !== undefined ? o.uses : base.uses;
+    if (o?.burnTurns !== undefined) s.burnTurns = o.burnTurns;
+    else delete s.burnTurns;
   }
 }
 applySkillBalance();

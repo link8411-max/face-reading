@@ -39,7 +39,7 @@ function skillValue(me: Fighter, foe: Fighter, s: Skill): number {
   const t = threat(foe, me);
   switch (s.effect) {
     case 'burn':
-      if (!foe.status.burn) v += 3 * 0.08 * foe.maxHp;
+      if (!foe.status.burn) v += (s.burnTurns ?? 3) * 0.08 * foe.maxHp;
       break;
     case 'confuse':
       if (!foe.status.confuse) v += 0.5 * t;

@@ -60,7 +60,7 @@ export interface Balance {
 
   // ── 장수·기술 (generals.ts·skills.ts·battle.ts) ──
   /** 기술 id → 위력·횟수 덮어쓰기 (skills.ts 표의 기준값 위에) */
-  skills: Record<string, { power?: number; uses?: number | null }>;
+  skills: Record<string, { power?: number; uses?: number | null; burnTurns?: number }>;
   /** 장수 id → 속도 보정 (generals.ts 기준값 대신) */
   speedAdj: Record<string, number>;
   /** 장수 id → 주는 피해 배율(캐릭터 균형용, 없으면 1). 적으로 나올 때도 같다 */
@@ -90,7 +90,7 @@ export const BALANCE: Balance = {
   // 1~5는 혼자 싸우고 회복이 회복약뿐이라 쓰러지는 합을 넉넉히, 장각(6)은 혼자 맞는 상성 천적(맹장 시작)이라 8/26.
   // prettier-ignore
   waveDesign: [
-    d(4, 21), d(4, 21), d(4, 21), d(5, 18), d(5, 18), d(8, 26), // 1~6 장각
+    d(4, 21), d(4, 21), d(4, 21), d(5, 18), d(5, 18), d(7, 26), // 1~6 장각
     d(5, 13), d(5, 13), d(5, 13), d(5, 13), d(5, 13), d(11, 10), // 7~12 하후돈
     d(6, 11), d(6, 11), d(6, 11), d(6, 11), d(6, 11), d(13, 10), // 13~18 동탁
     d(7, 9), d(7, 9), d(7, 9), d(7, 9), d(7, 9), d(13, 9), // 19~24 황충
@@ -118,9 +118,12 @@ export const BALANCE: Balance = {
   skills: {
     // 숨 고르기 무제한이면 긴 싸움에서 회복만 되풀이하는 교착이 생긴다
     breathe: { uses: 3 },
+    // 주유 적벽 화계: 화상은 maxHp 비율이라 상성을 무시한다. 3턴이면 필살기 3회로 보스 체력 45%라
+    // 상성 천적(24 황충·30 마초, 쓰러뜨리는 합 25~27)도 화상으로 넘었다. 2턴으로(2라운드 보정)
+    zhouyu_ult: { burnTurns: 1 },
   },
   speedAdj: {},
-  generalPower: { zhouyu: 0.7 },
+  generalPower: { zhouyu: 0.6 },
   generalHp: { zhangfei: 1.3, zhaoyun: 1.05, zhouyu: 0.9 },
 };
 

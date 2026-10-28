@@ -246,7 +246,7 @@ export function resolveTurn(
 
     switch (sk.effect) {
       case 'burn':
-        foe.status.burn = BURN_TURNS;
+        foe.status.burn = sk.burnTurns ?? BURN_TURNS;
         log.push({ who: foeSide, kind: 'status', text: `${name(foe)}에게 불이 붙었다!` });
         break;
       case 'confuse':

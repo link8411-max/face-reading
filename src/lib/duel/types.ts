@@ -11,6 +11,8 @@ export interface Skill {
   power: number;
   /** null = 무제한 */
   uses: number | null;
+  /** effect 'burn'의 화상 턴 수 (없으면 3) */
+  burnTurns?: number;
   effect?: SkillEffect;
 }
 
