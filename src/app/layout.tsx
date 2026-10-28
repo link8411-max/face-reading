@@ -142,8 +142,8 @@ export default function RootLayout({
       <body
         className={`${notoSans.variable} ${gowunBatang.variable} ${silkscreen.variable} font-sans antialiased bg-paper text-ink`}
       >
-        {/* 하단 탭바(h-16)에 내용이 가리지 않도록 아래 여백 */}
-        <div className="flex flex-col min-h-screen pb-[calc(4rem+env(safe-area-inset-bottom))]">
+        {/* 하단 탭바(h-16)에 내용이 가리지 않도록 아래 여백. 탭바를 숨기는 일기토 화면은 duel.css가 app-shell 여백을 줄인다 */}
+        <div className="app-shell flex flex-col min-h-screen pb-[calc(4rem+env(safe-area-inset-bottom))]">
           <main className="flex-grow">
             {children}
           </main>

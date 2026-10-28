@@ -61,6 +61,9 @@ export function sortieTap(save: { current?: { phase: string } | null }, armed: b
   return needsAbandonConfirm(save) && !armed ? 'arm' : 'start';
 }
 
+/** 결과 화면 아래 피드백 폼: 세로형(폰)은 처음부터, 가로형은 캔버스 별을 누른 뒤 */
+export const showFeedbackForm = (tall: boolean, stars: number) => tall || stars > 0;
+
 /** 새로 출진 확인 문구 */
 export const abandonWarning = (wave: number) => `진행 중인 판(제${wave}전)이 사라져요`;
 

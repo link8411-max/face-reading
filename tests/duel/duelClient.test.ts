@@ -1,5 +1,7 @@
 import { describe, it, expect } from 'vitest';
-import { abandonWarning, hitRects, needsAbandonConfirm, overlayLayout, resolveStarterUnlock, sortieTap, type Rect } from '@/components/duel/clientLogic';
+import { readFileSync } from 'node:fs';
+import { join } from 'node:path';
+import { abandonWarning, hitRects, needsAbandonConfirm, overlayLayout, resolveStarterUnlock, showFeedbackForm, sortieTap, type Rect } from '@/components/duel/clientLogic';
 import { DIALOG_BOX, FIELD_BOX, MENU_BOX, RESULT_TALL, RESULT_WIDE } from '@/game/duel/layout';
 import { GAME_H_TALL } from '@/game/duel/config';
 
@@ -55,6 +57,18 @@ describe('needsAbandonConfirm (새로 출진 전에 한 번 더 묻기)', () => 
     // 판이 없으면 한 번에 출진
     expect(sortieTap({ current: null }, false)).toBe('start');
     expect(sortieTap({ current: { phase: 'lost' } }, false)).toBe('start');
+  });
+  it('피드백 폼: 세로형(폰)은 별을 누르기 전에도 보이고, 가로형은 별을 누른 뒤', () => {
+    expect(showFeedbackForm(true, 0)).toBe(true);
+    expect(showFeedbackForm(true, 4)).toBe(true);
+    expect(showFeedbackForm(false, 0)).toBe(false);
+    expect(showFeedbackForm(false, 3)).toBe(true);
+  });
+  it('탭바를 숨기는 일기토 화면만 루트 아래 여백을 줄인다(app-shell + .duel-cloth)', () => {
+    const layout = readFileSync(join(__dirname, '../../src/app/layout.tsx'), 'utf8');
+    expect(layout).toMatch(/className="app-shell [^"]*pb-\[calc\(4rem\+env\(safe-area-inset-bottom\)\)\]/);
+    const css = readFileSync(join(__dirname, '../../src/components/duel/duel.css'), 'utf8');
+    expect(css).toMatch(/\.app-shell:has\(\.duel-cloth\)\s*\{\s*padding-bottom: env\(safe-area-inset-bottom\);/);
   });
   it('경고 문구에 그 판의 싸움 번호', () => {
     expect(abandonWarning(7)).toBe('진행 중인 판(제7전)이 사라져요');

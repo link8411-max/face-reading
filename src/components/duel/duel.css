@@ -31,6 +31,12 @@
   font-display: block;
 }
 
+/* 일기토 게임 화면은 하단 탭바를 숨긴다(BottomTabBar HIDE_ON) → 탭바 자리 여백(4rem)을 빼 바닥글 아래 빈 띠가 없게.
+   게임 천(.duel-cloth)이 있는 페이지에서만 맞는다(다른 페이지는 그대로) */
+.app-shell:has(.duel-cloth) {
+  padding-bottom: env(safe-area-inset-bottom);
+}
+
 /* 일기토 게임 영역 바탕: 캔버스 천과 같은 녹색 체커 디더. --px는 캔버스 CSS 배율(DuelClient가 정한다) */
 .duel-cloth {
   background-color: var(--color-cloth);

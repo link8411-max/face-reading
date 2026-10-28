@@ -22,7 +22,7 @@ import { useResultShare } from "@/hooks/useResultShare";
 import CoupangBanner from "@/components/CoupangBanner";
 import FeedbackForm from "./FeedbackForm";
 import OverlayButtons, { type OverlayButton } from "./OverlayButtons";
-import { abandonWarning, needsAbandonConfirm, overlayLayout, resolveStarterUnlock, sortieTap, stageLayout } from "./clientLogic";
+import { abandonWarning, needsAbandonConfirm, overlayLayout, resolveStarterUnlock, showFeedbackForm, sortieTap, stageLayout } from "./clientLogic";
 import { GAME_H, GAME_W } from "@/game/duel/config";
 import { resultLayout } from "@/game/duel/layout";
 import { bodyPages } from "@/game/duel/wrap";
@@ -692,7 +692,8 @@ export default function DuelClient() {
         <div className="mt-4 mx-auto px-4 max-w-lg flex flex-col gap-3">
           {notice && <p role="status" className="text-xs text-center text-paper">{notice}</p>}
           {busy && <p role="status" className="text-xs text-center text-paper">공유 준비 중…</p>}
-          {stars > 0 && (
+          {/* 폰(세로형)은 캔버스 별이 작아 처음부터 폼을 보인다. 넓은 화면은 캔버스 별을 누르면 나타난다 */}
+          {showFeedbackForm(tall, stars) && (
             // 판마다 한 번: 키는 판(선두·싸움 수·클리어·행군 기록 수), 별점은 캔버스와 폼이 같은 값을 쓴다
             <FeedbackForm
               key={`${record.starter}.${record.waves.length}.${record.cleared ? "c" : "l"}.${save.history.length}`}
