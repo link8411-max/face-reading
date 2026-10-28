@@ -2170,7 +2170,7 @@ export const allSamgukCharacters: SamgukCharacter[] = [
 
 // 초상화가 아직 없는 장수: 데이터는 두되 결과·공유 링크·우리 팀에는 나오지 않게 뺀다.
 // 그림을 public/images/samguk/<이름>.jpg로 넣으면 여기서 지우고, scripts/measure-portraits.mjs와 calibrate-samguk.ts를 다시 돌린다.
-export const PENDING_PORTRAIT_IDS = new Set([
+export const PENDING_PORTRAIT_IDS = new Set<string>([
 ])
 
 export const samgukCharacters: SamgukCharacter[] = allSamgukCharacters.filter((c) => !PENDING_PORTRAIT_IDS.has(c.id));
