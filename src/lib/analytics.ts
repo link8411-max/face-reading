@@ -8,6 +8,8 @@ export type ShareMethod = 'save_image' | 'share' | 'link' | 'kakao'
 type Events = {
   test_start: { test_name: TestName }
   photo_selected: { test_name: TestName }
+  // 사진 분석 실패 모니터링. result_id는 이유 키(noface·frontal·read·tool)만, 사진·수치는 보내지 않는다
+  photo_fail: { test_name: TestName; result_id: string }
   result_view: { test_name: TestName; result_id?: string }
   share_click: { test_name: TestName; method: ShareMethod }
   fortune_submit: { test_name: TestName }

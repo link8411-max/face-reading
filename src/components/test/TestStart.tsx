@@ -1,7 +1,7 @@
 "use client";
 
 import type { ChangeEvent, RefObject } from "react";
-import { useRef } from "react";
+import { useEffect, useRef } from "react";
 import { Icon, SmileFace } from "@/components/icons";
 import GenderPills, { type Gender } from "@/components/test/GenderPills";
 
@@ -11,6 +11,19 @@ export function analyzeButtonLabel(s: { hasImage: boolean; gender: Gender | null
   if (s.preparing) return "분석 준비 중…";
   if (s.loading) return "분석 중…";
   return s.label;
+}
+
+// 실패 안내. 분석할 때마다 error가 null → 문구로 바뀌어 다시 붙으므로, 같은 이유로 또 실패해도 흔들리며 눈에 들어오게 한다
+function ErrorNote({ text }: { text: string }) {
+  const ref = useRef<HTMLParagraphElement>(null);
+  useEffect(() => {
+    ref.current?.scrollIntoView({ block: "nearest", behavior: "smooth" });
+  }, [text]);
+  return (
+    <p ref={ref} role="alert" className="mt-4 rounded-[18px] bg-white border border-accent/40 text-accent text-sm p-3 text-center animate-shake-x">
+      {text}
+    </p>
+  );
 }
 
 // 사진 테스트 공통 시작 화면 (디자인 시안 TestStart): 성별 → 사진 → 안내 → 분석 버튼
@@ -79,7 +92,7 @@ export default function TestStart({
         )}
       </div>
 
-      {error && <p role="alert" className="mt-4 rounded-[18px] bg-white border border-accent/40 text-accent text-sm p-3 text-center">{error}</p>}
+      {error && <ErrorNote text={error} />}
 
       <div className="mt-7 flex items-center gap-2.5 bg-white rounded-[18px] px-3.5 py-3">
         <Icon name="shield" size={20} className="text-accent flex-none" />

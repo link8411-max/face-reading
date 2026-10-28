@@ -21,7 +21,7 @@ import { SamgukCharacter } from "@/lib/samgukDB";
 import { useScreenshot } from "@/hooks/useScreenshot";
 import { matchCharacter } from "@/lib/samguk/matcher";
 import calibration from "@/lib/samguk/calibration.json";
-import { analyzePhoto, REASON_TEXT } from "@/lib/face/analyzePhoto";
+import { analyzePhoto, failText, holdAtLeast, REASON_TEXT } from "@/lib/face/analyzePhoto";
 
 interface AnalysisResult {
   name: string;
@@ -112,11 +112,14 @@ export default function SamgukPage() {
     setLoading(true);
     track("test_start", { test_name: "samguk" });
     setError(null);
+    const t0 = Date.now();
     try {
       // 브라우저 안에서 얼굴 분석 (사진은 서버로 보내지 않음)
       const r = await analyzePhoto(image, gender);
       if (!r.ok) {
-        setError(REASON_TEXT[r.reason]);
+        track("photo_fail", { test_name: "samguk", result_id: r.reason });
+        await holdAtLeast(t0);
+        setError(failText(r));
         return;
       }
       const matched = matchCharacter(r.z, gender, calibration.bias);
@@ -125,7 +128,8 @@ export default function SamgukPage() {
       // 결과가 나오면 페이지 상단으로 스크롤하여 결과를 바로 볼 수 있게 함
       window.scrollTo({ top: 0, behavior: "smooth" });
     } catch {
-      setError("사진을 읽지 못했어요. JPG나 PNG 사진으로 다시 올려 주세요.");
+      track("photo_fail", { test_name: "samguk", result_id: "read" });
+      setError(REASON_TEXT.read);
     } finally {
       setLoading(false);
     }

@@ -11,7 +11,7 @@ import PhotoSlot from "@/components/faceMatch/PhotoSlot";
 import { loadGender, saveGender } from "@/lib/genderMemory";
 import { useScreenshot } from "@/hooks/useScreenshot";
 import { useResultShare } from "@/hooks/useResultShare";
-import { analyzePhoto, REASON_TEXT } from "@/lib/face/analyzePhoto";
+import { analyzePhoto, failText } from "@/lib/face/analyzePhoto";
 import { matchAnimal, ANIMAL_KEYS, type AnimalKey } from "@/lib/animal/matcher";
 import animalCalibration from "@/lib/animal/calibration.json";
 import { faceMatch, REL, REL_NAME, type Rel } from "@/lib/faceMatch/compat";
@@ -77,7 +77,8 @@ export default function FaceMatchClient({ invite }: { invite?: { key: AnimalKey;
     const run = async (s: Slot): Promise<Slot> => {
       if (!needs(s)) return s;
       const r = await analyzePhoto(s.image!, s.gender!);
-      return r.ok ? { ...s, animal: matchAnimal(r.z, animalCalibration.bias).type, error: null } : { ...s, error: REASON_TEXT[r.reason] };
+      if (!r.ok) track("photo_fail", { test_name: "face_match", result_id: r.reason });
+      return r.ok ? { ...s, animal: matchAnimal(r.z, animalCalibration.bias).type, error: null } : { ...s, error: failText(r) };
     };
     const [m, o] = [await run(me), await run(other)];
     setMe(m);

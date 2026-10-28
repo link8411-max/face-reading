@@ -11,7 +11,7 @@ import Link from "next/link";
 import { useScreenshot } from "@/hooks/useScreenshot";
 import { matchAnimal, type AnimalTypeResult } from "@/lib/animal/matcher";
 import animalCalibration from "@/lib/animal/calibration.json";
-import { analyzePhoto, REASON_TEXT } from "@/lib/face/analyzePhoto";
+import { analyzePhoto, failText, holdAtLeast, REASON_TEXT } from "@/lib/face/analyzePhoto";
 import { animalTypeDB } from "@/lib/animalTypeDB";
 import ResultCard, { type ResultCardProps } from "@/components/result/ResultCard";
 import ResultActions from "@/components/result/ResultActions";
@@ -80,10 +80,13 @@ export default function AnimalTypePage() {
     setLoading(true);
     track("test_start", { test_name: "animal" });
     setError(null);
+    const t0 = Date.now();
     try {
       const r = await analyzePhoto(image, gender);
       if (!r.ok) {
-        setError(REASON_TEXT[r.reason]);
+        track("photo_fail", { test_name: "animal", result_id: r.reason });
+        await holdAtLeast(t0);
+        setError(failText(r));
         return;
       }
       const matched = matchAnimal(r.z, animalCalibration.bias);
@@ -91,7 +94,8 @@ export default function AnimalTypePage() {
       track("result_view", { test_name: "animal", result_id: matched.type });
     } catch (err) {
       console.error("Analysis error:", err);
-      setError("사진을 읽지 못했어요. JPG나 PNG 사진으로 다시 올려 주세요.");
+      track("photo_fail", { test_name: "animal", result_id: "read" });
+      setError(REASON_TEXT.read);
     } finally {
       setLoading(false);
     }

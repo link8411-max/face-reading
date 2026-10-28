@@ -170,7 +170,8 @@ public/
 
 ## 방문 통계 (GA4)
 - 측정 ID `G-L99JPMPT9D` (`src/lib/analytics.ts`), `layout.tsx`의 `ga4-init` 스크립트. 운영 주소(unse-ai.com, `PROD_HOST_SOURCE`)가 아니면(로컬·Vercel 미리보기) gtag.js를 받지 않고 config도 안 해서 실제 통계에 안 섞인다(E2E는 `dataLayer`로 검사).
-- 이벤트는 `track()`만 쓴다: `photo_selected`, `test_start`, `result_view(result_id)`, `share_click(method: link·save_image·share)`, `fortune_submit`, `shared_landing`. GA 준비 전 이벤트는 잠시 모았다가 보낸다. / `test_name`: face·animal·samguk·fortune·daily·mbti_match
+- 이벤트는 `track()`만 쓴다: `photo_selected`, `test_start`, `photo_fail(result_id: noface·frontal·read·tool)`, `result_view(result_id)`, `share_click(method: link·save_image·share)`, `fortune_submit`, `shared_landing`.
+- **사진 분석 실패 모니터링**: GA 탐색에서 `photo_fail` 이벤트를 `result_id`(이유) × 브라우저·OS로 본다. `test_start` 대비 `result_view` 사용자 수가 특정 브라우저에서만 떨어지면 그 환경의 문제. 실패 문구는 `lib/face/analyzePhoto.ts` `failText`(고개 돌림은 방향·정도 숫자까지). GA 준비 전 이벤트는 잠시 모았다가 보낸다. / `test_name`: face·animal·samguk·fortune·daily·mbti_match
 - **사진·생년월일·얼굴 수치는 보내지 않는다.** `track()`은 허용 키(test_name, result_id, method)와 유형 키 형식(한글·영문·숫자 24자 이내, 숫자 4자리 연속 금지)만 통과시킨다. 결과는 유형 키만(fox, caocao, 재물상, 띠, INFP_ENTJ).
 - 일기토 퍼널(값은 `result_id`에 인코딩, 키 추가 없음): `duel_wave`(보스 웨이브 도달, `w06`~`w36`), `duel_end`(`<시작장수>_<c|l>_<마지막으로 넘은 보스>` 예 `guanyu_l_w18`), `duel_resume`, `duel_abandon`.
 - 일기토 판 요약은 GA와 별도로 `/api/duel/run` -> Supabase `duel_runs`(`docs/duel-runs.sql`)에 판마다 1회 저장. 시작 장수·도달 웨이브·결과·보상 id·기기 종류·시간 구간만, IP·runId는 저장하지 않는다. 리포트는 `scripts/duel-real-stats.ts`.

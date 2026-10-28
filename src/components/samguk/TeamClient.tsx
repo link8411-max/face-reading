@@ -10,7 +10,7 @@ import ResultActions from "@/components/result/ResultActions";
 import TeamCard from "@/components/samguk/TeamCard";
 import { useScreenshot } from "@/hooks/useScreenshot";
 import { useResultShare } from "@/hooks/useResultShare";
-import { analyzePhoto, REASON_TEXT } from "@/lib/face/analyzePhoto";
+import { analyzePhoto, failText } from "@/lib/face/analyzePhoto";
 import { matchCharacter } from "@/lib/samguk/matcher";
 import calibration from "@/lib/samguk/calibration.json";
 import { buildTeam } from "@/lib/samguk/team";
@@ -53,7 +53,8 @@ export default function TeamClient() {
     for (const s of slots) {
       if (s.character || !s.image || !s.gender) { next.push(s); continue; }
       const r = await analyzePhoto(s.image, s.gender);
-      next.push(r.ok ? { ...s, character: matchCharacter(r.z, s.gender, calibration.bias).character, error: null } : { ...s, error: REASON_TEXT[r.reason] });
+      if (!r.ok) track("photo_fail", { test_name: "team_samguk", result_id: r.reason });
+      next.push(r.ok ? { ...s, character: matchCharacter(r.z, s.gender, calibration.bias).character, error: null } : { ...s, error: failText(r) });
     }
     setSlots(next);
     setBusy(false);
