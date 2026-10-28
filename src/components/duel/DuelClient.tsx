@@ -22,11 +22,12 @@ import { useResultShare } from "@/hooks/useResultShare";
 import CoupangBanner from "@/components/CoupangBanner";
 import FeedbackForm from "./FeedbackForm";
 import OverlayButtons, { type OverlayButton } from "./OverlayButtons";
-import { abandonWarning, needsAbandonConfirm, overlayLayout, resolveStarterUnlock, showFeedbackForm, sortieTap, stageLayout, tapRow } from "./clientLogic";
+import { abandonWarning, needsAbandonConfirm, overlayLayout, resolveStarterUnlock, showFeedbackForm, sortieTap, stageLayout, tapRow, enterKey } from "./clientLogic";
 import { GAME_H, GAME_W } from "@/game/duel/config";
 import { resultLayout } from "@/game/duel/layout";
 import { bodyPages } from "@/game/duel/wrap";
 import {
+  battleConfirmLabel,
   battlePreview,
   battleRowInfo,
   pendingRecruit,
@@ -571,9 +572,13 @@ export default function DuelClient() {
       selectRow(BATTLE_ROWS[(i + (e.key === "ArrowDown" ? 1 : n - 1)) % n], true);
     } else if (e.key === "Enter" || e.key === " ") {
       e.preventDefault();
-      confirmBattle(battleSel);
+      // 결정 단추에 포커스가 있을 때 커서는 마지막 줄에 남아 있다. 미리보기에 보이는 고른 줄을 실행한다
+      const onConfirm = document.activeElement?.getAttribute("data-duel-btn") === "confirm";
+      const k = enterKey(pendingSel, battleSel, onConfirm);
+      if (k.confirm) confirmBattle(k.confirm);
+      else if (k.select) selectRow(k.select, true);
     }
-  }, [animating, battleSel, booted, confirmBattle, readyScene, screen, selectRow]);
+  }, [animating, battleSel, booted, confirmBattle, pendingSel, readyScene, screen, selectRow]);
 
   // ── 지금 화면의 투명 버튼 ──
   const startShow = useMemo(() => toStartShow(save, selected), [save, selected]);
@@ -595,12 +600,12 @@ export default function DuelClient() {
       const choice = battleChoice;
       return overlayLayout("battle", 0, false, { tall }).map((s) => {
         if (s.id === "confirm") {
-          return { ...s, label: choice ? `결정: ${choice.label}` : "먼저 메뉴에서 명령을 고르세요", disabled: !choice?.action };
+          return { ...s, label: run && choice ? battleConfirmLabel(run, pendingSel) : "먼저 메뉴에서 명령을 고르세요", disabled: !choice?.action };
         }
         const row = rowInfo(s.id as BattleFocusId);
         // 동행이 없으면 교체는 누를 수 없다(흐리게 + "동행 없음")
         if (s.id === "switch" && !row.action) return { ...s, label: "교체: 동행 없음", disabled: true };
-        const again = pendingSel === s.id ? " (한 번 더 누르면 결정)" : " 고르기";
+        const again = pendingSel === s.id && row.action ? " (한 번 더 누르면 결정)" : " 고르기";
         return { ...s, label: `${row.label}${row.action ? "" : " (쓸 수 없음)"}${again}`, pressed: battleSel === s.id };
       });
     }

@@ -96,7 +96,7 @@ export function toBattleView(run: RunState): BattleView | null {
   const message = events.length
     ? messageLines(events.map((e) => e.text))
     : messageLines([
-        `제${run.wave}전, ${enemyBase.name} 등장!`,
+        `제${run.wave}전 ${enemyBase.name} 등장`,
         `${enemyBase.name} 다음 ${intent.name}`,
         run.wave === 1 && b.turn === 1 ? '상성 맹>기>지>맹' : `${player.name}, 무엇을 할까?`,
       ]);
@@ -140,7 +140,10 @@ export function battlePreview(run: RunState, id: BattleFocusId, hint: boolean): 
     // 적 기술이 들어올 장수에게 유리하면 그 장수에겐 불리
     const word = EFF_WORD[({ win: 'lose', lose: 'win', even: 'even' } as const)[effOf(enemySkill.kind, getDuelGeneral(incoming.id)!.kind)]];
     const line = `${enemySkill.name}에 ${word}`;
-    return [`▶교체 ${nameOf(incoming.id)}`, wrapText(line, MSG_CHARS)[0], ...tail];
+    // 들어올 장수가 맞을 피해(최대). 한 줄에 안 들어가면 숫자를 버린다
+    const hit = enemySkill.power > 0 ? damageRange(b.enemy, incoming, enemySkill).max : 0;
+    const withDmg = hit > 0 ? `${line} ~${hit}` : line;
+    return [`▶교체 ${nameOf(incoming.id)}`, withDmg.length <= MSG_CHARS ? withDmg : wrapText(line, MSG_CHARS)[0], ...tail];
   }
   const chosen = skillsOf(lead)[Number(id.slice(5))];
   if (!chosen) return [];
@@ -152,12 +155,13 @@ export function battlePreview(run: RunState, id: BattleFocusId, hint: boolean): 
   if (sk.power > 0) {
     const r = damageRange(lead, b.enemy, sk);
     const word = EFF_WORD[effOf(sk.kind, getDuelGeneral(b.enemy.id)!.kind)];
-    const body = planned !== chosen ? `도발 중 ${word} ${r.min}~${r.max}` : `${word} 예상 ${r.min}~${r.max}`;
+    const body = planned !== chosen ? `도발 ${word} ${r.min}~${r.max}` : `${word} 예상 ${r.min}~${r.max}`;
     return [head, body, ...tail];
   }
   if (sk.effect === 'guard') {
-    const dmg = SKILLS[intent.skillId].power > 0 ? damageRange(b.enemy, lead, SKILLS[intent.skillId]) : null;
-    return [head, dmg ? `피해 절반 ~${Math.max(1, Math.round(dmg.max * 0.5))}` : skillDesc(planned).long, ...tail];
+    // 방어 태세를 쓴 모습으로 계산해 반올림이 두 번 겹치지 않게 한다
+    const dmg = SKILLS[intent.skillId].power > 0 ? damageRange(b.enemy, { ...lead, status: { ...lead.status, guard: true } }, SKILLS[intent.skillId]).max : null;
+    return [head, dmg ? `피해 절반 ~${dmg}` : skillDesc(planned).long, ...tail];
   }
   return [head, skillDesc(planned).long, ...tail];
 }
@@ -175,8 +179,16 @@ export function battleRowInfo(run: RunState, id: BattleFocusId): { label: string
   const sk = view?.player.skills[Number(id.slice(5))];
   if (!sk) return { label: '', action: null };
   const uses = sk.usesLeft === null ? '무제한' : `남은 ${sk.usesLeft}회`;
-  const body = sk.eff ? `${sk.name} ${EFF_WORD[sk.eff]}` : `${sk.name} ${sk.desc.long}`;
+  const body = sk.eff ? `${sk.name} ${EFF_WORD[sk.eff]}${sk.dmg ? ` 예상 ${sk.dmg.min}~${sk.dmg.max}` : ''}` : `${sk.name} ${sk.desc.long}`;
   return { label: `${body} ${uses}`, action: sk.usesLeft === 0 ? null : { type: 'skill', skillId: sk.id } };
+}
+
+/** 결정 단추의 aria-label: 고른 명령 + 적의 다음 행동. 고른 줄이 없으면 안내 */
+export function battleConfirmLabel(run: RunState, id: BattleFocusId | null): string {
+  const choice = id ? battleRowInfo(run, id) : null;
+  if (!choice) return '먼저 메뉴에서 명령을 고르세요';
+  const intent = toBattleView(run)?.enemy.intent;
+  return `결정: ${choice.label}${intent ? ` / 적 다음 ${intent.name}${intent.dmg ? ` ~${intent.dmg.max}` : ''}` : ''}`;
 }
 
 /** 교체 버튼이 보낼 자리: 지금 장수 다음의 살아 있는 장수, 없으면 null */

@@ -1,10 +1,10 @@
 import { describe, it, expect } from 'vitest';
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
-import { abandonWarning, hitRects, needsAbandonConfirm, overlayLayout, resolveStarterUnlock, showFeedbackForm, sortieTap, tapRow, type Rect } from '@/components/duel/clientLogic';
+import { abandonWarning, enterKey, hitRects, needsAbandonConfirm, overlayLayout, resolveStarterUnlock, showFeedbackForm, sortieTap, tapRow, type Rect } from '@/components/duel/clientLogic';
 import { DIALOG_BOX, FIELD_BOX, MENU_BOX, RESULT_TALL, RESULT_WIDE } from '@/game/duel/layout';
 import { GAME_H_TALL } from '@/game/duel/config';
-import { battleRowInfo } from '@/components/duel/view';
+import { battleConfirmLabel, battleRowInfo } from '@/components/duel/view';
 import { startRun } from '@/lib/duel/run';
 
 const inside = (r: Rect, W = 320, H = 240) => r.x >= 0 && r.y >= 0 && r.x + r.w <= W && r.y + r.h <= H;
@@ -87,6 +87,20 @@ describe('tapRow (고른 줄 pendingSel)', () => {
   })
   it('고른 줄을 다시 누르면 결정', () => {
     expect(tapRow('skill2', 'skill2')).toEqual({ pendingSel: 'skill2', confirm: true })
+  })
+})
+
+describe('enterKey (Enter/Space는 미리보기에 보이는 고른 줄을 실행한다)', () => {
+  it('고른 줄이 없으면 커서 줄을 고르기만 한다', () => {
+    expect(enterKey(null, 'skill1', false)).toEqual({ confirm: null, select: 'skill1' })
+    expect(enterKey(null, 'skill1', true)).toEqual({ confirm: null, select: 'skill1' })
+  })
+  it('고른 줄이 커서와 같으면 결정', () => {
+    expect(enterKey('skill0', 'skill0', false)).toEqual({ confirm: 'skill0', select: null })
+  })
+  it('고른 줄과 커서가 다르면 고르기(결정 단추에 포커스가 있으면 고른 줄을 결정)', () => {
+    expect(enterKey('skill0', 'skill1', false)).toEqual({ confirm: null, select: 'skill1' })
+    expect(enterKey('skill0', 'switch', true)).toEqual({ confirm: 'skill0', select: null })
   })
 })
 
@@ -296,7 +310,7 @@ describe('전투 버튼 aria-label (battleRowInfo)', () => {
     const run = startRun('guanyu', 7);
     const skill0 = battleRowInfo(run, 'skill0');
     const skill2 = battleRowInfo(run, 'skill2');
-    expect(skill0.label).toMatch(/^일격 비등 무제한/); // 공격 기술: `${name} ${effWord} ${uses}`
+    expect(skill0.label).toMatch(/^일격 비등 예상 \d+~\d+ 무제한$/); // 공격 기술: `${name} ${effWord} 예상 min~max ${uses}`
     expect(skill2.label).toMatch(/^방어 태세 이번 턴 피해 절반 무제한/); // 효과 기술: `${name} ${desc.long} ${uses}`
     expect(skill0.action).toEqual({ type: 'skill', skillId: expect.any(String) });
   });
@@ -309,5 +323,13 @@ describe('전투 버튼 aria-label (battleRowInfo)', () => {
     const sw = battleRowInfo(run, 'switch');
     expect(sw.label).toMatch(/^장비로 교체 (유리|불리|비등)$/);
     expect(sw.action).toEqual({ type: 'switch', toIndex: 1 }); // view.switchTo.index와 같은 자리
+  });
+});
+
+describe('결정 단추 aria-label (battleConfirmLabel)', () => {
+  it('고른 명령 + 적의 다음 행동', () => {
+    const run = startRun('guanyu', 7);
+    expect(battleConfirmLabel(run, null)).toBe('먼저 메뉴에서 명령을 고르세요');
+    expect(battleConfirmLabel(run, 'skill0')).toMatch(/^결정: 일격 비등 예상 \d+~\d+ 무제한 \/ 적 다음 일격 ~\d+$/);
   });
 });

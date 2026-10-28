@@ -411,7 +411,8 @@ export class BattleScene extends Phaser.Scene {
   private skillSub(s: BattleView['player']['skills'][number], tall: boolean): string {
     const uses = s.usesLeft === null ? '무제한' : `${s.usesLeft}회`;
     if (s.eff) return tall ? `${EFF_WORD[s.eff]}·${uses}·${s.desc.short}` : `${EFF_WORD[s.eff]}·${uses}`;
-    return tall ? s.desc.long : s.desc.short;
+    const left = s.usesLeft === null ? '' : `·${s.usesLeft}회`;
+    return tall ? `${s.desc.long}${left}` : `${s.desc.short}${left}`;
   }
 
   /** 가로형: 메뉴 상자 안 다섯 줄(Galmuri9) */
