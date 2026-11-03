@@ -2,6 +2,7 @@ import { readFileSync } from 'node:fs'
 import { join } from 'node:path'
 import { SITEMAP_ROUTES, LAST_MODIFIED } from '@/app/sitemap'
 import { PEOPLE_IDS } from '@/content/samgukPeople'
+import { PEOPLE_ID_LIST, hasPerson } from '@/content/samgukPeople/ids'
 
 const read = (p: string) => readFileSync(join(process.cwd(), p), 'utf8')
 
@@ -26,6 +27,11 @@ describe('열전 연결 소스', () => {
     expect(src).toContain('열전 보기')
     expect(src).toContain('내가 닮은 장수 응원하기')
   })
+  it('닮은꼴 결과(클라이언트)는 열전 본문 등록부를 불러오지 않고 id 목록만 쓴다', () => {
+    const src = read('src/app/samguk/(match)/page.tsx')
+    const imports = [...src.matchAll(/from\s+["']([^"']*samgukPeople[^"']*)["']/g)].map((m) => m[1])
+    expect(imports).toEqual(['@/content/samgukPeople/ids'])
+  })
   it('공유 착지에 열전 링크', () => {
     expect(read('src/components/share/SharePage.tsx')).toContain('/samguk/people/')
   })
@@ -36,5 +42,18 @@ describe('열전 연결 소스', () => {
     const nav = read('src/content/navigation.ts')
     expect(nav).toContain("href: '/samguk/people'")
     expect(nav).toContain('삼국지 인물열전')
+  })
+})
+
+describe('열전 id 목록(ids.ts)', () => {
+  it('등록부(index.ts)와 같은 id를 가진다', () => {
+    expect([...PEOPLE_ID_LIST].sort()).toEqual([...PEOPLE_IDS].sort())
+  })
+  it('hasPerson은 own-key만 true', () => {
+    for (const id of PEOPLE_IDS) expect(hasPerson(id)).toBe(true)
+    for (const id of ['', 'constructor', '__proto__', 'toString', 'nobody']) expect(hasPerson(id)).toBe(false)
+  })
+  it('ids.ts는 인물 파일·등록부를 import하지 않는다', () => {
+    expect(read('src/content/samgukPeople/ids.ts')).not.toMatch(/^\s*import\s/m)
   })
 })
