@@ -96,6 +96,17 @@ function isStats(v: unknown): v is PersonStats {
   return typeof o.cheer === 'number' && typeof o.duel === 'object' && typeof o.scene === 'object' && typeof o.verdict === 'object'
 }
 
+/**
+ * 투표 응답의 집계를 현재 인물의 집계에 반영한다. 대결 응답은 duel 만 받아들인다
+ * (서버가 page 기준으로 주지만, 서로 라이벌인 쌍에서 남의 응원·평 숫자가 섞이지 않도록 한 번 더 막는다).
+ * 응답 집계가 null 이면 숫자를 숨긴다.
+ */
+export function mergeVoteStats(kind: VoteKind, prev: PersonStats | null, next: PersonStats | null): PersonStats | null {
+  if (next === null) return null
+  if (kind === 'duel' && prev) return { ...prev, duel: next.duel }
+  return next
+}
+
 async function loadStats(id: string) {
   const e = entryOf(id)
   if (e.inflight || (e.fetchedAt && Date.now() - e.fetchedAt < STALE_MS)) return
@@ -150,7 +161,7 @@ export function usePersonStats(id: string): PersonStatsApi {
         const res = await fetch('/api/people/vote', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ kind, target, option }),
+          body: JSON.stringify({ kind, target, option, page: id }),
         })
         if (res.status === 503) {
           setSnap(id, { stats: null, disabled: true })
@@ -160,7 +171,7 @@ export function usePersonStats(id: string): PersonStatsApi {
         const data = (await res.json()) as { ok?: boolean; counted?: unknown; stats?: unknown }
         if (!data.ok) return null
         // 투표 응답의 집계를 쓴다. 집계 읽기만 실패했으면(null) 숫자를 숨긴다
-        setSnap(id, { stats: isStats(data.stats) ? data.stats : null, disabled: false })
+        setSnap(id, { stats: mergeVoteStats(kind, entryOf(id).snap.stats, isStats(data.stats) ? data.stats : null), disabled: false })
         entryOf(id).fetchedAt = Date.now()
         return { counted: data.counted === true }
       } catch {

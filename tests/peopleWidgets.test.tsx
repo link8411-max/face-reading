@@ -1,5 +1,5 @@
 import { renderToStaticMarkup } from 'react-dom/server'
-import { ratioView, LOW_VOTE_TEXT } from '@/components/people/usePersonStats'
+import { ratioView, LOW_VOTE_TEXT, mergeVoteStats } from '@/components/people/usePersonStats'
 import CheerButton from '@/components/people/CheerButton'
 import VotePoll from '@/components/people/VotePoll'
 import TopVerdictChip from '@/components/people/TopVerdictChip'
@@ -88,4 +88,21 @@ test('개인정보처리방침에 응원·투표 저장 안내', () => {
   const src = readFileSync('src/app/privacy/page.tsx', 'utf8')
   expect(src).toContain('삼국지 인물열전의 응원·투표는 고른 항목과 날짜, 그리고 기기·접속 정보를 되돌릴 수 없게 바꾼 값(해시)만 저장합니다. IP 주소와 쿠키 값 자체는 저장하지 않습니다.')
   expect(src).toContain('개정일자: 2026년 11월 3일')
+})
+
+describe('mergeVoteStats: 대결 응답은 duel 만 현재 인물 집계에 합친다', () => {
+  // 관우 페이지에서 투표했는데 (잘못된 서버가) 조조의 집계를 돌려준 경우
+  const guanyu = { cheer: 100, duel: { guanyu: 4, caocao: 6 }, scene: { a: 1 }, verdict: { loyal: 9 } }
+  const caocaoStats = { cheer: 7, duel: { guanyu: 5, caocao: 6 }, scene: { b: 2 }, verdict: { tragic: 3 } }
+  test('duel: cheer·scene·verdict 는 그대로, duel 만 교체', () => {
+    expect(mergeVoteStats('duel', guanyu, caocaoStats)).toEqual({ ...guanyu, duel: caocaoStats.duel })
+  })
+  test('duel 이고 기존 집계가 없으면 응답을 쓴다', () => {
+    expect(mergeVoteStats('duel', null, caocaoStats)).toBe(caocaoStats)
+  })
+  test('다른 종류는 응답 전체, 응답 stats 가 null 이면 숨김(null)', () => {
+    expect(mergeVoteStats('cheer', guanyu, caocaoStats)).toBe(caocaoStats)
+    expect(mergeVoteStats('duel', guanyu, null)).toBeNull()
+    expect(mergeVoteStats('scene', guanyu, null)).toBeNull()
+  })
 })

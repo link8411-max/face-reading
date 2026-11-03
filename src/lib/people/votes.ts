@@ -59,6 +59,19 @@ async function hmacHex(key: string | ArrayBuffer, data: string): Promise<{ raw: 
   return { raw, hex }
 }
 
+/**
+ * 투표 뒤 보여 줄 집계의 주인공(열전 인물 id).
+ * 대결은 쌍 키만으로는 어느 쪽 페이지인지 알 수 없다(서로를 라이벌로 둔 쌍이 있다). 그래서 `page`가 필수이고,
+ * 그 인물의 라이벌 쌍이 target과 같아야 한다. 그 밖의 종류는 page를 무시하고 target의 집계를 쓴다.
+ * 맞지 않으면 null (요청은 400).
+ */
+export function statsOwner(vote: VoteInput, page: unknown): string | null {
+  if (vote.kind !== 'duel') return vote.target
+  if (typeof page !== 'string') return null
+  const p = getPerson(page)
+  return p !== undefined && pairKey(page, p.rivalId) === vote.target ? page : null
+}
+
 /** HMAC-SHA256(HMAC-SHA256(secret, day), `${deviceId}|${ip}`) hex. 날짜가 바뀌면 같은 사람도 다른 값 */
 export async function voterHash(secret: string, day: string, deviceId: string, ip: string): Promise<string> {
   const daily = await hmacHex(secret, day)

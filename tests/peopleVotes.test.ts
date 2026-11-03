@@ -1,8 +1,8 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
 import { readFileSync } from 'node:fs'
 import { join } from 'node:path'
-import { getPerson } from '@/content/samgukPeople'
-import { pairKey, validateVote, voterHash, kstDay, voteGuard } from '@/lib/people/votes'
+import { getPerson, PEOPLE_IDS } from '@/content/samgukPeople'
+import { pairKey, validateVote, statsOwner, voterHash, kstDay, voteGuard } from '@/lib/people/votes'
 import { readStats, readCheerRanking, storeConfig } from '@/lib/people/store'
 import { POST } from '@/app/api/people/vote/route'
 import { GET } from '@/app/api/people/stats/route'
@@ -54,6 +54,37 @@ describe('validateVote', () => {
   })
   it('객체가 아니면 null', () => {
     for (const b of ['x', null, [], 1, undefined, [cheer]]) expect(validateVote(b)).toBeNull()
+  })
+})
+
+describe('statsOwner (대결 투표 뒤 집계의 주인)', () => {
+  // 서로를 라이벌로 둔 등록 인물 쌍을 데이터에서 찾는다
+  const mutual = PEOPLE_IDS.flatMap((a) => {
+    const b = getPerson(a)!.rivalId
+    return getPerson(b)?.rivalId === a && a < b ? [[a, b]] : []
+  })
+  it('등록 데이터에 서로 라이벌인 쌍이 있다', () => {
+    expect(mutual.length).toBeGreaterThan(0)
+  })
+  it('대결은 page 필수: 쌍의 어느 쪽 페이지든 그 페이지 인물이 주인', () => {
+    for (const [a, b] of mutual) {
+      const vote = { kind: 'duel' as const, target: pairKey(a, b), option: a }
+      expect(statsOwner(vote, a)).toBe(a)
+      expect(statsOwner(vote, b)).toBe(b)
+      expect(statsOwner(vote, undefined)).toBeNull()
+      expect(statsOwner(vote, 7)).toBeNull()
+      expect(statsOwner(vote, 'nobody')).toBeNull()
+      expect(statsOwner(vote, 'constructor')).toBeNull()
+    }
+  })
+  it('page가 그 쌍의 라이벌 관계가 아니면 null', () => {
+    const vote = { kind: 'duel' as const, target: pairKey('guanyu', p.rivalId), option: 'guanyu' }
+    expect(statsOwner(vote, notRival)).toBeNull()
+  })
+  it('다른 종류는 page를 무시하고 target', () => {
+    expect(statsOwner({ kind: 'cheer', target: 'guanyu', option: 'cheer' }, 'caocao')).toBe('guanyu')
+    expect(statsOwner({ kind: 'scene', target: 'guanyu', option: sceneKey }, undefined)).toBe('guanyu')
+    expect(statsOwner({ kind: 'verdict', target: 'guanyu', option: verdict }, 42)).toBe('guanyu')
   })
 })
 
@@ -204,6 +235,43 @@ describe('POST /api/people/vote', () => {
     expect(json.stats).toEqual({ cheer: 7, duel: {}, scene: {}, verdict: { [verdict]: 3 } })
     const rpcCall = f.mock.calls.find((c) => String(c[0]).includes('/rpc/people_stats'))!
     expect(JSON.parse(rpcCall[1].body)).toEqual({ p_id: 'guanyu', p_pair: pairKey('guanyu', p.rivalId) })
+  })
+
+  it('대결 투표: page 인물의 집계를 읽는다 (서로 라이벌인 쌍은 양쪽 페이지가 각자 자기 집계)', async () => {
+    const [a, b] = ['guanyu', p.rivalId]
+    expect(getPerson(b)?.rivalId).toBe(a) // 관우 <-> 조조
+    const target = pairKey(a, b)
+    for (const page of [a, b]) {
+      const f = stubUpstream([{ id: 1 }], [{ kind: 'cheer', option: 'cheer', n: 5 }])
+      voteGuard.reset()
+      const res = await POST(req(JSON.stringify({ kind: 'duel', target, option: a, page })))
+      expect(res.status).toBe(200)
+      const rpcCall = f.mock.calls.find((c) => String(c[0]).includes('/rpc/people_stats'))!
+      const sent = JSON.parse(rpcCall[1].body)
+      expect(sent.p_id).toBe(page)
+      expect(sent.p_pair).toBe(target)
+      // 저장 본문에 page는 들어가지 않는다
+      const row = JSON.parse(f.mock.calls.find((c) => String(c[0]).includes('people_votes'))![1].body)
+      expect(Object.keys(row).sort()).toEqual(['day', 'kind', 'option', 'target', 'voter_hash'])
+    }
+  })
+
+  it('대결 투표: page가 없거나 틀리면 400, 저장·집계 fetch 0회', async () => {
+    const f = stubUpstream()
+    const target = pairKey('guanyu', p.rivalId)
+    for (const extra of [{}, { page: 'nobody' }, { page: notRival }, { page: 7 }, { page: null }]) {
+      const res = await POST(req(JSON.stringify({ kind: 'duel', target, option: 'guanyu', ...extra })))
+      expect(res.status).toBe(400)
+    }
+    expect(f).not.toHaveBeenCalled()
+  })
+
+  it('다른 종류는 page를 무시하고 target 집계', async () => {
+    const f = stubUpstream()
+    const res = await POST(req(JSON.stringify({ kind: 'cheer', target: 'guanyu', option: 'cheer', page: 'bogus' })))
+    expect(res.status).toBe(200)
+    const rpcCall = f.mock.calls.find((c) => String(c[0]).includes('/rpc/people_stats'))!
+    expect(JSON.parse(rpcCall[1].body).p_id).toBe('guanyu')
   })
 
   it('집계 읽기만 실패하면 200 stats:null, 쿠키도 붙는다', async () => {

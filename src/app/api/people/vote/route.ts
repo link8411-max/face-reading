@@ -1,8 +1,7 @@
 import { NextResponse } from 'next/server'
-import { getPerson } from '@/content/samgukPeople'
 import { clientIp, readLimitedBody } from '@/lib/duel/feedbackGuard'
 import { insertVote, readStats, storeConfig } from '@/lib/people/store'
-import { kstDay, pairKey, validateVote, voteGuard, voterHash } from '@/lib/people/votes'
+import { kstDay, statsOwner, validateVote, voteGuard, voterHash } from '@/lib/people/votes'
 
 const COOKIE = 'pv'
 const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i
@@ -34,6 +33,9 @@ export async function POST(request: Request) {
   }
   const vote = validateVote(body)
   if (!vote) return NextResponse.json({ ok: false }, { status: 400 })
+  // 집계를 보여 줄 인물(page). 대결은 page가 필수라 맞지 않으면 저장 전에 400
+  const owner = statsOwner(vote, (body as { page?: unknown }).page)
+  if (!owner) return NextResponse.json({ ok: false }, { status: 400 })
 
   // 설정이 없으면 기록만 꺼진다. 꺼진 상태의 요청은 한도에서 돌려준다.
   const cfg = storeConfig()
@@ -70,16 +72,9 @@ export async function POST(request: Request) {
   // 저장은 됐으니 집계 읽기 실패는 치명적이지 않다(stats: null → 화면은 숫자를 숨긴다)
   let stats = null
   try {
-    stats = await readStats(cfg, vote.kind === 'duel' ? duelOwner(vote.target) : vote.target)
+    stats = await readStats(cfg, owner)
   } catch {
     stats = null
   }
   return respond({ ok: true, counted, stats })
-}
-
-// 대결 투표 뒤 보여 줄 집계의 주인공: 쌍 키의 두 id 중 그 쌍을 라이벌로 가진 열전 인물
-function duelOwner(target: string): string {
-  const [a, b] = target.split('__')
-  const p = getPerson(a)
-  return p && pairKey(a, p.rivalId) === target ? a : b
 }
