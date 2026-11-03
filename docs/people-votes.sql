@@ -2,8 +2,9 @@
 -- voter_hash(날마다 바뀌는 비밀 값으로 섞은 해시)만 저장한다.
 create table if not exists people_votes (
   id bigserial primary key,
-  kind text not null check (kind in ('cheer', 'duel', 'scene', 'verdict')),
+  kind text not null check (kind in ('cheer', 'duel', 'scene', 'verdict', 'cup_match', 'cup_win')),
   -- cheer·scene·verdict: 인물 id / duel: 두 id를 정렬해 이은 `a__b`
+  -- cup_match: 두 id 쌍(판 무관) / cup_win: 판 키 (삼국지 장수 월드컵, 미리 허용만 해 둠)
   target text not null,
   -- cheer: 'cheer' / duel: 둘 중 고른 인물 id / scene·verdict: 선택지 key
   option text not null,
