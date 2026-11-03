@@ -38,12 +38,12 @@ export const person: PersonEntry = {
     { name: '목문 전투', year: 231, role: '물러나는 촉군을 쫓다 목문에서 화살을 맞고 전사함', source: '정사' },
   ],
   relations: [
-    { id: 'yuanshao', type: '군신', note: '장합은 원소의 장수였으나 관도에서 의견이 거절되자 조조에게 항복했다.', source: '정사' },
-    { id: 'caocao', type: '군신', note: '항복한 장합을 조조가 한신에 빗대며 반겼다.', source: '정사' },
-    { id: 'simayi', type: '동료', note: '231년 제갈량의 북벌을 장합과 사마의가 함께 막았다. 추격을 두고 둘의 의견이 갈렸다는 이야기가 전한다.', source: '정사' },
-    { id: 'zhangfei', type: '라이벌', note: '와구에서 장비와 맞섰고, 져서 물러났다.', source: '정사' },
-    { id: 'zhugeliang', type: '라이벌', note: '북벌을 막는 위군의 장수로 맞섰고, 물러나는 제갈량군을 쫓다 전사했다.', source: '정사' },
-    { id: 'masu', type: '라이벌', note: '가정에서 장합이 마속의 군대를 무찔렀다.', source: '정사' },
+    { id: 'yuanshao', type: '군신', note: '장합은 원소의 장수였으나 관도에서 의견이 거절되자 조조에게 항복했어요.', source: '정사' },
+    { id: 'caocao', type: '군신', note: '항복한 장합을 조조가 한신에 빗대며 반겼어요.', source: '정사' },
+    { id: 'simayi', type: '동료', note: '231년 제갈량의 북벌을 장합과 사마의가 함께 막았어요. 추격을 두고 둘의 의견이 갈렸다는 이야기가 전해요.', source: '정사' },
+    { id: 'zhangfei', type: '라이벌', note: '와구에서 장비와 맞섰고, 져서 물러났어요.', source: '정사' },
+    { id: 'zhugeliang', type: '라이벌', note: '북벌을 막는 위군의 장수로 맞섰고, 물러나는 제갈량군을 쫓다 전사했어요.', source: '정사' },
+    { id: 'masu', type: '라이벌', note: '가정에서 장합이 마속의 군대를 무찔렀어요.', source: '정사' },
   ],
   novelVsHistory: [
     '연의에서는 장합이 공을 세우려 추격을 자청하고 사마의가 말리는 쪽이에요. 정사에 덧붙은 옛 기록은 거꾸로, 장합이 "돌아가는 군대는 쫓지 않는 법"이라며 반대했는데 사마의가 추격을 밀어붙였다고 적어요.',

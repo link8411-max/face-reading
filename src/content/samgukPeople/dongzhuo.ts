@@ -55,7 +55,7 @@ export const person: PersonEntry = {
     '연의의 호뢰관에서 유비 삼형제가 여포와 싸우는 장면은 정사에 없어요.',
     '동탁이 초선을 두고 여포와 갈라서는 연환계는 연의가 지어낸 이야기예요. 정사에는 왕윤과 여포 등이 동탁을 제거했다고만 적혀 있어요.',
   ],
-  rivalId: 'lvbu',
+  rivalId: 'yuanshao',
   sceneOptions: [
     { key: 'dethrone', label: '소제를 폐하고 헌제를 세우다', source: '정사' },
     { key: 'burn_luoyang', label: '낙양을 불태우고 장안으로 옮기다', source: '정사' },

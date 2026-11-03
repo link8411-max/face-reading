@@ -37,9 +37,9 @@ export const person: PersonEntry = {
     { name: '기산 군량 수송', year: 231, role: '장마로 군량이 끊기자 철군을 권한 뒤 책임을 피하려 거짓 보고', source: '정사' },
   ],
   relations: [
-    { id: 'zhugeliang', type: '라이벌', note: '함께 유조를 받은 동료였으나 군량 사건으로 제갈량이 이엄을 폐했다.', source: '정사' },
-    { id: 'liubei', type: '군신', note: '유비가 죽기 전 제갈량과 함께 이엄에게 뒷일을 맡겼다.', source: '정사' },
-    { name: '이풍', type: '부자', note: '이엄이 평민으로 쫓겨난 뒤에도 아들 이풍은 일을 이어 갔다.', source: '정사' },
+    { id: 'zhugeliang', type: '라이벌', note: '함께 유조를 받은 동료였으나 군량 사건으로 제갈량이 이엄을 폐했어요.', source: '정사' },
+    { id: 'liubei', type: '군신', note: '유비가 죽기 전 제갈량과 함께 이엄에게 뒷일을 맡겼어요.', source: '정사' },
+    { name: '이풍', type: '부자', note: '이엄이 평민으로 쫓겨난 뒤에도 아들 이풍은 일을 이어 갔어요.', source: '정사' },
   ],
   novelVsHistory: [
     '연의의 유언 장면은 제갈량에게 초점이 맞춰져 있어서 이엄의 몫이 거의 없어요. 정사는 유비가 제갈량과 이엄 두 사람에게 함께 유언을 남겼다고 적었어요.',

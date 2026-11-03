@@ -39,11 +39,11 @@ export const person: PersonEntry = {
     { name: '호로곡 유인', year: null, role: '사마의를 계곡으로 끌어들이는 미끼 역할을 맡음', source: '연의' },
   ],
   relations: [
-    { id: 'yangyi', type: '원수', note: '제갈량이 죽은 뒤 서로 군을 이끌 자격을 놓고 맞서다 위연이 목숨을 잃었다.', source: '정사' },
-    { id: 'zhugeliang', type: '군신', note: '위연이 여러 번 따로 군사를 이끌고 나아가겠다고 청했으나 제갈량이 허락하지 않았고, 위연은 이를 겁이 많은 탓이라 여겼다.', source: '정사' },
-    { id: 'liubei', type: '군신', note: '위연을 한중 태수로 발탁해 한중을 맡겼다.', source: '정사' },
-    { id: 'madai', type: '원수', note: '위연이 쫓기다 마대에게 목이 베였다.', source: '정사' },
-    { id: 'huangzhong', type: '군신', note: '장사에서 황충이 처형당할 위기를 위연이 구했다.', source: '연의' },
+    { id: 'yangyi', type: '원수', note: '제갈량이 죽은 뒤 서로 군을 이끌 자격을 놓고 맞서다 위연이 목숨을 잃었어요.', source: '정사' },
+    { id: 'zhugeliang', type: '군신', note: '위연이 여러 번 따로 군사를 이끌고 나아가겠다고 청했으나 제갈량이 허락하지 않았고, 위연은 이를 겁이 많은 탓이라 여겼어요.', source: '정사' },
+    { id: 'liubei', type: '군신', note: '위연을 한중 태수로 발탁해 한중을 맡겼어요.', source: '정사' },
+    { id: 'madai', type: '원수', note: '위연이 쫓기다 마대에게 목이 베였어요.', source: '정사' },
+    { id: 'huangzhong', type: '군신', note: '장사에서 황충이 처형당할 위기를 위연이 구했어요.', source: '연의' },
   ],
   novelVsHistory: [
     '연의에서 제갈량은 위연의 뒤통수에 반골이 있다며 처음부터 의심해요. 정사 위연전에는 반골 이야기가 없어요. 대신 위연의 성격이 오만해서 다른 장수들이 피했다는 기록이 있어요.',

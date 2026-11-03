@@ -49,7 +49,7 @@ export const person: PersonEntry = {
     '정사는 보부인이 질투하지 않고 다른 이를 추천하는 성품으로 오래 총애받았다고 적어요. 손권이 황후로 세우려 했지만 신하들의 반대로 십여 년을 미뤘어요.',
     '황후라는 칭호는 죽은 뒤에 내린 것이에요.',
   ],
-  rivalId: 'sunquan',
+  rivalId: 'panfuren',
   sceneOptions: [
     { key: 'no_jealousy', label: '질투하지 않고 다른 이를 추천해 오래 총애받다', source: '정사' },
     { key: 'two_daughters', label: '두 딸이 오나라 주요 가문에 시집가다', source: '정사' },

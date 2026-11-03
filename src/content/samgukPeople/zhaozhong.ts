@@ -37,10 +37,10 @@ export const person: PersonEntry = {
     { name: '환관 몰살', year: 189, role: '원소의 군사에게 쫓겨 취화루 앞에서 죽은 것으로 그려짐', source: '연의' },
   ],
   relations: [
-    { name: '영제', type: '군신', note: '영제와 조충: 영제가 조충을 어머니라 부를 만큼 아꼈다.', source: '정사' },
-    { id: 'zhangrang', type: '동료', note: '장양과 조충: 함께 중상시로 권세를 누렸고, 영제가 두 사람을 아버지와 어머니라 불렀다.', source: '정사' },
-    { id: 'jianshuo', type: '동료', note: '건석과 조충: 건석이 하진을 치자는 편지를 보냈으나 조충은 곽승 등과 함께 따르지 않았다.', source: '정사' },
-    { id: 'yuanshao', type: '원수', note: '원소와 조충: 하진이 죽은 뒤 원소가 하묘와 함께 조충을 붙잡아 베었다.', source: '정사' },
+    { name: '영제', type: '군신', note: '영제와 조충: 영제가 조충을 어머니라 부를 만큼 아꼈어요.', source: '정사' },
+    { id: 'zhangrang', type: '동료', note: '장양과 조충: 함께 중상시로 권세를 누렸고, 영제가 두 사람을 아버지와 어머니라 불렀어요.', source: '정사' },
+    { id: 'jianshuo', type: '동료', note: '건석과 조충: 건석이 하진을 치자는 편지를 보냈으나 조충은 곽승 등과 함께 따르지 않았어요.', source: '정사' },
+    { id: 'yuanshao', type: '원수', note: '원소와 조충: 하진이 죽은 뒤 원소가 하묘와 함께 조충을 붙잡아 베었어요.', source: '정사' },
   ],
   novelVsHistory: [
     '연의는 십상시를 장양, 조충, 단규 등 열 사람으로 꼽아요. 역사 기록은 영제 때 중상시 열두 명이 나란히 작위를 받았다고 적어요.',

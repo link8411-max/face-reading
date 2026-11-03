@@ -38,11 +38,11 @@ export const person: PersonEntry = {
     { name: '오환 원정', year: 207, role: '가볍게 꾸린 군대로 빠르게 쳐서 오환을 무너뜨리라고 권함', source: '정사' },
   ],
   relations: [
-    { id: 'caocao', type: '군신', note: '조조가 특히 아낀 책사. 곽가가 죽자 조조가 크게 슬퍼했다.', source: '정사' },
-    { id: 'xunyu', type: '동료', note: '순욱이 곽가를 조조에게 추천했다.', source: '정사' },
-    { id: 'yuanshao', type: '라이벌', note: '곽가가 원소가 질 수밖에 없는 열 가지 이유를 짚으며 조조를 북돋웠다.', source: '배송지 주' },
-    { id: 'lvbu', type: '원수', note: '하비성을 물에 잠기게 하는 계책에 곽가가 함께했다.', source: '정사' },
-    { id: 'sunce', type: '라이벌', note: '곽가가 손책의 경솔함을 들어 자객의 손에 죽을 것이라 내다봤다.', source: '정사' },
+    { id: 'caocao', type: '군신', note: '조조가 특히 아낀 책사. 곽가가 죽자 조조가 크게 슬퍼했어요.', source: '정사' },
+    { id: 'xunyu', type: '동료', note: '순욱이 곽가를 조조에게 추천했어요.', source: '정사' },
+    { id: 'yuanshao', type: '라이벌', note: '곽가가 원소가 질 수밖에 없는 열 가지 이유를 짚으며 조조를 북돋웠어요.', source: '배송지 주' },
+    { id: 'lvbu', type: '원수', note: '하비성을 물에 잠기게 하는 계책에 곽가가 함께했어요.', source: '정사' },
+    { id: 'sunce', type: '라이벌', note: '곽가가 손책의 경솔함을 들어 자객의 손에 죽을 것이라 내다봤어요.', source: '정사' },
   ],
   novelVsHistory: [
     '연의에서 곽가는 요동 일을 풀어 줄 유서를 남기고 죽어요. 정사 곽가전에는 이런 유서가 보이지 않아요.',

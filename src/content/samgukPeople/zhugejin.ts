@@ -47,7 +47,7 @@ export const person: PersonEntry = {
     '연의에서 관우에게 혼사를 청하러 가는 사신은 제갈근이지만, 정사 관우전에는 사신의 이름이 적혀 있지 않아요.',
     '연의에서는 이릉 뒤 제갈근의 비중이 줄지만, 정사의 제갈근은 이후에도 장군으로 활동하며 훗날 대장군에 올라요.',
   ],
-  rivalId: 'zhugeliang',
+  rivalId: 'lusu',
   sceneOptions: [
     { key: 'brothers_talk', label: '백이와 숙제를 들어 아우를 설득하다', source: '연의' },
     { key: 'marriage_refused', label: '관우의 혼사 거절을 전하다', source: '연의' },

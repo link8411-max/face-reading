@@ -38,12 +38,12 @@ export const person: PersonEntry = {
     { name: '번성 전투', year: 219, role: '관우의 포위를 받으면서도 성을 지켜 냄', source: '정사' },
   ],
   relations: [
-    { id: 'caocao', type: '사촌', note: '조조의 사촌 아우로 거병 때부터 함께했다.', source: '정사' },
-    { id: 'caopi', type: '군신', note: '조비가 즉위한 뒤 대장군과 대사마로 높였다.', source: '정사' },
-    { id: 'zhouyu', type: '라이벌', note: '적벽 이후 강릉과 남군을 두고 조인과 주유가 맞섰다.', source: '정사' },
-    { id: 'guanyu', type: '라이벌', note: '번성에서 관우의 포위를 받고도 성을 지켰다.', source: '정사' },
-    { id: 'xuhuang', type: '동료', note: '번성이 포위당했을 때 서황이 구원군을 이끌고 왔다.', source: '정사' },
-    { name: '서서', type: '라이벌', note: '연의에서 유비의 참모 서서가 조인의 팔문금쇄진을 깨뜨린다.', source: '연의' },
+    { id: 'caocao', type: '사촌', note: '조조의 사촌 아우로 거병 때부터 함께했어요.', source: '정사' },
+    { id: 'caopi', type: '군신', note: '조비가 즉위한 뒤 대장군과 대사마로 높였어요.', source: '정사' },
+    { id: 'zhouyu', type: '라이벌', note: '적벽 이후 강릉과 남군을 두고 조인과 주유가 맞섰어요.', source: '정사' },
+    { id: 'guanyu', type: '라이벌', note: '번성에서 관우의 포위를 받고도 성을 지켰어요.', source: '정사' },
+    { id: 'xuhuang', type: '동료', note: '번성이 포위당했을 때 서황이 구원군을 이끌고 왔어요.', source: '정사' },
+    { name: '서서', type: '라이벌', note: '연의에서 유비의 참모 서서가 조인의 팔문금쇄진을 깨뜨려요.', source: '연의' },
   ],
   novelVsHistory: [
     '연의에서 조인이 펼치고 서서가 깨뜨리는 팔문금쇄진은 정사에 없는 이야기예요.',

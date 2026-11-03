@@ -48,7 +48,7 @@ export const person: PersonEntry = {
     '하늘이 복을 주지 않을 거라는 말은 연의와 정사 기록에 모두 나와요.',
     '조절의 생년과 생모는 정사 기록에도 분명하지 않아요.',
   ],
-  rivalId: 'caopi',
+  rivalId: 'fuhuanghou',
   sceneOptions: [
     { key: 'jade_seal_throw', label: '옥새를 던지며 조비를 꾸짖다', source: '정사' },
     { key: 'enter_palace', label: '조조의 딸로 헌제의 귀인이 되다', source: '정사' },

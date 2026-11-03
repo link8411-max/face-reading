@@ -38,10 +38,10 @@ export const person: PersonEntry = {
     { name: '목상 계책', year: 234, role: '제갈량의 목상을 앞세워 사마의의 추격을 물리침', source: '연의' },
   ],
   relations: [
-    { id: 'weiyan', type: '라이벌', note: '평소 사이가 나빠 제갈량 사후 철군을 두고 서로 상대를 역적이라 했다.', source: '정사' },
-    { id: 'zhugeliang', type: '군신', note: '군량과 행정을 맡아 제갈량의 북벌을 뒷받침했다.', source: '정사' },
-    { id: 'guanyu', type: '군신', note: '처음 관우의 공조로 일하다 유비에게 보내졌다.', source: '정사' },
-    { name: '장완', type: '라이벌', note: '승상 후임을 기대한 양의 대신 장완이 제갈량의 뒤를 이었다.', source: '정사' },
+    { id: 'weiyan', type: '라이벌', note: '평소 사이가 나빠 제갈량 사후 철군을 두고 서로 상대를 역적이라 했어요.', source: '정사' },
+    { id: 'zhugeliang', type: '군신', note: '군량과 행정을 맡아 제갈량의 북벌을 뒷받침했어요.', source: '정사' },
+    { id: 'guanyu', type: '군신', note: '처음 관우의 공조로 일하다 유비에게 보내졌어요.', source: '정사' },
+    { name: '장완', type: '라이벌', note: '승상 후임을 기대한 양의 대신 장완이 제갈량의 뒤를 이었어요.', source: '정사' },
   ],
   novelVsHistory: [
     '연의에서는 제갈량이 남긴 비단 주머니 계책으로 마대가 위연을 베요. 정사에는 비단 주머니 이야기가 없어요. 위연의 군사가 흩어진 뒤 마대가 쫓아가 목을 벴다고 나와요.',

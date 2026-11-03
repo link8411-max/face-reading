@@ -44,7 +44,7 @@ export const person: PersonEntry = {
     '사마의의 꾀병을 본 하녀를 죽였다는 이야기는 진수의 『삼국지』에는 없어요. 나중에 쓰인 다른 역사책 『진서』에 실려 있어요.',
     '연의에서 사마의의 꾀병은 조상을 속이는 장면으로 유명해요. 하지만 장춘화 이야기 속 꾀병은 그보다 한참 전, 조조의 부름을 피할 때의 일이에요.',
   ],
-  rivalId: 'simayi',
+  rivalId: 'huangyueying',
   sceneOptions: [
     { key: 'maid_silenced', label: '꾀병을 본 하녀를 직접 처리하다', source: '정사' },
     { key: 'old_woman_remark', label: '늙은 것이 보기 싫다는 말에 음식을 끊다', source: '정사' },

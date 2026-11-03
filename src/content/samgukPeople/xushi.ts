@@ -47,7 +47,7 @@ export const person: PersonEntry = {
     '연의 속 서씨의 복수는 정사에 덧붙은 옛 기록의 줄거리에 가까워요. 다만 대원까지 서씨가 직접 불러들여 죽인 것으로 바꾸었어요.',
     '정사 본문에는 손익이 측근 변홍에게 죽었다는 짧은 기록만 있어요. 서씨가 복수한 이야기는 정사에 덧붙은 옛 기록에 실려 있어요.',
   ],
-  rivalId: 'sunquan',
+  rivalId: 'xiaoqiao',
   sceneOptions: [
     { key: 'ominous_divination', label: '불길한 점괘로 남편을 말리다', source: '연의' },
     { key: 'wait_new_moon', label: '그믐날까지 기다려 달라고 청하다', source: '연의' },

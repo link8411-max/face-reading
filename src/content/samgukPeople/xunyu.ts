@@ -37,10 +37,10 @@ export const person: PersonEntry = {
     { name: '관도 전투', year: 200, role: '군량이 떨어진 조조에게 물러서지 말고 기회를 기다리라고 권함', source: '정사' },
   ],
   relations: [
-    { id: 'caocao', type: '군신', note: '나의 자방이라 불린 핵심 책사. 위공 추대 문제로 사이가 벌어졌다.', source: '정사' },
-    { id: 'guojia', type: '동료', note: '순욱이 곽가를 조조에게 추천했다.', source: '정사' },
-    { id: 'yuanshao', type: '군신', note: '순욱은 처음 원소에게 몸을 맡겼다가 떠나 조조를 찾았다.', source: '정사' },
-    { name: '순운', type: '부자', note: '순욱의 맏아들 순운은 조조의 딸 안양공주와 혼인했다.', source: '정사' },
+    { id: 'caocao', type: '군신', note: '나의 자방이라 불린 핵심 책사. 위공 추대 문제로 사이가 벌어졌어요.', source: '정사' },
+    { id: 'guojia', type: '동료', note: '순욱이 곽가를 조조에게 추천했어요.', source: '정사' },
+    { id: 'yuanshao', type: '군신', note: '순욱은 처음 원소에게 몸을 맡겼다가 떠나 조조를 찾았어요.', source: '정사' },
+    { name: '순운', type: '부자', note: '순욱의 맏아들 순운은 조조의 딸 안양공주와 혼인했어요.', source: '정사' },
   ],
   novelVsHistory: [
     '연의에서 순욱은 조조가 보낸 빈 음식 상자를 받고 독을 마셔요. 정사 본문에는 병이 들어 수춘에 남았다가 근심 끝에 죽었다고만 나와요. 빈 상자 이야기는 정사에 덧붙은 옛 기록에 있어요.',

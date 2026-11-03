@@ -38,11 +38,11 @@ export const person: PersonEntry = {
     { name: '촉 멸망', year: 263, role: '위군 침공을 알리는 강유의 표문을 점괘를 이유로 덮음', source: '정사' },
   ],
   relations: [
-    { id: 'liushan', type: '군신', note: '후주 유선은 황호를 아끼고 곁에 두었다.', source: '정사' },
-    { id: 'jiangwei', type: '라이벌', note: '황호가 강유를 밀어내려 해 강유는 성도를 피해 답중에 머물렀다.', source: '정사' },
-    { id: 'dengai', type: '원수', note: '촉이 망했을 때 등애가 황호를 가두고 죽이려 했으나 뇌물로 면했다고 전한다.', source: '정사' },
-    { id: 'simazhao', type: '원수', note: '연의에서는 사마소가 촉 멸망 뒤 황호를 처형한다.', source: '연의' },
-    { name: '동윤', type: '라이벌', note: '동윤이 살아 있는 동안은 황호가 감히 나서지 못했다.', source: '정사' },
+    { id: 'liushan', type: '군신', note: '후주 유선은 황호를 아끼고 곁에 두었어요.', source: '정사' },
+    { id: 'jiangwei', type: '라이벌', note: '황호가 강유를 밀어내려 해 강유는 성도를 피해 답중에 머물렀어요.', source: '정사' },
+    { id: 'dengai', type: '원수', note: '촉이 망했을 때 등애가 황호를 가두고 죽이려 했으나 뇌물로 면했다고 전해요.', source: '정사' },
+    { id: 'simazhao', type: '원수', note: '연의에서는 사마소가 촉 멸망 뒤 황호를 처형해요.', source: '연의' },
+    { name: '동윤', type: '라이벌', note: '동윤이 살아 있는 동안은 황호가 감히 나서지 못했어요.', source: '정사' },
   ],
   novelVsHistory: [
     '연의에서 황호는 등애의 뇌물과 소문에 속아 강유를 불러들여요. 정사에는 이 이야기가 없어요. 대신 황호가 우대장군 염우를 세워 강유를 대신하게 하려 했다고 적혀 있어요.',

@@ -39,12 +39,12 @@ export const person: PersonEntry = {
     { name: '동관 전투', year: 211, role: '마초와 한수를 서로 의심하게 만드는 계책을 냄', source: '정사' },
   ],
   relations: [
-    { id: 'caocao', type: '군신', note: '장수와 함께 항복한 뒤 조조의 책사가 되었다.', source: '정사' },
-    { id: 'caopi', type: '군신', note: '후계 다툼 때 조비에게 도움이 되는 조언을 했고, 조비가 즉위한 뒤 태위에 올랐다.', source: '정사' },
-    { id: 'dongzhuo', type: '군신', note: '가후는 동탁이 죽기 전 그의 휘하에 있었다.', source: '정사' },
-    { id: 'lijue', type: '군신', note: '가후가 이각에게 장안을 치라고 권했다.', source: '정사' },
-    { name: '장수', type: '군신', note: '가후는 완성의 장수를 섬기다 함께 조조에게 항복했다.', source: '정사' },
-    { id: 'machao', type: '라이벌', note: '동관에서 마초와 한수 사이를 갈라놓는 계책의 대상이었다.', source: '정사' },
+    { id: 'caocao', type: '군신', note: '장수와 함께 항복한 뒤 조조의 책사가 되었어요.', source: '정사' },
+    { id: 'caopi', type: '군신', note: '후계 다툼 때 조비에게 도움이 되는 조언을 했고, 조비가 즉위한 뒤 태위에 올랐어요.', source: '정사' },
+    { id: 'dongzhuo', type: '군신', note: '가후는 동탁이 죽기 전 그의 휘하에 있었어요.', source: '정사' },
+    { id: 'lijue', type: '군신', note: '가후가 이각에게 장안을 치라고 권했어요.', source: '정사' },
+    { name: '장수', type: '군신', note: '가후는 완성의 장수를 섬기다 함께 조조에게 항복했어요.', source: '정사' },
+    { id: 'machao', type: '라이벌', note: '동관에서 마초와 한수 사이를 갈라놓는 계책의 대상이었어요.', source: '정사' },
   ],
   novelVsHistory: [
     '연의는 가후를 독한 계략가로 또렷하게 그리는 편이에요. 정사 가후전이 강조하는 것은 문을 닫아걸고 사적인 교제를 끊은 조심스러운 처세예요.',

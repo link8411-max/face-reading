@@ -39,9 +39,9 @@ export const person: PersonEntry = {
     { name: '신성 토벌', year: 228, role: '촉과 내통하려다 사마의의 급습으로 패해 목이 베임', source: '정사' },
   ],
   relations: [
-    { id: 'simayi', type: '라이벌', note: '신성에서 맹달의 반란을 사마의가 진압했다.', source: '정사' },
-    { id: 'caopi', type: '군신', note: '조비가 투항한 맹달을 후하게 맞아 중용했다.', source: '정사' },
-    { name: '유봉', type: '라이벌', note: '상용에서 함께 지내다 군악대 문제로 사이가 틀어졌다.', source: '정사' },
+    { id: 'simayi', type: '라이벌', note: '신성에서 맹달의 반란을 사마의가 진압했어요.', source: '정사' },
+    { id: 'caopi', type: '군신', note: '조비가 투항한 맹달을 후하게 맞아 중용했어요.', source: '정사' },
+    { name: '유봉', type: '라이벌', note: '상용에서 함께 지내다 군악대 문제로 사이가 틀어졌어요.', source: '정사' },
   ],
   novelVsHistory: [
     '연의에서는 팽양이 처형되자 두려워진 맹달이 위로 달아나요. 정사 유봉전에는 유봉이 맹달의 군악대를 빼앗는 등 둘이 다투다가 맹달이 두려워 항복했다고 나와요.',

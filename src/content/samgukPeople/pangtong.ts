@@ -37,11 +37,11 @@ export const person: PersonEntry = {
     { name: '낙봉파의 매복', year: 214, role: '장임의 매복에 걸려 화살을 맞고 죽은 것으로 그려짐', source: '연의' },
   ],
   relations: [
-    { id: 'liubei', type: '군신', note: '뇌양 현령으로 있던 방통을 중요하게 써서 촉에 들어갈 때 함께했다.', source: '정사' },
-    { id: 'zhugeliang', type: '라이벌', note: '복룡과 봉추로 나란히 불린 두 책사다.', source: '배송지 주' },
-    { id: 'zhouyu', type: '군신', note: '주유 밑에서 남군 공조를 지냈고, 주유가 죽자 장례 행렬을 오나라로 호송했다.', source: '정사' },
-    { id: 'caocao', type: '라이벌', note: '연의에서 방통이 연환계를 권해 조조의 배를 묶게 했다고 그려진다.', source: '연의' },
-    { name: '장임', type: '원수', note: '연의에서 낙봉파 매복으로 방통을 쏜 유장의 장수로 그려진다.', source: '연의' },
+    { id: 'liubei', type: '군신', note: '뇌양 현령으로 있던 방통을 중요하게 써서 촉에 들어갈 때 함께했어요.', source: '정사' },
+    { id: 'zhugeliang', type: '라이벌', note: '복룡과 봉추로 나란히 불린 두 책사예요.', source: '배송지 주' },
+    { id: 'zhouyu', type: '군신', note: '주유 밑에서 남군 공조를 지냈고, 주유가 죽자 장례 행렬을 오나라로 호송했어요.', source: '정사' },
+    { id: 'caocao', type: '라이벌', note: '연의에서 방통이 연환계를 권해 조조의 배를 묶게 했다고 그려져요.', source: '연의' },
+    { name: '장임', type: '원수', note: '연의에서 낙봉파 매복으로 방통을 쏜 유장의 장수로 그려져요.', source: '연의' },
   ],
   novelVsHistory: [
     '연의에서 방통은 적벽에서 조조에게 연환계를 권해요. 정사에는 이 이야기가 없어요.',

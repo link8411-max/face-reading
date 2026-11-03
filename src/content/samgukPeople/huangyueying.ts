@@ -38,15 +38,15 @@ export const person: PersonEntry = {
     { name: '임종의 당부', year: null, role: '제갈량 사후 곧 세상을 떠나며 아들 제갈첨에게 충효를 당부함', source: '연의' },
   ],
   relations: [
-    { id: 'zhugeliang', type: '부부', note: '황승언의 딸로 제갈량의 아내가 되었다.', source: '배송지 주' },
-    { name: '황승언', type: '부자', note: '제갈량에게 못난 딸을 아내로 주겠다고 청한 아버지. 연의에서는 제갈량의 장인으로 나온다.', source: '배송지 주' },
-    { name: '제갈첨', type: '부자', note: '연의는 제갈첨의 어머니를 황승언의 딸 황씨라고 적는다.', source: '연의' },
+    { id: 'zhugeliang', type: '부부', note: '황승언의 딸로 제갈량의 아내가 되었어요.', source: '배송지 주' },
+    { name: '황승언', type: '부자', note: '제갈량에게 못난 딸을 아내로 주겠다고 청한 아버지. 연의에서는 제갈량의 장인으로 나와요.', source: '배송지 주' },
+    { name: '제갈첨', type: '부자', note: '연의는 제갈첨의 어머니를 황승언의 딸 황씨라고 적어요.', source: '연의' },
   ],
   novelVsHistory: [
     '연의는 황씨가 천문과 지리, 병법에 두루 밝아 제갈량의 학문을 도왔다고 적어요. 정사에는 재주가 남편과 어울린다는 황승언의 말만 전해요.',
     '연의도 정사도 그의 이름을 적지 않아요. 월영이라는 이름과 발명가 이미지는 나중에 생겨났어요. 정사 제갈량전에서 목우유마와 연노 개량은 제갈량의 구상으로 적혀 있어요.',
   ],
-  rivalId: 'zhugeliang',
+  rivalId: 'zhangchunhua',
   sceneOptions: [
     { key: 'bridge_poem', label: '눈 덮인 다리에서 황승언이 시를 읊다', source: '연의' },
     { key: 'ugly_daughter', label: '못난 딸이라도 재주는 어울린다며 청혼을 받다', source: '배송지 주' },

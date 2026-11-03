@@ -48,7 +48,7 @@ export const person: PersonEntry = {
     '조조가 처음 정실로 삼은 사람은 정씨였어요. 정사에는 정씨가 조조를 떠난 뒤 변씨가 정실이 된 과정이 기록돼 있어요.',
     '정사에는 조비가 후계자로 세워졌을 때 변씨가 큰 상을 사양했다는 이야기가 실려 있어요. 연의에는 이 이야기가 나오지 않아요.',
   ],
-  rivalId: 'caocao',
+  rivalId: 'hetaihou',
   sceneOptions: [
     { key: 'refuse_reward', label: '조비가 후계자가 되자 큰 상을 사양하다', source: '정사' },
     { key: 'become_queen', label: '기녀 집안 출신으로 위왕후에 오르다', source: '정사' },

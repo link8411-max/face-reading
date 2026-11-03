@@ -37,11 +37,11 @@ export const person: PersonEntry = {
     { name: '가정의 산 포위', year: 228, role: '사마의가 물길을 끊고 산을 에워싸 마속의 진이 무너짐', source: '연의' },
   ],
   relations: [
-    { id: 'zhugeliang', type: '군신', note: '제갈량이 재능을 아껴 참모로 곁에 두었으나, 가정 패배 뒤 군법으로 처벌했다.', source: '정사' },
-    { id: 'liubei', type: '군신', note: '유비가 임종을 앞두고 제갈량에게 마속은 말이 실제보다 지나치니 크게 쓰지 말라고 일렀다.', source: '정사' },
-    { name: '마량', type: '형제', note: '재주로 이름 높던 마량의 동생이다.', source: '정사' },
-    { id: 'zhanghe', type: '원수', note: '가정에서 마속의 진을 무너뜨린 위의 장수다.', source: '정사' },
-    { id: 'wangping', type: '군신', note: '가정에서 마속의 부장으로 산 아래 진을 치라고 말렸으나 받아들여지지 않았다.', source: '정사' },
+    { id: 'zhugeliang', type: '군신', note: '제갈량이 재능을 아껴 참모로 곁에 두었으나, 가정 패배 뒤 군법으로 처벌했어요.', source: '정사' },
+    { id: 'liubei', type: '군신', note: '유비가 임종을 앞두고 제갈량에게 마속은 말이 실제보다 지나치니 크게 쓰지 말라고 일렀어요.', source: '정사' },
+    { name: '마량', type: '형제', note: '재주로 이름 높던 마량의 동생이에요.', source: '정사' },
+    { id: 'zhanghe', type: '원수', note: '가정에서 마속의 진을 무너뜨린 위의 장수예요.', source: '정사' },
+    { id: 'wangping', type: '군신', note: '가정에서 마속의 부장으로 산 아래 진을 치라고 말렸으나 받아들여지지 않았어요.', source: '정사' },
   ],
   novelVsHistory: [
     '연의에서 가정의 마속을 에워싸는 사람은 사마의예요. 하지만 정사 장합전은 가정에서 마속을 크게 이긴 사람이 장합이라고 적어요.',

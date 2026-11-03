@@ -46,7 +46,7 @@ export const person: PersonEntry = {
     '정사에 덧붙은 옛 기록에는 하후연 집안의 소녀가 장비에게 붙잡혀 아내가 되었다고 나와요. 연의의 장비 이야기에서는 이 인연이 중심 사건으로 다뤄지지 않아요.',
     '하후연이 전사한 뒤 장비의 아내가 장례를 치렀다는 이야기와, 하후패가 망명했을 때 유선이 한 말도 마찬가지예요. 정사 본문이 아니라 옛 기록에만 전해져요.',
   ],
-  rivalId: 'xiahouyuan',
+  rivalId: 'zhanghe',
   sceneOptions: [
     { key: 'firewood_meeting', label: '땔나무를 하다 장비를 만나다', source: '배송지 주' },
     { key: 'changban_bridge', label: '장판교에서 장비가 홀로 추격군을 막다', source: '연의' },

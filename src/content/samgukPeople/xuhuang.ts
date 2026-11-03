@@ -39,12 +39,12 @@ export const person: PersonEntry = {
     { name: '양양 방어', year: 226, role: '제갈근이 이끈 오군을 막아 냄', source: '정사' },
   ],
   relations: [
-    { id: 'caocao', type: '군신', note: '조조 밑에서 관도, 동관, 번성을 거치며 공을 세웠다.', source: '정사' },
-    { id: 'guanyu', type: '라이벌', note: '번성에서 서황의 구원군이 관우의 포위진을 깨뜨렸다. 둘이 옛 친분이 있었다는 이야기는 정사에 덧붙은 옛 기록에 전한다.', source: '정사' },
-    { id: 'caoren', type: '동료', note: '번성이 포위당했을 때 서황이 구원군을 이끌고 왔다.', source: '정사' },
-    { id: 'xuchu', type: '라이벌', note: '연의에서 서황과 허저가 처음 만나 오십 합이 넘도록 승부를 내지 못한다.', source: '연의' },
-    { id: 'zhugejin', type: '라이벌', note: '양양에서 서황이 제갈근이 이끈 오군을 막았다.', source: '정사' },
-    { name: '양봉', type: '군신', note: '서황은 처음 양봉의 장수였다가 조조에게 갔다.', source: '정사' },
+    { id: 'caocao', type: '군신', note: '조조 밑에서 관도, 동관, 번성을 거치며 공을 세웠어요.', source: '정사' },
+    { id: 'guanyu', type: '라이벌', note: '번성에서 서황의 구원군이 관우의 포위진을 깨뜨렸어요. 둘이 옛 친분이 있었다는 이야기는 정사에 덧붙은 옛 기록에 전해요.', source: '정사' },
+    { id: 'caoren', type: '동료', note: '번성이 포위당했을 때 서황이 구원군을 이끌고 왔어요.', source: '정사' },
+    { id: 'xuchu', type: '라이벌', note: '연의에서 서황과 허저가 처음 만나 오십 합이 넘도록 승부를 내지 못해요.', source: '연의' },
+    { id: 'zhugejin', type: '라이벌', note: '양양에서 서황이 제갈근이 이끈 오군을 막았어요.', source: '정사' },
+    { name: '양봉', type: '군신', note: '서황은 처음 양봉의 장수였다가 조조에게 갔어요.', source: '정사' },
   ],
   novelVsHistory: [
     '연의에서 서황은 큰 도끼를 쓰는 장수로 나와요. 정사에는 서황이 쓴 무기에 대한 서술이 없어요.',

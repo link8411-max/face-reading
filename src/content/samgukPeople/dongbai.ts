@@ -44,7 +44,7 @@ export const person: PersonEntry = {
     '동백이 어린 나이에 위양군에 봉해진 일은 정사에 덧붙은 옛 기록에 나와요.',
     '동백이 어떻게 세상을 떠났는지는 정사에도 구체적으로 전하지 않아요.',
   ],
-  rivalId: 'dongzhuo',
+  rivalId: 'lvbu',
   sceneOptions: [
     { key: 'weiyang_title', label: '어린 나이에 위양군에 봉해지다', source: '배송지 주' },
     { key: 'chain_plan', label: '연환계로 동탁과 여포 사이가 갈라지다', source: '연의' },
