@@ -81,6 +81,8 @@ export default function ThreeKingdomsMap({ count, selected, onSelect }: { count:
           className="group cursor-pointer outline-none"
           opacity={dim('기타')}
         >
+          {/* 눈에 보이는 칩은 작게, 누르는 영역은 위아래·좌우로 넓힌다(화면에서 44px 이상) */}
+          <rect x="256" y="0" width="104" height="50" fill="#000" fillOpacity="0" />
           <rect x="268" y="8" width="80" height="28" rx="14" fill={selected === '기타' ? '#2E2A27' : '#FBF6F1'} stroke={selected === '기타' ? '#2E2A27' : '#B8AE9F'} strokeWidth="1.5" className="group-focus-visible:stroke-accent group-focus-visible:[stroke-width:3px]" />
           <text x="308" y="27" textAnchor="middle" fontSize="14" fontWeight="700" fill={selected === '기타' ? '#FBF6F1' : '#2E2A27'} pointerEvents="none">군웅</text>
         </g>

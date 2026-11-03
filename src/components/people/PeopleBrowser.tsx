@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import Link from "next/link";
 import ThreeKingdomsMap from "@/components/people/ThreeKingdomsMap";
 import { FILTER_LABEL, matchedCount, todayCard, visibleIds, FIRST_PAGE, type HubCard, type HubFilter } from "@/lib/people/hubFilter";
@@ -23,6 +23,7 @@ export default function PeopleBrowser({ cards }: { cards: HubCard[] }) {
   const [query, setQuery] = useState("");
   const [expanded, setExpanded] = useState(false);
   const [date, setDate] = useState<string | null>(null);
+  const headingRef = useRef<HTMLHeadingElement>(null);
 
   // 날짜는 브라우저에서 계산한다(정적 HTML·캐시의 어제 날짜 방지)
   useEffect(() => {
@@ -43,9 +44,15 @@ export default function PeopleBrowser({ cards }: { cards: HubCard[] }) {
   const canMore = !searching && !expanded && total > FIRST_PAGE;
   const today = useMemo(() => (date ? todayCard(cards, date) : null), [cards, date]);
 
+  // 지도·세력 버튼을 눌렀는데 목록 제목이 화면 아래(하단 탭바 높이 포함)에 있으면 제목이 보이게 부드럽게 내려간다
   const choose = (f: HubFilter) => {
     setFilter(f);
     setExpanded(false);
+    const h = headingRef.current;
+    if (h && h.getBoundingClientRect().top > window.innerHeight - 140) {
+      const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+      h.scrollIntoView({ behavior: reduce ? "auto" : "smooth", block: "start" });
+    }
   };
 
   return (
@@ -59,7 +66,7 @@ export default function PeopleBrowser({ cards }: { cards: HubCard[] }) {
               type="button"
               aria-pressed={filter === f}
               onClick={() => choose(f)}
-              className={`h-10 px-4 rounded-full border text-sm font-medium transition ${filter === f ? "bg-ink text-paper border-ink" : "bg-white text-ink border-line hover:border-accent/50"}`}
+              className={`h-11 px-4 rounded-full border text-sm font-medium transition ${filter === f ? "bg-ink text-paper border-ink" : "bg-white text-ink border-line hover:border-accent/50"}`}
             >
               {FILTER_LABEL[f]} <span className={filter === f ? "text-paper/80" : "text-muted"}>{counts[f] ?? 0}</span>
             </button>
@@ -69,8 +76,8 @@ export default function PeopleBrowser({ cards }: { cards: HubCard[] }) {
 
       <section id="people-list" aria-label="인물 목록" className="mt-6">
         <div className="flex items-baseline justify-between gap-3">
-          <h2 className="font-serif font-bold text-lg">{filter === "all" ? "누구부터 만나 볼까요" : `${FACTION_NAME[filter]} 인물`}</h2>
-          <span className="text-xs text-muted" aria-live="polite">{searching ? `${total}명 찾았어요` : `${counts[filter] ?? 0}명`}</span>
+          <h2 ref={headingRef} className="scroll-mt-4 font-serif font-bold text-lg">{searching ? "검색 결과" : filter === "all" ? "누구부터 만나 볼까요" : `${FACTION_NAME[filter]} 인물`}</h2>
+          <span className="text-xs text-muted" aria-live="polite">{searching ? `${total}명` : `${counts[filter] ?? 0}명`}</span>
         </div>
         <label className="mt-3 block">
           <span className="sr-only">인물 이름 검색</span>
@@ -104,8 +111,8 @@ export default function PeopleBrowser({ cards }: { cards: HubCard[] }) {
         )}
       </section>
 
-      <section aria-label="오늘의 인물" className="mt-8 min-h-[132px]">
-        {today && (
+      {today && (
+        <section aria-label="오늘의 인물" className="mt-8">
           <div className="rounded-[22px] border border-line bg-white p-4">
             <p className="text-xs font-bold text-accent">오늘의 인물</p>
             <div className="mt-2 flex gap-4">
@@ -116,12 +123,12 @@ export default function PeopleBrowser({ cards }: { cards: HubCard[] }) {
               </div>
             </div>
             {today.fact && <p className="mt-3 rounded-2xl bg-card-2 px-3 py-2 text-sm leading-relaxed break-keep"><span className="font-bold">알고 보면</span> {today.fact}</p>}
-            <Link href={`/samguk/people/${today.id}`} prefetch={false} className="mt-3 inline-flex items-center h-10 px-4 rounded-full bg-ink text-paper text-sm font-medium">
+            <Link href={`/samguk/people/${today.id}`} prefetch={false} className="mt-3 inline-flex items-center h-11 px-4 rounded-full bg-ink text-paper text-sm font-medium">
               {today.name} 열전 읽기
             </Link>
           </div>
-        )}
-      </section>
+        </section>
+      )}
     </>
   );
 }

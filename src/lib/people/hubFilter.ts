@@ -26,18 +26,46 @@ export function matchesQuery(card: Pick<HubCard, 'name' | 'style'>, query: strin
   return norm(card.name).includes(q) || (card.style ? norm(card.style).includes(q) : false)
 }
 
-// 지금 화면에 보일 카드 id. 검색어가 있으면 세력 안의 모든 일치 결과, 없으면 처음엔 12명 + 더 보기로 나머지.
+// 지금 화면에 보일 카드 id. 검색어가 있으면 고른 세력과 상관없이 전체 127명에서 일치하는 모두(선택한 세력은 그대로 기억만 한다),
+// 없으면 세력 안에서 처음엔 12명 + 더 보기로 나머지.
 export function visibleIds(cards: HubCard[], opts: { filter: HubFilter; query: string; expanded: boolean }): string[] {
-  const inFaction = cards.filter((c) => opts.filter === 'all' || c.faction === opts.filter)
-  const matched = inFaction.filter((c) => matchesQuery(c, opts.query))
   const searching = opts.query.trim() !== ''
-  const shown = searching || opts.expanded ? matched : matched.slice(0, FIRST_PAGE)
-  return shown.map((c) => c.id)
+  if (searching) return cards.filter((c) => matchesQuery(c, opts.query)).map((c) => c.id)
+  const inFaction = cards.filter((c) => opts.filter === 'all' || c.faction === opts.filter)
+  return (opts.expanded ? inFaction : inFaction.slice(0, FIRST_PAGE)).map((c) => c.id)
 }
 
-// 필터·검색 조건에 맞는 전체 수(더 보기 버튼에 쓴다)
+// 지금 조건에 맞는 전체 수(더 보기 버튼·검색 결과 수에 쓴다). 검색 중이면 세력과 무관하게 전체에서 센다
 export function matchedCount(cards: HubCard[], opts: { filter: HubFilter; query: string }): number {
-  return cards.filter((c) => (opts.filter === 'all' || c.faction === opts.filter) && matchesQuery(c, opts.query)).length
+  if (opts.query.trim() !== '') return cards.filter((c) => matchesQuery(c, opts.query)).length
+  return cards.filter((c) => opts.filter === 'all' || c.faction === opts.filter).length
+}
+
+// 글자 두 개씩 묶은 조각(공백·문장부호 제외). 문장 사이 겹침을 재는 데 쓴다
+function bigrams(s: string): Set<string> {
+  const chars = [...s.replace(/[^\p{L}\p{N}]/gu, '')]
+  const out = new Set<string>()
+  for (let i = 0; i + 1 < chars.length; i++) out.add(chars[i] + chars[i + 1])
+  return out
+}
+
+// 알고 보면 한 줄: 첫 문장과 글자 조각이 가장 덜 겹치는 것(겹침 비율이 같으면 앞 번호). 같은 말을 두 번 보이지 않으려는 것이다
+export function pickFact(line: string, facts: string[]): string {
+  if (facts.length === 0) return ''
+  const base = bigrams(line)
+  let best = 0
+  let bestScore = Infinity
+  facts.forEach((f, i) => {
+    const g = bigrams(f)
+    let shared = 0
+    for (const b of g) if (base.has(b)) shared++
+    const score = g.size === 0 ? 0 : shared / g.size
+    if (score < bestScore) {
+      bestScore = score
+      best = i
+    }
+  })
+  return facts[best]
 }
 
 const gcd = (a: number, b: number): number => (b === 0 ? a : gcd(b, a % b))

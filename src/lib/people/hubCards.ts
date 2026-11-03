@@ -2,7 +2,7 @@
 import { PEOPLE, PEOPLE_IDS } from '@/content/samgukPeople'
 import { characterById } from './characters'
 import { portraitSrc } from './portrait'
-import type { HubCard } from './hubFilter'
+import { pickFact, type HubCard } from './hubFilter'
 
 // 응원 순위를 서버에서 읽지 않는 정적 허브라서, 대표 인물을 고정 순서로 먼저 보인다.
 export const POPULAR_IDS = ['caocao', 'liubei', 'guanyu', 'zhugeliang', 'lvbu', 'zhaoyun', 'zhangfei', 'sunquan', 'zhouyu', 'simayi', 'diaochan', 'machao']
@@ -21,14 +21,15 @@ export function hubCards(): HubCard[] {
   const make = (id: string): HubCard => {
     const c = characterById(id)
     const p = PEOPLE[id]
+    const line = firstSentence(p.summary)
     return {
       id,
       name: c?.name ?? id,
       style: p.style,
       faction: c?.faction ?? '기타',
       portrait: portraitSrc(id),
-      line: firstSentence(p.summary),
-      fact: p.funFacts[0] ?? '',
+      line,
+      fact: pickFact(line, p.funFacts), // 첫 문장과 가장 덜 겹치는 알고 보면 한 줄
     }
   }
   const popular = POPULAR_IDS.filter((id) => id in PEOPLE)

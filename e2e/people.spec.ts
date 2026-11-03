@@ -103,6 +103,16 @@ test('허브: 이름 검색(자 포함)과 결과 없음 안내', async ({ page 
   await expect(card(page, 'xiaohoudun')).toBeVisible()
   await expect(card(page, 'xiahouyuan')).toBeVisible()
   await expect(card(page, 'caocao')).toBeHidden()
+  // 촉을 골라 둬도 검색은 전체에서: 하후돈이 나오고, 지우면 촉 목록으로 돌아간다
+  await page.getByRole('button', { name: /^촉 \d+/ }).click()
+  await box.fill('하후')
+  await expect(page.getByRole('heading', { name: '검색 결과' })).toBeVisible()
+  await expect(card(page, 'xiaohoudun')).toBeVisible()
+  await expect(card(page, 'liubei')).toBeHidden()
+  await box.fill('')
+  await expect(card(page, 'liubei')).toBeVisible()
+  await expect(card(page, 'xiaohoudun')).toBeHidden()
+  await page.getByRole('button', { name: /^전체 \d+/ }).click()
   await box.fill('운장')
   await expect(card(page, 'guanyu')).toBeVisible()
   await box.fill('없는사람이름')
@@ -124,6 +134,25 @@ test('허브: 오늘의 인물 카드와 열전 링크, 관계도 바로가기�
   // 세력을 펼치면 기존 관계도 인물 링크가 보인다
   await page.locator('summary', { hasText: '촉나라' }).click()
   await expect(page.locator('#relations li a[href="/samguk/people/guanyu"]').first()).toBeVisible()
+})
+
+test('허브: 누르는 곳은 44px 이상이고, 지도를 누르면 목록 제목이 보이는 곳으로 내려간다', async ({ page }) => {
+  await page.setViewportSize({ width: 375, height: 667 })
+  await page.goto('/samguk/people')
+  const sizes = async (loc: ReturnType<Page['locator']>) => (await loc.evaluateAll((els) => els.map((e) => e.getBoundingClientRect().height))).map(Math.round)
+  expect((await sizes(page.getByRole('group', { name: '세력 고르기' }).getByRole('button'))).every((h) => h >= 44)).toBe(true)
+  // 군웅 칩은 지도 위 투명 확장 영역까지 포함해 44px 이상(화면 높이 기준)
+  const chip = await page.evaluate(() => {
+    const svg = document.querySelector('svg[aria-label="삼국 개략도"]')!
+    const rect = svg.querySelector('g[aria-label="군웅 인물 보기"] rect')!
+    return rect.getBoundingClientRect().height
+  })
+  expect(chip).toBeGreaterThanOrEqual(44)
+  const heading = page.locator('#people-list h2')
+  expect(await heading.evaluate((h) => h.getBoundingClientRect().top)).toBeGreaterThan(667 - 140)
+  await page.getByRole('button', { name: '촉나라 인물 보기' }).click()
+  await expect(heading).toBeInViewport()
+  await expect(heading).toHaveText('촉나라 인물')
 })
 
 test('허브 375px: 가로 스크롤이 없다', async ({ page }) => {
