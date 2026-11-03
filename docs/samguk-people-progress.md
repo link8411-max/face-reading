@@ -16,7 +16,7 @@
 
 | id | 이름 | 초상화 | 열전 | 사실 검토 | 공개 |
 | --- | --- | --- | --- | --- | --- |
-| caocao | 조조 | O | O |  |  |
+| caocao | 조조 | O | O | O |  |
 | simayi | 사마의 | O |  |  |  |
 | zhangliao | 장료 | O |  |  |  |
 | xiaohoudun | 하후돈 | O |  |  |  |
@@ -41,7 +41,7 @@
 | zhangchunhua | 장춘화 | O |  |  |  |
 | zhenji | 견씨 | O |  |  |  |
 | liubei | 유비 | O |  |  |  |
-| guanyu | 관우 | O | O |  |  |
+| guanyu | 관우 | O | O | O |  |
 | zhangfei | 장비 | O |  |  |  |
 | zhugeliang | 제갈량 | O |  |  |  |
 | zhaoyun | 조운 | O |  |  |  |
