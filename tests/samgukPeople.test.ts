@@ -36,6 +36,8 @@ test('each entry passes shape rules', () => {
     expect(p.tags.length, `${id} tags`).toBeLessThanOrEqual(5)
     expect(p.life.length, `${id} life`).toBeGreaterThanOrEqual(600)
     expect(p.life.length, `${id} life`).toBeLessThanOrEqual(1200)
+    expect(p.historyNote.length, `${id} historyNote`).toBeGreaterThanOrEqual(150)
+    expect(p.historyNote.length, `${id} historyNote`).toBeLessThanOrEqual(400)
     expect(p.battles.length, `${id} battles`).toBeGreaterThanOrEqual(2)
     expect(p.novelVsHistory.length, `${id} novelVsHistory`).toBeGreaterThanOrEqual(2)
     expect(p.novelVsHistory.length, `${id} novelVsHistory`).toBeLessThanOrEqual(4)

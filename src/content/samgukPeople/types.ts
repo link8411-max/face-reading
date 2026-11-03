@@ -32,7 +32,8 @@ export interface PersonEntry {
   nameMeaning: string // 이름·자 뜻 한두 문장
   weapon: { novel: string | null; history: string | null } // 정사 기록 없으면 null
   famousQuote: { text: string; source: Source }
-  life: string // 생애 열전(최후·묘 포함), 600~1200자, 문단은 \n\n
+  life: string // 연의로 보는 생애(최후·묘 포함), 600~1200자, 문단은 \n\n
+  historyNote: string // 정사로 본 실제 모습, 150~400자
   battles: { name: string; year: number | null; role: string; source: Source }[] // 2개 이상
   relations: { id?: string; name?: string; type: RelationType; note: string; source: Source }[] // id 또는 name 하나는 필수
   novelVsHistory: string[] // 2~4개
