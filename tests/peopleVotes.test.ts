@@ -2,7 +2,8 @@ import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
 import { readFileSync } from 'node:fs'
 import { join } from 'node:path'
 import { getPerson, PEOPLE_IDS } from '@/content/samgukPeople'
-import { pairKey, validateVote, statsOwner, voterHash, kstDay, voteGuard } from '@/lib/people/votes'
+import { createHmac } from 'node:crypto'
+import { pairKey, validateVote, statsOwner, voterHash, kstDay, voteGuard, signPvCookie, verifyPvCookie } from '@/lib/people/votes'
 import { readStats, readCheerRanking, storeConfig } from '@/lib/people/store'
 import { POST } from '@/app/api/people/vote/route'
 import { GET } from '@/app/api/people/stats/route'
@@ -14,6 +15,14 @@ const sceneKey = p.sceneOptions[0].key
 const verdict = p.verdictOptions[0]
 const UUID = '11111111-2222-4333-8444-555555555555'
 const IP = '203.0.113.77'
+const compact = (d: Date) => kstDay(d).replace(/-/g, '')
+const TODAY = () => compact(new Date())
+const YESTERDAY = () => compact(new Date(Date.now() - 24 * 3600 * 1000))
+const OTHER_UUID = UUID.replace('1111', '9999')
+// 비밀 값은 stubUpstream의 서비스 키 'k'
+const pv = async (uuid: string, day: string, secret = 'k') => `pv=${await signPvCookie(secret, uuid, day)}`
+const rows = (f: ReturnType<typeof vi.fn>) =>
+  f.mock.calls.filter((c) => String(c[0]).includes('people_votes')).map((c) => JSON.parse(c[1].body).voter_hash as string)
 
 describe('pairKey', () => {
   it('정렬해서 잇는다', () => {
@@ -118,6 +127,26 @@ describe('voterHash / kstDay', () => {
   })
 })
 
+describe('pv 쿠키 서명', () => {
+  it('형식은 uuid.YYYYMMDD.sig(HMAC-SHA256 pv|uuid|day 앞 32자 hex)', async () => {
+    const v = await signPvCookie('s', UUID, '20261103')
+    const sig = createHmac('sha256', 's').update(`pv|${UUID}|20261103`).digest('hex').slice(0, 32)
+    expect(v).toBe(`${UUID}.20261103.${sig}`)
+    expect(await verifyPvCookie('s', v)).toEqual({ uuid: UUID, issuedDay: '20261103' })
+  })
+  it('서명·형식·비밀 값이 틀리면 null', async () => {
+    const v = await signPvCookie('s', UUID, '20261103')
+    expect(await verifyPvCookie('t', v)).toBeNull()
+    expect(await verifyPvCookie('s', v.slice(0, -1) + (v.endsWith('0') ? '1' : '0'))).toBeNull()
+    expect(await verifyPvCookie('s', v.replace('20261103', '20261104'))).toBeNull()
+    expect(await verifyPvCookie('s', UUID)).toBeNull()
+    expect(await verifyPvCookie('s', `${UUID}.20261103`)).toBeNull()
+    expect(await verifyPvCookie('s', `${UUID}.2026-11-03.${v.split('.')[2]}`)).toBeNull()
+    expect(await verifyPvCookie('s', `${v}.x`)).toBeNull()
+    expect(await verifyPvCookie('s', '')).toBeNull()
+  })
+})
+
 const req = (body: string, headers: Record<string, string> = {}) =>
   new Request('http://localhost/api/people/vote', {
     method: 'POST',
@@ -188,22 +217,26 @@ describe('POST /api/people/vote', () => {
     expect(verdictCall[1].headers.Prefer).toBe('resolution=merge-duplicates,return=representation')
   })
 
-  it('Set-Cookie pv는 쿠키가 없을 때만, 속성은 지정대로', async () => {
+  it('Set-Cookie pv는 유효한 쿠키가 없을 때만, 속성은 지정대로, 값은 서명된 오늘 날짜', async () => {
     stubUpstream()
     const first = await POST(req(cheerBody))
     const cookie = first.headers.get('set-cookie')!
-    expect(cookie).toMatch(/^pv=[0-9a-f-]{36}; HttpOnly; SameSite=Lax; Path=\/api\/people; Max-Age=31536000; Secure$/)
-    const second = await POST(req(cheerBody, { cookie: `a=1; pv=${UUID}` }))
+    expect(cookie).toMatch(/^pv=[0-9a-f-]{36}\.\d{8}\.[0-9a-f]{32}; HttpOnly; SameSite=Lax; Path=\/api\/people; Max-Age=31536000; Secure$/)
+    const value = cookie.split(';')[0].slice(3)
+    expect(await verifyPvCookie('k', value)).toEqual({ uuid: value.slice(0, 36), issuedDay: TODAY() })
+    const second = await POST(req(cheerBody, { cookie: `a=1; ${await pv(UUID, YESTERDAY())}` }))
     expect(second.status).toBe(200)
     expect(second.headers.get('set-cookie')).toBeNull()
     // 형식이 틀린 쿠키는 없는 것으로 보고 새로 발급
-    const third = await POST(req(cheerBody, { cookie: 'pv=bogus' }))
-    expect(third.headers.get('set-cookie')).toMatch(/^pv=/)
+    for (const bad of ['pv=bogus', `pv=${UUID}`, `pv=${UUID}.${YESTERDAY()}.${'0'.repeat(32)}`]) {
+      const third = await POST(req(cheerBody, { cookie: bad }))
+      expect(third.headers.get('set-cookie')).toMatch(/^pv=/)
+    }
   })
 
   it('Supabase로 보낸 본문에 IP·쿠키 값이 없고 voter_hash는 64자 hex', async () => {
     const f = stubUpstream()
-    await POST(req(cheerBody, { cookie: `pv=${UUID}` }))
+    await POST(req(cheerBody, { cookie: await pv(UUID, YESTERDAY()) }))
     for (const [, init] of f.mock.calls) {
       const body = String(init.body)
       expect(body).not.toContain(IP)
@@ -216,14 +249,61 @@ describe('POST /api/people/vote', () => {
     expect(Object.keys(sent).sort()).toEqual(['day', 'kind', 'option', 'target', 'voter_hash'])
   })
 
-  it('같은 쿠키·IP면 같은 해시, 쿠키가 다르면 다른 해시', async () => {
+  it('서명 맞는 어제 쿠키: uuid로 해시(같은 쿠키·IP면 같은 해시, uuid가 다르면 다른 해시)', async () => {
     const f = stubUpstream()
-    await POST(req(cheerBody, { cookie: `pv=${UUID}` }))
-    await POST(req(cheerBody, { cookie: `pv=${UUID}` }))
-    await POST(req(cheerBody, { cookie: `pv=${UUID.replace('1111', '9999')}` }))
-    const h = f.mock.calls.filter((c) => String(c[0]).includes('people_votes')).map((c) => JSON.parse(c[1].body).voter_hash)
+    const a = await pv(UUID, YESTERDAY())
+    await POST(req(cheerBody, { cookie: a }))
+    await POST(req(cheerBody, { cookie: a }))
+    await POST(req(cheerBody, { cookie: await pv(OTHER_UUID, YESTERDAY()) }))
+    const h = rows(f)
     expect(h[0]).toBe(h[1])
     expect(h[0]).not.toBe(h[2])
+    expect(h[0]).toBe(await voterHash('k', kstDay(new Date()), UUID, IP))
+  })
+
+  it('위조 UUID 쿠키(서명 없음·틀림)는 new 취급: 같은 IP·대상이면 해시가 같아 두 번째는 세지 않는다', async () => {
+    const f = stubUpstream()
+    await POST(req(cheerBody, { cookie: `pv=${UUID}` }))
+    await POST(req(cheerBody, { cookie: `pv=${OTHER_UUID}` }))
+    await POST(req(cheerBody, { cookie: `pv=${OTHER_UUID}.${YESTERDAY()}.${'a'.repeat(32)}` }))
+    await POST(req(cheerBody, { cookie: await pv(OTHER_UUID, YESTERDAY(), 'wrong-secret') }))
+    const h = rows(f)
+    const expected = await voterHash('k', kstDay(new Date()), 'new', IP)
+    expect(h).toEqual([expected, expected, expected, expected])
+  })
+
+  it('위조 쿠키로 두 번째 요청: Supabase가 중복으로 돌려주면 counted:false', async () => {
+    stubUpstream([{ id: 1 }])
+    expect((await (await POST(req(cheerBody, { cookie: `pv=${UUID}` }))).json()).counted).toBe(true)
+    stubUpstream([])
+    expect((await (await POST(req(cheerBody, { cookie: `pv=${OTHER_UUID}` }))).json()).counted).toBe(false)
+  })
+
+  it('오늘 발급된 쿠키: 첫날은 new로 해시하고 새 쿠키는 다시 내리지 않는다', async () => {
+    const f = stubUpstream()
+    const res = await POST(req(cheerBody, { cookie: await pv(UUID, TODAY()) }))
+    expect(res.headers.get('set-cookie')).toBeNull()
+    expect(rows(f)[0]).toBe(await voterHash('k', kstDay(new Date()), 'new', IP))
+  })
+
+  it('비밀 값이 바뀌면 기존 쿠키는 무효(new 취급, 새 쿠키 발급)', async () => {
+    const f = stubUpstream()
+    const old = await pv(UUID, YESTERDAY())
+    vi.stubEnv('PEOPLE_VOTE_SECRET', 'rotated')
+    const res = await POST(req(cheerBody, { cookie: old }))
+    expect(res.headers.get('set-cookie')).toMatch(/^pv=/)
+    expect(rows(f)[0]).toBe(await voterHash('rotated', kstDay(new Date()), 'new', IP))
+  })
+
+  it('쿠키를 새로 받아 곧바로 다시 쓰는 스크립트도 첫날은 한 표(발급 → 사용 반복)', async () => {
+    const f = stubUpstream()
+    let cookie: string | undefined
+    for (let i = 0; i < 3; i++) {
+      const res = await POST(req(cheerBody, cookie ? { cookie } : {}))
+      cookie = res.headers.get('set-cookie')?.split(';')[0] ?? cookie
+    }
+    const h = rows(f)
+    expect(new Set(h).size).toBe(1)
   })
 
   it('응답에 집계가 담긴다 (cheer 합, 대결은 라이벌 쌍만 전달)', async () => {
@@ -302,7 +382,7 @@ describe('POST /api/people/vote', () => {
     stubUpstream()
     vi.stubEnv('PEOPLE_VOTE_SECRET', '')
     const f = vi.mocked(fetch)
-    const res = await POST(req(cheerBody, { cookie: `pv=${UUID}` }))
+    const res = await POST(req(cheerBody, { cookie: await pv(UUID, YESTERDAY(), 'k') }))
     expect(res.status).toBe(200)
     const sent = JSON.parse(String(f.mock.calls[0][1]!.body))
     expect(sent.voter_hash).toBe(await voterHash('k', kstDay(new Date()), UUID, IP))
@@ -333,7 +413,7 @@ describe('POST /api/people/vote', () => {
     const f = stubUpstream()
     const a = await POST(req(cheerBody))
     const b = await POST(req(cheerBody))
-    expect(a.headers.get('set-cookie')).toMatch(/^pv=[0-9a-f-]{36};/)
+    expect(a.headers.get('set-cookie')).toMatch(/^pv=[0-9a-f-]{36}\.\d{8}\.[0-9a-f]{32};/)
     expect(a.headers.get('set-cookie')).not.toBe(b.headers.get('set-cookie'))
     const h = f.mock.calls.filter((c) => String(c[0]).includes('people_votes')).map((c) => JSON.parse(c[1].body).voter_hash)
     expect(h[0]).toBe(h[1])

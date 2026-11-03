@@ -79,3 +79,31 @@ export async function voterHash(secret: string, day: string, deviceId: string, i
   const daily = await hmacHex(secret, day)
   return (await hmacHex(daily.raw, `${deviceId}|${ip}`)).hex
 }
+
+const PV_UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i
+const PV_DAY = /^\d{8}$/
+
+async function pvSig(secret: string, uuid: string, issuedDay: string): Promise<string> {
+  return (await hmacHex(secret, `pv|${uuid}|${issuedDay}`)).hex.slice(0, 32)
+}
+
+/** `pv` 쿠키 값: `<uuid>.<발급일 YYYYMMDD>.<서명>`. 서명 = HMAC-SHA256(secret, `pv|uuid|발급일`) 앞 32자 hex */
+export async function signPvCookie(secret: string, uuid: string, issuedDay: string): Promise<string> {
+  return `${uuid}.${issuedDay}.${await pvSig(secret, uuid, issuedDay)}`
+}
+
+/** 형식이 틀리거나 서명이 안 맞으면 null (쿠키 없음으로 취급) */
+export async function verifyPvCookie(
+  secret: string,
+  value: string,
+): Promise<{ uuid: string; issuedDay: string } | null> {
+  const parts = value.split('.')
+  if (parts.length !== 3) return null
+  const [uuid, issuedDay, sig] = parts
+  if (!PV_UUID.test(uuid) || !PV_DAY.test(issuedDay) || !/^[0-9a-f]{32}$/.test(sig)) return null
+  const want = await pvSig(secret, uuid, issuedDay)
+  // 길이가 같은 hex끼리 상수 시간 비교
+  let diff = 0
+  for (let i = 0; i < want.length; i++) diff |= want.charCodeAt(i) ^ sig.charCodeAt(i)
+  return diff === 0 ? { uuid, issuedDay } : null
+}

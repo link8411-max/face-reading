@@ -9,7 +9,7 @@ type Done = 'counted' | 'already' | 'thanks'
 
 const LABEL: Record<Done, string> = {
   counted: '오늘 응원했어요',
-  already: '오늘은 이미 응원했어요',
+  already: '오늘 응원이 반영됐어요',
   thanks: '고마워요',
 }
 

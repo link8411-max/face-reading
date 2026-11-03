@@ -1,18 +1,14 @@
 import { NextResponse } from 'next/server'
 import { clientIp, readLimitedBody } from '@/lib/duel/feedbackGuard'
 import { insertVote, readStatsWithRank, storeConfig } from '@/lib/people/store'
-import { kstDay, statsOwner, validateVote, voteGuard, voterHash } from '@/lib/people/votes'
+import { kstDay, signPvCookie, statsOwner, validateVote, verifyPvCookie, voteGuard, voterHash } from '@/lib/people/votes'
 
 const COOKIE = 'pv'
-const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i
 
-function readDeviceId(request: Request): string | null {
+function readPvCookie(request: Request): string | null {
   for (const part of (request.headers.get('cookie') ?? '').split(';')) {
     const [name, ...rest] = part.trim().split('=')
-    if (name === COOKIE) {
-      const v = rest.join('=')
-      return UUID.test(v) ? v : null
-    }
+    if (name === COOKIE) return rest.join('=')
   }
   return null
 }
@@ -68,19 +64,25 @@ export async function POST(request: Request) {
     return NextResponse.json({ ok: false, reason: 'disabled' }, { status: 503 })
   }
 
-  const existing = readDeviceId(request)
-  // 쿠키가 없는 요청의 해시는 새 UUID가 아니라 고정값('new')으로 만든다. 쿠키 없이 반복하는 스크립트가 매번 새 표를 얻지 못하게 한다.
-  // 새 쿠키는 다음 요청부터 쓰도록 계속 내려 준다.
-  const issued = existing ?? crypto.randomUUID()
-  const deviceId = existing ?? 'new'
   // 빈 문자열도 없는 것으로 본다(빈 키는 HMAC 키로 쓸 수 없다)
   const secret = process.env.PEOPLE_VOTE_SECRET || cfg.key
   const day = kstDay(new Date())
+  const today = day.replace(/-/g, '')
 
-  // 새로 만든 기기 id는 어떤 응답에도 쿠키로 실어 보낸다. 집계 읽기가 실패해 다시 눌러도 같은 해시가 되어 응원이 두 번 세어지지 않는다.
+  // pv 쿠키는 서버가 서명한 `<uuid>.<발급일>.<서명>`만 받는다. 형식·서명이 틀리면 쿠키가 없는 것으로 본다.
+  // 아무 UUID나 받으면 요청마다 새 UUID를 보내 표를 계속 늘릴 수 있다.
+  const raw = readPvCookie(request)
+  const valid = raw === null ? null : await verifyPvCookie(secret, raw)
+  // 발급일 다음 날부터만 쿠키의 uuid로 해시한다. 유효한 쿠키가 없거나 발급일이 오늘이면 고정값('new')이라
+  // 쿠키를 새로 받아 곧바로 쓰는 스크립트도 IP·대상마다 하루 한 표가 상한이다.
+  const deviceId = valid && valid.issuedDay < today ? valid.uuid : 'new'
+  // 유효한 쿠키가 없을 때만 새 쿠키를 내려 준다
+  const issued = valid ? null : await signPvCookie(secret, crypto.randomUUID(), today)
+
+  // 새로 만든 쿠키는 어떤 응답에도 실어 보낸다. 집계 읽기가 실패해 다시 눌러도 같은 해시가 되어 응원이 두 번 세어지지 않는다.
   const respond = (data: unknown, status = 200) => {
     const res = NextResponse.json(data, { status })
-    if (!existing) {
+    if (issued) {
       res.headers.append(
         'Set-Cookie',
         `${COOKIE}=${issued}; HttpOnly; SameSite=Lax; Path=/api/people; Max-Age=31536000; Secure`,
