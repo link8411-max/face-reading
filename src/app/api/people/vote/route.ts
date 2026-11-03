@@ -44,14 +44,13 @@ export async function POST(request: Request) {
 
   const existing = readDeviceId(request)
   const deviceId = existing ?? crypto.randomUUID()
-  const secret = process.env.PEOPLE_VOTE_SECRET ?? cfg.key
+  // 빈 문자열도 없는 것으로 본다(빈 키는 HMAC 키로 쓸 수 없다)
+  const secret = process.env.PEOPLE_VOTE_SECRET || cfg.key
   const day = kstDay(new Date())
 
-  try {
-    const voter_hash = await voterHash(secret, day, deviceId, ip)
-    const { counted } = await insertVote(cfg, { ...vote, voter_hash, day })
-    const stats = await readStats(cfg, vote.kind === 'duel' ? duelOwner(vote.target) : vote.target)
-    const res = NextResponse.json({ ok: true, counted, stats })
+  // 새로 만든 기기 id는 어떤 응답에도 쿠키로 실어 보낸다. 집계 읽기가 실패해 다시 눌러도 같은 해시가 되어 응원이 두 번 세어지지 않는다.
+  const respond = (data: unknown, status = 200) => {
+    const res = NextResponse.json(data, { status })
     if (!existing) {
       res.headers.append(
         'Set-Cookie',
@@ -59,9 +58,23 @@ export async function POST(request: Request) {
       )
     }
     return res
-  } catch {
-    return NextResponse.json({ ok: false }, { status: 502 })
   }
+
+  let counted: boolean
+  try {
+    const voter_hash = await voterHash(secret, day, deviceId, ip)
+    counted = (await insertVote(cfg, { ...vote, voter_hash, day })).counted
+  } catch {
+    return respond({ ok: false }, 502)
+  }
+  // 저장은 됐으니 집계 읽기 실패는 치명적이지 않다(stats: null → 화면은 숫자를 숨긴다)
+  let stats = null
+  try {
+    stats = await readStats(cfg, vote.kind === 'duel' ? duelOwner(vote.target) : vote.target)
+  } catch {
+    stats = null
+  }
+  return respond({ ok: true, counted, stats })
 }
 
 // 대결 투표 뒤 보여 줄 집계의 주인공: 쌍 키의 두 id 중 그 쌍을 라이벌로 가진 열전 인물

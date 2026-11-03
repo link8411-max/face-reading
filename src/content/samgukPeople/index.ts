@@ -10,5 +10,5 @@ export const PEOPLE: Record<string, PersonEntry> = Object.fromEntries(ENTRIES.ma
 export const PEOPLE_IDS: string[] = ENTRIES.map((e) => e.id)
 
 export function getPerson(id: string): PersonEntry | undefined {
-  return PEOPLE[id]
+  return Object.hasOwn(PEOPLE, id) ? PEOPLE[id] : undefined
 }

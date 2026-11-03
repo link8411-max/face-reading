@@ -57,6 +57,20 @@ describe('validateVote', () => {
   })
 })
 
+describe('상속 키 id는 인물이 아니다', () => {
+  const junk = ['constructor', '__proto__', 'toString', 'hasOwnProperty']
+  it('getPerson', () => {
+    for (const id of junk) expect(getPerson(id)).toBeUndefined()
+  })
+  it.each(junk)('validateVote 네 종류 모두 null (%s)', (id) => {
+    expect(validateVote({ kind: 'cheer', target: id, option: 'cheer' })).toBeNull()
+    expect(validateVote({ kind: 'scene', target: id, option: sceneKey })).toBeNull()
+    expect(validateVote({ kind: 'verdict', target: id, option: verdict })).toBeNull()
+    expect(validateVote({ kind: 'duel', target: pairKey(id, 'guanyu'), option: 'guanyu' })).toBeNull()
+    expect(validateVote({ kind: 'duel', target: pairKey(id, id), option: id })).toBeNull()
+  })
+})
+
 describe('voterHash / kstDay', () => {
   it('같은 입력 같은 값, 날짜가 다르면 다른 값, 64자 hex, 원본 미포함', async () => {
     const a = await voterHash('s', '2026-11-03', UUID, IP)
@@ -192,6 +206,40 @@ describe('POST /api/people/vote', () => {
     expect(JSON.parse(rpcCall[1].body)).toEqual({ p_id: 'guanyu', p_pair: pairKey('guanyu', p.rivalId) })
   })
 
+  it('집계 읽기만 실패하면 200 stats:null, 쿠키도 붙는다', async () => {
+    vi.stubEnv('SUPABASE_URL', 'https://x.supabase.co')
+    vi.stubEnv('SUPABASE_SERVICE_KEY', 'k')
+    vi.stubGlobal(
+      'fetch',
+      vi.fn().mockImplementation(async (url: string) =>
+        String(url).includes('/rpc/') ? new Response('no', { status: 500 }) : Response.json([{ id: 1 }], { status: 201 }),
+      ),
+    )
+    const res = await POST(req(cheerBody))
+    expect(res.status).toBe(200)
+    expect(await res.json()).toEqual({ ok: true, counted: true, stats: null })
+    expect(res.headers.get('set-cookie')).toMatch(/^pv=/)
+  })
+
+  it('저장 실패 502에도 새 쿠키가 붙는다', async () => {
+    vi.stubEnv('SUPABASE_URL', 'https://x.supabase.co')
+    vi.stubEnv('SUPABASE_SERVICE_KEY', 'k')
+    vi.stubGlobal('fetch', vi.fn().mockResolvedValue(new Response('no', { status: 500 })))
+    const res = await POST(req(cheerBody))
+    expect(res.status).toBe(502)
+    expect(res.headers.get('set-cookie')).toMatch(/^pv=/)
+  })
+
+  it('PEOPLE_VOTE_SECRET가 빈 문자열이면 서비스 키로 대신한다', async () => {
+    stubUpstream()
+    vi.stubEnv('PEOPLE_VOTE_SECRET', '')
+    const f = vi.mocked(fetch)
+    const res = await POST(req(cheerBody, { cookie: `pv=${UUID}` }))
+    expect(res.status).toBe(200)
+    const sent = JSON.parse(String(f.mock.calls[0][1]!.body))
+    expect(sent.voter_hash).toBe(await voterHash('k', kstDay(new Date()), UUID, IP))
+  })
+
   it('Supabase 실패는 502, 속도 제한은 429', async () => {
     vi.stubEnv('SUPABASE_URL', 'https://x.supabase.co')
     vi.stubEnv('SUPABASE_SERVICE_KEY', 'k')
@@ -217,6 +265,7 @@ describe('GET /api/people/stats', () => {
   it('id 없음·없는 인물 400, env 없음 503', async () => {
     expect((await get('')).status).toBe(400)
     expect((await get('?id=nobody')).status).toBe(400)
+    for (const id of ['constructor', '__proto__', 'toString']) expect((await get(`?id=${id}`)).status).toBe(400)
     vi.stubEnv('SUPABASE_URL', '')
     vi.stubEnv('SUPABASE_SERVICE_KEY', '')
     expect((await get('?id=guanyu')).status).toBe(503)
