@@ -1,0 +1,269 @@
+import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
+import { readFileSync } from 'node:fs'
+import { join } from 'node:path'
+import { getPerson } from '@/content/samgukPeople'
+import { pairKey, validateVote, voterHash, kstDay, voteGuard } from '@/lib/people/votes'
+import { readStats, readCheerRanking, storeConfig } from '@/lib/people/store'
+import { POST } from '@/app/api/people/vote/route'
+import { GET } from '@/app/api/people/stats/route'
+
+const p = getPerson('guanyu')!
+const other = getPerson('caocao')!
+const notRival = ['lvbu', 'zhangfei', 'liubei'].find((id) => id !== p.rivalId)!
+const sceneKey = p.sceneOptions[0].key
+const verdict = p.verdictOptions[0]
+const UUID = '11111111-2222-4333-8444-555555555555'
+const IP = '203.0.113.77'
+
+describe('pairKey', () => {
+  it('정렬해서 잇는다', () => {
+    expect(pairKey('guanyu', 'caocao')).toBe('caocao__guanyu')
+    expect(pairKey('caocao', 'guanyu')).toBe('caocao__guanyu')
+    expect(pairKey('guanyu', p.rivalId)).toBe(pairKey(p.rivalId, 'guanyu'))
+  })
+})
+
+describe('validateVote', () => {
+  const cheer = { kind: 'cheer', target: 'guanyu', option: 'cheer' }
+  it('cheer 정상·잘못된 인물·잘못된 option', () => {
+    expect(validateVote(cheer)).toEqual(cheer)
+    expect(validateVote({ ...cheer, target: 'nobody' })).toBeNull()
+    expect(validateVote({ ...cheer, option: 'x' })).toBeNull()
+  })
+  it('duel: 라이벌 쌍만, option은 두 id 중 하나', () => {
+    const target = pairKey('guanyu', p.rivalId)
+    expect(validateVote({ kind: 'duel', target, option: 'guanyu' })).not.toBeNull()
+    expect(validateVote({ kind: 'duel', target, option: p.rivalId })).not.toBeNull()
+    expect(validateVote({ kind: 'duel', target, option: notRival })).toBeNull()
+    expect(validateVote({ kind: 'duel', target: pairKey('guanyu', notRival), option: 'guanyu' })).toBeNull()
+    expect(validateVote({ kind: 'duel', target: `${p.rivalId}__guanyu`, option: 'guanyu' })).toEqual(
+      target === `${p.rivalId}__guanyu` ? { kind: 'duel', target, option: 'guanyu' } : null,
+    )
+  })
+  it('scene: 그 인물의 key만', () => {
+    expect(validateVote({ kind: 'scene', target: 'guanyu', option: sceneKey })).not.toBeNull()
+    const foreign = other.sceneOptions.find((o) => !p.sceneOptions.some((q) => q.key === o.key))!
+    expect(validateVote({ kind: 'scene', target: 'guanyu', option: foreign.key })).toBeNull()
+  })
+  it('verdict: 그 인물 선택지 안만', () => {
+    expect(validateVote({ kind: 'verdict', target: 'guanyu', option: verdict })).not.toBeNull()
+    const outside = (['loyal', 'righteous', 'brave', 'strategist', 'ambitious', 'tragic', 'overrated', 'underrated'] as const).find(
+      (v) => !p.verdictOptions.includes(v),
+    )!
+    expect(validateVote({ kind: 'verdict', target: 'guanyu', option: outside })).toBeNull()
+  })
+  it('객체가 아니면 null', () => {
+    for (const b of ['x', null, [], 1, undefined, [cheer]]) expect(validateVote(b)).toBeNull()
+  })
+})
+
+describe('voterHash / kstDay', () => {
+  it('같은 입력 같은 값, 날짜가 다르면 다른 값, 64자 hex, 원본 미포함', async () => {
+    const a = await voterHash('s', '2026-11-03', UUID, IP)
+    expect(a).toBe(await voterHash('s', '2026-11-03', UUID, IP))
+    expect(a).not.toBe(await voterHash('s', '2026-11-04', UUID, IP))
+    expect(a).not.toBe(await voterHash('t', '2026-11-03', UUID, IP))
+    expect(a).toMatch(/^[0-9a-f]{64}$/)
+    expect(a).not.toContain(IP)
+    expect(a).not.toContain(UUID)
+  })
+  it('한국 날짜', () => {
+    expect(kstDay(new Date('2026-11-03T15:30:00Z'))).toBe('2026-11-04')
+    expect(kstDay(new Date('2026-11-03T14:30:00Z'))).toBe('2026-11-03')
+  })
+})
+
+const req = (body: string, headers: Record<string, string> = {}) =>
+  new Request('http://localhost/api/people/vote', {
+    method: 'POST',
+    body,
+    headers: { 'x-forwarded-for': IP, ...headers },
+  })
+const cheerBody = JSON.stringify({ kind: 'cheer', target: 'guanyu', option: 'cheer' })
+
+const stubUpstream = (insertRows: unknown[] = [{ id: 1 }], statsRows: unknown[] = []) => {
+  vi.stubEnv('SUPABASE_URL', 'https://x.supabase.co/')
+  vi.stubEnv('SUPABASE_SERVICE_KEY', 'k')
+  const f = vi.fn().mockImplementation(async (url: string) =>
+    String(url).includes('/rpc/')
+      ? Response.json(statsRows)
+      : Response.json(insertRows, { status: 201 }),
+  )
+  vi.stubGlobal('fetch', f)
+  return f
+}
+
+describe('POST /api/people/vote', () => {
+  beforeEach(() => voteGuard.reset())
+  afterEach(() => {
+    vi.unstubAllEnvs()
+    vi.unstubAllGlobals()
+  })
+
+  it('env 없으면 503 disabled, fetch 0회', async () => {
+    vi.stubEnv('SUPABASE_URL', '')
+    vi.stubEnv('SUPABASE_SERVICE_KEY', '')
+    const f = vi.fn()
+    vi.stubGlobal('fetch', f)
+    const res = await POST(req(cheerBody))
+    expect(res.status).toBe(503)
+    expect(await res.json()).toEqual({ ok: false, reason: 'disabled' })
+    expect(f).not.toHaveBeenCalled()
+  })
+
+  it('깨진 JSON·검증 실패는 400, 2048바이트 초과는 413 (fetch 0회)', async () => {
+    const f = stubUpstream()
+    expect((await POST(req('{'))).status).toBe(400)
+    expect((await POST(req('{}'))).status).toBe(400)
+    expect((await POST(req('[]'))).status).toBe(400)
+    expect((await POST(req(JSON.stringify({ kind: 'cheer', target: 'guanyu', option: 'cheer', pad: 'x'.repeat(3000) })))).status).toBe(413)
+    expect(f).not.toHaveBeenCalled()
+  })
+
+  it('cheer: 처음은 counted true, 같은 날 두 번째(빈 배열)는 false', async () => {
+    stubUpstream([{ id: 1 }])
+    const first = await POST(req(cheerBody))
+    expect(first.status).toBe(200)
+    expect((await first.json()).counted).toBe(true)
+    stubUpstream([])
+    const second = await POST(req(cheerBody))
+    const json = await second.json()
+    expect(json.counted).toBe(false)
+    expect(json.ok).toBe(true)
+  })
+
+  it('cheer는 ignore-duplicates, 나머지는 merge-duplicates로 upsert', async () => {
+    const f = stubUpstream()
+    await POST(req(cheerBody))
+    const [url, init] = f.mock.calls[0]
+    expect(url).toBe('https://x.supabase.co/rest/v1/people_votes?on_conflict=kind,target,voter_hash,day')
+    expect(init.headers.Prefer).toBe('resolution=ignore-duplicates,return=representation')
+    await POST(req(JSON.stringify({ kind: 'verdict', target: 'guanyu', option: verdict })))
+    const verdictCall = f.mock.calls.find((c) => c[1].body?.includes('"verdict"') && String(c[0]).includes('people_votes'))!
+    expect(verdictCall[1].headers.Prefer).toBe('resolution=merge-duplicates,return=representation')
+  })
+
+  it('Set-Cookie pv는 쿠키가 없을 때만, 속성은 지정대로', async () => {
+    stubUpstream()
+    const first = await POST(req(cheerBody))
+    const cookie = first.headers.get('set-cookie')!
+    expect(cookie).toMatch(/^pv=[0-9a-f-]{36}; HttpOnly; SameSite=Lax; Path=\/api\/people; Max-Age=31536000; Secure$/)
+    const second = await POST(req(cheerBody, { cookie: `a=1; pv=${UUID}` }))
+    expect(second.status).toBe(200)
+    expect(second.headers.get('set-cookie')).toBeNull()
+    // 형식이 틀린 쿠키는 없는 것으로 보고 새로 발급
+    const third = await POST(req(cheerBody, { cookie: 'pv=bogus' }))
+    expect(third.headers.get('set-cookie')).toMatch(/^pv=/)
+  })
+
+  it('Supabase로 보낸 본문에 IP·쿠키 값이 없고 voter_hash는 64자 hex', async () => {
+    const f = stubUpstream()
+    await POST(req(cheerBody, { cookie: `pv=${UUID}` }))
+    for (const [, init] of f.mock.calls) {
+      const body = String(init.body)
+      expect(body).not.toContain(IP)
+      expect(body).not.toContain(UUID)
+      expect(JSON.stringify(init.headers)).not.toContain(UUID)
+    }
+    const sent = JSON.parse(f.mock.calls[0][1].body)
+    expect(sent.voter_hash).toMatch(/^[0-9a-f]{64}$/)
+    expect(sent.day).toBe(kstDay(new Date()))
+    expect(Object.keys(sent).sort()).toEqual(['day', 'kind', 'option', 'target', 'voter_hash'])
+  })
+
+  it('같은 쿠키·IP면 같은 해시, 쿠키가 다르면 다른 해시', async () => {
+    const f = stubUpstream()
+    await POST(req(cheerBody, { cookie: `pv=${UUID}` }))
+    await POST(req(cheerBody, { cookie: `pv=${UUID}` }))
+    await POST(req(cheerBody, { cookie: `pv=${UUID.replace('1111', '9999')}` }))
+    const h = f.mock.calls.filter((c) => String(c[0]).includes('people_votes')).map((c) => JSON.parse(c[1].body).voter_hash)
+    expect(h[0]).toBe(h[1])
+    expect(h[0]).not.toBe(h[2])
+  })
+
+  it('응답에 집계가 담긴다 (cheer 합, 대결은 라이벌 쌍만 전달)', async () => {
+    const f = stubUpstream([{ id: 1 }], [
+      { kind: 'cheer', option: 'cheer', n: 7 },
+      { kind: 'verdict', option: verdict, n: 3 },
+    ])
+    const json = await (await POST(req(cheerBody))).json()
+    expect(json.stats).toEqual({ cheer: 7, duel: {}, scene: {}, verdict: { [verdict]: 3 } })
+    const rpcCall = f.mock.calls.find((c) => String(c[0]).includes('/rpc/people_stats'))!
+    expect(JSON.parse(rpcCall[1].body)).toEqual({ p_id: 'guanyu', p_pair: pairKey('guanyu', p.rivalId) })
+  })
+
+  it('Supabase 실패는 502, 속도 제한은 429', async () => {
+    vi.stubEnv('SUPABASE_URL', 'https://x.supabase.co')
+    vi.stubEnv('SUPABASE_SERVICE_KEY', 'k')
+    vi.stubGlobal('fetch', vi.fn().mockResolvedValue(new Response('no', { status: 500 })))
+    expect((await POST(req(cheerBody))).status).toBe(502)
+    vi.stubGlobal('fetch', vi.fn().mockRejectedValue(new Error('timeout')))
+    expect((await POST(req(cheerBody))).status).toBe(502)
+    voteGuard.reset()
+    stubUpstream()
+    let last = 200
+    for (let i = 0; i < 21; i++) last = (await POST(req(cheerBody))).status
+    expect(last).toBe(429)
+  })
+})
+
+describe('GET /api/people/stats', () => {
+  afterEach(() => {
+    vi.unstubAllEnvs()
+    vi.unstubAllGlobals()
+  })
+  const get = (q: string) => GET(new Request(`http://localhost/api/people/stats${q}`))
+
+  it('id 없음·없는 인물 400, env 없음 503', async () => {
+    expect((await get('')).status).toBe(400)
+    expect((await get('?id=nobody')).status).toBe(400)
+    vi.stubEnv('SUPABASE_URL', '')
+    vi.stubEnv('SUPABASE_SERVICE_KEY', '')
+    expect((await get('?id=guanyu')).status).toBe(503)
+  })
+  it('집계와 캐시 헤더, 실패는 502', async () => {
+    const pair = pairKey('guanyu', p.rivalId)
+    stubUpstream([], [
+      { kind: 'cheer', option: 'cheer', n: 2 },
+      { kind: 'duel', option: 'guanyu', n: 4 },
+      { kind: 'scene', option: sceneKey, n: 1 },
+    ])
+    const res = await get('?id=guanyu')
+    expect(res.status).toBe(200)
+    expect(res.headers.get('cache-control')).toBe('public, s-maxage=30, stale-while-revalidate=300')
+    expect(await res.json()).toEqual({ cheer: 2, duel: { guanyu: 4 }, scene: { [sceneKey]: 1 }, verdict: {} })
+    expect(pair).toBeTruthy()
+    vi.stubGlobal('fetch', vi.fn().mockResolvedValue(new Response('no', { status: 500 })))
+    expect((await get('?id=guanyu')).status).toBe(502)
+  })
+})
+
+describe('store', () => {
+  afterEach(() => {
+    vi.unstubAllEnvs()
+    vi.unstubAllGlobals()
+  })
+  it('storeConfig는 끝 슬래시를 떼고, env 없으면 null', () => {
+    vi.stubEnv('SUPABASE_URL', 'https://x.supabase.co//')
+    vi.stubEnv('SUPABASE_SERVICE_KEY', 'k')
+    expect(storeConfig()).toEqual({ url: 'https://x.supabase.co', key: 'k' })
+    vi.stubEnv('SUPABASE_URL', '')
+    expect(storeConfig()).toBeNull()
+  })
+  it('readCheerRanking은 target을 id로 바꾼다', async () => {
+    vi.stubGlobal('fetch', vi.fn().mockImplementation(async () => Response.json([{ target: 'guanyu', n: '5' }, { target: 3, n: 1 }])))
+    expect(await readCheerRanking({ url: 'https://x', key: 'k' })).toEqual([{ id: 'guanyu', n: 5 }])
+    expect(await readStats({ url: 'https://x', key: 'k' }, 'guanyu')).toEqual({ cheer: 0, duel: {}, scene: {}, verdict: {} })
+  })
+})
+
+describe('SQL 문서', () => {
+  const sql = readFileSync(join(__dirname, '../docs/people-votes.sql'), 'utf8')
+  it('테이블·유니크·RLS·함수', () => {
+    expect(sql).toContain('unique (kind, target, voter_hash, day)')
+    expect(sql).toContain('alter table people_votes enable row level security')
+    expect(sql).toContain('function people_stats(p_id text, p_pair text)')
+    expect(sql).toContain('function people_cheer_ranking()')
+    expect(sql).toContain('Supabase SQL Editor에서 한 번 실행')
+  })
+})
