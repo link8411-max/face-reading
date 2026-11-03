@@ -15,6 +15,7 @@ import { useHandedPhoto } from "@/hooks/useHandedPhoto";
 import { useResultShare } from "@/hooks/useResultShare";
 import { faceSlug, ogImageUrl, parseShared, shareUrl, SITE } from "@/lib/shareLinks";
 import { guardianFor } from "@/lib/samguk/guardian";
+import { getPerson } from "@/content/samgukPeople";
 import { Icon } from "@/components/icons";
 import Link from "next/link";
 import { SamgukCharacter } from "@/lib/samgukDB";
@@ -228,6 +229,12 @@ export default function SamgukPage() {
                 busy={busy || isCapturing}
                 notice={notice}
               />
+              {getPerson(result.character.id) && (
+                <p className="mt-3 flex flex-wrap justify-center gap-x-5 gap-y-1 text-[13px] text-muted">
+                  <Link href={`/samguk/people/${result.character.id}`} className="underline underline-offset-2">{result.character.name} 열전 보기</Link>
+                  <Link href={`/samguk/people/${result.character.id}#cheer`} className="underline underline-offset-2">내가 닮은 장수 응원하기</Link>
+                </p>
+              )}
               <div className="mt-2">
                 <CoupangBanner subId="samguk" />
               </div>

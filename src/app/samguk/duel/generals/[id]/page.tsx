@@ -5,6 +5,7 @@ import { DUEL_GENERAL_INTRO } from "@/content/duelGuide";
 import { BOSS_IDS, DUEL_GENERALS, getDuelGeneral } from "@/lib/duel/generals";
 import { SKILLS } from "@/lib/duel/skills";
 import { getCharacterById } from "@/lib/samgukDB";
+import { getPerson } from "@/content/samgukPeople";
 import RosterStartLink from "@/components/duel/RosterStartLink";
 
 type Props = { params: Promise<{ id: string }> };
@@ -83,6 +84,12 @@ export default async function GeneralPage({ params }: Props) {
             <p className="mt-1 text-sm">{g.kind} · 속도 {g.speed}</p>
           </div>
         </header>
+
+        {getPerson(id) && (
+          <Link href={`/samguk/people/${id}`} className="mt-5 flex h-11 items-center justify-center rounded-full border border-line bg-white text-sm font-medium text-ink">
+            {g.name} 인물열전 보기
+          </Link>
+        )}
 
         <section className="mt-6 space-y-3 leading-relaxed">
           <h2 className="font-serif font-bold text-lg">{g.name} 소개</h2>
