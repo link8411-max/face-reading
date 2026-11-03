@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import MbtiArticle from "@/components/mbti/MbtiArticle";
 import { mbtiProfiles, MBTI_SLUGS } from "@/content/mbtiTypes";
-import { isMbti } from "@/lib/mbti/compat";
+import { bestMatches, isMbti } from "@/lib/mbti/compat";
 
 export const dynamicParams = false;
 // 이달의 운세가 달이 바뀐 뒤에도 서버 HTML에 맞게 나오도록 하루마다 다시 만든다
@@ -17,8 +17,10 @@ export async function generateMetadata({ params }: { params: Promise<{ type: str
   const T = type.toUpperCase();
   if (!isMbti(T)) return {};
   const p = mbtiProfiles[T];
-  const title = `${T} ${p.nickname} — 궁합·연애·여행지·직업 – 운명을 읽다`;
-  const description = `${T}와 잘 맞는 MBTI, 연애 스타일, 어울리는 여행지와 직업까지. ${p.summary.slice(0, 60)}…`;
+  const withNickname = `${T} 특징·궁합 순위 | ${p.nickname} – 운명을 읽다`;
+  const title = withNickname.length <= 48 ? withNickname : `${T} 특징·궁합 순위 – 운명을 읽다`;
+  const best = bestMatches(T, "love", 1)[0];
+  const description = `${T}와 연애로 잘 맞는 유형 1위는 ${best}. 연애 스타일과 어울리는 직업, 여행지까지 정리했어요.`;
   const url = `https://unse-ai.com/mbti/${type}`;
   return {
     title, description,
