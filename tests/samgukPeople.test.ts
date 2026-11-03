@@ -7,6 +7,12 @@ import { relationsOf, factionGroups } from '@/lib/people/relations'
 
 const DB_IDS = new Set(allSamgukCharacters.map((c) => c.id))
 const SOURCES = ['정사', '배송지 주', '연의']
+// 첫 공개 때 쓴 열전이라 관계가 8개를 넘는 인물(내용 변경 없이 허용)
+const RELATION_MAX_EXCEPTIONS: Record<string, number> = { caocao: 10 }
+const CORE_IDS = new Set([
+  'caocao', 'guanyu', 'liubei', 'zhangfei', 'zhugeliang', 'zhaoyun', 'lvbu', 'sunquan', 'zhouyu', 'simayi', 'xiaohoudun',
+  'xiahouyuan', 'xuchu', 'dianwei', 'zhangliao', 'machao', 'huangzhong', 'dongzhuo', 'diaochan', 'sunce', 'jiangwei', 'zhangjiao',
+])
 
 // 객체 안의 모든 문자열을 모은다.
 function strings(v: unknown): string[] {
@@ -26,18 +32,33 @@ test('every PEOPLE id exists in allSamgukCharacters', () => {
   expect(getPerson('nobody')).toBeUndefined()
 })
 
+test('registers all 127 people', () => {
+  expect(PEOPLE_IDS).toHaveLength(127)
+  expect(new Set(PEOPLE_IDS).size).toBe(127)
+  for (const id of CORE_IDS) expect(PEOPLE_IDS, id).toContain(id)
+})
+
 test('each entry passes shape rules', () => {
   const verdictKeys = VERDICTS.map((v) => v.key) as string[]
   for (const id of PEOPLE_IDS) {
     const p = PEOPLE[id]
+    const core = CORE_IDS.has(id)
     expect(p.summary.length, `${id} summary`).toBeGreaterThanOrEqual(60)
     expect(p.summary.length, `${id} summary`).toBeLessThanOrEqual(200)
     expect(p.tags.length, `${id} tags`).toBeGreaterThanOrEqual(3)
     expect(p.tags.length, `${id} tags`).toBeLessThanOrEqual(5)
-    expect(p.life.length, `${id} life`).toBeGreaterThanOrEqual(600)
+    expect(p.funFacts.length, `${id} funFacts`).toBeGreaterThanOrEqual(2)
+    expect(p.funFacts.length, `${id} funFacts`).toBeLessThanOrEqual(3)
+    for (const f of p.funFacts) {
+      expect(f.length, `${id} funFact ${f}`).toBeGreaterThanOrEqual(15)
+      expect(f.length, `${id} funFact ${f}`).toBeLessThanOrEqual(70)
+    }
+    expect(p.life.length, `${id} life`).toBeGreaterThanOrEqual(core ? 600 : 400)
     expect(p.life.length, `${id} life`).toBeLessThanOrEqual(1200)
-    expect(p.historyNote.length, `${id} historyNote`).toBeGreaterThanOrEqual(150)
+    expect(p.historyNote.length, `${id} historyNote`).toBeGreaterThanOrEqual(core ? 150 : 100)
     expect(p.historyNote.length, `${id} historyNote`).toBeLessThanOrEqual(400)
+    expect(p.relations.length, `${id} relations`).toBeGreaterThanOrEqual(core ? 4 : 0)
+    expect(p.relations.length, `${id} relations`).toBeLessThanOrEqual(RELATION_MAX_EXCEPTIONS[id] ?? 8)
     expect(p.battles.length, `${id} battles`).toBeGreaterThanOrEqual(2)
     expect(p.novelVsHistory.length, `${id} novelVsHistory`).toBeGreaterThanOrEqual(2)
     expect(p.novelVsHistory.length, `${id} novelVsHistory`).toBeLessThanOrEqual(4)
@@ -50,7 +71,10 @@ test('each entry passes shape rules', () => {
     for (const v of p.verdictOptions) expect(verdictKeys, `${id} verdict ${v}`).toContain(v)
     expect(p.rivalId, `${id} rivalId`).not.toBe(id)
     expect(PEOPLE[p.rivalId], `${id} rival in PEOPLE`).toBeDefined()
-    expect(SOURCES).toContain(p.famousQuote.source)
+    if (p.famousQuote !== null) {
+      expect(p.famousQuote.text.length, `${id} quote`).toBeGreaterThan(0)
+      expect(SOURCES).toContain(p.famousQuote.source)
+    }
     for (const b of p.battles) expect(SOURCES).toContain(b.source)
     for (const s of p.sceneOptions) expect(SOURCES).toContain(s.source)
     for (const r of p.relations) {
@@ -85,7 +109,7 @@ test('relationsOf is bidirectional', () => {
 test('relationsOf marks pages and kin', () => {
   const g = relationsOf('guanyu')
   const ping = g.find((r) => r.otherId === 'guanping')!
-  expect(ping.hasPage).toBe(false)
+  expect(ping.hasPage).toBe(true) // 127명 전원 열전이 있다
   expect(ping.type).toBe('부자')
   expect(ping.kin).toBe(true)
   expect(ping.otherName).toBe('관평')

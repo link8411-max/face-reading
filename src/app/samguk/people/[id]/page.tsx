@@ -133,6 +133,14 @@ export default async function PersonPage({ params }: Props) {
               <li key={t} className="rounded-full border border-line bg-white px-3 py-1 text-xs">{t}</li>
             ))}
           </ul>
+          <div className="mt-4 bg-card-2 rounded-[22px] px-5 py-4">
+            <h2 className="font-serif font-bold text-base mb-2">알고 보면 재밌는 이야기</h2>
+            <ul className="list-disc pl-5 space-y-1.5 text-sm leading-relaxed">
+              {p.funFacts.map((f) => (
+                <li key={f}>{f}</li>
+              ))}
+            </ul>
+          </div>
         </section>
 
         {/* 4. 한눈에 보기 */}
@@ -150,13 +158,15 @@ export default async function PersonPage({ params }: Props) {
                 <p>정사: {p.weapon.history ?? "정사 기록 없음"}</p>
               </dd>
             </div>
-            <div>
-              <dt className="text-xs text-muted">대표 명언</dt>
-              <dd>
-                &ldquo;{p.famousQuote.text}&rdquo;
-                <SourceChip source={p.famousQuote.source} />
-              </dd>
-            </div>
+            {p.famousQuote && (
+              <div>
+                <dt className="text-xs text-muted">대표 명언</dt>
+                <dd>
+                  &ldquo;{p.famousQuote.text}&rdquo;
+                  <SourceChip source={p.famousQuote.source} />
+                </dd>
+              </div>
+            )}
           </dl>
         </section>
 
@@ -177,7 +187,7 @@ export default async function PersonPage({ params }: Props) {
           </details>
 
           <details className={detailsClass}>
-            <summary className={summaryClass}>주요 전투</summary>
+            <summary className={summaryClass}>주요 전투·사건</summary>
             <ul className="mt-3 space-y-2 text-sm leading-relaxed">
               {p.battles.map((b) => (
                 <li key={`${b.name}-${b.year}`}>

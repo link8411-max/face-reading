@@ -47,13 +47,29 @@ test('관우 페이지: 위에서 아래 순서와 details 4개', async () => {
   const order = [idx('쿠팡 추천 상품'), idx('나도 관우를 닮았을까'), idx('<h1'), idx('id="cheer"'), idx('<details'), idx('id="duel-vote"'), idx('id="scene-vote"'), idx('id="verdict-vote"')]
   expect([...order].sort((a, b) => a - b)).toEqual(order)
   expect(html.match(/<details/g)).toHaveLength(4)
-  for (const t of ['연의로 보는 생애', '주요 전투', '관계도·혈연', '정사와 연의의 차이', '정사로 본 실제 모습']) expect(html).toContain(t)
+  for (const t of ['연의로 보는 생애', '주요 전투·사건', '관계도·혈연', '정사와 연의의 차이', '정사로 본 실제 모습']) expect(html).toContain(t)
   expect(html).toContain('/samguk/duel?me=guanyu')
   expect(html).toContain('일기토에서 싸워 보기')
   expect(html).toContain('"@type":"Person"')
   expect(html).toContain('"@type":"BreadcrumbList"')
   expect(html).toContain('연의: 청룡언월도')
   expect(html).toContain('정사 기록 없음')
+  expect(html).toContain('알고 보면 재밌는 이야기')
+})
+
+test('funFacts는 요약·태그 아래, 한눈에 보기 위에 나온다', async () => {
+  const html = await render('guanyu')
+  const a = html.indexOf('알고 보면 재밌는 이야기')
+  expect(a).toBeGreaterThan(html.indexOf('<h1'))
+  expect(a).toBeLessThan(html.indexOf('한눈에 보기'))
+})
+
+test('famousQuote가 null이면 명언 칸을 숨긴다', async () => {
+  const { PEOPLE } = await import('@/content/samgukPeople')
+  const noQuote = Object.values(PEOPLE).find((p) => p.famousQuote === null)
+  const withQuote = Object.values(PEOPLE).find((p) => p.famousQuote !== null)!
+  expect(await render(withQuote.id)).toContain('대표 명언')
+  if (noQuote) expect(await render(noQuote.id)).not.toContain('대표 명언')
 })
 
 test('을/를: 받침에 따라', async () => {

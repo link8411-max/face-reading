@@ -2,10 +2,10 @@
 
 export type Source = '정사' | '배송지 주' | '연의'
 
-export type RelationType = '군신' | '의형제' | '부자' | '형제' | '부부' | '혼인' | '사촌' | '라이벌' | '원수'
+export type RelationType = '군신' | '의형제' | '부자' | '형제' | '부부' | '혼인' | '사촌' | '숙질' | '친족' | '동료' | '라이벌' | '원수'
 
 // 혈연으로 묶어 보여 주는 관계
-export const KIN_TYPES: RelationType[] = ['부자', '형제', '부부', '혼인', '사촌']
+export const KIN_TYPES: RelationType[] = ['부자', '형제', '부부', '혼인', '사촌', '숙질', '친족']
 
 export const VERDICTS = [
   { key: 'loyal', label: '충신' },
@@ -28,10 +28,11 @@ export interface PersonEntry {
   died: number | null
   birthplace: string | null
   summary: string // 2~3문장, 60~200자
+  funFacts: string[] // 알고 보면 재밌는 이야기, 2~3개, 각 15~70자
   tags: string[] // 3~5개
   nameMeaning: string // 이름·자 뜻 한두 문장
   weapon: { novel: string | null; history: string | null } // 정사 기록 없으면 null
-  famousQuote: { text: string; source: Source }
+  famousQuote: { text: string; source: Source } | null // 실제 기록된 말이 없으면 null
   life: string // 연의로 보는 생애(최후·묘 포함), 600~1200자, 문단은 \n\n
   historyNote: string // 정사로 본 실제 모습, 150~400자
   battles: { name: string; year: number | null; role: string; source: Source }[] // 2개 이상

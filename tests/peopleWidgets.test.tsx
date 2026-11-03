@@ -78,7 +78,7 @@ test('analytics: people 이벤트와 test_name', () => {
 test('관우 페이지에 응원·투표 위젯이 들어간다', async () => {
   const html = renderToStaticMarkup(await Page({ params: Promise.resolve({ id: 'guanyu' }) }))
   expect(html).toContain('응원하기')
-  expect(html).toContain('관우 vs 조조, 일기토하면 누가 이길까?')
+  expect(html).toContain('관우 vs 여포, 일기토하면 누가 이길까?')
   expect(html).toContain('화용도에서 조조를 놓아 주다')
   expect(html).toContain('한 줄로')
   expect(html).not.toContain('%')

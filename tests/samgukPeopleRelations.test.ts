@@ -4,7 +4,7 @@ import type { PersonEntry } from '@/content/samgukPeople/types'
 function fake(id: string, relations: PersonEntry['relations']): PersonEntry {
   return {
     id, style: null, styleHanja: null, born: null, died: null, birthplace: null,
-    summary: '', tags: [], nameMeaning: '', weapon: { novel: null, history: null },
+    summary: '', funFacts: [], tags: [], nameMeaning: '', weapon: { novel: null, history: null },
     famousQuote: { text: '', source: '정사' }, life: '', battles: [], relations,
     novelVsHistory: [], rivalId: 'liubei', sceneOptions: [], verdictOptions: [],
   }

@@ -43,7 +43,7 @@ test('응원 버튼: 숫자 영역 없음, 누르면 people_cheer 이벤트와 �
 test('투표: 투표 전 % 없음, 누르면 people_vote 이벤트와 선택 표시, 비율은 숨김', async ({ page }) => {
   await page.goto('/samguk/people/guanyu')
   const duel = page.locator('#duel-vote')
-  await expect(duel.getByRole('heading')).toHaveText('관우 vs 조조, 일기토하면 누가 이길까?')
+  await expect(duel.getByRole('heading')).toHaveText('관우 vs 여포, 일기토하면 누가 이길까?')
   await expect(duel).not.toContainText('%')
   await duel.getByRole('button', { name: '관우' }).click()
   await expect(duel.getByRole('button', { name: '관우' })).toHaveAttribute('aria-pressed', 'true')
