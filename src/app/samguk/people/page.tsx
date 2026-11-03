@@ -69,7 +69,7 @@ export default async function PeopleHubPage() {
                       const src = portraitSrc(id);
                       return (
                         <li key={id}>
-                          <Link href={`/samguk/people/${id}`} className="flex items-center gap-3 rounded-2xl border border-line bg-paper px-3 py-2 hover:border-accent/50 transition">
+                          <Link href={`/samguk/people/${id}`} prefetch={false} className="flex items-center gap-3 rounded-2xl border border-line bg-paper px-3 py-2 hover:border-accent/50 transition">
                             {src ? (
                               // eslint-disable-next-line @next/next/no-img-element
                               <img src={src} alt={`${c?.name ?? id} 초상`} width={40} height={50} loading="lazy" className="w-10 h-[50px] object-cover rounded-lg border border-line flex-none" />
@@ -87,10 +87,12 @@ export default async function PeopleHubPage() {
                   </ul>
 
                   {(within[g.faction]?.length ?? 0) > 0 && (
-                    <div className="mt-5">
-                      <h3 className="font-bold text-sm mb-2">{label}의 관계</h3>
-                      <HubRelationList lines={within[g.faction]} />
-                    </div>
+                    <details className="mt-5 rounded-2xl border border-line px-4 py-3">
+                      <summary className="cursor-pointer font-bold text-sm">관계 목록 보기 ({within[g.faction].length})</summary>
+                      <div className="mt-3">
+                        <HubRelationList lines={within[g.faction]} />
+                      </div>
+                    </details>
                   )}
                 </div>
               </details>

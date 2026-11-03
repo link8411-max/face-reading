@@ -58,7 +58,7 @@ test('허브: 열전 링크를 눌러 열전으로 이동하고, 순위 링크�
   await expect(page.getByRole('heading', { level: 1 })).toHaveText('삼국지 인물 관계도')
   await expect(page.getByRole('link', { name: '가장 응원받는 장수 순위 보기' })).toHaveAttribute('href', '/samguk/people/ranking')
   // 첫 세력(위나라)만 펼쳐져 있으니 촉나라를 펼친 뒤 관우 카드를 누른다
-  await page.locator('details', { hasText: '촉나라' }).locator('summary').click()
+  await page.locator('summary', { hasText: '촉나라' }).click()
   await page.locator('main li a[href="/samguk/people/guanyu"]').first().click()
   await expect(page).toHaveURL(/\/samguk\/people\/guanyu$/)
   await expect(page.getByRole('heading', { level: 1 })).toContainText('관우')
@@ -69,7 +69,7 @@ test('순위: 집계가 없으면 응원을 모으는 중과 열전 링크', asy
   const errors = trackErrors(page)
   await page.goto('/samguk/people/ranking')
   await expect(page.getByText('응원을 모으는 중', { exact: true })).toBeVisible()
-  await page.getByRole('main').getByRole('link', { name: /관우/ }).click()
+  await page.locator('main a[href="/samguk/people/guanyu"]').click()
   await expect(page).toHaveURL(/\/samguk\/people\/guanyu$/)
   expect(realErrors(errors)).toEqual([])
 })

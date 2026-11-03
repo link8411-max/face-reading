@@ -41,7 +41,7 @@ function Row({ id, rank, n }: { id: string; rank?: number; n?: number }) {
   const c = getCharacterById(id);
   return (
     <li>
-      <Link href={`/samguk/people/${id}`} className="flex items-center gap-3 rounded-full border border-line bg-white px-4 py-2.5 text-sm hover:border-accent/50 transition">
+      <Link href={`/samguk/people/${id}`} prefetch={false} className="flex items-center gap-3 rounded-full border border-line bg-white px-4 py-2.5 text-sm hover:border-accent/50 transition">
         {n !== undefined && <span className="w-7 text-center font-bold tabular-nums">{rank}</span>}
         <span className="font-medium">{c?.name ?? id}</span>
         <span className="text-xs text-muted truncate">{c?.role}</span>
