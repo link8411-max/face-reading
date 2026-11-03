@@ -1,0 +1,82 @@
+import { renderToStaticMarkup } from 'react-dom/server'
+import Page, { generateMetadata, generateStaticParams } from '@/app/samguk/people/[id]/page'
+import { portraitSrc, personTitle } from '@/lib/people/portrait'
+import { PEOPLE_IDS } from '@/content/samgukPeople'
+
+async function render(id: string): Promise<string> {
+  return renderToStaticMarkup(await Page({ params: Promise.resolve({ id }) }))
+}
+
+test('portraitSrc: 한글 이름 jpg, 초상화 대기 인물은 null', () => {
+  expect(portraitSrc('guanyu')).toBe('/images/samguk/관우.jpg')
+  expect(portraitSrc('caojie')).toBeNull()
+})
+
+test('personTitle: 이름 열전 | 자, 브랜드 끝, 48자 이하', () => {
+  const t = personTitle('caocao')
+  expect(t.startsWith('조조 열전')).toBe(true)
+  expect(t.endsWith(' – 운명을 읽다')).toBe(true)
+  expect(t.length).toBeLessThanOrEqual(48)
+  expect(t).toContain('자 맹덕')
+  for (const id of PEOPLE_IDS) expect(personTitle(id).length, id).toBeLessThanOrEqual(48)
+})
+
+test('generateStaticParams는 PEOPLE_IDS', () => {
+  expect(generateStaticParams()).toEqual(PEOPLE_IDS.map((id) => ({ id })))
+})
+
+test('메타: 설명 50~110자에 무기·관계·최후, canonical, OG 이미지', async () => {
+  const m = await generateMetadata({ params: Promise.resolve({ id: 'guanyu' }) })
+  const d = String(m.description)
+  expect(d.length).toBeGreaterThanOrEqual(50)
+  expect(d.length).toBeLessThanOrEqual(110)
+  for (const w of ['무기', '관계', '최후']) expect(d).toContain(w)
+  expect(m.alternates?.canonical).toBe('https://unse-ai.com/samguk/people/guanyu')
+  const og = m.openGraph as { images?: { url: string }[] }
+  expect(og.images?.[0].url).toContain(`/api/og?title=${encodeURIComponent('관우 열전')}`)
+})
+
+test('관우 페이지: 위에서 아래 순서와 details 4개', async () => {
+  const html = await render('guanyu')
+  const idx = (s: string) => {
+    const i = html.indexOf(s)
+    expect(i, s).toBeGreaterThanOrEqual(0)
+    return i
+  }
+  const order = [idx('쿠팡 추천 상품'), idx('나도 관우를 닮았을까'), idx('<h1'), idx('id="cheer"'), idx('<details'), idx('id="duel-vote"'), idx('id="scene-vote"'), idx('id="verdict-vote"')]
+  expect([...order].sort((a, b) => a - b)).toEqual(order)
+  expect(html.match(/<details/g)).toHaveLength(4)
+  for (const t of ['연의로 보는 생애', '주요 전투', '관계도·혈연', '정사와 연의의 차이', '정사로 본 실제 모습']) expect(html).toContain(t)
+  expect(html).toContain('/samguk/duel?me=guanyu')
+  expect(html).toContain('일기토에서 싸워 보기')
+  expect(html).toContain('"@type":"Person"')
+  expect(html).toContain('"@type":"BreadcrumbList"')
+  expect(html).toContain('연의: 청룡언월도')
+  expect(html).toContain('정사 기록 없음')
+})
+
+test('을/를: 받침에 따라', async () => {
+  expect(await render('guanyu')).toContain('나도 관우를 닮았을까')
+  expect(await render('caocao')).toContain('나도 조조를 닮았을까')
+})
+
+test('일기토에 없는 인물은 일기토 버튼 없음', async () => {
+  const html = await render('caocao')
+  expect(html).not.toContain('일기토에서 싸워 보기')
+  expect(html).not.toContain('/samguk/duel?me=')
+})
+
+test('함께 보는 인물: 열전 있으면 링크, 없으면 이름만', async () => {
+  const html = await render('guanyu')
+  expect(html).toContain('/samguk/people/caocao')
+  if (!PEOPLE_IDS.includes('guanping')) {
+    expect(html).toContain('관평')
+    expect(html).not.toContain('/samguk/people/guanping')
+  }
+})
+
+test('관계도 SVG와 글 목록', async () => {
+  const html = await render('guanyu')
+  expect(html).toContain('<svg')
+  expect(html).toContain('혈연')
+})
