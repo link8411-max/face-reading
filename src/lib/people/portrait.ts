@@ -71,3 +71,8 @@ export function personDescription(id: string): string {
   if (d.length < DESC_MIN) d = `${nameOf(id)} 열전.${d.startsWith(' ') ? '' : ' '}${d}`
   return d
 }
+
+// 전투 연도 표시: 모르면 "연도 미상" (년 붙이지 않음)
+export function yearLabel(year: number | null): string {
+  return year === null ? '연도 미상' : `${year}년`
+}

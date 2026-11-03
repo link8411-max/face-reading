@@ -7,7 +7,7 @@ import RelationMap from "@/components/people/RelationMap";
 import SourceChip from "@/components/people/SourceChip";
 import { PEOPLE_IDS, getPerson } from "@/content/samgukPeople";
 import { getDuelGeneral } from "@/lib/duel/generals";
-import { eulReul, personDescription, personTitle, portraitSrc } from "@/lib/people/portrait";
+import { eulReul, personDescription, personTitle, portraitSrc, yearLabel } from "@/lib/people/portrait";
 import { relationsOf } from "@/lib/people/relations";
 import { allSamgukCharacters } from "@/lib/samgukDB";
 
@@ -165,7 +165,7 @@ export default async function PersonPage({ params }: Props) {
               {p.battles.map((b) => (
                 <li key={`${b.name}-${b.year}`}>
                   <span className="font-medium">{b.name}</span>
-                  <span className="text-muted"> ({b.year ?? "연도 미상"}년)</span> {b.role}
+                  <span className="text-muted"> ({yearLabel(b.year)})</span> {b.role}
                   <SourceChip source={b.source} />
                 </li>
               ))}

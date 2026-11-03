@@ -1,7 +1,8 @@
 import { renderToStaticMarkup } from 'react-dom/server'
 import Page, { generateMetadata, generateStaticParams } from '@/app/samguk/people/[id]/page'
-import { portraitSrc, personTitle } from '@/lib/people/portrait'
+import { portraitSrc, personTitle, yearLabel } from '@/lib/people/portrait'
 import { PEOPLE_IDS } from '@/content/samgukPeople'
+import { relationsOf } from '@/lib/people/relations'
 
 async function render(id: string): Promise<string> {
   return renderToStaticMarkup(await Page({ params: Promise.resolve({ id }) }))
@@ -66,13 +67,32 @@ test('일기토에 없는 인물은 일기토 버튼 없음', async () => {
   expect(html).not.toContain('/samguk/duel?me=')
 })
 
-test('함께 보는 인물: 열전 있으면 링크, 없으면 이름만', async () => {
+test('함께 보는 인물: 열전 있으면 링크, 없으면 이름만 (데이터에서 계산)', async () => {
   const html = await render('guanyu')
   expect(html).toContain('/samguk/people/caocao')
-  if (!PEOPLE_IDS.includes('guanping')) {
-    expect(html).toContain('관평')
-    expect(html).not.toContain('/samguk/people/guanping')
+  for (const r of relationsOf('guanyu')) {
+    if (r.hasPage && r.otherId) {
+      expect(html, r.otherName).toContain(`/samguk/people/${r.otherId}`)
+    } else {
+      expect(html, r.otherName).toContain(r.otherName)
+      if (r.otherId) expect(html, r.otherName).not.toContain(`/samguk/people/${r.otherId}`)
+    }
   }
+})
+
+test('열전 없는 관계(이름만, 조조의 아들 조앙)는 링크 없이 이름만', async () => {
+  const rels = relationsOf('caocao').filter((r) => r.otherId === null)
+  expect(rels.map((r) => r.otherName)).toContain('조앙')
+  const html = await render('caocao')
+  expect(html).toContain('조앙')
+  // 함께 보는 인물 칸의 이름만 칩: 링크가 아니라 span
+  expect(html).toMatch(/<span class="[^"]*border-dashed[^"]*"><span>조앙<\/span>/)
+  expect(html).not.toMatch(/<a [^>]*>[^<]*(<span>)?조앙/)
+})
+
+test('yearLabel: 연도 미상에는 년을 붙이지 않음', () => {
+  expect(yearLabel(null)).toBe('연도 미상')
+  expect(yearLabel(200)).toBe('200년')
 })
 
 test('관계도 SVG와 글 목록', async () => {
