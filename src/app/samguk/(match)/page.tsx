@@ -228,10 +228,10 @@ export default function SamgukPage() {
                 busy={busy || isCapturing}
                 notice={notice}
               />
-              {image && <NextTests current="samguk" image={image} />}
               <div className="mt-2">
                 <CoupangBanner subId="samguk" />
               </div>
+              {image && <NextTests current="samguk" image={image} />}
 
               <details className="group mt-4 bg-white border border-line rounded-[22px] px-5 py-4">
                 <summary className="font-bold cursor-pointer list-none flex justify-between items-center">

@@ -168,10 +168,10 @@ export default function Face2Page() {
               busy={busy || isCapturing}
               notice={notice}
             />
-            {image && <NextTests current="face" image={image} />}
             <div className="mt-2">
               <CoupangBanner subId="face" />
             </div>
+            {image && <NextTests current="face" image={image} />}
 
             <details className="group mt-4 bg-white border border-line rounded-[22px] px-5 py-4">
               <summary className="font-bold cursor-pointer list-none flex justify-between items-center">

@@ -34,3 +34,43 @@ test('GA 위치 값: subId의 하이픈을 밑줄로 (GA 개인정보 필터 통
   expect(gaSlot('face-match')).toBe('face_match')
   expect(gaSlot('home')).toBe('home')
 })
+
+import { isDisplayedMessage, coupangHomeUrl, fallbackLinks, FALLBACK_DELAY_MS } from '@/components/CoupangBanner'
+test('노출 메시지 판별: adOnePixelDisplayed / adDisplayed만 true (문자열 JSON·객체 모두)', () => {
+  expect(isDisplayedMessage('{"type":"adDisplayed","id":"1043563"}')).toBe(true)
+  expect(isDisplayedMessage({ type: 'adOnePixelDisplayed', id: '1043563' })).toBe(true)
+  expect(isDisplayedMessage('{"type":"adLoaded","id":"1043563","hasAd":true}')).toBe(false)
+  expect(isDisplayedMessage({ type: 'adLoaded', id: '1043563', hasAd: true })).toBe(false)
+  expect(isDisplayedMessage('garbage')).toBe(false)
+  expect(isDisplayedMessage(null)).toBe(false)
+  expect(isDisplayedMessage(42)).toBe(false)
+})
+
+test('대체 링크 대기 시간은 4초', () => {
+  expect(FALLBACK_DELAY_MS).toBe(5000)
+})
+
+test('쿠팡 홈 링크: 파트너스 추적 코드와 subid', () => {
+  const url = coupangHomeUrl('samguk')
+  expect(url.startsWith('https://link.coupang.com/re/AFFHOMEWW')).toBe(true)
+  expect(url).toContain('lptag=AF6497036')
+  expect(url).toContain('subid=samguk')
+})
+
+test('대체 링크: 시즌 중엔 시즌 링크 뒤에 홈, 시즌 밖엔 홈만', () => {
+  expect(fallbackLinks('face', new Date('2026-11-03T03:00:00Z')).map((l) => l.key)).toEqual(['gift', 'chapssal', 'yeot', 'snack', 'home'])
+  expect(fallbackLinks('face', new Date('2026-12-15T03:00:00Z')).map((l) => l.key)).toEqual(['home'])
+})
+
+test.each(['src/app/samguk/(match)/page.tsx', 'src/app/face2/page.tsx', 'src/app/animal/page.tsx'])(
+  '%s: 배너는 공유·저장 버튼 바로 아래, 다음 테스트 위',
+  (file) => {
+    const src = readFileSync(file, 'utf8')
+    const actions = src.indexOf('<ResultActions')
+    const banner = src.indexOf('<CoupangBanner')
+    const next = src.indexOf('<NextTests')
+    expect(actions).toBeGreaterThan(-1)
+    expect(actions).toBeLessThan(banner)
+    expect(banner).toBeLessThan(next)
+  },
+)
