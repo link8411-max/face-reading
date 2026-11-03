@@ -1,5 +1,5 @@
 import Link from 'next/link'
-import { allSamgukCharacters } from '@/lib/samgukDB'
+import { characterById } from '@/lib/people/characters'
 import { relationsOf, type RelationView } from '@/lib/people/relations'
 import SourceChip from './SourceChip'
 
@@ -11,7 +11,7 @@ const R = 132
 // 가운데 인물 + 관계 상대를 원형으로 둔 그림(최대 10명). 혈연은 실선, 그 밖은 점선.
 // 검색 로봇은 그림을 못 읽으므로 같은 내용을 아래 글 목록으로도 적는다.
 export default function RelationMap({ centerId }: { centerId: string }) {
-  const centerName = allSamgukCharacters.find((c) => c.id === centerId)?.name ?? centerId
+  const centerName = characterById(centerId)?.name ?? centerId
   const rels = relationsOf(centerId)
   if (rels.length === 0) return <p className="text-sm text-muted">정리된 관계가 아직 없어요.</p>
 
@@ -33,7 +33,7 @@ export default function RelationMap({ centerId }: { centerId: string }) {
               </g>
               <rect x={x - 30} y={y - 15} width={60} height={30} rx={15} className="fill-white stroke-line" strokeWidth={1} />
               <text x={x} y={y - 1} textAnchor="middle" className="fill-ink" fontSize={12}>{r.otherName}</text>
-              <text x={x} y={y + 11} textAnchor="middle" className="fill-muted" fontSize={9}>{r.type}</text>
+              <text x={x} y={y + 11} textAnchor="middle" className="fill-muted" fontSize={9}>{r.label}</text>
             </g>
           )
         })}
@@ -61,7 +61,7 @@ function RelationList({ title, items }: { title: string; items: RelationView[] }
             ) : (
               <span className="font-medium">{r.otherName}</span>
             )}
-            <span className="text-muted"> ({r.type})</span> {r.note}
+            <span className="text-muted"> ({r.label})</span> {r.note}
             <SourceChip source={r.source} />
           </li>
         ))}

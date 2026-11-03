@@ -4,7 +4,7 @@ import { useState } from 'react'
 import { track } from '@/lib/analytics'
 import { useResultShare } from '@/hooks/useResultShare'
 import type { VoteKind } from '@/lib/people/votes'
-import { LOW_VOTE_TEXT, ratioView, useMarker, usePersonStats, writeMarker } from './usePersonStats'
+import { LIMITED_TEXT, headCountText, ratioView, useMarker, usePersonStats, writeMarker } from './usePersonStats'
 
 export interface PollOption {
   key: string
@@ -40,6 +40,7 @@ export default function VotePoll({ kind, id, target, title, options, share }: Pr
   const [already, setAlready] = useState(false)
   const [busy, setBusy] = useState(false)
   const [failed, setFailed] = useState(false)
+  const [limited, setLimited] = useState(false)
 
   const voted = localVoted || marker !== null
   const markerChoice = marker !== null && options.some((o) => o.key === marker) ? marker : null
@@ -56,10 +57,13 @@ export default function VotePoll({ kind, id, target, title, options, share }: Pr
     if (busy || voted) return
     setBusy(true)
     setFailed(false)
+    setLimited(false)
     track('people_vote', { result_id: `${kind}_${id}` })
     const r = await vote(kind, target, option)
     setBusy(false)
-    if (r) {
+    if (r === 'limited') {
+      setLimited(true)
+    } else if (r) {
       writeMarker(kind, target, r.counted ? option : UNKNOWN)
       setVoted(true)
       setAlready(!r.counted)
@@ -76,6 +80,7 @@ export default function VotePoll({ kind, id, target, title, options, share }: Pr
 
   const counts = stats ? Object.fromEntries(options.map((o) => [o.key, stats[kind][o.key] ?? 0])) : null
   const view = counts ? ratioView(counts) : null
+  const headCount = counts ? Object.values(counts).reduce((s, n) => s + n, 0) : 0
 
   return (
     <div className="bg-white rounded-[22px] border border-line px-5 py-5">
@@ -117,9 +122,10 @@ export default function VotePoll({ kind, id, target, title, options, share }: Pr
       {voted && (
         <p className="mt-3 text-sm text-muted" aria-live="polite">
           {thanks ? '고마워요' : already ? '오늘은 이미 투표했어요' : '투표했어요'}
-          {view && !view.show && ` · ${LOW_VOTE_TEXT}`}
+          {headCount > 0 && view && !view.show && ` · ${headCountText(headCount)}`}
         </p>
       )}
+      {limited && <p className="mt-3 text-sm text-muted">{LIMITED_TEXT}</p>}
       {failed && <p className="mt-3 text-sm text-muted">연결을 확인하고 다시 눌러 주세요</p>}
       {voted && share && shareText && (
         <div className="mt-3">

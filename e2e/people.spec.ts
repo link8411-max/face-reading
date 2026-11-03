@@ -23,7 +23,7 @@ test('열전 페이지: 로딩, 쿠팡 배너가 닮은꼴 배너보다 위, 펼
   expect(realErrors(errors)).toEqual([])
 })
 
-test('응원 버튼: 숫자 영역 없음, 누르면 people_cheer 이벤트와 고마워요', async ({ page }) => {
+test('응원 버튼: 기록이 꺼져 있으면 숫자·순위 없음, 누르면 people_cheer 이벤트와 고마워요', async ({ page }) => {
   const errors = trackErrors(page)
   const statsResponse = page.waitForResponse((r) => r.url().includes('/api/people/stats'))
   await page.goto('/samguk/people/guanyu')
@@ -33,6 +33,8 @@ test('응원 버튼: 숫자 영역 없음, 누르면 people_cheer 이벤트와 �
   // 집계 요청이 끝난 뒤에도 숫자는 없다
   expect((await statsResponse).status()).toBe(503)
   await expect(cheer.locator('[data-cheer-count]')).toHaveCount(0)
+  await expect(cheer.locator('[data-cheer-rank]')).toHaveCount(0)
+  await expect(cheer.getByRole('link', { name: '응원 순위 보기' })).toHaveAttribute('href', '/samguk/people/ranking')
   await btn.click()
   await expect(cheer.getByRole('button')).toHaveText('고마워요')
   await expect(cheer.locator('[data-cheer-count]')).toHaveCount(0)
@@ -69,6 +71,9 @@ test('순위: 집계가 없으면 응원을 모으는 중과 열전 링크', asy
   const errors = trackErrors(page)
   await page.goto('/samguk/people/ranking')
   await expect(page.getByText('응원을 모으는 중', { exact: true })).toBeVisible()
+  // 세력별 목록은 닫혀 있다
+  await expect(page.locator('main a[href="/samguk/people/guanyu"]')).toBeHidden()
+  await page.locator('summary', { hasText: '촉나라' }).click()
   await page.locator('main a[href="/samguk/people/guanyu"]').click()
   await expect(page).toHaveURL(/\/samguk\/people\/guanyu$/)
   expect(realErrors(errors)).toEqual([])

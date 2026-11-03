@@ -1,25 +1,34 @@
 import { renderToStaticMarkup } from 'react-dom/server'
 import Hub, { generateMetadata as hubMeta } from '@/app/samguk/people/page'
 import Ranking, { generateMetadata as rankMeta, revalidate } from '@/app/samguk/people/ranking/page'
-import { rankingView } from '@/lib/people/ranking'
+import { rankingView, rankOf } from '@/lib/people/ranking'
 import { PEOPLE_IDS } from '@/content/samgukPeople'
-import { factionGroups } from '@/lib/people/relations'
+import { factionGroups, relationsOf } from '@/lib/people/relations'
+import { hubRelations } from '@/lib/people/hubRelations'
+import { PENDING_PORTRAIT_IDS } from '@/lib/samgukDB'
 
-test('rankingView: 합 30 미만이면 준비 중, 30 이상이면 순위(동점은 같은 순위, 열전 없는 id는 빠짐)', () => {
-  expect(rankingView([{ id: 'a', n: 10 }, { id: 'b', n: 10 }]).ready).toBe(false)
-  expect(rankingView([{ id: 'guanyu', n: 10 }, { id: 'caocao', n: 10 }]).ready).toBe(false)
+test('rankingView: 응원이 하나라도 있으면 순위(동점은 같은 순위, 열전 없는 id는 빠짐), 없으면 준비 중', () => {
   expect(rankingView([]).ready).toBe(false)
+  expect(rankingView([{ id: 'guanyu', n: 0 }]).ready).toBe(false)
+  expect(rankingView([{ id: 'nobody', n: 5 }]).ready).toBe(false)
+  const one = rankingView([{ id: 'guanyu', n: 1 }])
+  expect(one.ready).toBe(true)
+  expect(one.rows).toEqual([{ id: 'guanyu', n: 1, rank: 1 }])
   const v = rankingView([{ id: 'guanyu', n: 20 }, { id: 'caocao', n: 20 }, { id: 'nobody', n: 99 }, { id: 'liubei', n: 5 }])
   expect(v.ready).toBe(true)
   expect(v.rows.map((r) => r.id)).not.toContain('nobody')
-  const g = v.rows.find((r) => r.id === 'guanyu')!
-  const c = v.rows.find((r) => r.id === 'caocao')!
-  expect(g.rank).toBe(1)
-  expect(c.rank).toBe(1)
-  const low = rankingView([{ id: 'guanyu', n: 20 }, { id: 'caocao', n: 15 }])
-  expect(low.rows.map((r) => [r.id, r.rank])).toEqual([['guanyu', 1], ['caocao', 2]])
-  const third = rankingView([{ id: 'guanyu', n: 20 }, { id: 'caocao', n: 20 }, { id: 'zhangfei', n: 20 }].filter((r) => PEOPLE_IDS.includes(r.id)), 30)
-  expect(third.rows.every((r) => r.rank === 1)).toBe(true)
+  expect(v.rows.map((r) => [r.id, r.rank])).toEqual([['caocao', 1], ['guanyu', 1], ['liubei', 3]])
+  expect(rankingView([{ id: 'guanyu', n: 20 }, { id: 'caocao', n: 15 }]).rows.map((r) => [r.id, r.rank])).toEqual([['guanyu', 1], ['caocao', 2]])
+  expect(rankingView([{ id: 'guanyu', n: 2 }], 30).ready).toBe(false)
+})
+
+test('rankOf: 동점은 같은 순위, 응원 없는 인물은 null', () => {
+  const rows = [{ id: 'caocao', n: 9 }, { id: 'guanyu', n: 7 }, { id: 'liubei', n: 7 }, { id: 'zhangfei', n: 0 }]
+  expect(rankOf(rows, 'caocao')).toBe(1)
+  expect(rankOf(rows, 'guanyu')).toBe(2)
+  expect(rankOf(rows, 'liubei')).toBe(2)
+  expect(rankOf(rows, 'zhangfei')).toBeNull()
+  expect(rankOf(rows, 'nobody')).toBeNull()
 })
 
 test('허브: 세력 제목, 열전 링크, 관우·조조가 한 줄에 나오는 관계 글, 쿠팡 배너는 본문 아래', async () => {
@@ -82,4 +91,86 @@ test('순위 메타·재검증 1시간', async () => {
   const m = await rankMeta()
   expect(m.title).toBe('삼국지 인물 순위 | 가장 응원받는 장수 – 운명을 읽다')
   expect(m.alternates?.canonical).toBe('https://unse-ai.com/samguk/people/ranking')
+})
+
+const noRawIds = (html: string) => {
+  for (const id of PEOPLE_IDS) {
+    expect(html, `raw id >${id}<`).not.toContain(`>${id}<`)
+    expect(html, `raw id "${id} 초상"`).not.toContain(`alt="${id} 초상"`)
+  }
+}
+
+describe('초상화 대기 인물도 이름으로 보인다', () => {
+  test('허브: 모든 열전 id가 글자로 노출되지 않고, 인물마다 정확히 한 세력 묶음에 들어간다', async () => {
+    const html = renderToStaticMarkup(await Hub())
+    noRawIds(html)
+    const groups = factionGroups()
+    const all = groups.flatMap((g) => g.ids)
+    expect(all.length).toBe(PEOPLE_IDS.length)
+    expect(new Set(all).size).toBe(PEOPLE_IDS.length)
+    expect([...all].sort()).toEqual([...PEOPLE_IDS].sort())
+    for (const id of PENDING_PORTRAIT_IDS) if (PEOPLE_IDS.includes(id)) expect(all).toContain(id)
+  })
+
+  test('허브 관계 글: 줄 수가 서로 다른 관계 수와 같다(대기 인물의 관계도 빠지지 않는다)', () => {
+    const { within, cross } = hubRelations()
+    let expected = 0
+    const seen = new Set<string>()
+    for (const id of PEOPLE_IDS) {
+      for (const r of relationsOf(id)) {
+        if (r.otherId) {
+          const key = [id, r.otherId].sort().join('|')
+          if (seen.has(key)) continue
+          seen.add(key)
+        }
+        expected++
+      }
+    }
+    const got = Object.values(within).reduce((s, l) => s + l.length, 0) + cross.length
+    expect(got).toBe(expected)
+    for (const l of [...Object.values(within).flat(), ...cross]) expect(l.aName).not.toBe(l.aId)
+  })
+
+  test('순위 대체 목록: 열전 id가 글자로 노출되지 않고, 세력별 닫힌 details로 묶인다', async () => {
+    const saved = [process.env.SUPABASE_URL, process.env.SUPABASE_SERVICE_KEY]
+    delete process.env.SUPABASE_URL
+    delete process.env.SUPABASE_SERVICE_KEY
+    try {
+      const html = renderToStaticMarkup(await Ranking())
+      noRawIds(html)
+      for (const id of PEOPLE_IDS) expect(html).toContain(`href="/samguk/people/${id}"`)
+      expect(html.match(/<details/g)!.length).toBe(factionGroups().length)
+      expect(html).not.toMatch(/<details open/)
+    } finally {
+      if (saved[0] !== undefined) process.env.SUPABASE_URL = saved[0]
+      if (saved[1] !== undefined) process.env.SUPABASE_SERVICE_KEY = saved[1]
+    }
+  })
+})
+
+describe('순위 페이지: 응원이 하나라도 있으면 실제 순위', () => {
+  afterEach(() => {
+    vi.unstubAllEnvs()
+    vi.unstubAllGlobals()
+  })
+  test('응원이 있는 인물만 순위에, 나머지는 닫힌 세력별 목록에', async () => {
+    vi.stubEnv('SUPABASE_URL', 'https://x.supabase.co')
+    vi.stubEnv('SUPABASE_SERVICE_KEY', 'k')
+    vi.stubGlobal('fetch', vi.fn().mockResolvedValue(Response.json([{ target: 'guanyu', n: 1 }])))
+    const html = renderToStaticMarkup(await Ranking())
+    expect(html).not.toContain('응원을 모으는 중')
+    expect(html).toContain('전체 순위')
+    expect(html).toContain('1번 응원')
+    expect(html).toContain('아직 응원이 없는 인물')
+    expect(html).not.toMatch(/<details open/)
+    // 순위 줄(번 응원)은 관우 하나뿐이고, 나머지 인물은 목록에만 있다
+    expect(html.match(/번 응원/g)).toHaveLength(2) // 전체 순위 + 촉나라 순위
+    const ol = html.slice(html.indexOf('전체 순위'), html.indexOf('아직 응원이 없는 인물'))
+    expect(ol).toContain('/samguk/people/guanyu')
+    expect(ol).not.toContain('/samguk/people/caocao')
+    const rest = html.slice(html.indexOf('아직 응원이 없는 인물'))
+    expect(rest).toContain('/samguk/people/caocao')
+    expect(rest).not.toContain('/samguk/people/guanyu"')
+    noRawIds(html)
+  })
 })

@@ -79,8 +79,8 @@ export default async function PersonPage({ params }: Props) {
     alternateName: [...new Set([c.hanja, p.style, p.styleHanja].filter((x): x is string => !!x))],
     url,
   };
-  if (p.born !== null) person.birthDate = String(p.born);
-  if (p.died !== null) person.deathDate = String(p.died);
+  if (p.born !== null) person.birthDate = String(p.born).padStart(4, "0");
+  if (p.died !== null) person.deathDate = String(p.died).padStart(4, "0");
   if (c.faction !== "기타") person.affiliation = { "@type": "Organization", name: factionLabel(c.faction) };
   const breadcrumb = {
     "@context": "https://schema.org",
@@ -264,12 +264,12 @@ export default async function PersonPage({ params }: Props) {
                   {r.hasPage && r.otherId ? (
                     <Link href={`/samguk/people/${r.otherId}`} className="flex items-center justify-between rounded-full border border-line bg-white px-4 py-2.5 text-sm hover:border-accent/50 transition">
                       <span>{r.otherName}</span>
-                      <span className="text-xs text-muted">{r.type}</span>
+                      <span className="text-xs text-muted">{r.label}</span>
                     </Link>
                   ) : (
                     <span className="flex items-center justify-between rounded-full border border-dashed border-line px-4 py-2.5 text-sm text-muted">
                       <span>{r.otherName}</span>
-                      <span className="text-xs">{r.type}</span>
+                      <span className="text-xs">{r.label}</span>
                     </span>
                   )}
                 </li>

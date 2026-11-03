@@ -245,6 +245,29 @@ public/
 
 ---
 
+## 삼국지 인물열전 (/samguk/people)
+
+127명의 연의·정사 열전, 관계도, 응원·투표. 설계: `docs/superpowers/specs/2026-11-03-samguk-yeoljeon-design.md`, 진행표: `docs/samguk-people-progress.md`.
+
+| 위치 | 내용 |
+|------|------|
+| 라우트 | `/samguk/people`(허브: 세력별 관계도·관계 글 목록), `/samguk/people/[id]`(열전 127개 정적, `dynamicParams=false`), `/samguk/people/ranking`(응원 순위, ISR `revalidate=3600`) |
+| 데이터 | `src/content/samgukPeople/<id>.ts`(인물 한 명당 한 파일, 형식은 `types.ts`) → `index.ts` 등록(`PEOPLE`, `PEOPLE_IDS`). 인물 id는 `samgukDB`와 같다. 파이프라인: 작성 → 사실 검토 → 쉬운 말 → 재미 → 인용 점검 |
+| `ids.ts` | 클라이언트·닮은꼴 페이지가 열전 id 목록만 가볍게 쓰려는 파일(인물 본문 import 금지). **`index.ts`와 같아야 하며 테스트(`tests/peopleLinks.test.ts`)가 어긋남을 잡는다.** 인물을 추가하면 둘 다 고친다 |
+| 조회 | 열전 코드는 `lib/people/characters.ts`의 `characterById`를 쓴다(초상화 대기 인물도 포함. `samgukDB`의 `getCharacterById`는 대기 인물이 빠진다). 관계 화면 말은 `relationLabel`(부녀·모자·남매 등, 데이터 `type`은 그대로) |
+| API | `/api/people/vote`(POST: JSON만, 같은 사이트 Origin만, 10분 60회), `/api/people/stats`(GET). 환경변수 `SUPABASE_URL`·`SUPABASE_SERVICE_KEY`(없으면 503, 화면은 숫자를 숨김). 선택 `PEOPLE_VOTE_SECRET`(투표자 해시 키, 없으면 서비스 키 사용) |
+| DB | `docs/people-votes.sql`을 Supabase SQL Editor에서 **한 번** 실행(RLS 켜고 service_role만 접근). 실행 전에는 투표가 조용히 꺼져 있다 |
+| 중복 방지 | 하루마다 바뀌는 해시(`HMAC(날짜, 기기id\|IP)`)로 같은 날 같은 대상은 한 번. `pv` 쿠키가 없으면 기기id를 `new`로 고정한다. IP·쿠키 원본은 저장하지 않는다 |
+| 표시 규칙 | 응원은 실제 숫자로 보인다(0이면 "첫 응원을 남겨 보세요", 1+는 `응원 N번`, 순위를 알면 "지금 응원 순위 N위", 순위는 stats 응답의 `rank`). 기록이 꺼져 있으면(503) 숫자·순위를 숨긴다. 투표 비율은 투표 전엔 숨기고 합이 10 미만이면 "지금 N명이 투표했어요". 순위 페이지는 응원이 1번이라도 있으면 실제 순위를 보이고, 응원 없는 인물은 닫힌 세력별 목록 |
+
+**내용 규칙**
+- 실제 기록이 없는 명언을 만들지 않는다(`famousQuote: null`). 말을 쓰면 출처(`정사`·`배송지 주`·`연의`)를 표시한다.
+- 연의에만 있는 이야기는 `life`, 정사는 `historyNote`, 차이는 `novelVsHistory`에 나눠 쓰고, 요약(`summary`)에 연의 사건을 쓰면 "연의에서는"처럼 밝힌다(검색 미리보기가 된다).
+- 해요체, 어려운 말에는 괄호 풀이. 관계 설명(`relations.note`)도 해요체나 짧은 명사구로 쓴다(`~다` 종결은 테스트로 막음).
+- `rivalId`는 부부·혼인·부자·형제·숙질·친족이 아닌 인물(테스트로 확인).
+
+---
+
 ## 자주 수정하는 파일
 
 | 작업 | 파일 |

@@ -16,7 +16,7 @@ export default function HubRelationList({ lines }: { lines: HubLine[] }) {
           <Name id={l.aId} name={l.aName} page />
           <span className="text-muted"> · </span>
           <Name id={l.otherId} name={l.otherName} page={l.otherHasPage} />
-          <span className="text-muted"> ({l.type})</span> {l.note}
+          <span className="text-muted"> ({l.label})</span> {l.note}
           <SourceChip source={l.source} />
         </li>
       ))}

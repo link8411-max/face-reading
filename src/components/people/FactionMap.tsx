@@ -1,5 +1,5 @@
 import Link from 'next/link'
-import { getCharacterById } from '@/lib/samgukDB'
+import { characterById } from '@/lib/people/characters'
 import { pickMapNodes } from '@/lib/people/factionNodes'
 import { relationsOf } from '@/lib/people/relations'
 
@@ -44,7 +44,7 @@ export default function FactionMap({ ids, label }: { ids: string[]; label: strin
         })}
         {shown.map((s) => {
           const p = pos.get(s.id)!
-          const name = getCharacterById(s.id)?.name ?? s.id
+          const name = characterById(s.id)?.name ?? s.id
           return (
             <Link key={s.id} href={`/samguk/people/${s.id}`} prefetch={false}>
               <rect x={p.x - 28} y={p.y - 14} width={56} height={28} rx={14} className="fill-white stroke-line" strokeWidth={1} />

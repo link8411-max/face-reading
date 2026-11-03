@@ -164,3 +164,24 @@ test('progress doc marks every published person as fact-checked', () => {
     expect(cols[4], `${id} 사실 검토`).toBe('O')
   }
 })
+
+describe('일기토 라이벌은 가족이 아니다', () => {
+  // 사촌은 뺀다(원술-원소처럼 사촌끼리의 다툼은 라이벌로 유명하다). 부부·혼인·부자·형제·숙질·친족이면 안 된다.
+  const FAMILY = ['부부', '혼인', '부자', '형제', '숙질', '친족']
+  test('rivalId가 어느 쪽 relations에서도 가족 관계가 아니다', () => {
+    const bad: string[] = []
+    for (const id of PEOPLE_IDS) {
+      const rv = PEOPLE[id].rivalId
+      const mine = PEOPLE[id].relations.filter((r) => r.id === rv)
+      const theirs = (PEOPLE[rv]?.relations ?? []).filter((r) => r.id === id)
+      for (const r of [...mine, ...theirs]) if (FAMILY.includes(r.type)) bad.push(`${id} -> ${rv} (${r.type})`)
+    }
+    expect(bad).toEqual([])
+  })
+})
+
+test('관계 설명은 해요체나 짧은 명사구다 (~다 문장 종결 금지)', () => {
+  const bad: string[] = []
+  for (const id of PEOPLE_IDS) for (const r of PEOPLE[id].relations) if (/다[.]?$/.test(r.note.trim())) bad.push(`${id}: ${r.note}`)
+  expect(bad).toEqual([])
+})

@@ -1,5 +1,6 @@
 // 인물열전 응원·투표 저장소(Supabase PostgREST). 일기토 API와 같은 방식: 서비스 키, 5초 제한, 키·본문은 로그에 남기지 않는다.
 import { getPerson } from '@/content/samgukPeople'
+import { rankOf } from './ranking'
 import { pairKey, type PersonStats, type VoteKind } from './votes'
 
 export interface StoreConfig {
@@ -80,4 +81,14 @@ export async function readCheerRanking(cfg: StoreConfig): Promise<{ id: string; 
   return (rows as { target?: unknown; n?: unknown }[])
     .filter((r) => typeof r.target === 'string' && Number.isFinite(Number(r.n)))
     .map((r) => ({ id: r.target as string, n: Number(r.n) }))
+}
+
+/** 집계 + 응원 순위. 순위를 못 읽어도 집계는 돌려준다(rank 없음). 집계를 못 읽으면 throw */
+export async function readStatsWithRank(cfg: StoreConfig, id: string): Promise<PersonStats> {
+  const [stats, rows] = await Promise.all([readStats(cfg, id), readCheerRanking(cfg).catch(() => null)])
+  if (rows && stats.cheer > 0) {
+    const rank = rankOf(rows, id)
+    if (rank !== null) stats.rank = rank
+  }
+  return stats
 }

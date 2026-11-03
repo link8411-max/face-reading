@@ -14,13 +14,15 @@ export interface VoteInput {
 
 export interface PersonStats {
   cheer: number
+  /** 응원 순위(동점은 같은 순위). 응원이 없거나 순위를 모르면 없다 */
+  rank?: number
   duel: Record<string, number>
   scene: Record<string, number>
   verdict: Record<string, number>
 }
 
-/** 투표 API 속도 제한: 10분에 20회 */
-export const voteGuard = createGuard(20)
+/** 투표 API 속도 제한: 10분에 60회 */
+export const voteGuard = createGuard(60)
 
 export function validateVote(body: unknown): VoteInput | null {
   if (typeof body !== 'object' || body === null || Array.isArray(body)) return null

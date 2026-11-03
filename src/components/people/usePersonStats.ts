@@ -4,7 +4,9 @@ import { useCallback, useEffect, useSyncExternalStore } from 'react'
 import type { PersonStats, VoteKind } from '@/lib/people/votes'
 import { kstDay } from '@/lib/people/keys'
 
-export const LOW_VOTE_TEXT = '아직 투표가 적어요'
+/** 투표가 적어 비율을 숨길 때, 실제 참여 수만 알려 준다 */
+export const headCountText = (n: number) => `지금 ${n.toLocaleString('ko-KR')}명이 투표했어요`
+export const LIMITED_TEXT = '잠시 후 다시 눌러 주세요'
 
 /** 집계 합이 threshold 미만이면 비율을 숨긴다. 보이면 합이 정확히 100이 되도록 반올림(최대 잉여법) */
 export function ratioView(counts: Record<string, number>, threshold = 10): { show: boolean; pct: Record<string, number> } {
@@ -130,7 +132,8 @@ async function loadStats(id: string) {
 export interface PersonStatsApi {
   stats: PersonStats | null
   disabled: boolean
-  vote(kind: VoteKind, target: string, option: string): Promise<{ counted: boolean } | null>
+  /** 성공이면 { counted }, 속도 제한(429)이면 'limited', 그 밖의 실패는 null */
+  vote(kind: VoteKind, target: string, option: string): Promise<{ counted: boolean } | 'limited' | null>
 }
 
 /** 마운트 때 /api/people/stats 를 한 번(같은 인물의 위젯끼리 공유). 503이면 disabled. */
@@ -167,6 +170,7 @@ export function usePersonStats(id: string): PersonStatsApi {
           setSnap(id, { stats: null, disabled: true })
           return null
         }
+        if (res.status === 429) return 'limited'
         if (!res.ok) return null
         const data = (await res.json()) as { ok?: boolean; counted?: unknown; stats?: unknown }
         if (!data.ok) return null

@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server'
 import { clientIp, readLimitedBody } from '@/lib/duel/feedbackGuard'
-import { insertVote, readStats, storeConfig } from '@/lib/people/store'
+import { insertVote, readStatsWithRank, storeConfig } from '@/lib/people/store'
 import { kstDay, statsOwner, validateVote, voteGuard, voterHash } from '@/lib/people/votes'
 
 const COOKIE = 'pv'
@@ -17,7 +17,31 @@ function readDeviceId(request: Request): string | null {
   return null
 }
 
+const ALLOWED_HOSTS = new Set(['unse-ai.com', 'www.unse-ai.com', 'localhost'])
+
+// Origin 헤더가 있으면(브라우저의 교차 출처 요청 포함) 우리 사이트에서 온 것만 받는다.
+function sameSite(request: Request): boolean {
+  const origin = request.headers.get('origin')
+  if (origin === null) return true
+  let host: string
+  let hostname: string
+  try {
+    const u = new URL(origin)
+    host = u.host
+    hostname = u.hostname
+  } catch {
+    return false
+  }
+  const own = request.headers.get('host') ?? new URL(request.url).host
+  return host === own || ALLOWED_HOSTS.has(hostname)
+}
+
 export async function POST(request: Request) {
+  // 다른 사이트의 폼·no-cors 요청은 본문을 읽기 전에 막는다
+  const type = (request.headers.get('content-type') ?? '').split(';')[0].trim().toLowerCase()
+  if (type !== 'application/json') return NextResponse.json({ ok: false }, { status: 415 })
+  if (!sameSite(request)) return NextResponse.json({ ok: false }, { status: 403 })
+
   // IP는 속도 제한과 해시 계산에만 쓰고 저장·로그·전송하지 않는다
   const ip = clientIp(request.headers)
   if (!voteGuard.allowRequest(ip)) return NextResponse.json({ ok: false }, { status: 429 })
@@ -45,7 +69,10 @@ export async function POST(request: Request) {
   }
 
   const existing = readDeviceId(request)
-  const deviceId = existing ?? crypto.randomUUID()
+  // 쿠키가 없는 요청의 해시는 새 UUID가 아니라 고정값('new')으로 만든다. 쿠키 없이 반복하는 스크립트가 매번 새 표를 얻지 못하게 한다.
+  // 새 쿠키는 다음 요청부터 쓰도록 계속 내려 준다.
+  const issued = existing ?? crypto.randomUUID()
+  const deviceId = existing ?? 'new'
   // 빈 문자열도 없는 것으로 본다(빈 키는 HMAC 키로 쓸 수 없다)
   const secret = process.env.PEOPLE_VOTE_SECRET || cfg.key
   const day = kstDay(new Date())
@@ -56,7 +83,7 @@ export async function POST(request: Request) {
     if (!existing) {
       res.headers.append(
         'Set-Cookie',
-        `${COOKIE}=${deviceId}; HttpOnly; SameSite=Lax; Path=/api/people; Max-Age=31536000; Secure`,
+        `${COOKIE}=${issued}; HttpOnly; SameSite=Lax; Path=/api/people; Max-Age=31536000; Secure`,
       )
     }
     return res
@@ -72,7 +99,7 @@ export async function POST(request: Request) {
   // 저장은 됐으니 집계 읽기 실패는 치명적이지 않다(stats: null → 화면은 숫자를 숨긴다)
   let stats = null
   try {
-    stats = await readStats(cfg, owner)
+    stats = await readStatsWithRank(cfg, owner)
   } catch {
     stats = null
   }

@@ -1,4 +1,4 @@
-import { getCharacterById, allSamgukCharacters } from '@/lib/samgukDB'
+import { characterById } from '@/lib/people/characters'
 import { getPerson } from '@/content/samgukPeople'
 import { portraitSrc } from '@/lib/people/portrait'
 import TopVerdictChip from './TopVerdictChip'
@@ -10,7 +10,7 @@ export function factionLabel(faction: string): string {
 // 머리 카드: 초상화(없으면 자리), 소속·역할, 이름·한자·자, 생몰년·출신지
 export default function PersonHeader({ id, verdictOptions }: { id: string; verdictOptions?: { key: string; label: string }[] }) {
   const p = getPerson(id)
-  const c = allSamgukCharacters.find((x) => x.id === id) ?? getCharacterById(id)
+  const c = characterById(id)
   if (!p || !c) return null
   const src = portraitSrc(id)
   const years = `${p.born ?? '?'} ~ ${p.died ?? '?'}년`

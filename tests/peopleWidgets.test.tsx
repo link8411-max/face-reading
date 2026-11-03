@@ -1,5 +1,5 @@
 import { renderToStaticMarkup } from 'react-dom/server'
-import { ratioView, LOW_VOTE_TEXT, mergeVoteStats } from '@/components/people/usePersonStats'
+import { ratioView, headCountText, mergeVoteStats } from '@/components/people/usePersonStats'
 import CheerButton from '@/components/people/CheerButton'
 import VotePoll from '@/components/people/VotePoll'
 import TopVerdictChip from '@/components/people/TopVerdictChip'
@@ -26,7 +26,7 @@ describe('ratioView', () => {
   })
   test('threshold 인자와 문구', () => {
     expect(ratioView({ a: 3, b: 2 }, 5).show).toBe(true)
-    expect(LOW_VOTE_TEXT).toBe('아직 투표가 적어요')
+    expect(headCountText(3)).toBe('지금 3명이 투표했어요')
   })
 })
 
@@ -36,7 +36,7 @@ test('keys: votes.ts 와 같은 함수', () => {
   expect(pairKey('guanyu', 'caocao')).toBe('caocao__guanyu')
 })
 
-test('CheerButton 서버 렌더: 문구만 있고 숫자 영역은 없다', () => {
+test('CheerButton 서버 렌더(집계 전): 문구만 있고 숫자 영역은 없다', () => {
   const html = renderToStaticMarkup(<CheerButton id="guanyu" name="관우" />)
   expect(html).toContain('응원하기')
   expect(html).not.toContain('data-cheer-count')
@@ -84,10 +84,19 @@ test('관우 페이지에 응원·투표 위젯이 들어간다', async () => {
   expect(html).not.toContain('%')
 })
 
-test('개인정보처리방침에 응원·투표 저장 안내', () => {
+test('개인정보처리방침에 응원·투표 저장 안내: GA 항목 밖의 별도 항목, pv 쿠키·localStorage 안내', () => {
   const src = readFileSync('src/app/privacy/page.tsx', 'utf8')
-  expect(src).toContain('삼국지 인물열전의 응원·투표는 고른 항목과 날짜, 그리고 기기·접속 정보를 되돌릴 수 없게 바꾼 값(해시)만 저장합니다. IP 주소와 쿠키 값 자체는 저장하지 않습니다.')
-  expect(src).toContain('개정일자: 2026년 11월 3일')
+  const line = '삼국지 인물열전의 응원·투표는 고른 항목과 날짜, 그리고 기기·접속 정보를 되돌릴 수 없게 바꾼 값(해시)만 저장합니다. IP 주소와 쿠키 값 자체는 저장하지 않습니다.'
+  expect(src).toContain(line)
+  const gaStart = src.indexOf('5. 방문 통계 분석')
+  const peopleStart = src.indexOf('6. 삼국지 인물열전 응원·투표')
+  expect(gaStart).toBeGreaterThan(0)
+  expect(peopleStart).toBeGreaterThan(gaStart)
+  expect(src.indexOf(line)).toBeGreaterThan(peopleStart)
+  expect(src).toMatch(/pv 쿠키[^<]*1년/)
+  expect(src).toContain('기기를 구분하는 무작위 값')
+  expect(src).toContain('localStorage')
+  expect(src).toContain('개정일자: 2026년 11월 4일')
 })
 
 describe('mergeVoteStats: 대결 응답은 duel 만 현재 인물 집계에 합친다', () => {

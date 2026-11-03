@@ -2,7 +2,8 @@
 
 import { useState } from 'react'
 import { track } from '@/lib/analytics'
-import { useMarker, usePersonStats, writeMarker } from './usePersonStats'
+import Link from 'next/link'
+import { LIMITED_TEXT, useMarker, usePersonStats, writeMarker } from './usePersonStats'
 
 type Done = 'counted' | 'already' | 'thanks'
 
@@ -19,15 +20,19 @@ export default function CheerButton({ id, name }: { id: string; name: string }) 
   const done: Done | null = local ?? (marker !== null ? 'counted' : null)
   const [busy, setBusy] = useState(false)
   const [failed, setFailed] = useState(false)
+  const [limited, setLimited] = useState(false)
 
   async function onClick() {
     if (busy || done) return
     setBusy(true)
     setFailed(false)
+    setLimited(false)
     track('people_cheer', { result_id: id })
     const r = await vote('cheer', id, 'cheer')
     setBusy(false)
-    if (r) {
+    if (r === 'limited') {
+      setLimited(true)
+    } else if (r) {
       writeMarker('cheer', id, 'cheer')
       setDone(r.counted ? 'counted' : 'already')
     } else if (!navigator.onLine) {
@@ -51,11 +56,22 @@ export default function CheerButton({ id, name }: { id: string; name: string }) 
         {done ? LABEL[done] : '응원하기'}
       </button>
       {stats && (
-        <p data-cheer-count className="mt-2 text-sm text-muted">
-          {stats.cheer.toLocaleString('ko-KR')}명이 응원했어요
-        </p>
+        <div className="mt-2 text-sm text-muted">
+          <p data-cheer-count>{stats.cheer > 0 ? `응원 ${stats.cheer.toLocaleString('ko-KR')}번` : '첫 응원을 남겨 보세요'}</p>
+          {stats.cheer > 0 && typeof stats.rank === 'number' && (
+            <p data-cheer-rank className="mt-0.5">
+              지금 응원 순위 {stats.rank}위
+            </p>
+          )}
+        </div>
       )}
+      {limited && <p className="mt-2 text-sm text-muted">{LIMITED_TEXT}</p>}
       {failed && <p className="mt-2 text-sm text-muted">연결을 확인하고 다시 눌러 주세요</p>}
+      <p className="mt-3 text-xs">
+        <Link href="/samguk/people/ranking" prefetch={false} className="underline text-muted">
+          응원 순위 보기
+        </Link>
+      </p>
     </div>
   )
 }

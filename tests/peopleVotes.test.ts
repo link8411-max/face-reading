@@ -122,7 +122,7 @@ const req = (body: string, headers: Record<string, string> = {}) =>
   new Request('http://localhost/api/people/vote', {
     method: 'POST',
     body,
-    headers: { 'x-forwarded-for': IP, ...headers },
+    headers: { 'x-forwarded-for': IP, 'content-type': 'application/json', ...headers },
   })
 const cheerBody = JSON.stringify({ kind: 'cheer', target: 'guanyu', option: 'cheer' })
 
@@ -308,6 +308,38 @@ describe('POST /api/people/vote', () => {
     expect(sent.voter_hash).toBe(await voterHash('k', kstDay(new Date()), UUID, IP))
   })
 
+  it('Content-Type이 application/json이 아니면 415, 크로스 사이트 Origin은 403 (fetch 0회)', async () => {
+    const f = stubUpstream()
+    expect((await POST(req(cheerBody, { 'content-type': 'text/plain' }))).status).toBe(415)
+    expect((await POST(req(cheerBody, { 'content-type': 'application/x-www-form-urlencoded' }))).status).toBe(415)
+    const noType = new Request('http://localhost/api/people/vote', { method: 'POST', body: cheerBody, headers: { 'x-forwarded-for': IP } })
+    expect((await POST(noType)).status).toBe(415)
+    expect((await POST(req(cheerBody, { origin: 'https://evil.example' }))).status).toBe(403)
+    expect((await POST(req(cheerBody, { origin: 'null' }))).status).toBe(403)
+    expect((await POST(req(cheerBody, { origin: 'https://unse-ai.com.evil.example' }))).status).toBe(403)
+    expect(f).not.toHaveBeenCalled()
+  })
+
+  it('같은 사이트 Origin과 charset이 붙은 JSON은 통과', async () => {
+    const f = stubUpstream()
+    for (const origin of ['https://unse-ai.com', 'https://www.unse-ai.com', 'http://localhost:3200', 'http://localhost']) {
+      expect((await POST(req(cheerBody, { origin, 'content-type': 'application/json; charset=utf-8' }))).status).toBe(200)
+    }
+    expect((await POST(req(cheerBody, { origin: 'https://preview.vercel.app', host: 'preview.vercel.app' }))).status).toBe(200)
+    expect(f).toHaveBeenCalled()
+  })
+
+  it('쿠키가 없으면 해시는 고정값 new|ip, 그래도 새 쿠키는 내려 준다', async () => {
+    const f = stubUpstream()
+    const a = await POST(req(cheerBody))
+    const b = await POST(req(cheerBody))
+    expect(a.headers.get('set-cookie')).toMatch(/^pv=[0-9a-f-]{36};/)
+    expect(a.headers.get('set-cookie')).not.toBe(b.headers.get('set-cookie'))
+    const h = f.mock.calls.filter((c) => String(c[0]).includes('people_votes')).map((c) => JSON.parse(c[1].body).voter_hash)
+    expect(h[0]).toBe(h[1])
+    expect(h[0]).toBe(await voterHash('k', kstDay(new Date()), 'new', IP))
+  })
+
   it('Supabase 실패는 502, 속도 제한은 429', async () => {
     vi.stubEnv('SUPABASE_URL', 'https://x.supabase.co')
     vi.stubEnv('SUPABASE_SERVICE_KEY', 'k')
@@ -318,7 +350,7 @@ describe('POST /api/people/vote', () => {
     voteGuard.reset()
     stubUpstream()
     let last = 200
-    for (let i = 0; i < 21; i++) last = (await POST(req(cheerBody))).status
+    for (let i = 0; i < 61; i++) last = (await POST(req(cheerBody))).status
     expect(last).toBe(429)
   })
 })
@@ -382,5 +414,58 @@ describe('SQL 문서', () => {
     expect(sql).toContain('function people_stats(p_id text, p_pair text)')
     expect(sql).toContain('function people_cheer_ranking()')
     expect(sql).toContain('Supabase SQL Editor에서 한 번 실행')
+  })
+})
+
+describe('응원 순위(rank)가 집계에 실린다', () => {
+  const stub = (cheer: number, ranking: unknown | 'fail') => {
+    vi.stubEnv('SUPABASE_URL', 'https://x.supabase.co')
+    vi.stubEnv('SUPABASE_SERVICE_KEY', 'k')
+    vi.stubGlobal(
+      'fetch',
+      vi.fn().mockImplementation(async (url: string) => {
+        const u = String(url)
+        if (u.includes('people_cheer_ranking')) return ranking === 'fail' ? new Response('no', { status: 500 }) : Response.json(ranking)
+        if (u.includes('/rpc/')) return Response.json(cheer > 0 ? [{ kind: 'cheer', option: 'cheer', n: cheer }] : [])
+        return Response.json([{ id: 1 }], { status: 201 })
+      }),
+    )
+  }
+  beforeEach(() => voteGuard.reset())
+  afterEach(() => {
+    vi.unstubAllEnvs()
+    vi.unstubAllGlobals()
+  })
+  const ranking = [{ target: 'caocao', n: 9 }, { target: 'guanyu', n: 7 }, { target: 'liubei', n: 7 }, { target: 'zhangfei', n: 2 }, { target: 'nobody', n: 99 }]
+
+  it('GET stats: 동점은 같은 순위, 열전 없는 id는 세지 않는다', async () => {
+    stub(7, ranking)
+    const json = await (await GET(new Request('http://localhost/api/people/stats?id=guanyu'))).json()
+    expect(json.cheer).toBe(7)
+    expect(json.rank).toBe(2)
+    // 9, 7, 7, 2 -> 1위, 2위, 2위, 4위
+    stub(2, ranking)
+    expect((await (await GET(new Request('http://localhost/api/people/stats?id=zhangfei'))).json()).rank).toBe(4)
+  })
+  it('응원이 0이면 rank 없음', async () => {
+    stub(0, ranking)
+    const json = await (await GET(new Request('http://localhost/api/people/stats?id=guanyu'))).json()
+    expect(json.cheer).toBe(0)
+    expect('rank' in json).toBe(false)
+  })
+  it('순위를 못 읽어도 집계는 그대로(rank 없음)', async () => {
+    stub(7, 'fail')
+    const res = await GET(new Request('http://localhost/api/people/stats?id=guanyu'))
+    expect(res.status).toBe(200)
+    const json = await res.json()
+    expect(json.cheer).toBe(7)
+    expect('rank' in json).toBe(false)
+  })
+  it('POST vote 응답에도 rank가 실린다', async () => {
+    stub(7, ranking)
+    const json = await (await POST(req(cheerBody))).json()
+    expect(json.counted).toBe(true)
+    expect(json.stats.cheer).toBe(7)
+    expect(json.stats.rank).toBe(2)
   })
 })

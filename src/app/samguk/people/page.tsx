@@ -5,10 +5,10 @@ import FactionMap from "@/components/people/FactionMap";
 import HubRelationList from "@/components/people/HubRelationList";
 import { factionLabel } from "@/components/people/PersonHeader";
 import { PEOPLE_IDS } from "@/content/samgukPeople";
+import { characterById } from "@/lib/people/characters";
 import { hubRelations } from "@/lib/people/hubRelations";
 import { portraitSrc } from "@/lib/people/portrait";
 import { factionGroups } from "@/lib/people/relations";
-import { getCharacterById } from "@/lib/samgukDB";
 
 const SITE = "https://unse-ai.com";
 const URL = `${SITE}/samguk/people`;
@@ -65,7 +65,7 @@ export default async function PeopleHubPage() {
 
                   <ul className="mt-5 grid grid-cols-2 gap-2">
                     {g.ids.map((id) => {
-                      const c = getCharacterById(id);
+                      const c = characterById(id);
                       const src = portraitSrc(id);
                       return (
                         <li key={id}>

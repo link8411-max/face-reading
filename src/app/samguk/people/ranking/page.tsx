@@ -2,11 +2,10 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import CoupangBanner from "@/components/CoupangBanner";
 import { factionLabel } from "@/components/people/PersonHeader";
-import { PEOPLE_IDS } from "@/content/samgukPeople";
+import { characterById } from "@/lib/people/characters";
 import { rankingView, type RankRow } from "@/lib/people/ranking";
 import { factionGroups } from "@/lib/people/relations";
 import { readCheerRanking, storeConfig } from "@/lib/people/store";
-import { getCharacterById } from "@/lib/samgukDB";
 
 const SITE = "https://unse-ai.com";
 const URL = `${SITE}/samguk/people/ranking`;
@@ -38,7 +37,7 @@ async function loadRows(): Promise<{ id: string; n: number }[]> {
 }
 
 function Row({ id, rank, n }: { id: string; rank?: number; n?: number }) {
-  const c = getCharacterById(id);
+  const c = characterById(id);
   return (
     <li>
       <Link href={`/samguk/people/${id}`} prefetch={false} className="flex items-center gap-3 rounded-full border border-line bg-white px-4 py-2.5 text-sm hover:border-accent/50 transition">
@@ -58,9 +57,32 @@ function withRanks(rows: RankRow[]): RankRow[] {
   return out;
 }
 
+// 세력별로 접어 둔 목록(길이가 길어 한 줄로 펼치지 않는다)
+function ClosedFactionLists({ groups }: { groups: { faction: "위" | "촉" | "오" | "기타"; ids: string[] }[] }) {
+  return (
+    <div className="space-y-3">
+      {groups.map((g) => (
+        <details key={g.faction} className="bg-white rounded-[22px] border border-line px-5 py-4">
+          <summary className="cursor-pointer">
+            <h3 className="inline font-serif font-bold text-base">{factionLabel(g.faction)}</h3>
+            <span className="ml-2 text-xs text-muted">{g.ids.length}명</span>
+          </summary>
+          <ul className="mt-3 space-y-2">
+            {g.ids.map((id) => (
+              <Row key={id} id={id} />
+            ))}
+          </ul>
+        </details>
+      ))}
+    </div>
+  );
+}
+
 export default async function PeopleRankingPage() {
   const view = rankingView(await loadRows());
   const groups = factionGroups();
+  const ranked = new Set(view.rows.map((r) => r.id));
+  const unranked = groups.map((g) => ({ ...g, ids: g.ids.filter((id) => !ranked.has(id)) })).filter((g) => g.ids.length > 0);
 
   const breadcrumb = {
     "@context": "https://schema.org",
@@ -93,7 +115,7 @@ export default async function PeopleRankingPage() {
               </ol>
             </section>
             {groups.map((g) => {
-              const rows = withRanks(view.rows.filter((r) => getCharacterById(r.id)?.faction === g.faction));
+              const rows = withRanks(view.rows.filter((r) => characterById(r.id)?.faction === g.faction));
               if (rows.length === 0) return null;
               return (
                 <section key={g.faction} className="mt-8">
@@ -106,19 +128,21 @@ export default async function PeopleRankingPage() {
                 </section>
               );
             })}
+            {unranked.length > 0 && (
+              <section className="mt-8">
+                <h2 className="font-serif font-bold text-lg mb-3">아직 응원이 없는 인물</h2>
+                <ClosedFactionLists groups={unranked} />
+              </section>
+            )}
           </>
         ) : (
           <section className="mt-6">
             <div className="rounded-[22px] bg-card px-5 py-5 text-center">
               <p className="font-serif font-bold text-lg">응원을 모으는 중</p>
-              <p className="mt-1 text-sm text-muted">응원이 조금 더 모이면 순위를 보여 드려요. 좋아하는 장수의 열전에서 응원해 주세요.</p>
+              <p className="mt-1 text-sm text-muted">첫 응원이 모이면 바로 순위를 보여 드려요. 좋아하는 장수의 열전에서 응원해 주세요.</p>
             </div>
             <h2 className="mt-8 font-serif font-bold text-lg mb-3">열전이 있는 인물</h2>
-            <ul className="space-y-2">
-              {PEOPLE_IDS.map((id) => (
-                <Row key={id} id={id} />
-              ))}
-            </ul>
+            <ClosedFactionLists groups={groups} />
           </section>
         )}
 
