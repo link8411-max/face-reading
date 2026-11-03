@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server'
 import { clientIp, readLimitedBody } from '@/lib/duel/feedbackGuard'
 import { insertVote, readStatsWithRank, storeConfig } from '@/lib/people/store'
-import { kstDay, signPvCookie, statsOwner, validateVote, verifyPvCookie, voteGuard, voterHash } from '@/lib/people/votes'
+import { kstDay, pvUuidFor, signPvCookie, statsOwner, validateVote, verifyPvCookie, voteGuard, voterHash } from '@/lib/people/votes'
 
 const COOKIE = 'pv'
 
@@ -76,8 +76,8 @@ export async function POST(request: Request) {
   // 발급일 다음 날부터만 쿠키의 uuid로 해시한다. 유효한 쿠키가 없거나 발급일이 오늘이면 고정값('new')이라
   // 쿠키를 새로 받아 곧바로 쓰는 스크립트도 IP·대상마다 하루 한 표가 상한이다.
   const deviceId = valid && valid.issuedDay < today ? valid.uuid : 'new'
-  // 유효한 쿠키가 없을 때만 새 쿠키를 내려 준다
-  const issued = valid ? null : await signPvCookie(secret, crypto.randomUUID(), today)
+  // 유효한 쿠키가 없을 때만 새 쿠키를 내려 준다. uuid는 IP·날짜별 고정값이라 같은 IP는 하루에 쿠키를 하나만 받는다
+  const issued = valid ? null : await signPvCookie(secret, await pvUuidFor(secret, ip, today), today)
 
   // 새로 만든 쿠키는 어떤 응답에도 실어 보낸다. 집계 읽기가 실패해 다시 눌러도 같은 해시가 되어 응원이 두 번 세어지지 않는다.
   const respond = (data: unknown, status = 200) => {

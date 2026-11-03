@@ -257,7 +257,7 @@ public/
 | 조회 | 열전 코드는 `lib/people/characters.ts`의 `characterById`를 쓴다(초상화 대기 인물도 포함. `samgukDB`의 `getCharacterById`는 대기 인물이 빠진다). 관계 화면 말은 `relationLabel`(부녀·모자·남매 등, 데이터 `type`은 그대로) |
 | API | `/api/people/vote`(POST: JSON만, 같은 사이트 Origin만, 10분 60회), `/api/people/stats`(GET). 환경변수 `SUPABASE_URL`·`SUPABASE_SERVICE_KEY`(없으면 503, 화면은 숫자를 숨김). 선택 `PEOPLE_VOTE_SECRET`(투표자 해시 키, 없으면 서비스 키 사용) |
 | DB | `docs/people-votes.sql`을 Supabase SQL Editor에서 **한 번** 실행(RLS 켜고 service_role만 접근). 실행 전에는 투표가 조용히 꺼져 있다 |
-| 중복 방지 | 하루마다 바뀌는 해시(`HMAC(날짜, 기기id\|IP)`)로 같은 날 같은 대상은 한 번. `pv` 쿠키는 서명값 `<uuid>.<발급일YYYYMMDD>.<HMAC-SHA256(비밀, pv\|uuid\|발급일) 앞 32자>`(`signPvCookie`·`verifyPvCookie`)이고 틀리면 쿠키 없음으로 본다. **첫날(쿠키가 없거나 발급일이 오늘)은 기기id를 `new`로 고정해 IP 기준**, 다음 날부터 쿠키 uuid로 센다(스크립트가 새 쿠키를 계속 만들어도 IP·대상마다 하루 1표). IP·쿠키 원본은 저장하지 않는다. 같은 IP의 첫 방문자끼리는 첫날 응원이 겹칠 수 있어 `counted:false` 문구는 "오늘 응원이 반영됐어요" |
+| 중복 방지 | 하루마다 바뀌는 해시(`HMAC(날짜, 기기id\|IP)`)로 같은 날 같은 대상은 한 번. `pv` 쿠키는 서명값 `<uuid>.<발급일YYYYMMDD>.<HMAC-SHA256(비밀, pv\|uuid\|발급일) 앞 32자>`(`signPvCookie`·`verifyPvCookie`)이고 틀리면 쿠키 없음으로 본다. **첫날(쿠키가 없거나 발급일이 오늘)은 기기id를 `new`로 고정해 IP 기준**, 다음 날부터 쿠키 uuid로 센다(위조·즉석 발급 쿠키는 첫날 IP 기준으로 묶이고, 쿠키 uuid는 `HMAC(비밀, pvid\|IP\|발급일)`이라 IP·날짜마다 하나만 발급돼 비축을 막는다(IP를 바꾸며 모은 쿠키까지 막지는 못함). IP·쿠키 원본은 저장하지 않는다. 같은 IP의 첫 방문자끼리는 첫날 표가 겹칠 수 있어 `counted:false` 문구는 "오늘 응원이 반영됐어요"·"오늘 투표가 반영됐어요" |
 | 표시 규칙 | 응원은 실제 숫자로 보인다(0이면 "첫 응원을 남겨 보세요", 1+는 `응원 N번`, 순위를 알면 "지금 응원 순위 N위", 순위는 stats 응답의 `rank`). 기록이 꺼져 있으면(503) 숫자·순위를 숨긴다. 투표 비율은 투표 전엔 숨기고 합이 10 미만이면 "지금 N명이 투표했어요". 순위 페이지는 응원이 1번이라도 있으면 실제 순위를 보이고, 응원 없는 인물은 닫힌 세력별 목록 |
 
 **내용 규칙**

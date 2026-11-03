@@ -121,7 +121,7 @@ export default function VotePoll({ kind, id, target, title, options, share }: Pr
       </ul>
       {voted && (
         <p className="mt-3 text-sm text-muted" aria-live="polite">
-          {thanks ? '고마워요' : already ? '오늘은 이미 투표했어요' : '투표했어요'}
+          {thanks ? '고마워요' : already ? '오늘 투표가 반영됐어요' : '투표했어요'}
           {headCount > 0 && view && !view.show && ` · ${headCountText(headCount)}`}
         </p>
       )}

@@ -107,3 +107,12 @@ export async function verifyPvCookie(
   for (let i = 0; i < want.length; i++) diff |= want.charCodeAt(i) ^ sig.charCodeAt(i)
   return diff === 0 ? { uuid, issuedDay } : null
 }
+
+/**
+ * 새 쿠키에 담는 uuid 모양 값: HMAC-SHA256(secret, `pvid|ip|발급일`) 앞 32자를 uuid 꼴로.
+ * 같은 IP·같은 날은 같은 값이라, 쿠키 없는 요청을 반복해 쿠키를 비축할 수 없다(IP 원본은 담기지 않는다).
+ */
+export async function pvUuidFor(secret: string, ip: string, issuedDay: string): Promise<string> {
+  const h = (await hmacHex(secret, `pvid|${ip}|${issuedDay}`)).hex
+  return `${h.slice(0, 8)}-${h.slice(8, 12)}-${h.slice(12, 16)}-${h.slice(16, 20)}-${h.slice(20, 32)}`
+}
