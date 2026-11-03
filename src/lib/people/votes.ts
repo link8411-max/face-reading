@@ -1,6 +1,9 @@
 // 인물열전 응원·투표: 요청 검증, 날마다 바뀌는 해시, 한국 날짜. IP·쿠키 원본은 저장하지 않는다.
 import { getPerson } from '@/content/samgukPeople'
 import { createGuard } from '@/lib/duel/feedbackGuard'
+import { kstDay, pairKey } from './keys'
+
+export { kstDay, pairKey }
 
 export type VoteKind = 'cheer' | 'duel' | 'scene' | 'verdict'
 export interface VoteInput {
@@ -18,11 +21,6 @@ export interface PersonStats {
 
 /** 투표 API 속도 제한: 10분에 20회 */
 export const voteGuard = createGuard(20)
-
-/** 두 id를 정렬해 `${x}__${y}` */
-export function pairKey(a: string, b: string): string {
-  return a <= b ? `${a}__${b}` : `${b}__${a}`
-}
 
 export function validateVote(body: unknown): VoteInput | null {
   if (typeof body !== 'object' || body === null || Array.isArray(body)) return null
@@ -51,16 +49,6 @@ export function validateVote(body: unknown): VoteInput | null {
     return p && (p.verdictOptions as string[]).includes(option) ? { kind, target, option } : null
   }
   return null
-}
-
-/** 한국 날짜 'YYYY-MM-DD' */
-export function kstDay(now: Date): string {
-  return new Intl.DateTimeFormat('en-CA', {
-    timeZone: 'Asia/Seoul',
-    year: 'numeric',
-    month: '2-digit',
-    day: '2-digit',
-  }).format(now)
 }
 
 async function hmacHex(key: string | ArrayBuffer, data: string): Promise<{ raw: ArrayBuffer; hex: string }> {

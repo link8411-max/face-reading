@@ -1,0 +1,54 @@
+import { test, expect, type Page } from '@playwright/test'
+import { trackErrors } from './helpers'
+
+// 집계 API는 E2E 서버에서 일부러 503이므로 그 응답만 오류로 세지 않는다.
+// 열전 목록(/samguk/people)은 아직 없는 페이지라 경로 머리글의 링크 미리 받기가 404다(목록 페이지가 생기면 이 예외를 지운다).
+const realErrors = (errors: string[]) => errors.filter((e) => !e.includes('/api/people/') && !/\/samguk\/people\?_rsc/.test(e))
+
+const events = (page: Page) =>
+  page.evaluate(() => ((window as unknown as { dataLayer?: unknown[][] }).dataLayer ?? []).filter((a) => a[0] === 'event').map((a) => [a[1], a[2]] as [string, Record<string, string>]))
+
+// E2E 서버에는 Supabase 환경 변수가 없다 -> 집계 API는 503, 화면은 숫자를 숨긴다
+test('열전 페이지: 로딩, 쿠팡 배너가 닮은꼴 배너보다 위, 펼치면 생애 글', async ({ page }) => {
+  const errors = trackErrors(page)
+  await page.goto('/samguk/people/guanyu')
+  await expect(page.getByRole('heading', { level: 1 })).toContainText('관우')
+  const coupang = await page.getByText('추천 상품', { exact: true }).first().boundingBox()
+  const banner = await page.getByText('나도 관우를 닮았을까').first().boundingBox()
+  expect(coupang!.y).toBeLessThan(banner!.y)
+  const details = page.locator('details', { hasText: '연의로 보는 생애' })
+  await details.locator('summary').click()
+  await expect(details.locator('p').first()).toBeVisible()
+  const link = page.getByRole('link', { name: /사진 한 장으로 확인하기/ })
+  await expect(link).toHaveAttribute('href', '/samguk')
+  expect(realErrors(errors)).toEqual([])
+})
+
+test('응원 버튼: 숫자 영역 없음, 누르면 people_cheer 이벤트와 고마워요', async ({ page }) => {
+  const errors = trackErrors(page)
+  const statsResponse = page.waitForResponse((r) => r.url().includes('/api/people/stats'))
+  await page.goto('/samguk/people/guanyu')
+  const cheer = page.locator('#cheer')
+  const btn = cheer.getByRole('button', { name: '응원하기' })
+  await expect(btn).toBeVisible()
+  // 집계 요청이 끝난 뒤에도 숫자는 없다
+  expect((await statsResponse).status()).toBe(503)
+  await expect(cheer.locator('[data-cheer-count]')).toHaveCount(0)
+  await btn.click()
+  await expect(cheer.getByRole('button')).toHaveText('고마워요')
+  await expect(cheer.locator('[data-cheer-count]')).toHaveCount(0)
+  await expect.poll(async () => (await events(page)).filter((e) => e[0] === 'people_cheer')).toEqual([['people_cheer', { result_id: 'guanyu' }]])
+  expect(realErrors(errors)).toEqual([])
+})
+
+test('투표: 투표 전 % 없음, 누르면 people_vote 이벤트와 선택 표시, 비율은 숨김', async ({ page }) => {
+  await page.goto('/samguk/people/guanyu')
+  const duel = page.locator('#duel-vote')
+  await expect(duel.getByRole('heading')).toHaveText('관우 vs 조조, 일기토하면 누가 이길까?')
+  await expect(duel).not.toContainText('%')
+  await duel.getByRole('button', { name: '관우' }).click()
+  await expect(duel.getByRole('button', { name: '관우' })).toHaveAttribute('aria-pressed', 'true')
+  await expect(duel).not.toContainText('%')
+  await expect(duel.getByRole('button', { name: '친구에게 공유하기' })).toBeVisible()
+  await expect.poll(async () => (await events(page)).filter((e) => e[0] === 'people_vote')).toEqual([['people_vote', { result_id: 'duel_guanyu' }]])
+})

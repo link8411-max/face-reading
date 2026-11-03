@@ -3,8 +3,12 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import CoupangBanner from "@/components/CoupangBanner";
 import PersonHeader, { factionLabel } from "@/components/people/PersonHeader";
+import CheerButton from "@/components/people/CheerButton";
 import RelationMap from "@/components/people/RelationMap";
 import SourceChip from "@/components/people/SourceChip";
+import VotePoll from "@/components/people/VotePoll";
+import { VERDICTS } from "@/content/samgukPeople/types";
+import { pairKey } from "@/lib/people/keys";
 import { PEOPLE_IDS, getPerson } from "@/content/samgukPeople";
 import { getDuelGeneral } from "@/lib/duel/generals";
 import { eulReul, personDescription, personTitle, portraitSrc, yearLabel } from "@/lib/people/portrait";
@@ -21,6 +25,10 @@ export function generateStaticParams() {
   return PEOPLE_IDS.map((id) => ({ id }));
 }
 
+function ogImagePath(name: string, subtitle: string) {
+  return `/api/og?title=${encodeURIComponent(`${name} 열전`)}&subtitle=${encodeURIComponent(subtitle)}`;
+}
+
 function lookup(id: string) {
   const p = getPerson(id);
   const c = allSamgukCharacters.find((x) => x.id === id);
@@ -35,7 +43,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const title = personTitle(id);
   const description = personDescription(id);
   const url = `${SITE}/samguk/people/${id}`;
-  const image = `/api/og?title=${encodeURIComponent(`${c.name} 열전`)}&subtitle=${encodeURIComponent(p.style ? `자 ${p.style}` : c.role)}`;
+  const image = ogImagePath(c.name, p.style ? `자 ${p.style}` : c.role);
   return {
     title,
     description,
@@ -56,6 +64,13 @@ export default async function PersonPage({ params }: Props) {
   const duelOk = !!duel && duel.role !== "mob";
   const pending = portraitSrc(id) === null;
   const related = relationsOf(id);
+
+  // 투표 위젯에 넘길 값 (서버에서 계산해 평범한 데이터로 보낸다)
+  const rival = allSamgukCharacters.find((x) => x.id === p.rivalId);
+  const rivalName = rival?.name ?? p.rivalId;
+  const shareUrl = `${url}?utm_source=share&utm_medium=friend_link&utm_campaign=people`;
+  const shareImage = `${SITE}${ogImagePath(c.name, p.style ? `자 ${p.style}` : c.role)}`;
+  const verdictLabels = p.verdictOptions.map((key) => ({ key, label: VERDICTS.find((v) => v.key === key)?.label ?? key }));
 
   const person: Record<string, unknown> = {
     "@context": "https://schema.org",
@@ -108,7 +123,7 @@ export default async function PersonPage({ params }: Props) {
         </nav>
 
         {/* 2. 머리 카드 */}
-        <PersonHeader id={id} />
+        <PersonHeader id={id} verdictOptions={verdictLabels} />
 
         {/* 3. 요약·태그 */}
         <section className="mt-5">
@@ -145,8 +160,10 @@ export default async function PersonPage({ params }: Props) {
           </dl>
         </section>
 
-        {/* 5. 응원 (위젯은 다음 태스크) */}
-        <section id="cheer" className="mt-6" />
+        {/* 5. 응원 */}
+        <section id="cheer" className="mt-6 scroll-mt-4">
+          <CheerButton id={id} name={c.name} />
+        </section>
 
         {/* 6. 접힌 항목 */}
         <div className="mt-6 space-y-3">
@@ -193,10 +210,39 @@ export default async function PersonPage({ params }: Props) {
           </details>
         </div>
 
-        {/* 7~9. 투표 위젯 자리 (다음 태스크) */}
-        <section id="duel-vote" className="mt-8" />
-        <section id="scene-vote" className="mt-8" />
-        <section id="verdict-vote" className="mt-8" />
+        {/* 7~9. 투표 */}
+        <section id="duel-vote" className="mt-8">
+          <VotePoll
+            kind="duel"
+            id={id}
+            target={pairKey(id, p.rivalId)}
+            title={`${c.name} vs ${rivalName}, 일기토하면 누가 이길까?`}
+            options={[
+              { key: id, label: c.name },
+              { key: p.rivalId, label: rivalName },
+            ]}
+            share={{
+              url: shareUrl,
+              imageUrl: shareImage,
+              text: {
+                [id]: `${c.name} vs ${rivalName}, 나는 ${c.name}. 너는?`,
+                [p.rivalId]: `${c.name} vs ${rivalName}, 나는 ${rivalName}. 너는?`,
+              },
+            }}
+          />
+        </section>
+        <section id="scene-vote" className="mt-8">
+          <VotePoll
+            kind="scene"
+            id={id}
+            target={id}
+            title={`${c.name}의 명장면, 가장 멋진 장면은?`}
+            options={p.sceneOptions.map((o) => ({ key: o.key, label: o.label, note: o.source }))}
+          />
+        </section>
+        <section id="verdict-vote" className="mt-8">
+          <VotePoll kind="verdict" id={id} target={id} title={`${c.name}${eulReul(c.name)} 한 줄로 평가한다면?`} options={verdictLabels} />
+        </section>
 
         {/* 11. 함께 보는 인물 */}
         {related.length > 0 && (
