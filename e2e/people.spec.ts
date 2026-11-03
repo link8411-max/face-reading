@@ -54,17 +54,89 @@ test('투표: 투표 전 % 없음, 누르면 people_vote 이벤트와 선택 표
   await expect.poll(async () => (await events(page)).filter((e) => e[0] === 'people_vote')).toEqual([['people_vote', { result_id: 'duel_guanyu' }]])
 })
 
-test('허브: 열전 링크를 눌러 열전으로 이동하고, 순위 링크가 있다', async ({ page }) => {
+const card = (page: Page, id: string) => page.locator(`#people-list li[data-person="${id}"]`)
+
+test('허브: 처음엔 삼국 지도와 전체 인기 12명, 펼친 details 없음, 카드를 눌러 열전으로', async ({ page }) => {
   const errors = trackErrors(page)
   await page.goto('/samguk/people')
-  await expect(page.getByRole('heading', { level: 1 })).toHaveText('삼국지 인물 관계도')
-  await expect(page.getByRole('link', { name: '가장 응원받는 장수 순위 보기' })).toHaveAttribute('href', '/samguk/people/ranking')
-  // 첫 세력(위나라)만 펼쳐져 있으니 촉나라를 펼친 뒤 관우 카드를 누른다
-  await page.locator('summary', { hasText: '촉나라' }).click()
-  await page.locator('main li a[href="/samguk/people/guanyu"]').first().click()
+  await expect(page.getByRole('heading', { level: 1 })).toHaveText('천하를 눌러 영웅을 만나 보세요')
+  await expect(page.getByRole('group', { name: '삼국 개략도' })).toBeVisible()
+  await expect(page.getByText('개략도예요. 실제 국경과 다를 수 있어요')).toBeVisible()
+  await expect(page.locator('details[open]')).toHaveCount(0)
+  await expect(page.locator('#people-list li:visible')).toHaveCount(12)
+  await expect(card(page, 'caocao')).toBeVisible()
+  await expect(card(page, 'liubei')).toBeVisible()
+  await expect(page.getByRole('link', { name: /응원 순위/ })).toHaveAttribute('href', '/samguk/people/ranking')
+  await card(page, 'guanyu').locator('a').click()
   await expect(page).toHaveURL(/\/samguk\/people\/guanyu$/)
   await expect(page.getByRole('heading', { level: 1 })).toContainText('관우')
   expect(realErrors(errors)).toEqual([])
+})
+
+test('허브: 세력 버튼과 지도로 인물 목록이 바뀌고, 더 보기로 나머지가 나온다', async ({ page }) => {
+  await page.goto('/samguk/people')
+  await page.getByRole('button', { name: /^촉 \d+/ }).click()
+  await expect(card(page, 'liubei')).toBeVisible()
+  await expect(card(page, 'caocao')).toBeHidden()
+  // 지도에서 오나라를 누르면 오 인물만
+  await page.getByRole('button', { name: '오나라 인물 보기' }).click()
+  await expect(card(page, 'sunquan')).toBeVisible()
+  await expect(card(page, 'liubei')).toBeHidden()
+  // 같은 곳을 다시 누르면 전체로
+  await page.getByRole('button', { name: '오나라 인물 보기' }).click()
+  await expect(page.locator('#people-list li:visible')).toHaveCount(12)
+  // 군웅 칩
+  await page.getByRole('button', { name: '군웅 인물 보기' }).click()
+  await expect(card(page, 'lvbu')).toBeVisible()
+  // 더 보기: 전체에서 12명 밖 인물이 나온다
+  await page.getByRole('button', { name: /^전체 \d+/ }).click()
+  await expect(card(page, 'fazheng')).toBeHidden()
+  await page.getByRole('button', { name: /^더 보기/ }).click()
+  await expect(card(page, 'fazheng')).toBeVisible()
+  await expect(page.getByRole('button', { name: /^더 보기/ })).toHaveCount(0)
+})
+
+test('허브: 이름 검색(자 포함)과 결과 없음 안내', async ({ page }) => {
+  await page.goto('/samguk/people')
+  const box = page.getByRole('searchbox', { name: '인물 이름 검색' })
+  await box.fill('하후')
+  await expect(card(page, 'xiaohoudun')).toBeVisible()
+  await expect(card(page, 'xiahouyuan')).toBeVisible()
+  await expect(card(page, 'caocao')).toBeHidden()
+  await box.fill('운장')
+  await expect(card(page, 'guanyu')).toBeVisible()
+  await box.fill('없는사람이름')
+  await expect(page.getByText('찾는 인물이 아직 없어요')).toBeVisible()
+  await expect(page.locator('#people-list li:visible')).toHaveCount(0)
+  await box.fill('')
+  await expect(page.locator('#people-list li:visible')).toHaveCount(12)
+})
+
+test('허브: 오늘의 인물 카드와 열전 링크, 관계도 바로가기는 닫힌 세력 목록으로', async ({ page }) => {
+  await page.goto('/samguk/people')
+  const today = page.getByRole('region', { name: '오늘의 인물' })
+  await expect(today.getByText('알고 보면')).toBeVisible()
+  await expect(today.getByRole('link', { name: /열전 읽기$/ })).toHaveAttribute('href', /^\/samguk\/people\/[a-z]+$/)
+  await page.getByRole('link', { name: /관계도 보기/ }).click()
+  await expect(page).toHaveURL(/#relations$/)
+  await expect(page.getByRole('heading', { name: '세력별 관계도' })).toBeInViewport()
+  await expect(page.locator('details[open]')).toHaveCount(0)
+  // 세력을 펼치면 기존 관계도 인물 링크가 보인다
+  await page.locator('summary', { hasText: '촉나라' }).click()
+  await expect(page.locator('#relations li a[href="/samguk/people/guanyu"]').first()).toBeVisible()
+})
+
+test('허브 375px: 가로 스크롤이 없다', async ({ page }) => {
+  await page.setViewportSize({ width: 375, height: 800 })
+  await page.goto('/samguk/people')
+  await expect(page.getByRole('group', { name: '삼국 개략도' })).toBeVisible()
+  const over = await page.evaluate(() => document.documentElement.scrollWidth - document.documentElement.clientWidth)
+  expect(over).toBeLessThanOrEqual(0)
+  // 지도 안 글자는 화면에서 11px 이상
+  const small = await page.evaluate(() =>
+    [...document.querySelectorAll('svg[aria-label="삼국 개략도"] text')].filter((el) => el.getBoundingClientRect().height < 10 || parseFloat(getComputedStyle(el).fontSize) * (el.ownerSVGElement!.getBoundingClientRect().width / 360) < 11).length,
+  )
+  expect(small).toBe(0)
 })
 
 test('순위: 집계가 없으면 응원을 모으는 중과 열전 링크', async ({ page }) => {

@@ -6,6 +6,8 @@ import { PEOPLE_IDS } from '@/content/samgukPeople'
 import { factionGroups, relationsOf } from '@/lib/people/relations'
 import { hubRelations } from '@/lib/people/hubRelations'
 import { PENDING_PORTRAIT_IDS } from '@/lib/samgukDB'
+import { readFileSync } from 'node:fs'
+import { POPULAR_IDS } from '@/lib/people/hubCards'
 
 test('rankingView: 응원이 하나라도 있으면 순위(동점은 같은 순위, 열전 없는 id는 빠짐), 없으면 준비 중', () => {
   expect(rankingView([]).ready).toBe(false)
@@ -38,8 +40,9 @@ test('허브: 세력 제목, 열전 링크, 관우·조조가 한 줄에 나오�
   for (const f of factions) expect(html).toContain(f === '기타' ? '그 밖의 세력' : `${f}나라`)
   for (const id of PEOPLE_IDS) expect(html).toContain(`href="/samguk/people/${id}"`)
   expect(html.match(/<details/g)!.length).toBeGreaterThanOrEqual(factions.length)
-  expect(html.match(/<details open/g)).toHaveLength(1)
+  expect(html).not.toMatch(/<details[^>]*\sopen/)
   expect(html).toContain('<h1')
+  expect(html).toContain('천하를 눌러 영웅을 만나 보세요')
   expect(html).toContain('세력을 넘는 관계')
   const lines = html.match(/<li[^>]*>.*?<\/li>/gs)!.map((l) => l.replace(/<[^>]+>/g, ''))
   expect(lines.some((l) => l.includes('관우') && l.includes('조조'))).toBe(true)
@@ -47,6 +50,33 @@ test('허브: 세력 제목, 열전 링크, 관우·조조가 한 줄에 나오�
   expect(html.indexOf('세력을 넘는 관계')).toBeLessThan(html.indexOf('쿠팡 추천 상품'))
   expect(html).toContain('"BreadcrumbList"')
   expect(html).not.toMatch(/HOT|인기 순위|명 참여/)
+})
+
+test('허브: 처음엔 펼친 details가 없고, 인물 카드 127명이 모두 서버 HTML에 있으며, 처음 보이는 건 인기 12명', async () => {
+  const html = renderToStaticMarkup(await Hub())
+  expect(html.match(/<details/g)!.length).toBeGreaterThan(0)
+  expect(html).not.toMatch(/<details[^>]*\sopen/)
+  const list = html.slice(html.indexOf('id="people-list"'), html.indexOf('aria-label="바로가기"'))
+  const items = [...list.matchAll(/<li data-person="([^"]+)" class="([^"]*)"/g)]
+  expect(items.map((m) => m[1]).sort()).toEqual([...PEOPLE_IDS].sort())
+  expect(items.filter((m) => !m[2].includes('hidden')).map((m) => m[1])).toEqual(POPULAR_IDS)
+  for (const id of PEOPLE_IDS) expect(list).toContain(`href="/samguk/people/${id}"`)
+  expect(html).toContain('더 보기')
+  expect(html).toContain('개략도예요. 실제 국경과 다를 수 있어요')
+  for (const w of ['위나라 인물 보기', '촉나라 인물 보기', '오나라 인물 보기', '군웅 인물 보기']) expect(html).toContain(w)
+  for (const c of ['낙양', '허창', '성도', '건업']) expect(html).toContain(c)
+  expect(html).toContain('href="#relations"')
+  expect(html).toContain('href="/samguk/people/ranking"')
+  expect(html).toContain('id="relations"')
+  expect(html.indexOf('id="people-list"')).toBeLessThan(html.indexOf('id="relations"'))
+  expect(html.indexOf('id="relations"')).toBeLessThan(html.indexOf('쿠팡 추천 상품'))
+})
+
+test('허브 클라이언트 컴포넌트는 열전 본문(127명 전체 데이터)을 번들에 넣지 않는다', () => {
+  for (const f of ['src/components/people/PeopleBrowser.tsx', 'src/components/people/ThreeKingdomsMap.tsx', 'src/lib/people/hubFilter.ts']) {
+    const src = readFileSync(f, 'utf8')
+    expect(src, f).not.toMatch(/@\/content\/samgukPeople|samgukDB|lib\/people\/(hubCards|characters|relations|portrait)/)
+  }
 })
 
 test('허브 메타: 제목 형식, canonical', async () => {
