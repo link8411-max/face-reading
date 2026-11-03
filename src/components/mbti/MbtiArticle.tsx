@@ -37,6 +37,7 @@ export default function MbtiArticle({ type }: { type: MbtiType }) {
   return (
     <div className="max-w-lg mx-auto px-4 py-6 space-y-5">
       <nav className="text-sm text-muted"><Link href="/">홈</Link> › <Link href="/mbti">MBTI</Link> › {type}</nav>
+      <p className="text-sm text-muted text-center"><Link href="/face2" className="underline underline-offset-2">내 얼굴은 무슨 상일까?</Link> 사진 한 장으로 확인해 보세요</p>
       <header className="text-center">
         <p className="text-sm font-bold text-accent">{p.nickname}</p>
         <h1 className="font-serif text-4xl font-bold mt-1">{type}</h1>

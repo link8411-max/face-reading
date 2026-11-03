@@ -15,11 +15,17 @@ import { generateMetadata as duelGeneralMeta } from '@/app/samguk/duel/generals/
 import { DUEL_GENERALS } from '@/lib/duel/generals'
 import { metadata as fortune } from '@/app/fortune/layout'
 import { metadata as mbtiDaily } from '@/app/fortune/mbti/layout'
+import { generateMetadata as personMeta } from '@/app/samguk/people/[id]/page'
+import { generateMetadata as peopleHubMeta } from '@/app/samguk/people/page'
+import { generateMetadata as peopleRankingMeta } from '@/app/samguk/people/ranking/page'
+import { PEOPLE_IDS } from '@/content/samgukPeople'
 import { generateMetadata as zodiacMeta } from '@/app/fortune/2027/[zodiac]/page'
 import { generateMetadata as mbtiMeta } from '@/app/mbti/[type]/page'
 import Zodiac2027Article from '@/components/Zodiac2027Article'
 import { ZODIAC_SLUGS, SAMJAE_2027 } from '@/content/fortune2027Zodiac'
-import { MBTI_TYPES } from '@/lib/mbti/compat'
+import { MBTI_TYPES, bestMatches } from '@/lib/mbti/compat'
+import { mbtiProfiles } from '@/content/mbtiTypes'
+import MbtiArticle from '@/components/mbti/MbtiArticle'
 
 const TITLE_MAX = 48 // 구글은 약 30~35자 뒤를 자를 수 있다. 핵심어를 앞에 두고 잘려도 되는 브랜드를 끝에 둔다
 const DESC_MAX = 110
@@ -29,6 +35,8 @@ const BRAND = ' – 운명을 읽다'
 async function pages(): Promise<[string, Metadata][]> {
   const list: [string, Metadata][] = [['/', root], ['/face2', face2], ['/animal', animal], ['/samguk', samguk], ['/fortune', fortune], ['/fortune/mbti', mbtiDaily], ['/samguk/duel', duel]]
   for (const g of DUEL_GENERALS.filter((x) => x.role !== 'mob')) list.push([`/samguk/duel/generals/${g.id}`, await duelGeneralMeta({ params: Promise.resolve({ id: g.id }) })])
+  list.push(['/samguk/people', await peopleHubMeta()], ['/samguk/people/ranking', await peopleRankingMeta()])
+  for (const id of PEOPLE_IDS) list.push([`/samguk/people/${id}`, await personMeta({ params: Promise.resolve({ id }) })])
   for (const z of ZODIAC_SLUGS) list.push([`/fortune/2027/${z}`, await zodiacMeta({ params: Promise.resolve({ zodiac: z }) })])
   for (const t of MBTI_TYPES) list.push([`/mbti/${t.toLowerCase()}`, await mbtiMeta({ params: Promise.resolve({ type: t.toLowerCase() }) })])
   return list
@@ -107,4 +115,22 @@ test('삼국지 장수 수 문구는 실제 장수 수와 같다 (옛 52명이 �
     expect(src, f).not.toContain('간신')
   }
   expect(readFileSync('src/content/navigation.ts', 'utf8')).toContain(`${samgukCharacters.length}명`)
+})
+
+test('MBTI 16개: 제목은 "유형 특징·궁합 순위"로 시작, 별명 포함, 설명에 잘 맞는 유형 1위와 실제 1위 유형', async () => {
+  for (const T of MBTI_TYPES) {
+    const m = await mbtiMeta({ params: Promise.resolve({ type: T.toLowerCase() }) })
+    const title = String(m.title)
+    const desc = String(m.description)
+    expect(title.startsWith(`${T} 특징·궁합 순위`), `${T}: ${title}`).toBe(true)
+    expect(title, `${T} 별명`).toContain(mbtiProfiles[T].nickname)
+    expect(desc, `${T} 설명`).toContain('잘 맞는 유형 1위')
+    expect(desc, `${T} 1위 유형`).toContain(bestMatches(T, 'love', 1)[0])
+  }
+})
+
+test('MBTI 유형 페이지 위쪽에 사진 테스트(/face2) 연결 한 줄', () => {
+  const html = renderToStaticMarkup(<MbtiArticle type="ISFP" />)
+  expect(html).toContain('내 얼굴은 무슨 상일까')
+  expect(html).toContain('href="/face2"')
 })

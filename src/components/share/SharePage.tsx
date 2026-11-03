@@ -4,6 +4,7 @@ import { redirect } from "next/navigation";
 import { josa, ogImageUrl, parseShared, SITE, TEST_NAME, type ShareKind, type SharedResult } from "@/lib/shareLinks";
 import { animalTypeDB } from "@/lib/animalTypeDB";
 import { samgukCharacters } from "@/lib/samgukDB";
+import { getPerson } from "@/content/samgukPeople";
 import { MoonDeco, SmileFace } from "@/components/icons";
 import SharedLandingTracker from "./SharedLandingTracker";
 
@@ -62,6 +63,11 @@ export async function SharePage({ kind, params, searchParams }: { kind: ShareKin
       <Link href={r.testPath} className="mt-5 h-[56px] rounded-full flex items-center justify-center bg-ink text-paper text-base font-medium">
         나도 해보기
       </Link>
+      {kind === "samguk" && getPerson(r.key) && (
+        <Link href={`/samguk/people/${r.key}`} className="mt-3 block text-center text-[13px] text-muted underline underline-offset-2">
+          {r.name} 열전 보기
+        </Link>
+      )}
       <p className="mt-3 text-xs text-center text-muted">사진은 내 폰 안에서만 보고 바로 지워요</p>
     </main>
   );

@@ -245,6 +245,30 @@ public/
 
 ---
 
+## 삼국지 인물열전 (/samguk/people)
+
+127명의 연의·정사 열전, 관계도, 응원·투표. 설계: `docs/superpowers/specs/2026-11-03-samguk-yeoljeon-design.md`, 진행표: `docs/samguk-people-progress.md`.
+
+| 위치 | 내용 |
+|------|------|
+| 라우트 | `/samguk/people`(허브: 삼국 지도·세력 버튼·이름 검색·인물 카드·오늘의 인물, 아래쪽 `#relations`에 닫힌 세력별 관계도·관계 글), `/samguk/people/[id]`(열전 127개 정적, `dynamicParams=false`), `/samguk/people/ranking`(응원 순위, ISR `revalidate=3600`) |
+| 데이터 | `src/content/samgukPeople/<id>.ts`(인물 한 명당 한 파일, 형식은 `types.ts`) → `index.ts` 등록(`PEOPLE`, `PEOPLE_IDS`). 인물 id는 `samgukDB`와 같다. 파이프라인: 작성 → 사실 검토 → 쉬운 말 → 재미 → 인용 점검 |
+| `ids.ts` | 클라이언트·닮은꼴 페이지가 열전 id 목록만 가볍게 쓰려는 파일(인물 본문 import 금지). **`index.ts`와 같아야 하며 테스트(`tests/peopleLinks.test.ts`)가 어긋남을 잡는다.** 인물을 추가하면 둘 다 고친다 |
+| 조회 | 열전 코드는 `lib/people/characters.ts`의 `characterById`를 쓴다(초상화 대기 인물도 포함. `samgukDB`의 `getCharacterById`는 대기 인물이 빠진다). 관계 화면 말은 `relationLabel`(부녀·모자·남매 등, 데이터 `type`은 그대로) |
+| API | `/api/people/vote`(POST: JSON만, 같은 사이트 Origin만, 10분 60회), `/api/people/stats`(GET). 환경변수 `SUPABASE_URL`·`SUPABASE_SERVICE_KEY`(없으면 503, 화면은 숫자를 숨김). 선택 `PEOPLE_VOTE_SECRET`(투표자 해시 키, 없으면 서비스 키 사용) |
+| DB | `docs/people-votes.sql`을 Supabase SQL Editor에서 **한 번** 실행(RLS 켜고 service_role만 접근). 실행 전에는 투표가 조용히 꺼져 있다 |
+| 중복 방지 | 하루마다 바뀌는 해시(`HMAC(날짜, 기기id\|IP)`)로 같은 날 같은 대상은 한 번. `pv` 쿠키는 서명값 `<uuid>.<발급일YYYYMMDD>.<HMAC-SHA256(비밀, pv\|uuid\|발급일) 앞 32자>`(`signPvCookie`·`verifyPvCookie`)이고 틀리면 쿠키 없음으로 본다. **첫날(쿠키가 없거나 발급일이 오늘)은 기기id를 `new`로 고정해 IP 기준**, 다음 날부터 쿠키 uuid로 센다(위조·즉석 발급 쿠키는 첫날 IP 기준으로 묶이고, 쿠키 uuid는 `HMAC(비밀, pvid\|IP\|발급일)`이라 IP·날짜마다 하나만 발급돼 비축을 막는다(IP를 바꾸며 모은 쿠키까지 막지는 못함). IP·쿠키 원본은 저장하지 않는다. 같은 IP의 첫 방문자끼리는 첫날 표가 겹칠 수 있어 `counted:false` 문구는 "오늘 응원이 반영됐어요"·"오늘 투표가 반영됐어요" |
+| 허브 구조 | 서버 `page.tsx`가 `lib/people/hubCards.ts`로 카드 최소 필드(id·이름·자·세력·초상화·첫 문장·funFacts[0])만 뽑아 클라이언트 `PeopleBrowser`에 넘긴다. 127명 카드는 모두 서버 HTML에 있고(`li[data-person]`, 숨김은 `hidden` 클래스) 필터·검색·더 보기·오늘의 인물은 `lib/people/hubFilter.ts` 순수 함수. 지도는 직접 그린 SVG `ThreeKingdomsMap`(글자 viewBox 13 이상). 처음 12명은 `hubCards.ts`의 `POPULAR_IDS` 고정 순서(응원 순위는 허브가 정적이라 읽지 않음). 오늘의 인물은 한국 날짜로 브라우저에서 계산(`todayIndex`, 127일 동안 겹치지 않음) |
+| 표시 규칙 | 응원은 실제 숫자로 보인다(0이면 "첫 응원을 남겨 보세요", 1+는 `응원 N번`, 순위를 알면 "지금 응원 순위 N위", 순위는 stats 응답의 `rank`). 기록이 꺼져 있으면(503) 숫자·순위를 숨긴다. 투표 비율은 투표 전엔 숨기고 합이 10 미만이면 "지금 N명이 투표했어요". 순위 페이지는 응원이 1번이라도 있으면 실제 순위를 보이고, 응원 없는 인물은 닫힌 세력별 목록 |
+
+**내용 규칙**
+- 실제 기록이 없는 명언을 만들지 않는다(`famousQuote: null`). 말을 쓰면 출처(`정사`·`배송지 주`·`연의`)를 표시한다.
+- 연의에만 있는 이야기는 `life`, 정사는 `historyNote`, 차이는 `novelVsHistory`에 나눠 쓰고, 요약(`summary`)에 연의 사건을 쓰면 "연의에서는"처럼 밝힌다(검색 미리보기가 된다).
+- 해요체, 어려운 말에는 괄호 풀이. 관계 설명(`relations.note`)도 해요체나 짧은 명사구로 쓴다(`~다` 종결은 테스트로 막음).
+- `rivalId`는 부부·혼인·부자·형제·숙질·친족이 아닌 인물(테스트로 확인).
+
+---
+
 ## 자주 수정하는 파일
 
 | 작업 | 파일 |

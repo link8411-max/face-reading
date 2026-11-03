@@ -2,8 +2,11 @@ import { MetadataRoute } from 'next'
 import { ZODIAC_SLUGS } from '@/content/fortune2027Zodiac'
 import { MBTI_SLUGS } from '@/content/mbtiTypes'
 import { DUEL_GENERALS } from '@/lib/duel/generals'
+import { PEOPLE_IDS } from '@/content/samgukPeople'
 
 const DUEL_GENERAL_ROUTES = DUEL_GENERALS.filter((g) => g.role !== 'mob').map((g) => `/samguk/duel/generals/${g.id}`)
+
+const PEOPLE_ROUTES = PEOPLE_IDS.map((id) => `/samguk/people/${id}`)
 
 const baseUrl = 'https://unse-ai.com'
 
@@ -28,6 +31,9 @@ export const SITEMAP_ROUTES = [
     '/samguk/team',
     '/samguk/duel',
     ...DUEL_GENERAL_ROUTES,
+    '/samguk/people',
+    '/samguk/people/ranking',
+    ...PEOPLE_ROUTES,
 ]
 
 // 페이지 내용을 바꾸면 해당 라우트 날짜도 갱신할 것 (new Date()를 쓰면 매 요청마다 바뀌어 검색엔진이 무시함)
@@ -42,7 +48,7 @@ export const LAST_MODIFIED: Record<string, string> = {
     '/face-tests': '2026-10-26',
     '/unse': '2026-10-26',
     '/about': '2026-10-26',
-    '/privacy': '2026-10-28',
+    '/privacy': '2026-11-04',
     '/fortune/2027': '2026-10-26',
     ...Object.fromEntries(ZODIAC_SLUGS.map((s) => [`/fortune/2027/${s}`, '2026-10-26'])),
     '/mbti': '2026-10-26',
@@ -51,6 +57,9 @@ export const LAST_MODIFIED: Record<string, string> = {
     '/samguk/team': '2026-10-27',
     '/samguk/duel': '2026-10-28',
     ...Object.fromEntries(DUEL_GENERAL_ROUTES.map((r) => [r, '2026-10-28'])),
+    '/samguk/people': '2026-11-04',
+    '/samguk/people/ranking': '2026-11-03',
+    ...Object.fromEntries(PEOPLE_ROUTES.map((r) => [r, '2026-11-03'])),
     ...Object.fromEntries(MBTI_SLUGS.map((s) => [`/mbti/${s}`, '2026-10-26'])),
 }
 

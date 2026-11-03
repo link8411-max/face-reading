@@ -62,8 +62,8 @@ test('개인정보처리방침에 일기토 피드백(별점·한 줄 의견·�
   const src = readFileSync('src/app/privacy/page.tsx', 'utf8')
   expect(src).toMatch(/일기토 피드백[^<]*별점[^<]*한 줄 의견[^<]*시작 장수[^<]*도달 단계[^<]*기기 종류/)
   // 개정한 날을 사이트맵 lastModified에도
-  expect(src).toContain('개정일자: 2026년 10월 28일')
-  expect(LAST_MODIFIED['/privacy']).toBe('2026-10-28')
+  expect(src).toContain('개정일자: 2026년 11월 4일')
+  expect(LAST_MODIFIED['/privacy']).toBe('2026-11-04')
 })
 
 test('일기토 퍼널 이벤트는 result_id로만 값을 보내고 허용 키 밖의 값은 버린다', () => {
