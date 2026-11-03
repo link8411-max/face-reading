@@ -2,8 +2,7 @@ import { test, expect, type Page } from '@playwright/test'
 import { trackErrors } from './helpers'
 
 // 집계 API는 E2E 서버에서 일부러 503이므로 그 응답만 오류로 세지 않는다.
-// 열전 목록(/samguk/people)은 아직 없는 페이지라 경로 머리글의 링크 미리 받기가 404다(목록 페이지가 생기면 이 예외를 지운다).
-const realErrors = (errors: string[]) => errors.filter((e) => !e.includes('/api/people/') && !/\/samguk\/people\?_rsc/.test(e))
+const realErrors = (errors: string[]) => errors.filter((e) => !e.includes('/api/people/'))
 
 const events = (page: Page) =>
   page.evaluate(() => ((window as unknown as { dataLayer?: unknown[][] }).dataLayer ?? []).filter((a) => a[0] === 'event').map((a) => [a[1], a[2]] as [string, Record<string, string>]))
@@ -51,4 +50,26 @@ test('투표: 투표 전 % 없음, 누르면 people_vote 이벤트와 선택 표
   await expect(duel).not.toContainText('%')
   await expect(duel.getByRole('button', { name: '친구에게 공유하기' })).toBeVisible()
   await expect.poll(async () => (await events(page)).filter((e) => e[0] === 'people_vote')).toEqual([['people_vote', { result_id: 'duel_guanyu' }]])
+})
+
+test('허브: 열전 링크를 눌러 열전으로 이동하고, 순위 링크가 있다', async ({ page }) => {
+  const errors = trackErrors(page)
+  await page.goto('/samguk/people')
+  await expect(page.getByRole('heading', { level: 1 })).toHaveText('삼국지 인물 관계도')
+  await expect(page.getByRole('link', { name: '가장 응원받는 장수 순위 보기' })).toHaveAttribute('href', '/samguk/people/ranking')
+  // 첫 세력(위나라)만 펼쳐져 있으니 촉나라를 펼친 뒤 관우 카드를 누른다
+  await page.locator('details', { hasText: '촉나라' }).locator('summary').click()
+  await page.locator('main li a[href="/samguk/people/guanyu"]').first().click()
+  await expect(page).toHaveURL(/\/samguk\/people\/guanyu$/)
+  await expect(page.getByRole('heading', { level: 1 })).toContainText('관우')
+  expect(realErrors(errors)).toEqual([])
+})
+
+test('순위: 집계가 없으면 응원을 모으는 중과 열전 링크', async ({ page }) => {
+  const errors = trackErrors(page)
+  await page.goto('/samguk/people/ranking')
+  await expect(page.getByText('응원을 모으는 중', { exact: true })).toBeVisible()
+  await page.getByRole('main').getByRole('link', { name: /관우/ }).click()
+  await expect(page).toHaveURL(/\/samguk\/people\/guanyu$/)
+  expect(realErrors(errors)).toEqual([])
 })
