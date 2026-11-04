@@ -44,7 +44,7 @@ function detect(pcm) {
 }
 function silenceLog(pcm) {
   // ffmpeg는 결과를 stderr로 낸다
-  const res = execFileSync('sh', ['-c', `"${FF}" -hide_banner -f s16le -ar 24000 -ac 1 -i "${pcm}" -af silencedetect=n=-40dB:d=0.45 -f null - 2>&1`], { encoding: 'utf8' })
+  const res = execFileSync('sh', ['-c', `"${FF}" -hide_banner -f s16le -ar 24000 -ac 1 -i "${pcm}" -af silencedetect=n=-40dB:d=0.35 -f null - 2>&1`], { encoding: 'utf8' })
   return res
 }
 // 끝에 붙는 0dB 잡음 덩어리를 찾아 그 앞에서 자른다
@@ -94,7 +94,11 @@ if (!only && !items.every((x) => fs.existsSync(path.join(V, `nar_${x.id}.wav`)))
   const pcm = path.join(V, 'all.pcm')
   if (!fs.existsSync(pcm)) { console.log('TTS (전체 한 번)'); fs.writeFileSync(pcm, await tts(todo.map((x) => x.text).join('\n\n...\n\n'))) }
   // 경계마다 글자 수 비율로 예상 위치를 잡고, 그 근처의 쉼을 고른다(가장 긴 쉼만 고르면 문장 중간 쉼에 걸린다)
-  const all = detect(pcm)
+  let all = detect(pcm)
+  // 장면 사이의 "..."는 짧은 쉼 두 개가 0.25초 안에 붙어 나온다 → 붙은 쌍을 장면 경계로 본다
+  const pairs = []
+  for (let k = 0; k + 1 < all.length; k++) if (all[k + 1].st - all[k].en < 0.25) { pairs.push({ st: all[k].st, en: all[k + 1].en }); k++ }
+  if (pairs.length === todo.length - 1) { all = pairs; console.log('쌍 쉼으로 경계 확정') }
   const total = pcmDur(pcm), chars = todo.map((x) => x.text.replace(/\s/g, '').length), sum = chars.reduce((a, b) => a + b, 0)
   const sil = []
   let acc = 0, from = 0
@@ -125,6 +129,10 @@ for (const x of todo) {
 }
 // 받아쓰기로 확인: 지시문을 읽었거나 나누기가 어긋나면 비슷한 정도가 낮게 나온다
 let bad = 0
+// 받아쓰기를 못 하면(한도) 글자 수 대비 길이로 대신 검사한다: 나누기가 어긋나면 비율이 크게 벗어난다
+const lens = items.map((x) => pcmDur(path.join(V, `nar_${x.id}.wav`)) / 3.675), chs = items.map((x) => x.text.replace(/[^가-힣0-9A-Za-z]/g, '').length)
+const rate = lens.reduce((a, b) => a + b, 0) / chs.reduce((a, b) => a + b, 0)
+items.forEach((x, i) => { const dev = lens[i] / (chs[i] * rate) - 1; if (Math.abs(dev) > 0.25) { console.log(`길이 이상 ${x.id}: 예상보다 ${Math.round(dev * 100)}%`); bad++ } })
 for (const x of items) {
   const wav = path.join(V, `nar_${x.id}.wav`)
   const heard = await transcribe(wav)
