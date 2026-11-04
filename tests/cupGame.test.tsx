@@ -3,7 +3,8 @@ import { readdirSync, readFileSync } from 'node:fs'
 import { cleanup, fireEvent, render, screen, waitFor } from '@testing-library/react'
 import { afterEach, beforeEach, expect, test, vi } from 'vitest'
 
-vi.mock('next/navigation', () => ({ useSearchParams: () => new URLSearchParams('') }))
+const nav = vi.hoisted(() => ({ search: '' }))
+vi.mock('next/navigation', () => ({ useSearchParams: () => new URLSearchParams(nav.search) }))
 vi.mock('@/lib/analytics', () => ({ track: vi.fn() }))
 
 import CupGame from '@/components/cup/CupGame'
@@ -32,6 +33,7 @@ beforeEach(() => {
   fetchMock.mockResolvedValue({ ok: true, status: 200, json: async () => ({ ok: true, counted: true, others: { a1: 0, a2: 0 } }) })
   vi.stubGlobal('fetch', fetchMock)
   vi.mocked(track).mockClear()
+  nav.search = ''
 })
 afterEach(() => {
   cleanup()
@@ -114,16 +116,46 @@ test('고르면 고른 쪽이 표시되고 다음 대결 버튼이 바로 눌린
 })
 
 test('늦게 도착한 첫 응답은 두 번째 대결의 비율 칸에 들어가지 않는다', async () => {
+  // 1번 대결의 응답은 지연, 2번 대결에서는 카드를 고르지만 그 응답은 끝내 오지 않는다.
+  // 보호 장치가 없으면 1번 응답이 2번 대결의 비율 칸(고른 뒤라 표시됨)에 들어간다.
   let release!: (v: unknown) => void
   fetchMock.mockImplementationOnce(() => new Promise((r) => { release = r }))
+  fetchMock.mockImplementationOnce(() => new Promise(() => {}))
   setup()
   await screen.findByText('둘 중 누가 더 끌리나요?')
   fireEvent.click(matchCards()[0])
   fireEvent.click(screen.getByRole('button', { name: '다음 대결' }))
   expect(screen.getByText('테스트 판 8강 · 2/4')).toBeTruthy()
+  fireEvent.click(matchCards()[0])
+  expect(matchCards()[0].getAttribute('aria-pressed')).toBe('true')
+  expect(calls()).toHaveLength(2)
   release({ ok: true, status: 200, json: async () => ({ ok: true, counted: true, others: {} }) })
   await new Promise((r) => setTimeout(r, 20))
   expect(screen.getByTestId('ratio').textContent).toBe('')
+})
+
+test('?with=<id>로 들어오면 그 장수가 대진에 들어간다', async () => {
+  const pool: CupCard[] = Array.from({ length: 12 }, (_, i) => ({ ...cards[0], id: `p${i}`, name: `장수p${i}`, facts: ['x'] }))
+  const round1 = async () => {
+    const seen: string[] = []
+    for (let i = 0; i < 4; i++) {
+      await screen.findByText('둘 중 누가 더 끌리나요?')
+      seen.push(...matchCards().map((b) => b.dataset.cardId as string))
+      await playMatch(0)
+    }
+    return seen
+  }
+  // 12명 중 8명만 뽑히므로, 고정된 난수에서 빠지는 사람이 있다
+  vi.spyOn(Math, 'random').mockReturnValue(0)
+  const first = render(<CupGame board="warrior" title="테스트 판" cards={pool} notes={{}} top5={[]} />)
+  const seen = await round1()
+  first.unmount()
+  const left = pool.map((c) => c.id).find((id) => !seen.includes(id))!
+  expect(left).toBeTruthy()
+  nav.search = `with=${left}`
+  render(<CupGame board="warrior" title="테스트 판" cards={pool} notes={{}} top5={[]} />)
+  expect(await round1()).toContain(left)
+  vi.restoreAllMocks()
 })
 
 test('503이면 안내가 보이고 다음 대결로 계속 진행된다', async () => {
