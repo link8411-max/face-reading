@@ -171,7 +171,7 @@
 
 **Files:**
 - Create: `src/components/videos/PersonVideos.tsx`, `src/components/videos/Sanggwando.tsx`, `src/components/videos/RelatedVideosRow.tsx`
-- Modify: `src/app/samguk/people/[id]/page.tsx` (요약 section 뒤, `<CoupangBanner>` 앞), `export const revalidate = 3600` 추가
+- Modify: `src/app/samguk/people/[id]/page.tsx`: 순서는 요약 section → `PersonVideos` → 기존 `<CoupangBanner>` → `Sanggwando` → `RelatedVideosRow` → 닮은꼴 배너. `export const revalidate = 3600` 추가
 - Test: `tests/videos/peopleVideos.test.tsx`, 기존 `tests/peoplePage.test.tsx`의 순서 테스트 갱신
 
 **Interfaces:**
@@ -179,7 +179,7 @@
 - Produces: `<PersonVideos name={string} videos={Video[]} />`, `<Sanggwando id name groups={SgGroup[]} portrait={string|null} />`, `<RelatedVideosRow items={RelatedVideo[]} />`. 각각 비면 `null`을 렌더
 
 - [ ] **Step 1: 실패하는 테스트.** `vi.mock('@/lib/videos/fetch', …)`로 fixture 3편을 돌려준다.
-  - 하후돈 페이지 HTML 순서: `하후돈 이야기, 1분 영상` < `상관도` < `관계 인물 영상` < 쿠팡 배너 iframe 주소(`ads-partners.coupang.com`)
+  - 하후돈 페이지 HTML 순서: `하후돈 이야기, 1분 영상` < 쿠팡 배너 iframe 주소(`ads-partners.coupang.com`) < `상관도` < `관계 인물 영상` < `닮았을까?`(닮은꼴 배너). 영상이 없으면 요약 다음이 바로 쿠팡 배너
   - 상관도: `하후돈을 둘러싼`, 묶음 머리 `혈연 1명`, 조조 칸이 `href="/samguk/people/caocao"`, 재생 표시 `data-has-video`가 조조 칸에 있음
   - 관계 인물 영상 줄에 `NejqojdriBg`가 있고 `R-lrShfZU7s`는 둘째 줄에 없음
   - 첫 줄 카드: `함께 나오는 인물` 다음에 `조조 열전` 링크가 있음. 하후돈 자신은 칩에 없음
