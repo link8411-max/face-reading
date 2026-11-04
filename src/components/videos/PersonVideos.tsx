@@ -27,7 +27,7 @@ export default function PersonVideos({ id, name, videos }: { id: string; name: s
           <p className="text-[15px] font-bold leading-snug">{video.title}</p>
         </>
       ) : (
-        <div data-person-videos-row className="-mx-[22px] flex snap-x snap-mandatory gap-2.5 overflow-x-auto px-[22px] pb-1">
+        <div data-person-videos-row className="-mx-[22px] flex snap-x snap-mandatory scroll-px-[22px] gap-2.5 overflow-x-auto px-[22px] pb-1">
           {list.map((v) => (
             <div key={v.id} className="flex w-[240px] shrink-0 snap-start flex-col gap-2">
               <VideoPlayer video={v} slot="people" className="!rounded-[22px]" />
