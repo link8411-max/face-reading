@@ -8,6 +8,9 @@ import { ogQueryOk, OG_CACHE_CONTROL } from '@/lib/ogQuery';
 import { parseMbtiDailyKey } from '@/lib/shareLinks';
 import { duelShared } from '@/lib/duel/share';
 import { decodeRunKey } from '@/lib/duel/shareKey';
+import { cupName } from '@/lib/cup/share';
+import { parseCupShare } from '@/lib/cup/shareLanding';
+import { BOARDS } from '@/lib/cup/boards';
 import { mbtiProfiles } from '@/content/mbtiTypes';
 
 export const runtime = 'edge';
@@ -67,6 +70,11 @@ export async function GET(request: NextRequest) {
     if (!d || !k) return new Response('bad request', { status: 400 });
     big = d.starterName; score = k.cleared ? '여포를 꺾다' : `${k.wave}번째 싸움까지`; phrase = d.headline; label = '삼국지 일기토';
     await loadPortrait(d.image);
+  } else if (kind === 'cup') {
+    const c = parseCupShare(q.get('board') ?? '', q.get('key') ?? '');
+    if (!c) return new Response('bad request', { status: 400 });
+    big = c.name; score = cupName(BOARDS[c.board].title); phrase = c.phrase; label = '삼국지 장수 월드컵';
+    await loadPortrait(c.image);
   } else {
     return new Response('bad request', { status: 400 });
   }

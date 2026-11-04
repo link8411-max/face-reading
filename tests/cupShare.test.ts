@@ -11,3 +11,18 @@ test('월드컵 이름은 삼국지를 한 번만 붙인다', () => {
   expect(cupName('최강 무장')).toBe('삼국지 최강 무장 월드컵')
   expect(cupName('삼국지 여인')).toBe('삼국지 여인 월드컵')
 })
+
+test('parseCupShare: 판 후보에 든 인물만, 나머지는 null', async () => {
+  const { parseCupShare } = await import('@/lib/cup/shareLanding')
+  const { boardPool } = await import('@/lib/cup/boards')
+  const ok = parseCupShare('warrior', 'lvbu')
+  expect(ok).toEqual({ board: 'warrior', id: 'lvbu', name: '여포', image: '/images/samguk/여포.jpg', phrase: '나의 최애 장수는 여포. 너는?' })
+  expect(parseCupShare('warrior', 'zhugeliang')).toBeNull()
+  expect(parseCupShare('x', 'lvbu')).toBeNull()
+  expect(parseCupShare('random', '__proto__')).toBeNull()
+  expect(parseCupShare('__proto__', 'lvbu')).toBeNull()
+  for (const id of boardPool('women')) expect(parseCupShare('women', id)?.id).toBe(id)
+  // 초상화 대기 인물은 어느 판에서도 받지 않는다
+  const { PENDING_PORTRAIT_IDS } = await import('@/lib/samgukDB')
+  for (const id of PENDING_PORTRAIT_IDS) expect(parseCupShare('random', id)).toBeNull()
+})
