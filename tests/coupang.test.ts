@@ -29,7 +29,7 @@ test.each([
   ['src/app/fortune/2027/page.tsx', 'fortune-2027'], ['src/app/face-tests/page.tsx', 'face-tests'], ['src/app/unse/page.tsx', 'unse'],
   ['src/app/samguk/cup/ranking/page.tsx', 'cup-ranking'], ['src/app/mbti/r/[pair]/page.tsx', 'share-mbti'],
   ['src/app/samguk/cup/r/[board]/[id]/page.tsx', 'share-cup'], ['src/app/samguk/duel/r/[key]/page.tsx', 'share-duel'],
-  ['src/app/face-match/r/[pair]/page.tsx', 'share-face-match'], ['src/app/fortune/mbti/r/[type]/page.tsx', 'share-mbti-daily'],
+  ['src/app/face-match/r/[pair]/page.tsx', 'share-face-match'], ['src/app/fortune/mbti/r/[type]/page.tsx', 'share-mbti-daily'], ['src/app/samguk/(match)/team/r/[ids]/page.tsx', 'share-team'],
 ])('%s 에 배너가 있다', (file, subId) => {
   expect(readFileSync(file, 'utf8')).toContain(`<CoupangBanner subId="${subId}"`)
 })

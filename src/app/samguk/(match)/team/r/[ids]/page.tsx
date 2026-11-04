@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import CoupangBanner from "@/components/CoupangBanner";
 import { redirect } from "next/navigation";
 import TeamCard from "@/components/samguk/TeamCard";
 import SharedLandingTracker from "@/components/share/SharedLandingTracker";
@@ -38,6 +39,7 @@ export default async function TeamSharedPage({ params }: Props) {
       <TeamCard team={team} />
       <Link href="/samguk/team" className="mt-5 h-[56px] rounded-full flex items-center justify-center bg-ink text-paper text-base font-medium">우리 팀도 만들어 보기</Link>
       <p className="mt-3 text-xs text-center text-muted">사진은 내 폰 안에서만 보고 바로 지워요</p>
+      <CoupangBanner subId="share-team" />
     </main>
   );
 }
