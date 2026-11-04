@@ -1,20 +1,12 @@
 'use client'
 
-import { useEffect, useMemo, useState, useSyncExternalStore } from 'react'
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
+import { useNow } from './useNow'
 import VideoFeed from './VideoFeed'
 import { isNew, isVideoId, viewsLabel } from '@/lib/videos/format'
 import type { Video } from '@/lib/videos/types'
 
 export type Faces = Record<string, { name: string; portrait: string | null; hasPage: boolean }>
-
-const never = () => () => {}
-const clock: { at: number | null } = { at: null }
-
-/** 서버·하이드레이션은 null, 마운트 뒤에는 한 번만 잰 Date.now() (VideoPlayer와 같은 방식). */
-function useNow(): Date | null {
-  const ms = useSyncExternalStore(never, () => (clock.at ??= Date.now()), () => null)
-  return ms === null ? null : new Date(ms)
-}
 
 function Face({ face, size, className = '' }: { face: Faces[string] | undefined; size: number; className?: string }) {
   if (!face) return null
@@ -50,18 +42,26 @@ export default function VideosBrowser({ videos, faces }: { videos: Video[]; face
     if (isVideoId(v) && videos.some((x) => x.id === v)) setOpenId(v) // eslint-disable-line react-hooks/set-state-in-effect
   }, [videos])
 
+  const opener = useRef<HTMLElement | null>(null)
   const open = (id: string) => {
+    opener.current = document.activeElement instanceof HTMLElement ? document.activeElement : null
     setOpenId(id)
     const u = new URL(window.location.href)
     u.searchParams.set('v', id)
     window.history.replaceState(null, '', u)
   }
-  const close = () => {
+  const close = useCallback(() => {
+    const id = new URLSearchParams(window.location.search).get('v')
     setOpenId(null)
     const u = new URL(window.location.href)
     u.searchParams.delete('v')
     window.history.replaceState(null, '', u)
-  }
+    // 피드가 사라지고 inert가 풀린 뒤에 열었던 카드로 포커스를 돌려 준다.
+    requestAnimationFrame(() => {
+      const el = opener.current?.isConnected ? opener.current : id ? document.querySelector<HTMLElement>(`button[data-video-id="${id}"]`) : null
+      el?.focus()
+    })
+  }, [])
 
   const startIndex = openId ? shown.findIndex((v) => v.id === openId) : -1
   // 필터 밖 영상(?v=)이면 전체 목록으로 연다.
@@ -99,7 +99,7 @@ export default function VideosBrowser({ videos, faces }: { videos: Video[]; face
       <ul className="grid grid-cols-2 gap-x-2.5 gap-y-3.5">
         {shown.map((v) => {
           const fresh = now !== null && isNew(v.publishedAt, now)
-          const views = now === null ? null : viewsLabel(v, now)
+          const views = now === null || fresh ? null : viewsLabel(v, now)
           const names = v.people.map((p) => faces[p]?.name).filter(Boolean)
           const meta = [views, names.join(' · ')].filter(Boolean).join(' · ')
           return (
@@ -108,7 +108,7 @@ export default function VideosBrowser({ videos, faces }: { videos: Video[]; face
                 <span className="relative block aspect-[9/16] w-full overflow-hidden rounded-2xl bg-navy-game">
                   {/* eslint-disable-next-line @next/next/no-img-element */}
                   <img src={v.thumbnail} alt={`${v.title} 썸네일`} loading="lazy" className="absolute inset-0 h-full w-full object-cover" />
-                  {fresh && <span className="absolute left-2 top-2 rounded-full bg-accent px-2 py-[3px] text-[11px] font-bold text-white">NEW</span>}
+                  {fresh && <span className="absolute left-2 top-2 rounded-full bg-accent px-2 py-[3px] text-[11px] font-bold text-paper">NEW</span>}
                   <span className="absolute bottom-1.5 left-1.5 flex">
                     {v.people.slice(0, 3).map((p) => (
                       <Face key={p} face={faces[p]} size={24} className="-mr-1.5 border-2 border-paper" />

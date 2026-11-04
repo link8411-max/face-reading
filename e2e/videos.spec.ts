@@ -44,6 +44,7 @@ test('격자: 카드를 누르면 피드, 넘기면 iframe 1개, 닫으면 격�
   await expect(page).not.toHaveURL(/\?v=/)
   expect(await page.evaluate(() => document.body.style.overflow)).toBe('')
   await expect(page.locator('[data-video-id]').first()).toBeVisible()
+  await expect(page.locator(`button[data-video-id="${id}"]`)).toBeFocused()
   expect(errors.filter((e) => !e.includes('youtube') && !e.includes('ytimg'))).toEqual([])
 })
 
@@ -86,4 +87,25 @@ test('피드는 하단 탭 위를 덮음', async ({ page }) => {
     return el.contains(document.elementFromPoint(r.x + r.width / 2, r.y + r.height / 2))
   })
   expect(hit).toBe(true)
+})
+
+test('피드가 열리면 뒤쪽은 inert, 탭 포커스가 피드 안에 머묾', async ({ page }) => {
+  const n = await hasVideos(page)
+  test.skip(n === 0, 'RSS를 받지 못해 영상이 없음')
+  await page.locator('[data-video-id]').first().click()
+  await expect(page.getByRole('dialog')).toBeVisible()
+  expect(await page.evaluate(() => document.querySelector('main')!.closest('[inert]') !== null)).toBe(true)
+  for (let i = 0; i < 12; i++) {
+    await page.keyboard.press('Tab')
+    expect(await page.evaluate(() => !!document.activeElement?.closest('[role="dialog"]') || document.activeElement === document.body)).toBe(true)
+  }
+})
+
+test('?v= 딥링크로 열고 닫으면 그 카드로 포커스', async ({ page }) => {
+  const n = await hasVideos(page)
+  test.skip(n === 0, 'RSS를 받지 못해 영상이 없음')
+  const id = await page.locator('[data-video-id]').first().getAttribute('data-video-id')
+  await page.goto(`/samguk/videos?v=${id}`)
+  await page.getByRole('button', { name: '목록으로' }).click()
+  await expect(page.locator(`button[data-video-id="${id}"]`)).toBeFocused()
 })

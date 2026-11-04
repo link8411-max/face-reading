@@ -1,25 +1,21 @@
 'use client'
 
 import Link from 'next/link'
-import { useEffect, useRef, useState, useSyncExternalStore } from 'react'
+import { createPortal } from 'react-dom'
+import { useEffect, useRef, useState } from 'react'
+import { useNow } from './useNow'
 import VideoPlayer, { SubscribeLink } from './VideoPlayer'
 import { track } from '@/lib/analytics'
 import { isNew, viewsLabel } from '@/lib/videos/format'
 import type { Video } from '@/lib/videos/types'
 import type { Faces } from './VideosBrowser'
 
-const never = () => () => {}
-const clock: { at: number | null } = { at: null }
-function useNow(): Date | null {
-  const ms = useSyncExternalStore(never, () => (clock.at ??= Date.now()), () => null)
-  return ms === null ? null : new Date(ms)
-}
-
 export default function VideoFeed({
   videos, startIndex, faces, onClose,
 }: { videos: Video[]; startIndex: number; faces: Faces; onClose: () => void }) {
   const [active, setActive] = useState(startIndex)
   const scroller = useRef<HTMLDivElement>(null)
+  const root = useRef<HTMLDivElement>(null)
   const closeBtn = useRef<HTMLButtonElement>(null)
   const now = useNow()
 
@@ -30,7 +26,13 @@ export default function VideoFeed({
     const onKey = (e: KeyboardEvent) => { if (e.key === 'Escape') onClose() }
     window.addEventListener('keydown', onKey)
     closeBtn.current?.focus()
+    // aria-modal: 피드 밖(본문·하단 탭)은 포커스·클릭을 막는다.
+    const inerted: HTMLElement[] = []
+    for (const el of Array.from(document.body.children)) {
+      if (el instanceof HTMLElement && !el.contains(root.current) && !el.inert) { el.inert = true; inerted.push(el) }
+    }
     return () => {
+      for (const el of inerted) el.inert = false
       document.body.style.overflow = prev
       window.removeEventListener('keydown', onKey)
     }
@@ -58,14 +60,14 @@ export default function VideoFeed({
     return () => io.disconnect()
   }, [videos])
 
-  return (
-    <div role="dialog" aria-modal="true" aria-label="쇼츠 보기" className="fixed inset-0 z-[70] bg-[#111] text-paper">
+  return createPortal(
+    <div ref={root} role="dialog" aria-modal="true" aria-label="쇼츠 보기" className="fixed inset-0 z-[70] bg-ink text-paper">
       <div ref={scroller} className="h-full snap-y snap-mandatory overflow-y-auto overscroll-contain">
         {videos.map((v, i) => {
           const fresh = now !== null && isNew(v.publishedAt, now)
           const views = now === null || fresh ? null : viewsLabel(v, now)
           return (
-            <section key={v.id} data-index={i} className="flex h-dvh snap-start snap-always flex-col px-4 pb-5 pt-[68px]">
+            <section key={v.id} data-index={i} className="flex h-full snap-start snap-always flex-col px-4 pb-5 pt-[68px]">
               <div className="flex min-h-0 flex-1 items-center justify-center">
                 <div className="aspect-[9/16] h-full max-w-full">
                   {i === active ? (
@@ -127,11 +129,11 @@ export default function VideoFeed({
           type="button"
           aria-label="목록으로"
           onClick={onClose}
-          className="pointer-events-auto flex h-11 w-11 items-center justify-center rounded-full bg-[#111]/50"
+          className="pointer-events-auto flex h-11 w-11 items-center justify-center rounded-full bg-ink/50"
         >
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18" /></svg>
         </button>
-        <span className="rounded-full bg-[#111]/50 px-3 py-1.5 text-xs">{active + 1} / {videos.length} · 위아래로 넘겨요</span>
+        <span className="rounded-full bg-ink/50 px-3 py-1.5 text-xs">{active + 1} / {videos.length} · 위아래로 넘겨요</span>
       </div>
 
       <div className="pointer-events-none absolute right-3 top-1/3 flex flex-col items-center gap-1.5" aria-hidden="true">
@@ -139,6 +141,7 @@ export default function VideoFeed({
           <span key={v.id} className={`w-1.5 rounded-[3px] ${i === active ? 'h-[30px] bg-paper' : 'h-[18px] bg-paper/40'}`} />
         ))}
       </div>
-    </div>
+    </div>,
+    document.body,
   )
 }
