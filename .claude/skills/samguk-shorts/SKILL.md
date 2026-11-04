@@ -5,6 +5,8 @@ description: 삼국지 유튜브 쇼츠·인스타 릴스 한 편을 기획→�
 
 # 삼국지 쇼츠 만들기
 
+**먼저 `docs/videos/TEMPLATE.md`(v2)를 읽고 그대로 따른다.** 6박자 구조, 출처는 해설이 아니라 화면 배지, 화면은 Flow 이어 찍기 체인(Extend/Jump To), 인물은 `docs/videos/characters/` 기준 시트로 고정. 아래는 도구 조작 요령이다.
+
 채널: 유튜브 "삼국지 한 장면"(@unse_ai, 브랜드 계정), 인스타 @unse.ai. 목적은 unse-ai.com 유입.
 비용은 무료·Google AI Pro 안에서만. 사용자와는 한국어, 해요체.
 
