@@ -113,7 +113,7 @@ export default async function PersonPage({ params }: Props) {
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(person) }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumb) }} />
       {bigVideo && (
-        <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify({ "@context": "https://schema.org", ...videoObjectJsonLd(bigVideo) }) }} />
+        <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify({ "@context": "https://schema.org", ...videoObjectJsonLd(bigVideo) }).replace(/</g, "\\u003c") }} />
       )}
       <main className="mx-auto px-[22px] max-w-lg pb-12">
         <nav className="pt-5 text-sm text-muted" aria-label="경로">
