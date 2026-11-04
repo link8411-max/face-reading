@@ -1,5 +1,6 @@
 // 인물열전 응원·투표 저장소(Supabase PostgREST). 일기토 API와 같은 방식: 서비스 키, 5초 제한, 키·본문은 로그에 남기지 않는다.
 import { getPerson } from '@/content/samgukPeople'
+import { BOARD_KEYS, type BoardKey } from '@/lib/cup/boards'
 import { rankOf } from './ranking'
 import { pairKey, type PersonStats, type VoteKind } from './votes'
 
@@ -91,4 +92,53 @@ export async function readStatsWithRank(cfg: StoreConfig, id: string): Promise<P
     if (rank !== null) stats.rank = rank
   }
   return stats
+}
+
+type CountRow = { target?: unknown; option?: unknown; n?: unknown }
+
+/** 월드컵 두 사람 쌍의 집계(고른 id → 표 수, 판 무관). 실패하면 throw */
+export async function readCupPair(cfg: StoreConfig, pair: string): Promise<Record<string, number>> {
+  const rows = await rpc(cfg, 'cup_pair_stats', { p_pair: pair })
+  const out: Record<string, number> = {}
+  if (!Array.isArray(rows)) return out
+  for (const r of rows as CountRow[]) {
+    const n = Number(r.n)
+    if (typeof r.option === 'string' && Number.isFinite(n)) out[r.option] = n
+  }
+  return out
+}
+
+const byCount = (a: { id: string; n: number }, b: { id: string; n: number }) =>
+  b.n - a.n || (a.id < b.id ? -1 : a.id > b.id ? 1 : 0)
+
+/** 월드컵 판별 우승 집계(많은 순·동점은 id 오름차순)와 판 수, 경기 승수 순위. 실패하면 throw */
+export async function readCupSummary(cfg: StoreConfig): Promise<{
+  plays: Record<BoardKey, number>
+  wins: Record<BoardKey, { id: string; n: number }[]>
+  matchWins: { id: string; n: number }[]
+}> {
+  const [winRows, matchRows] = await Promise.all([rpc(cfg, 'cup_win_counts', {}), rpc(cfg, 'cup_match_wins', {})])
+  const wins = Object.fromEntries(BOARD_KEYS.map((k) => [k, [] as { id: string; n: number }[]])) as Record<
+    BoardKey,
+    { id: string; n: number }[]
+  >
+  if (Array.isArray(winRows)) {
+    for (const r of winRows as CountRow[]) {
+      const n = Number(r.n)
+      if (typeof r.target !== 'string' || typeof r.option !== 'string' || !Number.isFinite(n)) continue
+      if (Object.hasOwn(wins, r.target)) wins[r.target as BoardKey].push({ id: r.option, n })
+    }
+  }
+  const plays = Object.fromEntries(BOARD_KEYS.map((k) => [k, 0])) as Record<BoardKey, number>
+  for (const k of BOARD_KEYS) {
+    wins[k].sort(byCount)
+    plays[k] = wins[k].reduce((sum, w) => sum + w.n, 0)
+  }
+  const matchWins = Array.isArray(matchRows)
+    ? (matchRows as CountRow[])
+        .filter((r) => typeof r.option === 'string' && Number.isFinite(Number(r.n)))
+        .map((r) => ({ id: r.option as string, n: Number(r.n) }))
+        .sort(byCount)
+    : []
+  return { plays, wins, matchWins }
 }

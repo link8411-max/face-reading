@@ -21,7 +21,7 @@ export interface PollShare {
 }
 
 interface Props {
-  kind: Exclude<VoteKind, 'cheer'>
+  kind: Exclude<VoteKind, 'cheer' | 'cup_match' | 'cup_win'>
   id: string
   target: string
   title: string
