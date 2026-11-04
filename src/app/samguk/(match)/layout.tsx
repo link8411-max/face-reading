@@ -1,4 +1,6 @@
 import PageGuide from "@/components/PageGuide";
+import VideoStrip from "@/components/videos/VideoStrip";
+import { getChannelVideos } from "@/lib/videos/fetch";
 
 const jsonLd = {
   "@context": "https://schema.org",
@@ -31,7 +33,8 @@ const breadcrumbJsonLd = {
 };
 
 // 닮은꼴 테스트(/samguk), 공유 착지, 우리 팀 삼국지에만 붙는 구조화 데이터와 안내문. 일기토(/samguk/duel)는 따로 가진다
-export default function Layout({ children }: { children: React.ReactNode }) {
+export default async function Layout({ children }: { children: React.ReactNode }) {
+  const videos = await getChannelVideos();
   return (
     <>
       <script
@@ -43,6 +46,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
         dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }}
       />
       {children}
+      <div className="mx-auto max-w-lg px-[22px]"><VideoStrip videos={videos} /></div>
       <PageGuide route="/samguk" />
     </>
   );

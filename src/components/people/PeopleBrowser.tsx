@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState, type ReactNode } from "react";
 import Link from "next/link";
 import ThreeKingdomsMap from "@/components/people/ThreeKingdomsMap";
 import { FILTER_LABEL, matchedCount, todayCard, visibleIds, FIRST_PAGE, type HubCard, type HubFilter } from "@/lib/people/hubFilter";
@@ -18,7 +18,7 @@ function Portrait({ card, className, width, height }: { card: HubCard; className
 }
 
 // 삼국 지도·세력 버튼·검색·인물 카드. 127명 카드는 모두 서버 HTML에 들어 있고(검색 로봇용), 화면에서는 보이기만 바꾼다.
-export default function PeopleBrowser({ cards }: { cards: HubCard[] }) {
+export default function PeopleBrowser({ cards, afterMap }: { cards: HubCard[]; afterMap?: ReactNode }) {
   const [filter, setFilter] = useState<HubFilter>("all");
   const [query, setQuery] = useState("");
   const [expanded, setExpanded] = useState(false);
@@ -73,6 +73,8 @@ export default function PeopleBrowser({ cards }: { cards: HubCard[] }) {
           ))}
         </div>
       </section>
+
+      {afterMap}
 
       <section id="people-list" aria-label="인물 목록" className="mt-6">
         <div className="flex items-baseline justify-between gap-3">

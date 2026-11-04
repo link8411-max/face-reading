@@ -10,6 +10,8 @@ import { PEOPLE_IDS } from "@/content/samgukPeople";
 import { characterById } from "@/lib/people/characters";
 import { hubCards } from "@/lib/people/hubCards";
 import { hubRelations } from "@/lib/people/hubRelations";
+import VideoStrip from "@/components/videos/VideoStrip";
+import { getChannelVideos } from "@/lib/videos/fetch";
 import { portraitSrc } from "@/lib/people/portrait";
 import { factionGroups } from "@/lib/people/relations";
 
@@ -18,6 +20,9 @@ const URL = `${SITE}/samguk/people`;
 const TITLE = "삼국지 인물 관계도 | 위·촉·오 인물 소개 – 운명을 읽다";
 const DESCRIPTION = "위·촉·오 삼국지 인물의 관계도와 열전을 세력별로 모았어요. 의형제·혈연·라이벌 관계를 한눈에 보고 인물 이야기를 읽어 보세요.";
 const OG = `/api/og?title=${encodeURIComponent("삼국지 인물 관계도")}&subtitle=${encodeURIComponent("위·촉·오 인물 열전")}`;
+
+// 허브는 정적이지만 쇼츠 띠가 1시간마다 새 영상을 받도록 ISR
+export const revalidate = 3600;
 
 export async function generateMetadata(): Promise<Metadata> {
   return {
@@ -31,6 +36,7 @@ export async function generateMetadata(): Promise<Metadata> {
 
 export default async function PeopleHubPage() {
   const cards = hubCards();
+  const videos = await getChannelVideos();
   const groups = factionGroups();
   const { within, cross } = hubRelations();
 
@@ -53,7 +59,7 @@ export default async function PeopleHubPage() {
           위·촉·오 삼국지 인물 {PEOPLE_IDS.length}명의 열전과 관계도예요. 지도에서 세력을 누르면 그 세력 인물만 모아 볼 수 있어요.
         </p>
 
-        <PeopleBrowser cards={cards} />
+        <PeopleBrowser cards={cards} afterMap={<VideoStrip videos={videos} />} />
 
         <nav aria-label="바로가기" className="mt-8 grid grid-cols-2 gap-3">
           <a href="#relations" className="rounded-[22px] border border-line bg-white px-4 py-4 hover:border-accent/50 transition">
