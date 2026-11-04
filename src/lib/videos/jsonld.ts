@@ -1,5 +1,5 @@
 import type { Video } from './types'
-import { thumbUrl } from './format'
+import { isVideoId, thumbUrl } from './format'
 
 function isoDuration(sec: number): string {
   const h = Math.floor(sec / 3600)
@@ -8,6 +8,7 @@ function isoDuration(sec: number): string {
   return `PT${h ? `${h}H` : ''}${m ? `${m}M` : ''}${s || (!h && !m) ? `${s}S` : ''}`
 }
 
+/** v.id는 isVideoId를 통과한 값이어야 한다(목록 단위는 itemListJsonLd가 걸러 준다). */
 export function videoObjectJsonLd(v: Video): Record<string, unknown> {
   const o: Record<string, unknown> = {
     '@type': 'VideoObject',
@@ -33,6 +34,6 @@ export function itemListJsonLd(vs: Video[]): Record<string, unknown> {
   return {
     '@context': 'https://schema.org',
     '@type': 'ItemList',
-    itemListElement: vs.map((v, i) => ({ '@type': 'ListItem', position: i + 1, item: videoObjectJsonLd(v) })),
+    itemListElement: vs.filter((v) => isVideoId(v.id)).map((v, i) => ({ '@type': 'ListItem', position: i + 1, item: videoObjectJsonLd(v) })),
   }
 }

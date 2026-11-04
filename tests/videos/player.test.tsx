@@ -17,14 +17,20 @@ describe('VideoPlayer', () => {
     expect(html).toContain('loading="lazy"')
   })
   it('NEW 영상은 NEW만 보인다', () => {
-    const v = { ...api[0], publishedAt: new Date().toISOString() }
-    const html = renderToStaticMarkup(<VideoPlayer video={v} slot="people" />)
+    const now = Date.now()
+    const v = { ...api[0], publishedAt: new Date(now - 3600_000).toISOString() }
+    const html = renderToStaticMarkup(<VideoPlayer video={v} slot="people" nowMs={now} />)
     expect(html).toContain('NEW')
     expect(html).not.toContain('조회수')
   })
   it('오래된 영상은 조회수', () => {
     const v = { ...api[0], publishedAt: '2020-01-01T00:00:00Z', views: 1008 }
-    expect(renderToStaticMarkup(<VideoPlayer video={v} slot="people" />)).toContain('조회수 1,008회')
+    expect(renderToStaticMarkup(<VideoPlayer video={v} slot="people" nowMs={Date.parse('2026-11-05T00:00:00Z')} />)).toContain('조회수 1,008회')
+  })
+  it('nowMs가 없으면 서버·첫 클라이언트 렌더에 띠가 없다(하이드레이션 일치)', () => {
+    const html = renderToStaticMarkup(<VideoPlayer video={{ ...api[0], views: 5 }} slot="people" />)
+    expect(html).not.toContain('NEW')
+    expect(html).not.toContain('조회수')
   })
   it('잘못된 id는 버튼 없이 썸네일만', () => {
     const v = { ...api[0], id: '"><script>' }
@@ -54,6 +60,10 @@ describe('jsonld', () => {
   })
   it('views가 없으면 interactionStatistic 없음', () => {
     expect(videoObjectJsonLd({ ...api[0], views: null })).not.toHaveProperty('interactionStatistic')
+  })
+  it('ItemList는 잘못된 id를 건너뛴다', () => {
+    const l = itemListJsonLd([api[0], { ...api[1], id: 'bad' }, api[2]]) as { itemListElement: { position: number }[] }
+    expect(l.itemListElement.map((e) => e.position)).toEqual([1, 2])
   })
   it('ItemList', () => {
     const l = itemListJsonLd(api.slice(0, 2)) as { itemListElement: { position: number }[] }

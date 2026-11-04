@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useState, type ReactNode } from 'react'
+import { useEffect, useId, useState, type ReactNode } from 'react'
 import { track } from '@/lib/analytics'
 import { gaVideoId, isNew, isVideoId, viewsLabel } from '@/lib/videos/format'
 import type { Video, VideoSlot } from '@/lib/videos/types'
@@ -37,22 +37,25 @@ function PlayMark() {
 }
 
 export default function VideoPlayer({
-  video, slot, className = '',
-}: { video: Video; slot: VideoSlot; className?: string }) {
+  video, slot, className = '', nowMs,
+}: { video: Video; slot: VideoSlot; className?: string; nowMs?: number }) {
   const [playing, setPlaying] = useState(false)
+  const [now, setNow] = useState<number | null>(nowMs ?? null)
+  const token = useId()
+  useEffect(() => setNow(Date.now()), [])
   const playable = isVideoId(video.id)
 
   useEffect(() => {
     const onOther = (e: Event) => {
-      if ((e as CustomEvent).detail !== video.id) setPlaying(false)
+      if ((e as CustomEvent).detail !== token) setPlaying(false)
     }
     window.addEventListener(PLAY_EVENT, onOther)
     return () => window.removeEventListener(PLAY_EVENT, onOther)
-  }, [video.id])
+  }, [token])
 
-  const now = new Date()
-  const fresh = isNew(video.publishedAt, now)
-  const views = viewsLabel(video, now)
+  const nowDate = now === null ? null : new Date(now)
+  const fresh = nowDate !== null && isNew(video.publishedAt, nowDate)
+  const views = nowDate === null ? null : viewsLabel(video, nowDate)
   const pill = (fresh || views) && (
     <span className="absolute left-2 top-2 rounded-full bg-ink/70 px-2.5 py-1 text-xs font-semibold text-paper">
       {fresh ? 'NEW' : views}
@@ -90,7 +93,7 @@ export default function VideoPlayer({
       aria-label={`${video.title} 재생`}
       className={`${box} block text-left`}
       onClick={() => {
-        window.dispatchEvent(new CustomEvent(PLAY_EVENT, { detail: video.id }))
+        window.dispatchEvent(new CustomEvent(PLAY_EVENT, { detail: token }))
         setPlaying(true)
         track('video_play', { slot, result_id: gaVideoId(video.id) })
       }}
