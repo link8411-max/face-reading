@@ -4,6 +4,9 @@ import { insertVote, readStatsWithRank, storeConfig } from '@/lib/people/store'
 import { resolveVoter, sameSite } from '@/lib/people/voter'
 import { statsOwner, validateVote, voteGuard } from '@/lib/people/votes'
 
+// Supabase가 서울(ap-northeast-2)에 있어 함수도 서울에서 돌린다(미국 동부면 요청마다 태평양 왕복 2번)
+export const preferredRegion = 'icn1'
+
 export async function POST(request: Request) {
   // 다른 사이트의 폼·no-cors 요청은 본문을 읽기 전에 막는다
   const type = (request.headers.get('content-type') ?? '').split(';')[0].trim().toLowerCase()

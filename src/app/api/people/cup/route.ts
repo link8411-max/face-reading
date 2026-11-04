@@ -4,6 +4,9 @@ import { clientIp, readLimitedBody } from '@/lib/duel/feedbackGuard'
 import { insertVote, readCupPair, storeConfig } from '@/lib/people/store'
 import { resolveVoter, sameSite } from '@/lib/people/voter'
 
+// Supabase가 서울(ap-northeast-2)에 있어 함수도 서울에서 돌린다(미국 동부면 요청마다 태평양 왕복 2번)
+export const preferredRegion = 'icn1'
+
 // 열전 투표(/api/people/vote)와 같은 규칙: 쿠키 Path가 /api/people이라 같은 pv 쿠키를 받는다.
 export async function POST(request: Request) {
   const type = (request.headers.get('content-type') ?? '').split(';')[0].trim().toLowerCase()
