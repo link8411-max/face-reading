@@ -4,6 +4,7 @@ import Link from "next/link";
 export const metadata: Metadata = {
     title: "서비스 소개 | 운명을 읽다",
     description: "AI와 전통 명리학의 만남, 운명을 읽다 서비스를 소개합니다.",
+    alternates: { canonical: "https://unse-ai.com/about" },
 };
 
 export default function AboutPage() {

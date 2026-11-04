@@ -3,6 +3,7 @@ import type { Metadata } from "next";
 export const metadata: Metadata = {
     title: "개인정보처리방침 | 운명을 읽다",
     description: "운명을 읽다 서비스의 개인정보처리방침입니다. 유저의 소중한 정보를 보호하기 위한 노력을 확인하세요.",
+    alternates: { canonical: "https://unse-ai.com/privacy" },
 };
 
 export default function PrivacyPage() {
