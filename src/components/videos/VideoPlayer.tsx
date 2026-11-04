@@ -2,7 +2,7 @@
 
 import { useEffect, useId, useState, useSyncExternalStore, type ReactNode } from 'react'
 import { track } from '@/lib/analytics'
-import { gaVideoId, isNew, isVideoId, viewsLabel } from '@/lib/videos/format'
+import { durationLabel, gaVideoId, isVideoId, videoBadge } from '@/lib/videos/format'
 import type { Video, VideoSlot } from '@/lib/videos/types'
 
 const PLAY_EVENT = 'samguk-video-play'
@@ -60,12 +60,11 @@ export default function VideoPlayer({
     return () => window.removeEventListener(PLAY_EVENT, onOther)
   }, [token])
 
-  const nowDate = now === null ? null : new Date(now)
-  const fresh = nowDate !== null && isNew(video.publishedAt, nowDate)
-  const views = nowDate === null ? null : viewsLabel(video, nowDate)
-  const pill = (fresh || views) && (
+  const badge = now === null ? null : videoBadge(video, now)
+  const dur = durationLabel(video.durationSec)
+  const pill = badge && (
     <span className="absolute left-2 top-2 rounded-full bg-ink/70 px-2.5 py-1 text-xs font-semibold text-paper">
-      {fresh ? 'NEW' : views}
+      {badge.kind === 'new' ? 'NEW' : dur ? `${badge.text} · ${dur}` : badge.text}
     </span>
   )
 

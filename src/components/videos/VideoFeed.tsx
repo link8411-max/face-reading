@@ -6,7 +6,7 @@ import { useEffect, useRef, useState } from 'react'
 import { useNow } from './useNow'
 import VideoPlayer, { SubscribeLink } from './VideoPlayer'
 import { track } from '@/lib/analytics'
-import { isNew, viewsLabel } from '@/lib/videos/format'
+import { videoBadge } from '@/lib/videos/format'
 import type { Video } from '@/lib/videos/types'
 import type { Faces } from './VideosBrowser'
 
@@ -64,8 +64,9 @@ export default function VideoFeed({
     <div ref={root} role="dialog" aria-modal="true" aria-label="쇼츠 보기" className="fixed inset-0 z-[70] bg-ink text-paper">
       <div ref={scroller} className="h-full snap-y snap-mandatory overflow-y-auto overscroll-contain">
         {videos.map((v, i) => {
-          const fresh = now !== null && isNew(v.publishedAt, now)
-          const views = now === null || fresh ? null : viewsLabel(v, now)
+          const badge = now === null ? null : videoBadge(v, now.getTime())
+          const fresh = badge?.kind === 'new'
+          const views = badge?.kind === 'views' ? badge.text : null
           return (
             <section key={v.id} data-index={i} className="flex h-full snap-start snap-always flex-col px-4 pb-5 pt-[68px]">
               <div className="flex min-h-0 flex-1 items-center justify-center">

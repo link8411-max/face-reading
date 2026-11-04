@@ -26,6 +26,7 @@ describe('VideoStrip', () => {
     expect(html).toContain('no-screenshot')
     expect(html).toContain('loading="lazy"')
     expect(html).not.toContain('<iframe')
+    expect(html).not.toMatch(/<img[^>]*alt="[^"]+"/)
   })
 
   it('빈 목록이면 아무것도 그리지 않는다', () => {

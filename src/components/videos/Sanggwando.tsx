@@ -9,7 +9,7 @@ function Tile({ t }: { t: SgTile }) {
     <span className="relative block h-16 w-16 overflow-hidden rounded-[14px] border-2 border-ink bg-navy-game">
       {t.portrait ? (
         // eslint-disable-next-line @next/next/no-img-element
-        <img src={t.portrait} alt={t.name} loading="lazy" className="h-full w-full object-cover [image-rendering:pixelated]" />
+        <img src={t.portrait} alt="" loading="lazy" className="h-full w-full object-cover [image-rendering:pixelated]" />
       ) : null}
     </span>
   )
@@ -24,7 +24,7 @@ function Tile({ t }: { t: SgTile }) {
         {t.portrait ? face : dashed}
         {t.hasVideo && (
           <span className="absolute bottom-[3px] right-[3px] flex h-5 w-5 items-center justify-center rounded-full bg-accent" aria-label="영상 있음">
-            <svg width="10" height="10" viewBox="0 0 24 24" aria-hidden="true"><path d="M8 5v14l11-7z" fill="#fff" /></svg>
+            <svg width="10" height="10" viewBox="0 0 24 24" aria-hidden="true" className="text-paper"><path d="M8 5v14l11-7z" fill="currentColor" /></svg>
           </span>
         )}
       </span>

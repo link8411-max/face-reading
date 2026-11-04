@@ -109,3 +109,17 @@ test('?v= 딥링크로 열고 닫으면 그 카드로 포커스', async ({ page 
   await page.getByRole('button', { name: '목록으로' }).click()
   await expect(page.locator(`button[data-video-id="${id}"]`)).toBeFocused()
 })
+
+test('뒤로 가기는 피드만 닫고 /samguk/videos에 머묾', async ({ page }) => {
+  const n = await hasVideos(page)
+  test.skip(n === 0, 'RSS를 받지 못해 영상이 없음')
+  const id = await page.locator('[data-video-id]').first().getAttribute('data-video-id')
+  await page.locator('[data-video-id]').first().click()
+  const dialog = page.getByRole('dialog', { name: '쇼츠 보기' })
+  await expect(dialog).toBeVisible()
+  await expect(page).toHaveURL(new RegExp(`\\?v=${id}`))
+  await page.goBack()
+  await expect(dialog).toHaveCount(0)
+  await expect(page).toHaveURL(/\/samguk\/videos$/)
+  await expect(page.locator('[data-video-id]').first()).toBeVisible()
+})

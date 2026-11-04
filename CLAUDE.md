@@ -311,9 +311,9 @@ public/
 | 파일 | `lib/videos/{types,format,parse,fetch,forPerson,jsonld}.ts`, `components/videos/*`(VideoPlayer·VideoFeed·VideosBrowser·PersonVideos·RelatedVideosRow·Sanggwando·ResultVideos·ResultVideoBlock·VideoStrip), `app/samguk/videos/page.tsx`, `/api/samguk/videos/[id]`(결과 화면이 클라이언트에서 영상 한 편을 받는 길). 영상 id는 `/^[A-Za-z0-9_-]{11}$/`만 쓴다 |
 | 보정 파일 | `src/content/videoOverrides.ts`: 영상 id → `{ people?, hide?, event? }`. **숨기려면** `hide: true`, **인물을 고치려면** `people: [id, …]`(첫째가 주인공). 보정이 해시태그 추출보다 우선한다. 해시태그는 `allSamgukCharacters`의 `name`과 정확히 같을 때만 인물 id로 바뀐다 |
 | 환경변수 | `YOUTUBE_API_KEY`(Vercel Production, Google Cloud 프로젝트 `unse-ai-513714`, YouTube Data API v3만 허용). **`lib/videos/fetch.ts`에서만 읽는다.** 없으면 RSS 경로. `tests/videos/boundaries.test.ts`가 클라이언트 파일의 서버 모듈·키 사용을 막는다 |
-| 재생 | 첫 화면엔 iframe 없음, 누르면 `youtube-nocookie.com/embed/<id>?autoplay=1&playsinline=1` 하나만. 24시간 안이면 `NEW`, 그 뒤 `조회수 1,008회` |
+| 재생 | 첫 화면엔 iframe 없음, 누르면 `youtube-nocookie.com/embed/<id>?autoplay=1&playsinline=1` 하나만. 24시간 안이면 `NEW`, 그 뒤 `조회수 1,008회`(규칙은 `format.ts` `videoBadge` 한 곳, 열전 첫 카드는 ` · 1:03` 길이도 붙임). 열전 첫 줄은 본인 영상 전부(2편 이상이면 같은 크기 카드를 가로로 넘김). 피드는 `?v=`를 `pushState`로 쌓고 뒤로 가기·`popstate`로 닫는다(딥링크로 들어왔으면 닫을 때 `replaceState`) |
 | 노출 위치 | **열전**(`/samguk/people/[id]`) 순서: 요약 → 1분 영상 → 쿠팡 → 상관도 → 관계 인물 영상 → 닮은꼴 배너. **결과 화면**: 공유 버튼·쿠팡 아래 "내 장수 이야기, 1분 영상" 카드와 엮인 장수 칸(둘 다 `no-screenshot`). **허브 띠** `VideoStrip`: 열전 허브 지도 아래, `(match)/layout.tsx`(시작 화면·결과·공유 착지·우리 팀) 안내문 위. 누르면 `/samguk/videos?v=<id>` 피드(canonical은 `/samguk/videos` 하나) |
-| GA | `video_play {slot, result_id}`, `video_subscribe_click {slot}`, `video_test_click {slot}`. slot은 `people`·`result`·`videos`·`hub`. 영상 id의 `-`는 `_`로 바꿔 `result_id`에 넣는다(`SAFE_VALUE`는 그대로). `next_test_click`과 뜻이 달라 새 이벤트 |
+| GA | `video_play {slot, result_id}`, `video_subscribe_click {slot}`, `video_test_click {slot}`. slot은 `people`·`result`·`videos`·`hub`. 결과(`result`)·허브(`hub`) 카드 클릭도 그 slot으로 `video_play`를 보내고, 이어서 피드에서 재생하면 slot `videos`로 한 번 더 보내므로 건수가 겹친다. 영상 id의 `-`는 `_`로 바꿔 `result_id`에 넣는다(`SAFE_VALUE`는 그대로). `next_test_click`과 뜻이 달라 새 이벤트 |
 | tsconfig | `scripts/shorts`(쇼츠 제작 스크립트, 별도 의존성)는 `exclude`에 있다. 없으면 `next build`가 이 폴더까지 타입 검사해 실패한다 |
 | 채널 프로필 링크 | 사용자가 유튜브 스튜디오에서 직접 건다: `https://unse-ai.com/samguk/videos?utm_source=youtube&utm_medium=profile&utm_campaign=channel` (`?v=`는 공유용이라 프로필에 쓰지 않는다) |
 

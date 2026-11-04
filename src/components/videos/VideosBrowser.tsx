@@ -3,7 +3,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { useNow } from './useNow'
 import VideoFeed from './VideoFeed'
-import { isNew, isVideoId, viewsLabel } from '@/lib/videos/format'
+import { isVideoId, videoBadge } from '@/lib/videos/format'
 import type { Video } from '@/lib/videos/types'
 
 export type Faces = Record<string, { name: string; portrait: string | null; hasPage: boolean }>
@@ -43,25 +43,50 @@ export default function VideosBrowser({ videos, faces }: { videos: Video[]; face
   }, [videos])
 
   const opener = useRef<HTMLElement | null>(null)
+  const pushed = useRef(false) // 이 화면이 ?v= 기록을 쌓았는지(딥링크로 들어왔으면 false)
   const open = (id: string) => {
     opener.current = document.activeElement instanceof HTMLElement ? document.activeElement : null
     setOpenId(id)
     const u = new URL(window.location.href)
     u.searchParams.set('v', id)
-    window.history.replaceState(null, '', u)
+    window.history.pushState(null, '', u)
+    pushed.current = true
   }
-  const close = useCallback(() => {
-    const id = new URLSearchParams(window.location.search).get('v')
-    setOpenId(null)
-    const u = new URL(window.location.href)
-    u.searchParams.delete('v')
-    window.history.replaceState(null, '', u)
-    // 피드가 사라지고 inert가 풀린 뒤에 열었던 카드로 포커스를 돌려 준다.
+  // 피드가 사라지고 inert가 풀린 뒤에 열었던 카드로 포커스를 돌려 준다.
+  const restoreFocus = useCallback((id: string | null) => {
     requestAnimationFrame(() => {
       const el = opener.current?.isConnected ? opener.current : id ? document.querySelector<HTMLElement>(`button[data-video-id="${id}"]`) : null
       el?.focus()
     })
   }, [])
+  const close = useCallback(() => {
+    if (pushed.current) {
+      pushed.current = false
+      window.history.back() // popstate가 피드를 닫는다
+      return
+    }
+    setOpenId(null)
+    const u = new URL(window.location.href)
+    u.searchParams.delete('v')
+    window.history.replaceState(null, '', u)
+    restoreFocus(openId)
+  }, [restoreFocus, openId])
+
+  // 뒤로 가기(또는 앞으로 가기)로 ?v=가 바뀌면 피드를 맞춘다.
+  useEffect(() => {
+    const onPop = () => {
+      pushed.current = false
+      const v = new URLSearchParams(window.location.search).get('v')
+      if (isVideoId(v) && videos.some((x) => x.id === v)) {
+        setOpenId(v)
+      } else {
+        setOpenId(null)
+        restoreFocus(openId)
+      }
+    }
+    window.addEventListener('popstate', onPop)
+    return () => window.removeEventListener('popstate', onPop)
+  }, [videos, restoreFocus, openId])
 
   const startIndex = openId ? shown.findIndex((v) => v.id === openId) : -1
   // 필터 밖 영상(?v=)이면 전체 목록으로 연다.
@@ -98,8 +123,9 @@ export default function VideosBrowser({ videos, faces }: { videos: Video[]; face
 
       <ul className="grid grid-cols-2 gap-x-2.5 gap-y-3.5">
         {shown.map((v) => {
-          const fresh = now !== null && isNew(v.publishedAt, now)
-          const views = now === null || fresh ? null : viewsLabel(v, now)
+          const badge = now === null ? null : videoBadge(v, now.getTime())
+          const fresh = badge?.kind === 'new'
+          const views = badge?.kind === 'views' ? badge.text : null
           const names = v.people.map((p) => faces[p]?.name).filter(Boolean)
           const meta = [views, names.join(' · ')].filter(Boolean).join(' · ')
           return (
