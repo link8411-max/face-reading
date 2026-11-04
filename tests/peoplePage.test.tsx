@@ -1,7 +1,7 @@
 import { renderToStaticMarkup } from 'react-dom/server'
 import Page, { generateMetadata, generateStaticParams } from '@/app/samguk/people/[id]/page'
 import { portraitSrc, personTitle, yearLabel } from '@/lib/people/portrait'
-import { PEOPLE_IDS } from '@/content/samgukPeople'
+import { PEOPLE, PEOPLE_IDS } from '@/content/samgukPeople'
 import { relationsOf } from '@/lib/people/relations'
 
 async function render(id: string): Promise<string> {
@@ -44,7 +44,7 @@ test('관우 페이지: 위에서 아래 순서와 details 4개', async () => {
     expect(i, s).toBeGreaterThanOrEqual(0)
     return i
   }
-  const order = [idx('쿠팡 추천 상품'), idx('나도 관우를 닮았을까'), idx('<h1'), idx('id="cheer"'), idx('<details'), idx('id="duel-vote"'), idx('id="scene-vote"'), idx('id="verdict-vote"')]
+  const order = [idx('<h1'), idx('알고 보면 재밌는 이야기'), idx('쿠팡 추천 상품'), idx('나도 관우를 닮았을까'), idx('관우 한눈에 보기'), idx('id="cheer"'), idx('<details'), idx('id="duel-vote"'), idx('id="scene-vote"'), idx('id="verdict-vote"')]
   expect([...order].sort((a, b) => a - b)).toEqual(order)
   expect(html.match(/<details/g)).toHaveLength(4)
   for (const t of ['연의로 보는 생애', '주요 전투·사건', '관계도·혈연', '정사와 연의의 차이', '정사로 본 실제 모습']) expect(html).toContain(t)
@@ -55,6 +55,25 @@ test('관우 페이지: 위에서 아래 순서와 details 4개', async () => {
   expect(html).toContain('연의: 청룡언월도')
   expect(html).toContain('정사 기록 없음')
   expect(html).toContain('알고 보면 재밌는 이야기')
+})
+
+test('초상화 대기 인물도 요약 → 쿠팡 → 닮은꼴 배너 순서', async () => {
+  const html = await render('wangyi')
+  const idx = (s: string) => {
+    const i = html.indexOf(s)
+    expect(i, s).toBeGreaterThanOrEqual(0)
+    return i
+  }
+  expect(idx('<h1')).toBeLessThan(idx('쿠팡 추천 상품'))
+  expect(idx('쿠팡 추천 상품')).toBeLessThan(idx('삼국지 닮은꼴 테스트 하기'))
+})
+
+test('하후돈 요약: 박망파 제갈량 화공은 연의라고 밝힌다', () => {
+  const s = PEOPLE.xiaohoudun.summary
+  expect(s.startsWith('하후돈은 연의에서 ')).toBe(true)
+  expect(s.indexOf('연의에서')).toBeLessThan(s.indexOf('눈알'))
+  expect(s.lastIndexOf('연의에서는')).toBeLessThan(s.indexOf('제갈량'))
+  expect(s.lastIndexOf('연의에서는')).toBeGreaterThan(s.indexOf('눈알'))
 })
 
 test('funFacts는 요약·태그 아래, 한눈에 보기 위에 나온다', async () => {

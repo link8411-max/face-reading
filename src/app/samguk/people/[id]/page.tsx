@@ -101,24 +101,6 @@ export default async function PersonPage({ params }: Props) {
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(person) }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumb) }} />
       <main className="mx-auto px-[22px] max-w-lg pb-12">
-        {/* 0. 쿠팡 배너 */}
-        <CoupangBanner subId={`people-${id}`} />
-
-        {/* 1. 닮은꼴 배너 */}
-        <section className="mt-5 rounded-[22px] bg-card px-5 py-5 text-center">
-          <p className="font-serif font-bold text-lg break-keep">나도 {c.name}{eulReul(c.name)} 닮았을까?</p>
-          <div className="mt-3 flex flex-col gap-2">
-            <Link href="/samguk" className="flex h-[52px] items-center justify-center rounded-full bg-ink text-paper font-medium px-4">
-              {pending ? "삼국지 닮은꼴 테스트 하기" : `나도 ${c.name}${eulReul(c.name)} 닮았을까? 사진 한 장으로 확인하기`}
-            </Link>
-            {duelOk && (
-              <Link href={`/samguk/duel?me=${id}`} className="flex h-[52px] items-center justify-center rounded-full border border-ink font-medium px-4">
-                일기토에서 싸워 보기
-              </Link>
-            )}
-          </div>
-        </section>
-
         <nav className="pt-5 text-sm text-muted" aria-label="경로">
           <Link href="/samguk/people" className="underline">삼국지 인물열전</Link> / {c.name}
         </nav>
@@ -144,7 +126,25 @@ export default async function PersonPage({ params }: Props) {
           </div>
         </section>
 
-        {/* 4. 한눈에 보기 */}
+        {/* 4. 쿠팡 배너 */}
+        <CoupangBanner subId={`people-${id}`} />
+
+        {/* 5. 닮은꼴 배너 */}
+        <section className="mt-5 rounded-[22px] bg-card px-5 py-5 text-center">
+          <p className="font-serif font-bold text-lg break-keep">나도 {c.name}{eulReul(c.name)} 닮았을까?</p>
+          <div className="mt-3 flex flex-col gap-2">
+            <Link href="/samguk" className="flex h-[52px] items-center justify-center rounded-full bg-ink text-paper font-medium px-4">
+              {pending ? "삼국지 닮은꼴 테스트 하기" : `나도 ${c.name}${eulReul(c.name)} 닮았을까? 사진 한 장으로 확인하기`}
+            </Link>
+            {duelOk && (
+              <Link href={`/samguk/duel?me=${id}`} className="flex h-[52px] items-center justify-center rounded-full border border-ink font-medium px-4">
+                일기토에서 싸워 보기
+              </Link>
+            )}
+          </div>
+        </section>
+
+        {/* 6. 한눈에 보기 */}
         <section className="mt-6">
           <h2 className="font-serif font-bold text-lg mb-3">{c.name} 한눈에 보기</h2>
           <dl className="bg-white rounded-[22px] border border-line px-5 py-4 space-y-3 text-sm leading-relaxed">
@@ -171,12 +171,12 @@ export default async function PersonPage({ params }: Props) {
           </dl>
         </section>
 
-        {/* 5. 응원 */}
+        {/* 7. 응원 */}
         <section id="cheer" className="mt-6 scroll-mt-4">
           <CheerButton id={id} name={c.name} />
         </section>
 
-        {/* 6. 접힌 항목 */}
+        {/* 8. 접힌 항목 */}
         <div className="mt-6 space-y-3">
           <details className={detailsClass}>
             <summary className={summaryClass}>연의로 보는 생애</summary>
@@ -221,7 +221,7 @@ export default async function PersonPage({ params }: Props) {
           </details>
         </div>
 
-        {/* 7~9. 투표 */}
+        {/* 9~11. 투표 */}
         <section id="duel-vote" className="mt-8">
           <VotePoll
             kind="duel"
@@ -256,7 +256,7 @@ export default async function PersonPage({ params }: Props) {
           <VotePoll kind="verdict" id={id} target={id} title={`${c.name}${eulReul(c.name)} 한 줄로 평가한다면?`} options={verdictLabels} />
         </section>
 
-        {/* 11. 함께 보는 인물 */}
+        {/* 12. 함께 보는 인물 */}
         {related.length > 0 && (
           <section className="mt-10">
             <h2 className="font-serif font-bold text-lg mb-3">함께 보는 인물</h2>
