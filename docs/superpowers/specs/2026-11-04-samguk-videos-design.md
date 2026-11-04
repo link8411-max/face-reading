@@ -108,7 +108,7 @@
 - 이렇게 정한 이유(내 판단): 격자는 한눈에 고르기 좋고 검색 엔진이 읽기 쉽다. 피드는 쇼츠에서 온 사람에게 익숙하다. 두 가지를 다 얻는다.
 - `?v=<id>`로 들어오면 그 영상으로 피드를 바로 연다. 공유용이고, 채널 프로필 링크에는 쓰지 않는다. canonical은 언제나 `/samguk/videos`이고 색인 대상도 이 기본 주소 하나다.
 - `ItemList` + 각 `VideoObject` JSON-LD를 넣는다. 사이트맵에 `/samguk/videos`를 추가한다.
-- 저장소 규칙상 일반 내용 페이지로 다룬다. 그래서 `layout.tsx` 메타데이터, `pageGuides.ts` 본문 + `<PageGuide>`, 사이트맵 `LAST_MODIFIED` 갱신을 모두 한다. 쿠팡 다이나믹 배너(subId `videos-hub`)는 격자 아래에 두고, 전체 화면 피드 안에는 두지 않는다. 하단 탭은 새로 만들지 않는다(`tabForPath`에서 얼굴 탭 소속, 기존 `/samguk` 하위와 같음).
+- 저장소 규칙상 일반 내용 페이지로 다룬다. 그래서 `layout.tsx` 메타데이터와 사이트맵 `LAST_MODIFIED` 갱신을 한다. `PageGuide`는 사진 테스트 전용(`GuideRoute`)이라 월드컵처럼 두지 않고, 서버 HTML에 제목과 소개 문단을 둔다. 쿠팡 다이나믹 배너(subId `videos-hub`)는 격자 아래에 두고, 전체 화면 피드 안에는 두지 않는다. 하단 탭은 새로 만들지 않는다(`tabForPath`에서 얼굴 탭 소속, 기존 `/samguk` 하위와 같음).
 
 **④ 허브 띠**
 - `/samguk/people`(열전 허브)와 `/samguk`(시작 화면, 결과 전)에 "쇼츠로 보는 삼국지" 가로 띠로 최신 4편을 보여 준다. 누르면 `/samguk/videos?v=<id>`로 간다.
