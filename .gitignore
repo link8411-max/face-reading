@@ -67,3 +67,7 @@ docs/videos/**/*.png
 scripts/shorts/remotion/node_modules/
 scripts/shorts/remotion/public/ep*/
 scripts/shorts/remotion/public/portraits/
+
+# 인물 기준 시트는 편 공용이라 버전 관리
+!docs/videos/characters/
+!docs/videos/characters/**
