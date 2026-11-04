@@ -41,7 +41,8 @@ const Badge: React.FC<{text: string}> = ({text}) => {
 	);
 };
 
-// 단어별 자막: 문장부호에서 줄을 끊어 실제 쉼과 자막 페이지를 맞춘다
+// 문구 자막: 문장부호(=실제 쉼)에서만 페이지를 나눈다. 단어별 색 바꾸기는 싱크가 어긋나 보여서 쓰지 않고,
+// 핵심어만 금색으로 고정한다. 페이지가 바뀌는 순간만 살짝 튀어 오른다(쉼 위치라 정확함).
 const Captions: React.FC<{words: Timing[string]['words']; emphasis: string[]}> = ({words, emphasis}) => {
 	const f = useCurrentFrame();
 	const {fps} = useVideoConfig();
@@ -50,22 +51,22 @@ const Captions: React.FC<{words: Timing[string]['words']; emphasis: string[]}> =
 	let cur: typeof words = [];
 	for (const w of words) {
 		cur.push(w);
-		const len = cur.reduce((a, x) => a + x.text.length, 0);
-		if (/[.?!,]$/.test(w.text) || len >= 12) { pages.push(cur); cur = []; }
+		if (/[.?!,]$/.test(w.text)) { pages.push(cur); cur = []; }
 	}
 	if (cur.length) pages.push(cur);
 	const page = pages.find((_, i) => now < (pages[i + 1]?.[0].start ?? 1e9)) ?? pages[pages.length - 1];
 	if (!page || now < page[0].start - 0.12) return null;
 	const pageStart = Math.round((page[0].start + LEAD) * fps);
 	const pop = spring({frame: f - pageStart, fps, config: {damping: 14, stiffness: 180}});
+	const chars = page.reduce((a, w) => a + w.text.length, 0);
+	const size = chars > 16 ? 64 : chars > 11 ? 72 : 80;
 	return (
-		<div style={{position: 'absolute', top: 1270, left: 60, right: 60, textAlign: 'center', fontFamily: FONT, transform: `scale(${0.85 + 0.15 * pop})`}}>
+		<div style={{position: 'absolute', top: 1250, left: 50, right: 50, textAlign: 'center', fontFamily: FONT, transform: `scale(${0.9 + 0.1 * pop})`}}>
 			{page.map((w, i) => {
-				const active = now >= w.start - 0.05 && now < w.end + 0.05;
 				const key = emphasis.some((e) => w.text.includes(e));
 				return (
-					<span key={i} style={{display: 'inline-block', margin: '0 10px', fontSize: active ? 86 : 78, fontWeight: 900, lineHeight: 1.25,
-						color: key || active ? GOLD : 'white', WebkitTextStroke: '10px black', paintOrder: 'stroke fill', textShadow: '0 6px 12px rgba(0,0,0,0.6)'}}>
+					<span key={i} style={{display: 'inline-block', margin: '0 9px', fontSize: size, fontWeight: 900, lineHeight: 1.25,
+						color: key ? GOLD : 'white', WebkitTextStroke: '10px black', paintOrder: 'stroke fill', textShadow: '0 6px 12px rgba(0,0,0,0.6)'}}>
 						{w.text.replace(/[,.]$/, '')}
 					</span>
 				);
