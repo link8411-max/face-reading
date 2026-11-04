@@ -46,6 +46,16 @@ export default function MbtiArticle({ type }: { type: MbtiType }) {
         </div>
       </header>
 
+      <section className={card}>
+        <h2 className={h2}>{type} 한눈에 보기</h2>
+        <p className="leading-relaxed">{p.nickname} {type}의 연애 궁합 1위는 {bestMatches(type, "love", 1)[0]}, 친구 궁합 1위는 {bestMatches(type, "friend", 1)[0]}, 직장 궁합 1위는 {bestMatches(type, "work", 1)[0]}예요.</p>
+        <ul className="mt-2 space-y-1 text-sm">
+          <li><b>어울리는 직업</b> · {p.jobs.slice(0, 3).map((j) => j.title).join(", ")}</li>
+          <li><b>잘 맞는 여행지</b> · {p.travel.domestic[0].place}, {p.travel.abroad[0].place}</li>
+        </ul>
+        <Link href={`/fortune/mbti?t=${slug}`} className="mt-3 inline-block text-sm text-accent underline underline-offset-2">오늘의 {type} 운세 보기</Link>
+      </section>
+
       <section className={card}><h2 className={h2}>{type}는 이런 사람</h2><p className="leading-relaxed">{p.summary}</p></section>
 
       <section className={card}>

@@ -17,10 +17,9 @@ export async function generateMetadata({ params }: { params: Promise<{ type: str
   const T = type.toUpperCase();
   if (!isMbti(T)) return {};
   const p = mbtiProfiles[T];
-  const withNickname = `${T} 특징·궁합 순위 | ${p.nickname} – 운명을 읽다`;
-  const title = withNickname.length <= 48 ? withNickname : `${T} 특징·궁합 순위 – 운명을 읽다`;
   const best = bestMatches(T, "love", 1)[0];
-  const description = `${T}와 연애로 잘 맞는 유형 1위는 ${best}. 연애 스타일과 어울리는 직업, 여행지까지 정리했어요.`;
+  const title = `${p.nickname} ${T} 특징·궁합 1위 ${best} – 운명을 읽다`;
+  const description = `${p.nickname} ${T}와 연애로 잘 맞는 유형 1위는 ${best}. 친구·직장 궁합과 어울리는 직업, 여행지까지 정리했어요.`;
   const url = `https://unse-ai.com/mbti/${type}`;
   return {
     title, description,

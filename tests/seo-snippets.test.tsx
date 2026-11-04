@@ -117,15 +117,15 @@ test('삼국지 장수 수 문구는 실제 장수 수와 같다 (옛 52명이 �
   expect(readFileSync('src/content/navigation.ts', 'utf8')).toContain(`${samgukCharacters.length}명`)
 })
 
-test('MBTI 16개: 제목은 "유형 특징·궁합 순위"로 시작, 별명 포함, 설명에 잘 맞는 유형 1위와 실제 1위 유형', async () => {
+test('MBTI 16개: 제목은 "별명 유형 특징·궁합 1위 <1위>"로 시작, 설명은 별명으로 시작', async () => {
   for (const T of MBTI_TYPES) {
     const m = await mbtiMeta({ params: Promise.resolve({ type: T.toLowerCase() }) })
     const title = String(m.title)
     const desc = String(m.description)
-    expect(title.startsWith(`${T} 특징·궁합 순위`), `${T}: ${title}`).toBe(true)
-    expect(title, `${T} 별명`).toContain(mbtiProfiles[T].nickname)
-    expect(desc, `${T} 설명`).toContain('잘 맞는 유형 1위')
-    expect(desc, `${T} 1위 유형`).toContain(bestMatches(T, 'love', 1)[0])
+    const best = bestMatches(T, 'love', 1)[0]
+    const nick = mbtiProfiles[T].nickname
+    expect(title.startsWith(`${nick} ${T} 특징·궁합 1위 ${best}`), `${T}: ${title}`).toBe(true)
+    expect(desc.startsWith(`${nick} ${T}와 연애로 잘 맞는 유형 1위는 ${best}`), `${T}: ${desc}`).toBe(true)
   }
 })
 
