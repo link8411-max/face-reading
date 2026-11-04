@@ -240,3 +240,20 @@
 .animate-shimmer {
   animation: shimmer 3s infinite;
 }
+
+/* 장수 월드컵: 대결이 바뀔 때 짧게 나타남(움직임 줄이기 설정이면 없음) */
+@media (prefers-reduced-motion: no-preference) {
+  .cup-in {
+    animation: cup-in 0.18s ease-out;
+  }
+}
+
+@keyframes cup-in {
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
+}

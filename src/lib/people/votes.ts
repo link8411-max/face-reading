@@ -5,7 +5,7 @@ import { kstDay, pairKey } from './keys'
 
 export { kstDay, pairKey }
 
-export type VoteKind = 'cheer' | 'duel' | 'scene' | 'verdict'
+export type VoteKind = 'cheer' | 'duel' | 'scene' | 'verdict' | 'cup_match' | 'cup_win'
 export interface VoteInput {
   kind: VoteKind
   target: string

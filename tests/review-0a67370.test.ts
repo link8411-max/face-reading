@@ -35,6 +35,8 @@ test('미리보기 이미지: 알 수 없는 매개변수·점수 형식은 거�
   expect(q('kind=face-match&a=cat&b=dog&rel=lover')).toBe(true)
   expect(q('kind=invite&key=cat&rel=friend')).toBe(true)
   expect(q('kind=team&ids=liubei-caocao')).toBe(true)
+  expect(q('kind=cup&board=warrior&key=lvbu')).toBe(true)
+  expect(q('kind=cup&board=warrior&key=lvbu&s=90')).toBe(false)
   expect(q('kind=animal&key=cat&s=87&zz=1')).toBe(false)
   expect(q('kind=animal&key=cat&s=87&s=88')).toBe(false)
   for (const s of ['0x57', '87.0', '1e2', '087', ' 87', '100', '5']) expect(q(`kind=animal&key=cat&s=${encodeURIComponent(s)}`), s).toBe(false)

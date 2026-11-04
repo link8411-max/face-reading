@@ -17,6 +17,7 @@ import { faceSlug, ogImageUrl, parseShared, shareUrl, SITE } from "@/lib/shareLi
 import { guardianFor } from "@/lib/samguk/guardian";
 import { hasPerson } from "@/content/samgukPeople/ids";
 import { Icon } from "@/components/icons";
+import CupWithLink from "@/components/cup/CupWithLink";
 import Link from "next/link";
 import { SamgukCharacter } from "@/lib/samgukDB";
 import { useScreenshot } from "@/hooks/useScreenshot";
@@ -235,6 +236,7 @@ export default function SamgukPage() {
                   <Link href={`/samguk/people/${result.character.id}#cheer`} className="underline underline-offset-2">내가 닮은 장수 응원하기</Link>
                 </p>
               )}
+              <CupWithLink id={result.character.id} label="닮은 장수로 월드컵 하기" wrapClassName="mt-2" />
               <div className="mt-2">
                 <CoupangBanner subId="samguk" />
               </div>

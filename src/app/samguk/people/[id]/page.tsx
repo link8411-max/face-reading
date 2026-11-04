@@ -7,6 +7,7 @@ import CheerButton from "@/components/people/CheerButton";
 import RelationMap from "@/components/people/RelationMap";
 import SourceChip from "@/components/people/SourceChip";
 import VotePoll from "@/components/people/VotePoll";
+import CupWithLink from "@/components/cup/CupWithLink";
 import { VERDICTS } from "@/content/samgukPeople/types";
 import { pairKey } from "@/lib/people/keys";
 import { PEOPLE_IDS, getPerson } from "@/content/samgukPeople";
@@ -240,6 +241,7 @@ export default async function PersonPage({ params }: Props) {
               },
             }}
           />
+          <CupWithLink id={id} label="이 장수로 월드컵 하기" wrapClassName="mt-3" />
         </section>
         <section id="scene-vote" className="mt-8">
           <VotePoll
