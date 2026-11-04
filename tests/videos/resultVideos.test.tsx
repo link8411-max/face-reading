@@ -61,6 +61,13 @@ describe('ResultVideoBlock', () => {
     expect(html).toContain('/samguk/people/xiaohoudun')
   })
 
+  it('서버 렌더에는 조회수·NEW 라벨이 없다(마운트 뒤 표시, 하이드레이션 안전)', () => {
+    const html = renderToStaticMarkup(<ResultVideoBlock name="하후돈" video={{ ...video, views: 1008 }} faces={[]} />)
+    expect(html).not.toContain('조회수')
+    expect(html).not.toContain('NEW')
+    expect(html).not.toContain('#FBF6F1')
+  })
+
   it('영상 없으면 카드 없이 엮인 장수만', () => {
     const html = renderToStaticMarkup(<ResultVideoBlock name="하후돈" personId="xiaohoudun" video={null} faces={faces} />)
     expect(html).not.toContain('1분 영상')

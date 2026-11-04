@@ -1,7 +1,8 @@
 'use client'
 
 import { track } from '@/lib/analytics'
-import { gaVideoId, isVideoId, thumbUrl, viewsLabel } from '@/lib/videos/format'
+import VideoBadgeText from './VideoBadgeText'
+import { gaVideoId, isVideoId, thumbUrl } from '@/lib/videos/format'
 import { PEOPLE_ID_LIST } from '@/content/samgukPeople/ids'
 import type { SgTile } from '@/lib/videos/forPerson'
 import type { Video } from '@/lib/videos/types'
@@ -32,7 +33,6 @@ export default function ResultVideoBlock({
 }: { name: string; personId?: string; video: Video | null; faces: SgTile[]; who?: '내' | '친구' }) {
   const v = video && isVideoId(video.id) ? video : null
   if (!v && faces.length === 0) return null
-  const views = v ? viewsLabel(v, new Date()) : null
   return (
     <div className="no-screenshot mt-3 flex flex-col gap-3">
       {v && (
@@ -46,14 +46,14 @@ export default function ResultVideoBlock({
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img src={thumbUrl(v.id)} alt={`${name} 영상 썸네일`} width={112} height={199} loading="lazy" className="h-full w-full object-cover" />
             <span className="pointer-events-none absolute left-1/2 top-1/2 flex h-11 w-11 -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-full bg-ink/80">
-              <svg width="18" height="18" viewBox="0 0 24 24" aria-hidden="true"><path d="M8 5v14l11-7z" fill="#FBF6F1" /></svg>
+              <svg width="18" height="18" viewBox="0 0 24 24" aria-hidden="true" className="text-paper"><path d="M8 5v14l11-7z" fill="currentColor" /></svg>
             </span>
           </a>
           <div className="flex min-w-0 flex-col justify-between gap-2">
             <div className="flex flex-col gap-1.5">
               <span className="text-xs font-bold text-accent">{who} 장수 이야기, 1분 영상</span>
               <span className="font-serif text-[17px] font-bold leading-snug">{v.title}</span>
-              {views && <span className="text-xs text-muted">{views}</span>}
+              <VideoBadgeText video={v} className="text-xs text-muted" newClassName="text-xs font-bold text-accent" />
             </div>
             <a
               href={`/samguk/videos?v=${v.id}`}

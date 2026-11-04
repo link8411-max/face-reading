@@ -1,4 +1,5 @@
 import Link from 'next/link'
+import VideoBadgeText from './VideoBadgeText'
 import { portraitSrc } from '@/lib/people/portrait'
 import { isVideoId } from '@/lib/videos/format'
 import type { RelatedVideo } from '@/lib/videos/forPerson'
@@ -17,7 +18,7 @@ export default function RelatedVideosRow({ items }: { items: RelatedVideo[] }) {
             <Link key={i.video.id} href={`/samguk/videos?v=${i.video.id}`} className="flex w-[150px] shrink-0 flex-col gap-1.5">
               <span className="relative block h-[266px] w-[150px] overflow-hidden rounded-2xl bg-navy-game">
                 {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img src={i.video.thumbnail} alt={i.video.title} loading="lazy" className="h-full w-full object-cover" />
+                <img src={i.video.thumbnail} alt="" loading="lazy" className="h-full w-full object-cover" />
                 <span className="absolute bottom-2 left-2 flex items-center gap-1 rounded-full bg-paper/95 py-0.5 pl-0.5 pr-2 text-[11px] text-ink">
                   {face ? (
                     // eslint-disable-next-line @next/next/no-img-element
@@ -29,7 +30,7 @@ export default function RelatedVideosRow({ items }: { items: RelatedVideo[] }) {
                 </span>
               </span>
               <span className="text-[13px] font-bold leading-snug text-ink">{i.video.title}</span>
-              {i.video.views !== null && <span className="text-[11px] text-muted">조회수 {i.video.views.toLocaleString('en-US')}회</span>}
+              <VideoBadgeText video={i.video} className="text-[11px] text-muted" newClassName="text-[11px] font-bold text-accent" />
             </Link>
           )
         })}
