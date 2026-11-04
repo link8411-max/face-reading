@@ -30,6 +30,7 @@ test('판 고르기: 판 카드 4개, 집계가 없으면 판 수 문구 없음,
   const boardCards = page.locator('main ul a[href^="/samguk/cup/"]')
   await expect(boardCards).toHaveCount(4)
   await expect(page.locator('body')).not.toContainText('지금까지')
+  await expect(page.getByText('추천 상품', { exact: true })).toBeVisible()
   await boardCards.filter({ hasText: '최강 무장' }).click()
   await expect(page).toHaveURL(/\/samguk\/cup\/warrior$/)
   await expect(page.getByText('둘 중 누가 더 끌리나요?')).toBeVisible()
@@ -46,6 +47,9 @@ test('최강 무장 한 판: 15번 고르면 끝 화면, 열전 링크, cup_star
   await expect(page.getByRole('heading', { name: '나의 최애 장수' })).toBeVisible()
   await expect(page.getByRole('link', { name: /열전 보기$/ })).toHaveAttribute('href', /^\/samguk\/people\/[a-z]+$/)
   await expect(page.getByRole('link', { name: '다른 판 하기' })).toHaveAttribute('href', '/samguk/cup')
+  const other = await page.getByRole('link', { name: '다른 판 하기' }).boundingBox()
+  const coupang = await page.getByText('추천 상품', { exact: true }).boundingBox()
+  expect(other!.y).toBeLessThan(coupang!.y)
   const ev = await events(page)
   expect(ev.filter((e) => e[0] === 'cup_start')).toEqual([['cup_start', { result_id: 'warrior' }]])
   const ends = ev.filter((e) => e[0] === 'cup_end')
@@ -104,6 +108,9 @@ test('공유 착지: 나도 해보기와 noindex, 후보가 아닌 조합은 월
 
 test('375px: 가로 스크롤 없음, 카드 버튼 44px 이상', async ({ page }) => {
   await page.setViewportSize({ width: 375, height: 812 })
+  await page.goto('/samguk/cup')
+  await expect(page.getByText('추천 상품', { exact: true })).toBeVisible()
+  expect(await page.evaluate(() => document.documentElement.scrollWidth - document.documentElement.clientWidth)).toBeLessThanOrEqual(0)
   await page.goto('/samguk/cup/warrior')
   await expect(cards(page)).toHaveCount(2)
   const overflow = await page.evaluate(() => document.documentElement.scrollWidth - document.documentElement.clientWidth)

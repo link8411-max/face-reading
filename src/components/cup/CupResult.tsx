@@ -1,6 +1,7 @@
 'use client'
 
 import Link from 'next/link'
+import CoupangBanner from '@/components/CoupangBanner'
 import { Icon } from '@/components/icons'
 import { useResultShare } from '@/hooks/useResultShare'
 import type { BoardKey } from '@/lib/cup/boards'
@@ -71,6 +72,7 @@ export default function CupResult({ board, title, champion, path, top5 }: Props)
           다른 판 하기
         </Link>
       </div>
+      <CoupangBanner subId={`cup-${board}`} />
       {top5.length > 0 && (
         <section data-testid="cup-top5" className="mt-8 text-left">
           <h3 className="font-serif text-lg font-bold">{title} 우승 순위</h3>

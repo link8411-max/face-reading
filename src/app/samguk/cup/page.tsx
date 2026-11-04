@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { BOARDS, BOARD_KEYS, boardPool, type BoardKey } from "@/lib/cup/boards";
+import CoupangBanner from "@/components/CoupangBanner";
 import { characterById } from "@/lib/people/characters";
 import { portraitSrc } from "@/lib/people/portrait";
 import { readCupSummary, storeConfig } from "@/lib/people/store";
@@ -81,6 +82,7 @@ export default async function CupPickerPage() {
             );
           })}
         </ul>
+        <CoupangBanner subId="cup-hub" />
 
         <div className="mt-6 flex flex-col gap-2">
           <Link href="/samguk/cup/ranking" className="flex h-[52px] items-center justify-center rounded-full border border-line bg-card-2 text-base font-medium">

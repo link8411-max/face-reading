@@ -24,6 +24,7 @@ test('고객 관심 기반 추천 배너 + 페이지별 subId + 수수료 고지
 test.each([
   ['src/app/page.tsx', 'home'], ['src/app/face2/page.tsx', 'face'], ['src/app/animal/page.tsx', 'animal'],
   ['src/app/samguk/(match)/page.tsx', 'samguk'], ['src/app/fortune/FortuneClient.tsx', 'fortune'], ['src/app/fortune/daily/page.tsx', 'daily'],
+  ['src/app/samguk/cup/page.tsx', 'cup-hub'],
 ])('%s 에 배너가 있다', (file, subId) => {
   expect(readFileSync(file, 'utf8')).toContain(`<CoupangBanner subId="${subId}"`)
 })
@@ -33,6 +34,7 @@ test('GA 위치 값: subId의 하이픈을 밑줄로 (GA 개인정보 필터 통
   expect(gaSlot('mbti-infp')).toBe('mbti_infp')
   expect(gaSlot('face-match')).toBe('face_match')
   expect(gaSlot('home')).toBe('home')
+  expect(gaSlot('cup-strategist')).toBe('cup_strategist')
 })
 
 import { isDisplayedMessage, coupangHomeUrl, fallbackLinks, FALLBACK_DELAY_MS } from '@/components/CoupangBanner'

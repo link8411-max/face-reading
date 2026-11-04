@@ -54,6 +54,12 @@ test('판 고르기: 판 카드 4개와 실제 판 수만 적는다', async () =
   expect(html).not.toContain('지금까지 0판')
   expect(html).toContain('href="/samguk/cup/ranking"')
   expect(html).toContain('href="/samguk/people"')
+  expect(html).toContain('subId=cup-hub')
+  const lastBoard = html.indexOf('href="/samguk/cup/random"')
+  const banner = html.indexOf('추천 상품')
+  const ranking = html.indexOf('href="/samguk/cup/ranking"')
+  expect(lastBoard).toBeLessThan(banner)
+  expect(banner).toBeLessThan(ranking)
 })
 
 test('판 고르기: 집계를 못 읽으면 지금까지 문구가 없다', async () => {

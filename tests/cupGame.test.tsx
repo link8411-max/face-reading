@@ -54,6 +54,7 @@ test('첫 화면: 질문과 진행 표시', async () => {
   setup()
   expect(await screen.findByText('둘 중 누가 더 끌리나요?')).toBeTruthy()
   expect(screen.getByText('테스트 판 8강 · 1/4')).toBeTruthy()
+  expect(screen.queryByText('추천 상품')).toBeNull()
   expect(matchCards()).toHaveLength(2)
   expect(track).toHaveBeenCalledWith('cup_start', { result_id: 'warrior' })
 })
@@ -215,6 +216,13 @@ test('top5가 있으면 순위와 전체 순위 보기가 있다', async () => {
   await screen.findByText('나의 최애 장수')
   expect(screen.getByTestId('cup-top5').textContent).toContain('장수a3')
   expect(screen.getByRole('link', { name: '전체 순위 보기' }).getAttribute('href')).toBe('/samguk/cup/ranking')
+  const banner = document.querySelector('iframe[title="쿠팡 추천 상품"]')
+  expect(banner?.getAttribute('src')).toContain('subId=cup-warrior')
+  const other = screen.getByRole('link', { name: '다른 판 하기' })
+  const top5 = screen.getByTestId('cup-top5')
+  const label = screen.getByText('추천 상품')
+  expect(other.compareDocumentPosition(label) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy()
+  expect(label.compareDocumentPosition(top5) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy()
 })
 
 test('클라이언트 월드컵 컴포넌트는 열전 본문·서버 카드 모듈을 번들에 넣지 않는다', () => {
