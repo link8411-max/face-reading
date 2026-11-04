@@ -10,6 +10,7 @@ import TestStart from "@/components/test/TestStart";
 import SamgukGameCard from "@/components/samguk/SamgukGameCard";
 import ResultActions from "@/components/result/ResultActions";
 import { duelCta } from "@/lib/duel/cta";
+import ResultVideos from "@/components/videos/ResultVideos";
 import NextTests from "@/components/result/NextTests";
 import { useHandedPhoto } from "@/hooks/useHandedPhoto";
 import { useResultShare } from "@/hooks/useResultShare";
@@ -240,6 +241,7 @@ export default function SamgukPage() {
               <div className="mt-2">
                 <CoupangBanner subId="samguk" />
               </div>
+              <ResultVideos id={result.character.id} name={result.character.name} />
               {image && <NextTests current="samguk" image={image} />}
 
               <details className="group mt-4 bg-white border border-line rounded-[22px] px-5 py-4">

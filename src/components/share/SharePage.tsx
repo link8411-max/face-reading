@@ -7,6 +7,9 @@ import { samgukCharacters } from "@/lib/samgukDB";
 import { getPerson } from "@/content/samgukPeople";
 import { MoonDeco, SmileFace } from "@/components/icons";
 import CoupangBanner from "@/components/CoupangBanner";
+import ResultVideoBlock from "@/components/videos/ResultVideoBlock";
+import { getChannelVideos } from "@/lib/videos/fetch";
+import { relatedFaces, videosForPerson } from "@/lib/videos/forPerson";
 import SharedLandingTracker from "./SharedLandingTracker";
 
 type P = Promise<{ key: string }>;
@@ -42,6 +45,7 @@ export async function SharePage({ kind, params, searchParams }: { kind: ShareKin
   const { key } = await params;
   const r = parseShared(kind, key, one((await searchParams).s));
   if (!r) redirect(kind === "face" ? "/face2" : `/${kind}`);
+  const samguk = kind === "samguk" ? { video: videosForPerson(await getChannelVideos(), r.key).own[0] ?? null, faces: relatedFaces(r.key) } : null;
   const scoreLabel = r.score !== null ? `닮음 ${r.score}%` : null;
   return (
     <main className="max-w-lg mx-auto px-[22px] pt-8 pb-10">
@@ -71,6 +75,7 @@ export async function SharePage({ kind, params, searchParams }: { kind: ShareKin
       )}
       <p className="mt-3 text-xs text-center text-muted">사진은 내 폰 안에서만 보고 바로 지워요</p>
       <CoupangBanner subId={`share-${kind}`} />
+      {samguk && <ResultVideoBlock name={r.name} personId={r.key} video={samguk.video} faces={samguk.faces} who="친구" />}
     </main>
   );
 }
