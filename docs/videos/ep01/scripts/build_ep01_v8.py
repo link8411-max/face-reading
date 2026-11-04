@@ -22,7 +22,8 @@ def esc(t):
 
 TITLE = (f"drawbox=x=0:y=120:w=iw:h=150:color=black@0.45:t=fill,"
          f"drawtext=fontfile='{FONT}':text='적벽대전':fontsize=76:fontcolor=0xE8B547:borderw=4:bordercolor=black:x=(w-text_w)/2:y=135,"
-         f"drawtext=fontfile='{FONT}':text='{esc('조조는 왜 불탔을까?')}':fontsize=42:fontcolor=white:x=(w-text_w)/2:y=222")
+         f"drawtext=fontfile='{FONT}':text='{esc('조조는 왜 불탔을까?')}':fontsize=42:fontcolor=white:x=(w-text_w)/2:y=222,"
+         f"drawtext=fontfile='{FONT}':text='unse-ai.com':fontsize=34:fontcolor=white@0.75:borderw=3:bordercolor=black@0.6:x=(w-text_w)/2:y=290")
 
 def captions(groups, d, delay=0.3, y0=1360, size=58, gap=80):
     """자막 묶음을 글자 수 비율로 해설 시간에 나눠 차례로 보여 준다."""
@@ -103,21 +104,26 @@ def seg_end3(out, nar, groups):
     return d
 
 def seg_end(out, nar):
+    """끝 화면: 적벽의 책사 넷 + 삼국지 장수 월드컵 안내."""
     d = round(dur(nar) + 1.4, 2)
-    cap = lambda t, y, s, col="white": (f"drawtext=fontfile='{FONT}':text='{esc(t)}':fontsize={s}:fontcolor={col}:borderw=5:"
-                                        f"bordercolor=black@0.85:x=(w-text_w)/2:y={y}")
-    fc = ("[1:v]scale=440:440:flags=neighbor[p1];[2:v]scale=440:440:flags=neighbor[p2];"
-          "[0:v][p1]overlay=80:470[t1];[t1][p2]overlay=560:470,"
-          + cap("조조", 925, 54, "0xE8B547") .replace("x=(w-text_w)/2", "x=300-text_w/2") + ","
-          + cap("제갈량", 925, 54, "0xE8B547").replace("x=(w-text_w)/2", "x=780-text_w/2") + ","
-          + cap("여러분은 조조일까요, 제갈량일까요?", 1120, 62) + ","
-          + cap("얼굴 사진 한 장으로 확인하기", 1225, 50) + ","
-          + cap("unse-ai.com/samguk", 1380, 78, "0xE8B547")
-          + f",fade=t=in:st=0:d=0.3,format=yuv420p[v];"
-          + f"[3:a]adelay=300|300,apad,afade=t=in:d=0.2,afade=t=out:st={d-0.5:.2f}:d=0.5[a]")
+    cap = lambda t, y, s, col="white", x="(w-text_w)/2": (f"drawtext=fontfile='{FONT}':text='{esc(t)}':fontsize={s}:fontcolor={col}:borderw=5:"
+                                                         f"bordercolor=black@0.85:x={x}:y={y}")
+    names = ["제갈량", "주유", "방통", "조조"]
+    pos = [(150, 360), (570, 360), (150, 800), (570, 800)]
+    fc = "".join(f"[{i+1}:v]scale=360:360:flags=neighbor[p{i}];" for i in range(4))
+    prev = "0:v"
+    for i, (x, y) in enumerate(pos):
+        fc += f"[{prev}][p{i}]overlay={x}:{y}[o{i}];"
+        prev = f"o{i}"
+    fc += f"[{prev}]" + ",".join(cap(n, y + 370, 46, "0xE8B547", f"{x + 180}-text_w/2") for n, (x, y) in zip(names, pos))
+    fc += ("," + cap("적벽의 책사 중 너의 최애는?", 1290, 66) + ","
+           + cap("운명을 읽다 · 삼국지 장수 월드컵", 1400, 46) + ","
+           + cap("unse-ai.com", 1500, 78, "0xE8B547")
+           + f",fade=t=in:st=0:d=0.3,format=yuv420p[v];"
+           + f"[5:a]adelay=300|300,apad,afade=t=in:d=0.2,afade=t=out:st={d-0.5:.2f}:d=0.5[a]")
+    ins = sum((["-i", os.path.join(PORTRAITS, f"{n}.jpg")] for n in names), [])
     subprocess.run([FF, "-y", "-loglevel", "error", "-f", "lavfi", "-i", f"color=c=0x23263A:s=1080x1920:d={d}:r={FPS}",
-                    "-i", os.path.join(PORTRAITS, "조조.jpg"), "-i", os.path.join(PORTRAITS, "제갈량.jpg"), "-i", nar,
-                    "-filter_complex", fc, "-map", "[v]", "-map", "[a]", "-t", str(d), *ENC, out], check=True)
+                    *ins, "-i", nar, "-filter_complex", fc, "-map", "[v]", "-map", "[a]", "-t", str(d), *ENC, out], check=True)
     return d
 
 nar = lambda i: os.path.join(V, f"nar_{i}.wav")
@@ -131,7 +137,7 @@ plan = [
          ["마침 형주의 주인 유표가", "세상을 떠납니다."], ["조조는 이때다 하고,", "대군을 몰아 남쪽으로 내려오죠."]], 12.4, 4.6)),
     ("s04", lambda o: seg_clips(o, [("clip_yz.mp4", FULL)], nar("yz"),
         [["그런데요, 그 한 해 전."], ["제갈량은 유비에게", "이런 그림을 보여 줬어요."],
-         ["“형주와 익주를 얻고,", "손권과 손잡아 조조와 맞서십시오.”"], ["천하를 셋으로", "나누자는 거였죠."]])),
+         ["형주와 익주를 얻고, 손권과 손잡아", "조조와 맞서자는 계획이에요."], ["천하를 셋으로", "나누자는 거였죠."]])),
     ("s05", lambda o: seg_clips(o, [("clip3.mp4", FULL)], old(2),
         [["그런데요, 여기서", "첫 번째 문제가 터집니다."], ["북쪽 병사들은", "배를 탈 줄 몰랐어요."], ["배는 흔들리지, 속은 뒤집히지,", "거기다 병까지 돕니다."]])),
     ("s06", lambda o: seg_clips(o, [("clip_pang.mp4", 5.6), ("clip4.mp4", FULL)], nar("chain"),
@@ -141,7 +147,7 @@ plan = [
     ("s09", lambda o: seg_clips(o, [("clip7b.mp4", FULL)], nar("wind"),
         [["그런데 또 문제가 생깁니다.", "겨울 장강엔 북서풍이 불어요."], ["불을 놓으면,", "오히려 우리 쪽이 탑니다."], ["연의에서는 주유가", "걱정 끝에 쓰러지죠."]])),
     ("s10", lambda o: seg_clips(o, [("clip8b.mp4", FULL)], nar("altar"),
-        [["연의에서는 제갈량이", "제단을 쌓고 바람을 부릅니다."], ["실제 기록에도 그날", "동남풍이 거셌다고 나와요."]])),
+        [["연의에서는 제갈량이", "제단을 쌓고 바람을 부릅니다."], ["옛 기록에도 그날", "동남풍이 거셌다고 나와요."]])),
     ("s11", lambda o: seg_clips(o, [("clip6.mp4", FULL)], nar("ram"),
         [["황개는 항복하는 척 다가가,", "불붙인 배로 그대로 들이받죠!"]])),
     ("s12", lambda o: seg_end3(o, nar("end3"),
@@ -167,5 +173,5 @@ final = os.path.join(W, "ep01-chibi-v8.mp4")
 subprocess.run(args + ["-filter_complex", fc, "-map", "[v]", "-map", "[a]", "-c:v", "libx264", "-preset", "veryfast", "-crf", "20",
                        "-c:a", "aac", "-b:a", "192k", final], check=True)
 small = os.path.join(EP, "ep01-chibi-v8-small.mp4")
-subprocess.run([FF, "-y", "-loglevel", "error", "-i", final, "-c:v", "libx264", "-preset", "veryfast", "-crf", "28", "-c:a", "copy", small], check=True)
+subprocess.run([FF, "-y", "-loglevel", "error", "-i", final, "-c:v", "libx264", "-preset", "slow", "-crf", "30", "-c:a", "aac", "-b:a", "128k", small], check=True)
 print(final, dur(final), os.path.getsize(small) / 1e6, "MB")
