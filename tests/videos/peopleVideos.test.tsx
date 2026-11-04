@@ -62,6 +62,16 @@ describe('열전 영상 칸', () => {
     expect(card).toContain('/samguk/videos')
   })
 
+  it('조조: 첫 줄에 본인 영상 두 편 모두, VideoObject도 두 개', async () => {
+    const html = await render('caocao')
+    const row = html.slice(html.indexOf('조조 이야기, 1분 영상'), html.indexOf('ads-partners.coupang.com'))
+    expect(row).toContain('R-lrShfZU7s')
+    expect(row).toContain('NejqojdriBg')
+    expect(row).toContain('data-person-videos-row')
+    expect(row).toContain('overflow-x-auto')
+    expect(html.match(/"@type":"VideoObject"/g)).toHaveLength(2)
+  })
+
   it('VideoObject JSON-LD', async () => {
     expect(await render('xiaohoudun')).toContain('"@type":"VideoObject"')
   })

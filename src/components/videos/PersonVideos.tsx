@@ -3,24 +3,39 @@ import VideoPlayer, { SubscribeLink } from './VideoPlayer'
 import { PEOPLE_ID_LIST } from '@/content/samgukPeople/ids'
 import { characterById } from '@/lib/people/characters'
 import { portraitSrc } from '@/lib/people/portrait'
+import { isVideoId } from '@/lib/videos/format'
 import type { Video } from '@/lib/videos/types'
 
 const PEOPLE_WITH_PAGE = new Set<string>(PEOPLE_ID_LIST)
 
 /** 열전 첫 줄: 이 인물이 나오는 영상 중 첫 편을 큰 카드로. 비면 null. */
 export default function PersonVideos({ id, name, videos }: { id: string; name: string; videos: Video[] }) {
-  const video = videos[0]
+  const list = videos.filter((v) => isVideoId(v.id))
+  const video = list[0]
   if (!video) return null
 
-  const others = video.people
+  const others = [...new Set(list.flatMap((v) => v.people))]
     .filter((p) => p !== id && PEOPLE_WITH_PAGE.has(p))
     .map((p) => ({ id: p, name: characterById(p)?.name ?? p, portrait: portraitSrc(p) }))
 
   return (
     <section className="mt-6 flex flex-col gap-2.5">
       <h2 className="font-serif font-bold text-lg">{name} 이야기, 1분 영상</h2>
-      <VideoPlayer video={video} slot="people" className="mx-auto max-h-[560px] max-w-[315px] !rounded-[22px]" />
-      <p className="text-[15px] font-bold leading-snug">{video.title}</p>
+      {list.length === 1 ? (
+        <>
+          <VideoPlayer video={video} slot="people" className="mx-auto max-h-[560px] max-w-[315px] !rounded-[22px]" />
+          <p className="text-[15px] font-bold leading-snug">{video.title}</p>
+        </>
+      ) : (
+        <div data-person-videos-row className="-mx-[22px] flex snap-x snap-mandatory gap-2.5 overflow-x-auto px-[22px] pb-1">
+          {list.map((v) => (
+            <div key={v.id} className="flex w-[240px] shrink-0 snap-start flex-col gap-2">
+              <VideoPlayer video={v} slot="people" className="!rounded-[22px]" />
+              <p className="text-[15px] font-bold leading-snug">{v.title}</p>
+            </div>
+          ))}
+        </div>
+      )}
       {others.length > 0 && (
         <div className="flex flex-wrap items-center gap-1.5">
           <span className="text-xs text-muted">함께 나오는 인물</span>

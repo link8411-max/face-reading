@@ -75,7 +75,7 @@ export default async function PersonPage({ params }: Props) {
   const related = relationsOf(id);
   const channelVideos = await getChannelVideos();
   const { own, related: relatedVideos } = videosForPerson(channelVideos, id);
-  const bigVideo = own[0] && isVideoId(own[0].id) ? own[0] : null;
+  const ownVideos = own.filter((v) => isVideoId(v.id));
   const groups = sanggwando(id, channelVideos);
 
   // 투표 위젯에 넘길 값 (서버에서 계산해 평범한 데이터로 보낸다)
@@ -112,8 +112,8 @@ export default async function PersonPage({ params }: Props) {
     <div className="min-h-screen bg-paper text-ink">
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(person) }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumb) }} />
-      {bigVideo && (
-        <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify({ "@context": "https://schema.org", ...videoObjectJsonLd(bigVideo) }).replace(/</g, "\\u003c") }} />
+      {ownVideos.length > 0 && (
+        <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(ownVideos.map((v) => ({ "@context": "https://schema.org", ...videoObjectJsonLd(v) }))).replace(/</g, "\\u003c") }} />
       )}
       <main className="mx-auto px-[22px] max-w-lg pb-12">
         <nav className="pt-5 text-sm text-muted" aria-label="경로">
