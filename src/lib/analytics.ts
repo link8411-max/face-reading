@@ -28,6 +28,10 @@ type Events = {
   // 장수 월드컵. cup_start는 판 키(warrior), cup_end는 `<판>_<우승 id>`(warrior_guanyu). 값은 24자 이하(테스트로 전 조합 확인)
   cup_start: { result_id: string }
   cup_end: { result_id: string }
+  // 쇼츠 영상. result_id는 `-`를 `_`로 바꾼 영상 id, slot은 people·result·videos·hub
+  video_play: { slot: string; result_id: string }
+  video_subscribe_click: { slot: string }
+  video_test_click: { slot: string }
 }
 
 const ALLOWED_KEYS = new Set(['test_name', 'result_id', 'method', 'slot', 'keyword'])

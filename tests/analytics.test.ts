@@ -95,3 +95,14 @@ test('GA가 아직 준비 전이면 이벤트를 모아 두었다가 준비되�
     vi.useRealTimers()
   }
 })
+
+test('영상 이벤트는 slot·result_id를 그대로 보낸다', () => {
+  track('video_play', { slot: 'people', result_id: 'R_lrShfZU7s' })
+  track('video_subscribe_click', { slot: 'hub' })
+  track('video_test_click', { slot: 'videos' })
+  expect(calls.slice(-3)).toEqual([
+    ['event', 'video_play', { slot: 'people', result_id: 'R_lrShfZU7s' }],
+    ['event', 'video_subscribe_click', { slot: 'hub' }],
+    ['event', 'video_test_click', { slot: 'videos' }],
+  ])
+})
