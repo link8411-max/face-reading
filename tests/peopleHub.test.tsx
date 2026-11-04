@@ -1,3 +1,4 @@
+vi.mock('@/lib/videos/fetch', () => ({ getChannelVideos: async () => [] }))
 import { renderToStaticMarkup } from 'react-dom/server'
 import Hub, { generateMetadata as hubMeta } from '@/app/samguk/people/page'
 import Ranking, { generateMetadata as rankMeta, revalidate } from '@/app/samguk/people/ranking/page'
