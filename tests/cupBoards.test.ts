@@ -2,6 +2,7 @@ import { BOARD_KEYS, boardPool, bracketSize, drawEntrants, drawFromPool, isBoard
 import { cupCards, meetNotes } from '@/lib/cup/cards'
 import { createRng } from '@/lib/duel/rng'
 import { samgukCharacters } from '@/lib/samgukDB'
+import { PEOPLE } from '@/content/samgukPeople'
 import { pairKey } from '@/lib/people/keys'
 
 const portrait = new Set(samgukCharacters.map((c) => c.id))
@@ -60,6 +61,16 @@ test('카드: 첫 문장과 funFacts, 초상화 경로', () => {
   expect(c.line.length).toBeGreaterThan(10)
   expect(c.facts.length).toBeGreaterThanOrEqual(2)
   expect(c.portrait).toMatch(/^\/images\/samguk\//)
+})
+test('카드: 그 장수 이름이 들어간 이야기만(없으면 전부)', () => {
+  const [z] = cupCards(['zhangfei'])
+  expect(z.facts.length).toBeGreaterThanOrEqual(1)
+  for (const f of z.facts) expect(f).toContain('장비')
+  expect(z.facts).toEqual(PEOPLE.zhangfei.funFacts.filter((f) => f.includes('장비')))
+  // 이름이 들어간 이야기가 하나도 없는 장수는 전부 보인다
+  expect(PEOPLE.sunquan.funFacts.some((f) => f.includes('손권'))).toBe(false)
+  const [s] = cupCards(['sunquan'])
+  expect(s.facts).toEqual([...PEOPLE.sunquan.funFacts])
 })
 test('만난 장면: 관계로 이어진 쌍만', () => {
   const m = meetNotes(['liubei', 'guanyu', 'diaochan'])

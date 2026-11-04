@@ -8,7 +8,7 @@ import { readCupSummary, storeConfig } from "@/lib/people/store";
 const SITE = "https://unse-ai.com";
 const URL = `${SITE}/samguk/cup`;
 const TITLE = "삼국지 장수 월드컵 | 최강 무장·책사·여인 16강 – 운명을 읽다";
-const DESCRIPTION = "최강 무장·최고 책사·삼국지 여인·전체 무작위 16강. 장수마다 열전에서 뽑은 짧은 이야기를 읽고 골라 보세요.";
+const DESCRIPTION = "최강 무장·최고 책사·삼국지 여인·전체 무작위 월드컵. 장수마다 열전에서 뽑은 짧은 이야기를 읽고 골라 보세요.";
 const OG = `/api/og?title=${encodeURIComponent("삼국지 장수 월드컵")}&subtitle=${encodeURIComponent("나의 최애 장수는?")}`;
 
 export const revalidate = 3600;
@@ -52,7 +52,7 @@ export default async function CupPickerPage() {
       <main className="mx-auto max-w-lg px-[22px] pt-6 pb-12">
         <p className="text-sm font-medium text-accent">삼국지 장수 월드컵</p>
         <h1 className="mt-2 font-serif text-[27px] font-bold leading-[1.3] break-keep">누가 나의 최애 장수일까요?</h1>
-        <p className="mt-2 leading-relaxed text-muted break-keep">16명 중 한 명을 고를 때마다 짧은 이야기를 읽어요</p>
+        <p className="mt-2 leading-relaxed text-muted break-keep">두 장수 중 한 명을 고를 때마다 짧은 이야기를 읽어요</p>
 
         <ul className="mt-6 space-y-3">
           {BOARD_KEYS.map((board) => {

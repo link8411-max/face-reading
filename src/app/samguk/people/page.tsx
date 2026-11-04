@@ -69,7 +69,7 @@ export default async function PeopleHubPage() {
           <Link href="/samguk/cup" className="col-span-2 rounded-[22px] border border-line bg-white px-4 py-4 hover:border-accent/50 transition">
             <Icon name="shield" className="text-accent" />
             <span className="mt-2 block font-bold">장수 월드컵</span>
-            <span className="mt-0.5 block text-xs text-muted">이야기를 읽고 고르는 16강</span>
+            <span className="mt-0.5 block text-xs text-muted">이야기를 읽고 고르는 장수 토너먼트</span>
           </Link>
         </nav>
 

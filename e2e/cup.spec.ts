@@ -17,6 +17,8 @@ async function playMatches(page: Page, count: number) {
     await expect(cards(page)).toHaveCount(2)
     await cards(page).first().click()
     await expect(page.getByTestId('ratio')).toHaveText(FAIL_COPY)
+    // 마지막 대결만 버튼이 '결과 보기', 그 전은 '다음 대결'
+    await expect(nextButton(page)).toHaveText(i === count - 1 ? '결과 보기' : '다음 대결')
     await nextButton(page).click()
   }
 }
@@ -53,7 +55,7 @@ test('최강 무장 한 판: 15번 고르면 끝 화면, 열전 링크, cup_star
   expect(realErrors(errors)).toEqual([])
 })
 
-test('같은 대결에서 카드를 두 번 눌러도 저장 요청은 한 번', async ({ page }) => {
+test('같은 대결에서 카드를 세 번 눌러도 저장 요청은 한 번', async ({ page }) => {
   const posts: string[] = []
   page.on('request', (r) => {
     if (r.url().includes('/api/people/cup')) posts.push(r.method())
@@ -64,7 +66,6 @@ test('같은 대결에서 카드를 두 번 눌러도 저장 요청은 한 번',
   await cards(page).last().click()
   await cards(page).first().click()
   await expect(page.getByTestId('ratio')).toHaveText(FAIL_COPY)
-  await page.waitForTimeout(500)
   expect(posts).toEqual(['POST'])
 })
 

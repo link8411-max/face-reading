@@ -40,7 +40,7 @@ export const CATEGORIES: Category[] = [
       { title: '우리 팀 삼국지', desc: '팀원 얼굴로 보는 세력과 역할', href: '/samguk/team', thumb: { icon: 'users', bg: '#E8EEE6' }, chip: '2~6명' },
       { title: '삼국지 일기토', desc: '관우·여포와 벌이는 로그라이크 일기토', href: '/samguk/duel', thumb: { image: '/images/samguk/여포.jpg' }, chip: '미니게임' },
       { title: '삼국지 인물열전', desc: '관계도·응원 순위와 장수별 열전', href: '/samguk/people', thumb: { image: '/images/samguk/제갈량.jpg' }, chip: '관계도' },
-      { title: '삼국지 장수 월드컵', desc: '이야기를 읽고 고르는 16강', href: '/samguk/cup', thumb: { image: '/images/samguk/관우.jpg' }, chip: '16강' },
+      { title: '삼국지 장수 월드컵', desc: '이야기를 읽고 고르는 장수 토너먼트', href: '/samguk/cup', thumb: { image: '/images/samguk/관우.jpg' }, chip: '월드컵' },
       { title: '동물상 테스트', desc: '강아지상? 고양이상? 8가지 중 하나', href: '/animal', thumb: { icon: 'cat', bg: '#F3EBDD' }, chip: '친구랑 비교' },
       { title: 'AI 관상 테스트', desc: '초년·중년·말년운과 재물운', href: '/face2', thumb: { icon: 'face', bg: '#F1EBE2' }, chip: '무제한 무료' },
     ],

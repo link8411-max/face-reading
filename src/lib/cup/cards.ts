@@ -16,7 +16,9 @@ export function cupCards(ids: string[]): CupCard[] {
     const p = PEOPLE[id]
     const portrait = portraitSrc(id)
     if (!c || !p || !portrait) continue
-    out.push({ id, name: c.name, faction: c.faction, portrait, line: firstSentence(p.summary), facts: [...p.funFacts] })
+    // 다른 사람 이야기가 이 카드에 붙지 않게, 이름이 들어간 이야기를 먼저 쓴다(없으면 전부)
+    const named = p.funFacts.filter((f) => f.includes(c.name))
+    out.push({ id, name: c.name, faction: c.faction, portrait, line: firstSentence(p.summary), facts: [...(named.length ? named : p.funFacts)] })
   }
   return out
 }

@@ -35,7 +35,7 @@ describe('월드컵 연결', () => {
   test('메뉴: 얼굴 묶음에서 인물열전 바로 다음', () => {
     const items = CATEGORIES.find((c) => c.key === 'face')!.items
     const i = items.findIndex((x) => x.href === '/samguk/people')
-    expect(items[i + 1]).toMatchObject({ title: '삼국지 장수 월드컵', href: '/samguk/cup', chip: '16강' })
+    expect(items[i + 1]).toMatchObject({ title: '삼국지 장수 월드컵', href: '/samguk/cup', chip: '월드컵' })
   })
   test('열전 페이지·닮은꼴 결과에 월드컵 링크', () => {
     const person = read('src/app/samguk/people/[id]/page.tsx')

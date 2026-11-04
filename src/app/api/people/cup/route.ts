@@ -57,8 +57,9 @@ export async function POST(request: Request) {
   let others: Record<string, number> | null = null
   try {
     const stats = await readCupPair(cfg, row.target)
-    // 방금 저장한 내 표 1개는 뺀다(0 아래로 내려가지 않게)
-    others = { ...stats, [vote.pick]: Math.max(0, (stats[vote.pick] ?? 0) - 1) }
+    // 두 장수 표만 돌려준다(RPC가 다른 키를 줘도 무시, 없으면 0). 방금 저장한 내 표 1개는 뺀다(0 아래로 내려가지 않게)
+    const own = (id: string) => Math.max(0, (stats[id] ?? 0) - (id === vote.pick ? 1 : 0))
+    others = { [vote.a]: own(vote.a), [vote.b]: own(vote.b) }
   } catch {
     others = null
   }

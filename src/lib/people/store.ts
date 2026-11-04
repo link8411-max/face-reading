@@ -99,7 +99,7 @@ type CountRow = { target?: unknown; option?: unknown; n?: unknown }
 /** 월드컵 두 사람 쌍의 집계(고른 id → 표 수, 판 무관). 실패하면 throw */
 export async function readCupPair(cfg: StoreConfig, pair: string): Promise<Record<string, number>> {
   const rows = await rpc(cfg, 'cup_pair_stats', { p_pair: pair })
-  const out: Record<string, number> = {}
+  const out: Record<string, number> = Object.create(null)
   if (!Array.isArray(rows)) return out
   for (const r of rows as CountRow[]) {
     const n = Number(r.n)

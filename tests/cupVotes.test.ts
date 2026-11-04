@@ -104,7 +104,21 @@ describe('POST /api/people/cup', () => {
 
   it('match: 집계가 비어 있어도 0 아래로 내려가지 않는다', async () => {
     stubUpstream([])
-    expect((await (await POST(req(match))).json()).others).toEqual({ lvbu: 0 })
+    expect((await (await POST(req(match))).json()).others).toEqual({ lvbu: 0, guanyu: 0 })
+  })
+
+  it('match: 두 장수 표만 돌려주고 RPC의 다른 선택지는 버린다', async () => {
+    stubUpstream([{ option: 'lvbu', n: 3 }, { option: 'guanyu', n: 2 }, { option: 'zhangfei', n: 50 }, { option: '__proto__', n: 9 }])
+    const others = (await (await POST(req(match))).json()).others
+    expect(others).toEqual({ lvbu: 2, guanyu: 2 })
+    expect(Object.keys(others).sort()).toEqual(['guanyu', 'lvbu'])
+  })
+
+  it('match: RPC가 한쪽만 줘도 두 키가 모두 있다', async () => {
+    stubUpstream([{ option: 'guanyu', n: 5 }])
+    const others = (await (await POST(req(match))).json()).others
+    expect(Object.keys(others).sort()).toEqual(['guanyu', 'lvbu'])
+    expect(others).toEqual({ lvbu: 0, guanyu: 5 })
   })
 
   it('match: 집계 읽기 실패면 200에 others null', async () => {
@@ -168,6 +182,16 @@ describe('store: 월드컵 읽기', () => {
   it('readCupPair', async () => {
     stub({ cup_pair_stats: [{ option: 'lvbu', n: '4' }, { option: 5, n: 1 }, { option: 'x', n: 'z' }] })
     expect(await readCupPair(cfg, 'guanyu__lvbu')).toEqual({ lvbu: 4 })
+  })
+
+  it('readCupPair: __proto__ 선택지가 있어도 프로토타입이 오염되지 않는다', async () => {
+    stub({ cup_pair_stats: [{ option: '__proto__', n: 7 }, { option: 'lvbu', n: 1 }] })
+    const s = await readCupPair(cfg, 'guanyu__lvbu')
+    expect(Object.getPrototypeOf(s)).toBeNull()
+    expect(Object.keys(s).sort()).toEqual(['__proto__', 'lvbu'])
+    expect(s.lvbu).toBe(1)
+    expect(({} as Record<string, unknown>).n).toBeUndefined()
+    expect(Object.getPrototypeOf({})).toBe(Object.prototype)
   })
 
   it('readCupSummary: 판별 정렬·합, 모르는 판은 무시', async () => {
