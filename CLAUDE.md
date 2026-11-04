@@ -269,6 +269,34 @@ public/
 
 ---
 
+## 삼국지 장수 월드컵 (/samguk/cup)
+
+초상화가 있는 장수 16강(또는 8강)에서 카드 글을 읽고 둘 중 하나를 고르는 월드컵. 열전 데이터를 그대로 재사용한다(새 문장 없음). 설계: `docs/superpowers/specs/2026-11-04-samguk-worldcup-design.md`, 계획: `docs/superpowers/plans/2026-11-04-samguk-worldcup.md`.
+
+| 위치 | 내용 |
+|------|------|
+| 라우트 | `/samguk/cup`(판 고르기, ISR 3600), `/samguk/cup/[board]`(게임, `?with=<id>`면 그 장수를 대진에 반드시 포함), `/samguk/cup/ranking`(판별 우승 순위·경기 승수, ISR 3600), `/samguk/cup/r/[board]/[id]`(공유 착지: noindex·canonical `/samguk/cup`·사이트맵 제외, 버튼 `나도 해보기`). 사이트맵에는 `/samguk/cup`·`/samguk/cup/ranking`만 |
+| `src/lib/cup/boards.ts` | 판 키(`warrior`·`strategist`·`women`·`random`)·판 이름·`boardPool`·대진 뽑기(`drawEntrants`), `cupBoardFor(id)`(열전·닮은꼴 결과의 "월드컵 하기" 링크가 열 판: 무장 → 책사 → 여인 순 첫 판, 어디에도 없으면 random, 초상화 대기·모르는 id는 null이라 링크를 그리지 않음). 클라이언트에서도 쓰므로 열전 본문을 가져오지 않는다 |
+| `cards.ts` | 카드 데이터(열전 `summary` 첫 문장·`funFacts`)와 `meetNotes`(`relations.note`와 `source`). 열전 본문을 읽으므로 서버 전용 |
+| `game.ts` | 진행 상태(`startCup`·`pick`·`currentMatch`)와 비율 문구. 순수 함수 |
+| `votes.ts` | 월드컵 API 검증(`validateCupVote`)·저장 행(`cupRow`)·속도 제한 `cupGuard` |
+| `share.ts` / `shareLanding.ts` | 공유 링크·문구·미리보기 이미지 주소(클라이언트 안전) / 공유 링크 검사(서버·엣지 전용) |
+| `types.ts` | 카드 타입(클라이언트도 가져옴) |
+| 컴포넌트 | `src/components/cup/`: `CupGame`(대결), `CupResult`(끝 화면), `CupCardButton`, `CupWithLink`(열전·닮은꼴 결과의 `?with=` 링크) |
+| 판 구성 | `warrior` = `stats.무력` 상위 16(동점 `통솔`), `strategist` = `stats.지력` 상위 16(동점 `정치`, `huatuo` 제외), `women` = `gender '여'` 전원(16명 이상이면 무작위 16, 8~15명이면 무작위 8), `random` = 전원에서 무작위 16. 동점은 id 오름차순. 출전자는 초상화가 있는 인물(`samgukCharacters`)만. 능력치 기준 설명은 "코에이 스타일 무력/지력 기준"으로 쓰고 "역사적 강함"이라 쓰지 않는다 |
+| 저장 | `people_votes` 표(`docs/people-votes.sql`)에 `kind 'cup_match'`(target = `pairKey(a,b)`, 판과 무관, option = 고른 id)와 `kind 'cup_win'`(target = 판 키, option = 우승 id). 개인정보는 열전 투표와 같은 방식(해시만 저장) |
+| API | `POST /api/people/cup`(JSON만, 같은 사이트 Origin만, 열전 투표와 **따로** IP당 10분 200회). 투표자 판별은 열전과 같은 `pv` 쿠키·`resolveVoter`. 환경변수는 열전과 같고 없으면 503(화면은 숫자를 숨김) |
+| SQL | `docs/cup-votes.sql`(집계 함수 `cup_pair_stats`·`cup_win_counts`·`cup_match_wins`와 `(kind, target)` 색인). **아직 Supabase에서 실행하지 않았다.** 배포 전에 사용자 승인을 받고 컨트롤러가 실행한다. 실행 전에는 집계 함수가 없어 API가 503, 순위 페이지는 숫자 없이 나온다. `docs/people-votes.sql`은 `cup_match`·`cup_win` 종류를 이미 허용한다(실행 완료) |
+| GA | `TestName`에 `'cup'`. `cup_start(result_id=<판>)`, `cup_end(result_id=<판>_<우승 id>)`, 공유는 `share_click(test_name='cup')`. 값은 24자 이하(`strategist_huangyueying` 23자가 최장, 판 키+후보 id 전 조합을 테스트로 확인) |
+
+**표시 규칙**
+- 가짜 숫자 금지: 비율·순위·판 수는 실제 집계만 보이고, 집계가 없거나 못 읽으면 숨긴다.
+- 비율 문구(내 표 제외, 판과 무관하게 두 사람 쌍 기준): 다른 사람 0명 `이 대결을 처음 골랐어요`, 1~9명 `지금까지 N명이 이 대결을 골랐어요`, 10명 이상 `다른 사람들은 N%가 ○○를 골랐어요`(을/를은 받침으로), 실패 `지금은 다른 사람 선택을 불러오지 못했어요`.
+- 질문 `둘 중 누가 더 끌리나요?`, 진행 표시 `<판 이름> <N강> · <i>/<경기 수>`, 만난 장면 머리 `이 둘이 만난 장면:`, 카드 읽을거리 머리 `알고 보면:`. 기록에 없는 문장은 새로 쓰지 않는다.
+- 끝 화면: `나의 최애 장수`, 결승까지 이긴 상대 줄, 버튼 `공유하기`·`<이름> 열전 보기`·`다른 판 하기`, 판별 우승 상위 5(집계 있을 때만)와 `전체 순위 보기`.
+
+---
+
 ## 자주 수정하는 파일
 
 | 작업 | 파일 |

@@ -75,3 +75,11 @@ export function drawFromPool(pool: string[], rand: Rng, withId?: string | null):
 export function drawEntrants(board: BoardKey, rand: Rng, withId?: string | null): string[] {
   return drawFromPool(boardPool(board), rand, withId)
 }
+
+const CUP_LINK_ORDER: BoardKey[] = ['warrior', 'strategist', 'women']
+
+/** 열전·닮은꼴 결과에서 "이 장수로 월드컵 하기"가 열 판. 무장 → 책사 → 여인 순 첫 판, 어디에도 없으면 전체 무작위, 초상화 대기·모르는 id는 null */
+export function cupBoardFor(id: string): BoardKey | null {
+  for (const b of CUP_LINK_ORDER) if (boardPool(b).includes(id)) return b
+  return boardPool('random').includes(id) ? 'random' : null
+}

@@ -66,6 +66,11 @@ export default async function PeopleHubPage() {
             <span className="mt-2 block font-bold">응원 순위</span>
             <span className="mt-0.5 block text-xs text-muted">가장 응원받는 장수</span>
           </Link>
+          <Link href="/samguk/cup" className="col-span-2 rounded-[22px] border border-line bg-white px-4 py-4 hover:border-accent/50 transition">
+            <Icon name="shield" className="text-accent" />
+            <span className="mt-2 block font-bold">장수 월드컵</span>
+            <span className="mt-0.5 block text-xs text-muted">이야기를 읽고 고르는 16강</span>
+          </Link>
         </nav>
 
         <section id="relations" className="mt-10 scroll-mt-6">

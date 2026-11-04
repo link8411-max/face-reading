@@ -67,6 +67,8 @@ test('허브: 처음엔 펼친 details가 없고, 인물 카드 127명이 모두
   for (const c of ['낙양', '허창', '성도', '건업']) expect(html).toContain(c)
   expect(html).toContain('href="#relations"')
   expect(html).toContain('href="/samguk/people/ranking"')
+  expect(html).toContain('href="/samguk/cup"')
+  expect(html).toContain('장수 월드컵')
   expect(html).toContain('id="relations"')
   expect(html.indexOf('id="people-list"')).toBeLessThan(html.indexOf('id="relations"'))
   expect(html.indexOf('id="relations"')).toBeLessThan(html.indexOf('쿠팡 추천 상품'))
