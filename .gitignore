@@ -63,3 +63,7 @@ docs/videos/*/work/
 docs/videos/**/*.mp4
 docs/videos/**/*.m4a
 docs/videos/**/*.png
+
+scripts/shorts/remotion/node_modules/
+scripts/shorts/remotion/public/ep*/
+scripts/shorts/remotion/public/portraits/
