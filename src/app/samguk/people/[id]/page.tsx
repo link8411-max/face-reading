@@ -7,6 +7,13 @@ import CheerButton from "@/components/people/CheerButton";
 import RelationMap from "@/components/people/RelationMap";
 import SourceChip from "@/components/people/SourceChip";
 import VotePoll from "@/components/people/VotePoll";
+import PersonVideos from "@/components/videos/PersonVideos";
+import Sanggwando from "@/components/videos/Sanggwando";
+import RelatedVideosRow from "@/components/videos/RelatedVideosRow";
+import { getChannelVideos } from "@/lib/videos/fetch";
+import { sanggwando, videosForPerson } from "@/lib/videos/forPerson";
+import { videoObjectJsonLd } from "@/lib/videos/jsonld";
+import { isVideoId } from "@/lib/videos/format";
 import CupWithLink from "@/components/cup/CupWithLink";
 import { VERDICTS } from "@/content/samgukPeople/types";
 import { pairKey } from "@/lib/people/keys";
@@ -21,6 +28,7 @@ type Props = { params: Promise<{ id: string }> };
 const SITE = "https://unse-ai.com";
 
 export const dynamicParams = false;
+export const revalidate = 3600;
 
 export function generateStaticParams() {
   return PEOPLE_IDS.map((id) => ({ id }));
@@ -65,6 +73,10 @@ export default async function PersonPage({ params }: Props) {
   const duelOk = !!duel && duel.role !== "mob";
   const pending = portraitSrc(id) === null;
   const related = relationsOf(id);
+  const channelVideos = await getChannelVideos();
+  const { own, related: relatedVideos } = videosForPerson(channelVideos, id);
+  const bigVideo = own[0] && isVideoId(own[0].id) ? own[0] : null;
+  const groups = sanggwando(id, channelVideos);
 
   // 투표 위젯에 넘길 값 (서버에서 계산해 평범한 데이터로 보낸다)
   const rival = allSamgukCharacters.find((x) => x.id === p.rivalId);
@@ -100,6 +112,9 @@ export default async function PersonPage({ params }: Props) {
     <div className="min-h-screen bg-paper text-ink">
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(person) }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumb) }} />
+      {bigVideo && (
+        <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify({ "@context": "https://schema.org", ...videoObjectJsonLd(bigVideo) }) }} />
+      )}
       <main className="mx-auto px-[22px] max-w-lg pb-12">
         <nav className="pt-5 text-sm text-muted" aria-label="경로">
           <Link href="/samguk/people" className="underline">삼국지 인물열전</Link> / {c.name}
@@ -126,8 +141,15 @@ export default async function PersonPage({ params }: Props) {
           </div>
         </section>
 
+        {/* 3-1. 이 인물 영상 */}
+        <PersonVideos id={id} name={c.name} videos={own} />
+
         {/* 4. 쿠팡 배너 */}
         <CoupangBanner subId={`people-${id}`} />
+
+        {/* 4-1. 상관도 · 관계 인물 영상 */}
+        <Sanggwando id={id} name={c.name} groups={groups} portrait={portraitSrc(id)} />
+        <RelatedVideosRow items={relatedVideos} />
 
         {/* 5. 닮은꼴 배너 */}
         <section className="mt-5 rounded-[22px] bg-card px-5 py-5 text-center">

@@ -1,4 +1,5 @@
 import { renderToStaticMarkup } from 'react-dom/server'
+vi.mock('@/lib/videos/fetch', () => ({ getChannelVideos: async () => [] }))
 import Page, { generateMetadata, generateStaticParams } from '@/app/samguk/people/[id]/page'
 import { portraitSrc, personTitle, yearLabel } from '@/lib/people/portrait'
 import { PEOPLE, PEOPLE_IDS } from '@/content/samgukPeople'
@@ -44,7 +45,7 @@ test('관우 페이지: 위에서 아래 순서와 details 4개', async () => {
     expect(i, s).toBeGreaterThanOrEqual(0)
     return i
   }
-  const order = [idx('<h1'), idx('알고 보면 재밌는 이야기'), idx('쿠팡 추천 상품'), idx('나도 관우를 닮았을까'), idx('관우 한눈에 보기'), idx('id="cheer"'), idx('<details'), idx('id="duel-vote"'), idx('id="scene-vote"'), idx('id="verdict-vote"')]
+  const order = [idx('<h1'), idx('알고 보면 재밌는 이야기'), idx('쿠팡 추천 상품'), idx('상관도'), idx('나도 관우를 닮았을까'), idx('관우 한눈에 보기'), idx('id="cheer"'), idx('<details'), idx('id="duel-vote"'), idx('id="scene-vote"'), idx('id="verdict-vote"')]
   expect([...order].sort((a, b) => a - b)).toEqual(order)
   expect(html.match(/<details/g)).toHaveLength(4)
   for (const t of ['연의로 보는 생애', '주요 전투·사건', '관계도·혈연', '정사와 연의의 차이', '정사로 본 실제 모습']) expect(html).toContain(t)
