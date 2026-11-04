@@ -14,7 +14,7 @@ fs.mkdirSync(V, { recursive: true })
 const key = process.env.GEMINI_API_KEY
 const models = (process.env.TTS_MODELS || 'gemini-3.1-flash-tts-preview,gemini-3.8-flash-lite-tts,gemini-2.5-flash-preview-tts,gemini-3.8-flash-tts').split(',')
 const voice = spec.voice || 'Charon'
-const items = [...spec.scenes.map((s) => ({ id: s.id, text: s.narration })), { id: 'end', text: spec.end.narration }]
+const items = [...(spec.beats ?? spec.scenes).map((s) => ({ id: s.id, text: s.narration })), { id: 'end', text: spec.end.narration }]
   .filter((x) => x.text)
 
 async function tts(text) {
