@@ -1,6 +1,7 @@
 # 쇼츠 조립: episode.json + assets/ + work/voice/nar_*.wav → work/final.mp4, <ep>/<name>-small.mp4(30MB 이하)
 #   python3 scripts/shorts/build.py docs/videos/ep02        (ONLY=s03,s05 이면 그 장면만 다시)
 # 장면 종류(kind): clip(Veo 클립, 여러 개 이어 붙이기 가능) · image(그림+천천히 확대) · swap(그림 → 둘째 그림, 자막 묶음 swap_at부터)
+#   · impact(앞 그림 → 하얀 번쩍임·흔들림 → 뒤 그림, impact_at초. 맞는·꽂히는 순간을 Veo 없이 확정)
 import json, os, re, subprocess, sys
 from pathlib import Path
 
@@ -92,6 +93,18 @@ def seg_swap(sc, nar, d, out):
     run(["-loop", "1", "-i", str(A / sc["src"][0]), "-i", str(nar), "-loop", "1", "-i", str(A / sc["src"][1]),
          "-filter_complex", fc, "-map", "[v]", "-map", "[a]", "-t", str(d), *ENC, str(out)])
 
+def seg_impact(sc, nar, d, out):
+    """맞는 순간: 앞 그림(다가감) → 하얀 번쩍임 + 흔들림 → 뒤 그림. Veo 없이 결과를 확정한다(피·되감기 없음)."""
+    at = sc.get("impact_at", 1.5)
+    n1, n2 = int((at + 0.2) * FPS), int((d - at + 0.2) * FPS)
+    shake = "crop=1040:1850:20+18*sin(t*90)*lt(t\\,0.35):35+18*cos(t*77)*lt(t\\,0.35),scale=1080:1920"
+    fc = (f"[0:v]{KEN(n1, 1.0, 1.10)},trim=duration={at+0.2},setpts=PTS-STARTPTS[a];"
+          f"[2:v]{KEN(n2, 1.06, 1.0)},trim=duration={d-at+0.2},setpts=PTS-STARTPTS,{shake}[b];"
+          f"[a][b]xfade=transition=fadewhite:duration=0.2:offset={at},{TITLE},{captions(sc['captions'], d)},{FADE(d)},format=yuv420p[v];"
+          + NARMIX(1, d))
+    run(["-loop", "1", "-i", str(A / sc["src"][0]), "-i", str(nar), "-loop", "1", "-i", str(A / sc["src"][1]),
+         "-filter_complex", fc, "-map", "[v]", "-map", "[a]", "-t", str(d), *ENC, str(out)])
+
 def seg_end(end, nar, out):
     """끝 화면: 초상화(1~4장) + 문구 + 주소."""
     d = round(dur(nar) + 1.4, 2)
@@ -120,7 +133,7 @@ for sc in SPEC["scenes"]:
     nar, out = V / f"nar_{sc['id']}.wav", W / f"{sc['id']}.mp4"
     if not only or sc["id"] in only:
         d = round(dur(nar) + 0.6, 2)
-        {"clip": seg_clip, "image": seg_image, "swap": seg_swap}[sc["kind"]](sc, nar, d, out)
+        {"clip": seg_clip, "image": seg_image, "swap": seg_swap, "impact": seg_impact}[sc["kind"]](sc, nar, d, out)
         print(sc["id"], sc["kind"], d)
     segs.append(out)
 end_out = W / "end.mp4"

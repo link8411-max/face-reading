@@ -48,13 +48,17 @@ description: 삼국지 유튜브 쇼츠·인스타 릴스 한 편을 기획→�
 
 ## 3. 음성·조립·검사 (자동)
 ```bash
-python3 scripts/shorts/review.py docs/videos/epNN                    # 클립 검수 그림(1초 간격) → 직접 보고 must_show 확인
 node --env-file=.env.local scripts/shorts/tts.mjs docs/videos/epNN   # 해설 전체를 TTS 1회 → 글자 수 비율로 나누기 → 받아쓰기 검사
 python3 scripts/shorts/build.py docs/videos/epNN                     # 조립, <name>-small.mp4(30MB 이하)
-python3 scripts/shorts/check.py docs/videos/epNN                     # 경계 딸깍·튐·음량·크기, work/sheet.png
+python3 scripts/shorts/check.py docs/videos/epNN                     # 경계 딸깍·튐·음량·크기
+python3 scripts/shorts/review.py docs/videos/epNN                    # 장면 검수: 0.25초 간격 프레임 + 붉은 튐(피) 의심 경고
+python3 scripts/shorts/storyboard.py docs/videos/epNN                # 시나리오 검사: 장면별 시작·중간·끝 + 해설 한 장
 ```
 - TTS: 목소리 Charon. 무료 한도는 **모델마다 하루 10회**(태평양 자정 초기화)라 한 편을 한 번 호출로 만든다. 3.x 모델은 지시문을 소리 내 읽으므로 `[warm storytelling]`만 붙인다(스크립트가 처리). 끝 0.15초 0dB 잡음은 자동으로 자른다. 받아쓰기 80% 미만은 `ONLY=s03`으로 그 장면만 다시.
 - 한 편 안에서는 같은 모델로 통일한다(모델이 바뀌면 말투가 달라진다).
+- **장면 검수(review.png마다)**: ① 첫 프레임이 '시작' 상태인가(처음부터 화살이 박혀 있지 않은가) ② 동작이 한 번만, 해설 순서대로 일어나는가(빼고 다시 박기 같은 되감기 없음) ③ 붉은 튐 경고 프레임을 확대해 피가 없는가.
+- **시나리오 검사(storyboard.png)**: ① 같은 사건이 두 번 나오지 않는가(훅에서 결과를 보여 주고 본편에서 또 보여 주지 않기. 훅은 결과 직전에서 멈춘다) ② 인물 연속성(다치기 전 안대 없음, 안대 쪽 일관) ③ 장면마다 해설이 말하는 것이 화면에 있는가 ④ 훅→전개→반전→마무리→끝 화면 흐름.
+- 둘 다 통과해야 사용자에게 보낸다. 통과 못 하면 고치고 `ONLY=<id>`로 다시 조립한 뒤 세 검사를 다시 돌린다.
 - check가 "문제 없음"이 아니면 고치고 다시 돌린다. sheet.png를 직접 보고 글자 겹침·화풍을 확인한다.
 
 ## 4. 확인 ③ → 업로드
