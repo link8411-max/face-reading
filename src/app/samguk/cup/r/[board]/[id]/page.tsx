@@ -6,6 +6,7 @@ import { cupName, cupOgImageUrl } from "@/lib/cup/share";
 import { parseCupShare } from "@/lib/cup/shareLanding";
 import { SITE } from "@/lib/shareBase";
 import SharedLandingTracker from "@/components/share/SharedLandingTracker";
+import CoupangBanner from "@/components/CoupangBanner";
 
 type Props = { params: Promise<{ board: string; id: string }> };
 
@@ -51,6 +52,7 @@ export default async function CupSharePage({ params }: Props) {
       <Link href={`/samguk/people/${s.id}`} className="mt-2 flex h-[52px] items-center justify-center rounded-full border border-line bg-card-2 text-base font-medium">
         {s.name} 열전 보기
       </Link>
+      <CoupangBanner subId="share-cup" />
     </main>
   );
 }

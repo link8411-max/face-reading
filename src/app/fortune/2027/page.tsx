@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import CoupangBanner from "@/components/CoupangBanner";
 import { ZODIAC_SLUGS, zodiac2027, birthYears } from "@/content/fortune2027Zodiac";
 import { FORTUNE_YEAR } from "@/lib/fortuneYear";
 
@@ -43,6 +44,7 @@ export default function Zodiac2027Hub() {
         <Link href="/fortune" className="block text-center h-[52px] leading-[52px] bg-ink rounded-full font-medium text-paper">
           내 생년월일 사주로 자세히 보기
         </Link>
+        <CoupangBanner subId="fortune-2027" />
       </main>
     </div>
   );

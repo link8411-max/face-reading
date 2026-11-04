@@ -5,6 +5,7 @@ import { decodeRunKey } from "@/lib/duel/shareKey";
 import { duelOgImageUrl, duelShared } from "@/lib/duel/share";
 import { SITE } from "@/lib/shareBase";
 import SharedLandingTracker from "@/components/share/SharedLandingTracker";
+import CoupangBanner from "@/components/CoupangBanner";
 
 type Props = { params: Promise<{ key: string }> };
 
@@ -49,6 +50,7 @@ export default async function DuelSharePage({ params }: Props) {
       <Link href="/samguk/duel" className="mt-5 h-[56px] rounded-full flex items-center justify-center bg-ink text-paper text-base font-medium">
         나도 일기토 하기
       </Link>
+      <CoupangBanner subId="share-duel" />
     </main>
   );
 }

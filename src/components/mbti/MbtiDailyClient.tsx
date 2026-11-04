@@ -5,6 +5,7 @@ import Link from "next/link";
 import TestHeader from "@/components/test/TestHeader";
 import ResultActions from "@/components/result/ResultActions";
 import SeasonPicks from "@/components/SeasonPicks";
+import CoupangBanner from "@/components/CoupangBanner";
 import { TypeGroup } from "@/components/mbti/MatchCalculator";
 import MbtiDailyCard, { dateLabel } from "@/components/mbti/MbtiDailyCard";
 import { useBackOrHome } from "@/hooks/useBackOrHome";
@@ -77,6 +78,7 @@ export default function MbtiDailyClient() {
             busy={share.busy || isCapturing}
             notice={share.notice}
           />
+          <CoupangBanner subId="mbti-daily" />
           <div className="grid grid-cols-2 gap-2 mt-5 text-sm no-screenshot">
             <Link href={`/mbti/${type.toLowerCase()}`} className="text-center py-3 rounded-[18px] bg-card-2 font-bold">{type} {mbtiProfiles[type].nickname}</Link>
             <Link href="/fortune/daily" className="text-center py-3 rounded-[18px] bg-card-2 font-bold">띠로 보는 오늘의 운세</Link>

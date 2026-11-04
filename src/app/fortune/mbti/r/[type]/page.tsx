@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { redirect } from "next/navigation";
 import MbtiDailyShared from "@/components/mbti/MbtiDailyShared";
 import SharedLandingTracker from "@/components/share/SharedLandingTracker";
+import CoupangBanner from "@/components/CoupangBanner";
 import { isMbti } from "@/lib/mbti/compat";
 import { parseMbtiDailyKey, SITE } from "@/lib/shareLinks";
 
@@ -32,6 +33,7 @@ export default async function MbtiDailySharedPage({ params }: Props) {
     <main className="max-w-lg mx-auto px-[22px] pt-8 pb-10">
       <SharedLandingTracker test="mbti_daily" resultId={t} />
       <MbtiDailyShared type={t} />
+      <CoupangBanner subId="share-mbti-daily" />
     </main>
   );
 }

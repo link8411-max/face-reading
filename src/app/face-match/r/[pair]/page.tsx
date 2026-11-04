@@ -3,6 +3,7 @@ import Link from "next/link";
 import { redirect } from "next/navigation";
 import FaceMatchCard from "@/components/faceMatch/FaceMatchCard";
 import SharedLandingTracker from "@/components/share/SharedLandingTracker";
+import CoupangBanner from "@/components/CoupangBanner";
 import { parseFaceMatch, SITE } from "@/lib/shareLinks";
 
 type Props = { params: Promise<{ pair: string }>; searchParams: Promise<{ rel?: string | string[] }> };
@@ -34,6 +35,7 @@ export default async function FaceMatchSharedPage({ params, searchParams }: Prop
       <FaceMatchCard a={m.a} b={m.b} rel={m.rel} result={m.result} />
       <Link href="/face-match" className="mt-5 h-[56px] rounded-full flex items-center justify-center bg-ink text-paper text-base font-medium">나도 해보기</Link>
       <p className="mt-3 text-xs text-center text-muted">사진은 내 폰 안에서만 보고 바로 지워요</p>
+      <CoupangBanner subId="share-face-match" />
     </main>
   );
 }

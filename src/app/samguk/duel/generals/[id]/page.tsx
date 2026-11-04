@@ -7,6 +7,7 @@ import { SKILLS } from "@/lib/duel/skills";
 import { getCharacterById } from "@/lib/samgukDB";
 import { getPerson } from "@/content/samgukPeople";
 import RosterStartLink from "@/components/duel/RosterStartLink";
+import CoupangBanner from "@/components/CoupangBanner";
 
 type Props = { params: Promise<{ id: string }> };
 
@@ -169,6 +170,7 @@ export default async function GeneralPage({ params }: Props) {
           </ul>
           <Link href="/samguk/duel" className="mt-4 block text-center underline text-sm">일기토 하러 가기</Link>
         </section>
+        <CoupangBanner subId={`duel-${id}`} />
       </main>
     </div>
   );

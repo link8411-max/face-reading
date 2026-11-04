@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import CoupangBanner from "@/components/CoupangBanner";
 import { BOARDS, BOARD_KEYS, type BoardKey } from "@/lib/cup/boards";
 import { characterById } from "@/lib/people/characters";
 import { readCupSummary, storeConfig } from "@/lib/people/store";
@@ -122,6 +123,7 @@ export default async function CupRankingPage() {
             </Link>
           </section>
         )}
+        <CoupangBanner subId="cup-ranking" />
       </main>
     </div>
   );

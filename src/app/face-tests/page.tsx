@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import CategoryList from "@/components/CategoryList";
+import CoupangBanner from "@/components/CoupangBanner";
 import { CATEGORIES } from "@/content/navigation";
 
 const category = CATEGORIES[0];
@@ -18,6 +19,7 @@ export default function Page() {
       <h1 className="font-serif text-3xl font-bold">{category.title}</h1>
       <p className="text-sm text-muted leading-relaxed mt-2 mb-6">{category.intro}</p>
       <CategoryList items={category.items} />
+      <CoupangBanner subId="face-tests" />
     </div>
   );
 }

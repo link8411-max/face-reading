@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { Icon } from "@/components/icons";
+import CoupangBanner from "@/components/CoupangBanner";
 import { mbtiProfiles } from "@/content/mbtiTypes";
 import type { MbtiType } from "@/lib/mbti/compat";
 
@@ -50,6 +51,7 @@ export default function MbtiHub() {
           </div>
         </section>
       ))}
+      <CoupangBanner subId="mbti-hub" />
     </div>
   );
 }

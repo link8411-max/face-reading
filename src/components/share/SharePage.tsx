@@ -6,6 +6,7 @@ import { animalTypeDB } from "@/lib/animalTypeDB";
 import { samgukCharacters } from "@/lib/samgukDB";
 import { getPerson } from "@/content/samgukPeople";
 import { MoonDeco, SmileFace } from "@/components/icons";
+import CoupangBanner from "@/components/CoupangBanner";
 import SharedLandingTracker from "./SharedLandingTracker";
 
 type P = Promise<{ key: string }>;
@@ -69,6 +70,7 @@ export async function SharePage({ kind, params, searchParams }: { kind: ShareKin
         </Link>
       )}
       <p className="mt-3 text-xs text-center text-muted">사진은 내 폰 안에서만 보고 바로 지워요</p>
+      <CoupangBanner subId={`share-${kind}`} />
     </main>
   );
 }

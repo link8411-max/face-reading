@@ -129,3 +129,10 @@ test('열전 → 월드컵: 이 장수로 월드컵 하기 링크', async ({ pag
   await page.goto('/samguk/people/lvbu')
   await expect(page.getByRole('link', { name: '이 장수로 월드컵 하기' })).toHaveAttribute('href', '/samguk/cup/warrior?with=lvbu')
 })
+
+test('쿠팡 배너: 허브·순위·장수·공유 착지 페이지에도 추천 상품이 보인다', async ({ page }) => {
+  for (const path of ['/mbti', '/unse', '/samguk/cup/ranking', '/samguk/duel/generals/guanyu', '/samguk/r/zhaoyun?s=84']) {
+    await page.goto(path)
+    await expect(page.getByText('추천 상품', { exact: true }), path).toBeVisible()
+  }
+})

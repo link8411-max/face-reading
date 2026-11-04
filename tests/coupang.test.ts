@@ -25,8 +25,20 @@ test.each([
   ['src/app/page.tsx', 'home'], ['src/app/face2/page.tsx', 'face'], ['src/app/animal/page.tsx', 'animal'],
   ['src/app/samguk/(match)/page.tsx', 'samguk'], ['src/app/fortune/FortuneClient.tsx', 'fortune'], ['src/app/fortune/daily/page.tsx', 'daily'],
   ['src/app/samguk/cup/page.tsx', 'cup-hub'],
+  ['src/app/mbti/page.tsx', 'mbti-hub'], ['src/components/mbti/MbtiDailyClient.tsx', 'mbti-daily'],
+  ['src/app/fortune/2027/page.tsx', 'fortune-2027'], ['src/app/face-tests/page.tsx', 'face-tests'], ['src/app/unse/page.tsx', 'unse'],
+  ['src/app/samguk/cup/ranking/page.tsx', 'cup-ranking'], ['src/app/mbti/r/[pair]/page.tsx', 'share-mbti'],
+  ['src/app/samguk/cup/r/[board]/[id]/page.tsx', 'share-cup'], ['src/app/samguk/duel/r/[key]/page.tsx', 'share-duel'],
+  ['src/app/face-match/r/[pair]/page.tsx', 'share-face-match'], ['src/app/fortune/mbti/r/[type]/page.tsx', 'share-mbti-daily'],
 ])('%s 에 배너가 있다', (file, subId) => {
   expect(readFileSync(file, 'utf8')).toContain(`<CoupangBanner subId="${subId}"`)
+})
+
+test.each([
+  ['src/app/samguk/duel/generals/[id]/page.tsx', 'subId={`duel-${id}`}'],
+  ['src/components/share/SharePage.tsx', 'subId={`share-${kind}`}'],
+])('%s 에 배너가 있다 (%s)', (file, text) => {
+  expect(readFileSync(file, 'utf8')).toContain(text)
 })
 
 import { gaSlot } from '@/components/CoupangBanner'
@@ -35,6 +47,7 @@ test('GA 위치 값: subId의 하이픈을 밑줄로 (GA 개인정보 필터 통
   expect(gaSlot('face-match')).toBe('face_match')
   expect(gaSlot('home')).toBe('home')
   expect(gaSlot('cup-strategist')).toBe('cup_strategist')
+  expect(gaSlot('share-mbti-daily')).toBe('share_mbti_daily')
 })
 
 import { isDisplayedMessage, coupangHomeUrl, fallbackLinks, FALLBACK_DELAY_MS } from '@/components/CoupangBanner'

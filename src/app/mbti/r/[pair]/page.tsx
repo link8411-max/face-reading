@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { redirect } from "next/navigation";
 import MatchCalculator from "@/components/mbti/MatchCalculator";
+import CoupangBanner from "@/components/CoupangBanner";
 import { mbtiShared, ogImageUrl, SITE } from "@/lib/shareLinks";
 import type { MbtiType } from "@/lib/mbti/compat";
 
@@ -36,6 +37,7 @@ export default async function MbtiSharePage({ params }: Props) {
         <h1 className="font-serif text-3xl font-bold">MBTI 궁합</h1>
       </header>
       <MatchCalculator initial={{ a: m.a as MbtiType, b: m.b as MbtiType, fromShare: true }} />
+      <CoupangBanner subId="share-mbti" />
     </div>
   );
 }
