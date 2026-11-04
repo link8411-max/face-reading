@@ -148,6 +148,7 @@ public/
 | `/face2` | 무료 관상 | 무제한 | face-api.js + DB |
 | `/animal` | 동물상 테스트 | 무제한 | face-api.js + DB |
 | `/samguk` | 삼국지 닮은꼴 | 무제한 | MediaPipe + 프로필 매칭 |
+| `/samguk/videos` | 삼국지 쇼츠 모음(격자·세로 피드) | - | YouTube API/RSS, ISR 1시간 |
 | `/fortune` | 신년운세 | - | DB 기반 |
 | `/fortune/daily` | 오늘의 운세 | - | DB 기반 |
 
@@ -297,6 +298,24 @@ public/
 - 질문 `둘 중 누가 더 끌리나요?`, 진행 표시 `<판 이름> <N강> · <i>/<경기 수>`, 만난 장면 머리 `이 둘이 만난 장면:`, 카드 읽을거리 머리 `알고 보면:`. 기록에 없는 문장은 새로 쓰지 않는다.
 - 쿠팡 다이나믹 배너: 판 고르기(`cup-hub`, 판 목록 아래)·끝 화면(`cup-<판>`, 버튼 아래·우승 순위 위)·순위(`cup-ranking`)·공유 착지(`share-cup`)에 있고 대결 중에는 없다.
 - 끝 화면: `나의 최애 장수`, 결승까지 이긴 상대 줄, 버튼 `공유하기`·`<이름> 열전 보기`·`다른 판 하기`, 판별 우승 상위 5(집계 있을 때만)와 `전체 순위 보기`.
+
+---
+
+## 삼국지 쇼츠 연결 (/samguk/videos)
+
+유튜브 채널(`@unse_ai`, 채널 `UCQvI9qIC3pIq_24_x5XE_3g`) 쇼츠를 사이트에 잇는다. 설계: `docs/superpowers/specs/2026-11-04-samguk-videos-design.md`. 롱폼(181초 이상)은 어느 화면에도 내지 않는다.
+
+| 위치 | 내용 |
+|------|------|
+| 데이터 흐름 | `lib/videos/fetch.ts`의 `getChannelVideos()`: YouTube Data API(업로드 재생목록 `UUQvI9qIC3pIq_24_x5XE_3g`) → 실패하면 RSS(`feeds/videos.xml`, `isShort=true`·`durationSec=null`) → 그래도 실패하면 **빈 목록**(throw 안 함, 빌드 안 깨짐). 모든 fetch는 `revalidate: 3600`(ISR 1시간). 영상이 0편이면 열전·결과·허브의 영상 칸이 통째로 사라지고 `/samguk/videos`만 "아직 올라온 영상이 없어요" |
+| 파일 | `lib/videos/{types,format,parse,fetch,forPerson,jsonld}.ts`, `components/videos/*`(VideoPlayer·VideoFeed·VideosBrowser·PersonVideos·RelatedVideosRow·Sanggwando·ResultVideos·ResultVideoBlock·VideoStrip), `app/samguk/videos/page.tsx`, `/api/samguk/videos/[id]`(결과 화면이 클라이언트에서 영상 한 편을 받는 길). 영상 id는 `/^[A-Za-z0-9_-]{11}$/`만 쓴다 |
+| 보정 파일 | `src/content/videoOverrides.ts`: 영상 id → `{ people?, hide?, event? }`. **숨기려면** `hide: true`, **인물을 고치려면** `people: [id, …]`(첫째가 주인공). 보정이 해시태그 추출보다 우선한다. 해시태그는 `allSamgukCharacters`의 `name`과 정확히 같을 때만 인물 id로 바뀐다 |
+| 환경변수 | `YOUTUBE_API_KEY`(Vercel Production, Google Cloud 프로젝트 `unse-ai-513714`, YouTube Data API v3만 허용). **`lib/videos/fetch.ts`에서만 읽는다.** 없으면 RSS 경로. `tests/videos/boundaries.test.ts`가 클라이언트 파일의 서버 모듈·키 사용을 막는다 |
+| 재생 | 첫 화면엔 iframe 없음, 누르면 `youtube-nocookie.com/embed/<id>?autoplay=1&playsinline=1` 하나만. 24시간 안이면 `NEW`, 그 뒤 `조회수 1,008회` |
+| 노출 위치 | **열전**(`/samguk/people/[id]`) 순서: 요약 → 1분 영상 → 쿠팡 → 상관도 → 관계 인물 영상 → 닮은꼴 배너. **결과 화면**: 공유 버튼·쿠팡 아래 "내 장수 이야기, 1분 영상" 카드와 엮인 장수 칸(둘 다 `no-screenshot`). **허브 띠** `VideoStrip`: 열전 허브 지도 아래, `(match)/layout.tsx`(시작 화면·결과·공유 착지·우리 팀) 안내문 위. 누르면 `/samguk/videos?v=<id>` 피드(canonical은 `/samguk/videos` 하나) |
+| GA | `video_play {slot, result_id}`, `video_subscribe_click {slot}`, `video_test_click {slot}`. slot은 `people`·`result`·`videos`·`hub`. 영상 id의 `-`는 `_`로 바꿔 `result_id`에 넣는다(`SAFE_VALUE`는 그대로). `next_test_click`과 뜻이 달라 새 이벤트 |
+| tsconfig | `scripts/shorts`(쇼츠 제작 스크립트, 별도 의존성)는 `exclude`에 있다. 없으면 `next build`가 이 폴더까지 타입 검사해 실패한다 |
+| 채널 프로필 링크 | 사용자가 유튜브 스튜디오에서 직접 건다: `https://unse-ai.com/samguk/videos?utm_source=youtube&utm_medium=profile&utm_campaign=channel` (`?v=`는 공유용이라 프로필에 쓰지 않는다) |
 
 ---
 
