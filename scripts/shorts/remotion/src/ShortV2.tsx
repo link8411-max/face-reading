@@ -9,7 +9,7 @@ export const TAIL = 0.35;
 export const END_PAD = 1.4;
 export const beatFrames = (narDur: number) => Math.round((narDur + LEAD + TAIL) * FPS);
 
-export type Beat = {id: string; badge: string | null; narration: string; videos?: (string | {src: string; dur: number})[]; sfx?: 'whoosh' | 'boom'; chain: {kind: string}[]};
+export type Beat = {id: string; badge: string | null; narration: string; videos?: (string | {src: string; dur: number; badge?: string | null})[]; sfx?: 'whoosh' | 'boom'; chain: {kind: string}[]};
 export type EpisodeV2 = {version: 2; title: string; subtitle: string; watermark?: string; emphasis?: string[]; beats: Beat[];
 	end: {portraits: string[]; lines: string[]; url: string; narration: string}};
 export type Timing = Record<string, {duration: number; words: {text: string; start: number; end: number}[]}>;
@@ -36,7 +36,7 @@ const Badge: React.FC<{text: string}> = ({text}) => {
 	const red = text.startsWith('연의');
 	return (
 		<div style={{position: 'absolute', top: 340, right: 50, transform: `rotate(-6deg) scale(${0.6 + 0.4 * s})`, opacity: s, fontFamily: FONT,
-			border: `6px solid ${red ? '#C8403A' : '#3F78B5'}`, color: red ? '#C8403A' : '#3F78B5', background: 'rgba(0,0,0,0.35)',
+			border: `6px solid ${red ? '#C8403A' : '#3F78B5'}`, color: red ? '#C8403A' : '#3F78B5', background: 'rgba(0,0,0,0.7)',
 			borderRadius: 10, padding: '6px 18px', fontSize: 40, fontWeight: 900, letterSpacing: 2}}>{text}</div>
 	);
 };
@@ -76,9 +76,9 @@ const Captions: React.FC<{words: Timing[string]['words']; emphasis: string[]}> =
 };
 
 // 박자 화면: 체인 영상을 차례로. 영상 길이(dur)에 비례해 시간을 나누고, 슬롯이 영상보다 길면 살짝 느리게 재생해 끝이 비지 않게 한다
-type Vid = string | {src: string; dur: number};
+type Vid = string | {src: string; dur: number; badge?: string | null};
 const BeatVideos: React.FC<{ep: string; videos: Vid[]; frames: number}> = ({ep, videos, frames}) => {
-	const vs = videos.map((v) => (typeof v === 'string' ? {src: v, dur: 8} : v));
+	const vs = videos.map((v) => (typeof v === 'string' ? {src: v, dur: 8} as Exclude<Vid, string> : v));
 	const total = vs.reduce((a, v) => a + v.dur, 0);
 	let at = 0;
 	return (
@@ -88,7 +88,9 @@ const BeatVideos: React.FC<{ep: string; videos: Vid[]; frames: number}> = ({ep, 
 				const rate = Math.min(1, Math.max(0.8, (v.dur * FPS) / len));
 				const el = (
 					<Sequence key={v.src} from={at} durationInFrames={len}>
-						<OffthreadVideo src={staticFile(`${ep}/${v.src}`)} playbackRate={rate} volume={0.2} style={{width: '100%', height: '100%', objectFit: 'cover'}} />
+						{/* 오른쪽 아래 Veo 표시가 화면 밖으로 나가도록 왼쪽 위 기준으로 살짝 키운다 */}
+						<OffthreadVideo src={staticFile(`${ep}/${v.src}`)} playbackRate={rate} volume={0.2} style={{width: '100%', height: '100%', objectFit: 'cover', transform: 'scale(1.07)', transformOrigin: '0 0'}} />
+						{v.badge && <Badge text={v.badge} />}
 					</Sequence>
 				);
 				at += len;
@@ -102,10 +104,12 @@ const BeatVideos: React.FC<{ep: string; videos: Vid[]; frames: number}> = ({ep, 
 const Twist: React.FC<{ep: string; freeze: string; frames: number}> = ({ep, freeze, frames}) => {
 	const f = useCurrentFrame();
 	const t = interpolate(f, [0, frames * 0.7], [0, 1], {extrapolateRight: 'clamp', easing: Easing.out(Easing.quad)});
+	// 박자가 길면(8초 넘게) 화면이 검게 오래 머물지 않도록 그림이 보이는 만큼만 어두워지고, 천천히 다가간다
+	const zoom = interpolate(f, [0, frames], [1, 1.08]);
 	return (
 		<AbsoluteFill>
-			<Img src={staticFile(`${ep}/${freeze}`)} style={{width: '100%', height: '100%', objectFit: 'cover', filter: `grayscale(${t}) brightness(${1 - 0.45 * t}) contrast(${1 + 0.2 * t})`}} />
-			<AbsoluteFill style={{background: `radial-gradient(circle at 50% 45%, rgba(10,8,8,0) ${Math.max(0, 70 - 80 * t)}%, rgba(10,8,8,${0.85 * t}) ${Math.max(10, 110 - 80 * t)}%)`}} />
+			<Img src={staticFile(`${ep}/${freeze}`)} style={{width: '100%', height: '100%', objectFit: 'cover', transform: `scale(${zoom})`, filter: `grayscale(${0.8 * t}) brightness(${1 - 0.3 * t}) contrast(${1 + 0.15 * t})`}} />
+			<AbsoluteFill style={{background: `radial-gradient(circle at 50% 45%, rgba(10,8,8,0) ${Math.max(20, 70 - 50 * t)}%, rgba(10,8,8,${0.7 * t}) ${Math.max(60, 110 - 50 * t)}%)`}} />
 		</AbsoluteFill>
 	);
 };
@@ -145,14 +149,14 @@ export const ShortV2: React.FC<ShortV2Props> = ({ep, episode, timing, freeze = '
 		<AbsoluteFill style={{backgroundColor: 'black'}}>
 			{episode.beats.map((b, i) => {
 				const frames = beatFrames(timing[b.id].duration);
-				const isTwist = b.chain.every((c) => c.kind === 'effect');
+				const isTwist = b.chain.length > 0 && b.chain.every((c) => c.kind === 'effect');
 				const el = (
 					<Sequence key={b.id} from={at} durationInFrames={frames}>
 						<AbsoluteFill style={{backgroundColor: 'black'}}>
 							{isTwist ? <Twist ep={ep} freeze={freeze} frames={frames} /> : <BeatVideos ep={ep} videos={b.videos ?? []} frames={frames} />}
 							<Sequence from={Math.round(LEAD * FPS)}><Audio src={staticFile(`${ep}/nar_${b.id}.wav`)} /></Sequence>
 							{i > 0 && <Audio src={staticFile(`sfx/${isTwist ? 'boom' : b.sfx ?? 'whoosh'}.wav`)} volume={isTwist ? 0.6 : 0.3} />}
-							{b.badge && <Badge text={b.badge} />}
+							{b.badge && !(b.videos ?? []).some((v) => typeof v !== 'string' && 'badge' in v) && <Badge text={b.badge} />}
 							<Captions words={timing[b.id].words} emphasis={emphasis} />
 						</AbsoluteFill>
 					</Sequence>
