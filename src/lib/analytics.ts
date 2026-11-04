@@ -2,7 +2,7 @@
 // 개인정보 원칙: 사진·생년월일 원값·얼굴 수치는 절대 보내지 않는다. 결과는 유형 키(fox, caocao, 재물상, INFP_ENTJ 등)만.
 export const GA_ID = 'G-L99JPMPT9D'
 
-export type TestName = 'face' | 'animal' | 'samguk' | 'fortune' | 'daily' | 'mbti_match' | 'face_match' | 'team_samguk' | 'mbti_daily' | 'duel' | 'people'
+export type TestName = 'face' | 'animal' | 'samguk' | 'fortune' | 'daily' | 'mbti_match' | 'face_match' | 'team_samguk' | 'mbti_daily' | 'duel' | 'people' | 'cup'
 export type ShareMethod = 'save_image' | 'share' | 'link' | 'kakao'
 
 type Events = {
@@ -25,6 +25,9 @@ type Events = {
   // 삼국지 인물열전 응원·투표. people_vote의 result_id는 `<kind>_<인물id>` (예 duel_guanyu)
   people_cheer: { result_id: string }
   people_vote: { result_id: string }
+  // 장수 월드컵. cup_start는 판 키(warrior), cup_end는 `<판>_<우승 id>`(warrior_guanyu). 값은 24자 이하(테스트로 전 조합 확인)
+  cup_start: { result_id: string }
+  cup_end: { result_id: string }
 }
 
 const ALLOWED_KEYS = new Set(['test_name', 'result_id', 'method', 'slot', 'keyword'])

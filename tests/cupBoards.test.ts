@@ -66,3 +66,11 @@ test('만난 장면: 관계로 이어진 쌍만', () => {
   expect(m[pairKey('liubei', 'guanyu')]?.note.length).toBeGreaterThan(5)
   expect(m[pairKey('guanyu', 'diaochan')]).toBeUndefined()
 })
+
+test('GA 값: 모든 판 키 × 후보 id 조합이 24자 이하로 안전 값을 통과', async () => {
+  const { isSafeValue } = await import('@/lib/analytics')
+  for (const b of BOARD_KEYS) {
+    expect(isSafeValue(b)).toBe(true)
+    for (const id of boardPool(b)) expect(isSafeValue(`${b}_${id}`), `${b}_${id}`).toBe(true)
+  }
+})

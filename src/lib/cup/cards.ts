@@ -1,25 +1,13 @@
 // 월드컵 카드 데이터. 열전 본문을 읽으므로 서버에서만 쓴다.
 import { PEOPLE } from '@/content/samgukPeople'
-import type { Source } from '@/content/samgukPeople/types'
+import type { CupCard, MeetNote } from '@/lib/cup/types'
 import { samgukCharacters } from '@/lib/samgukDB'
 import { firstSentence } from '@/lib/people/hubCards'
 import { portraitSrc } from '@/lib/people/portrait'
 import { relationsOf } from '@/lib/people/relations'
 import { pairKey } from '@/lib/people/keys'
 
-export interface CupCard {
-  id: string
-  name: string
-  faction: '위' | '촉' | '오' | '기타'
-  portrait: string
-  line: string
-  facts: string[]
-}
-
-export interface MeetNote {
-  note: string
-  source: Source
-}
+export type { CupCard, MeetNote } from '@/lib/cup/types'
 
 export function cupCards(ids: string[]): CupCard[] {
   const out: CupCard[] = []
