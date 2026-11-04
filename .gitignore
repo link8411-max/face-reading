@@ -56,3 +56,10 @@ next-env.d.ts
 # claude 워크트리·sdd 작업 폴더
 /.claude/worktrees/
 /.superpowers/
+
+# 쇼츠 작업물(영상·그림·음성)
+docs/videos/*/assets/
+docs/videos/*/work/
+docs/videos/**/*.mp4
+docs/videos/**/*.m4a
+docs/videos/**/*.png
