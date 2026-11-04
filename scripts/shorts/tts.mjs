@@ -64,14 +64,16 @@ function cut(pcm, st, en, out) {
 
 async function transcribe(wav) {
   const b = fs.readFileSync(wav).toString('base64')
-  for (let i = 0; i < 3; i++) {
-    const r = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${key}`, {
+  // 받아쓰기도 모델마다 하루 한도가 있어 차례로 바꿔 본다
+  const sttModels = ['gemini-2.5-flash', 'gemini-2.5-flash-lite', 'gemini-3.8-flash', 'gemini-3.8-flash-lite']
+  for (let i = 0; i < sttModels.length; i++) {
+    const r = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${sttModels[i]}:generateContent?key=${key}`, {
       method: 'POST', headers: { 'content-type': 'application/json' },
       body: JSON.stringify({ contents: [{ parts: [{ inlineData: { mimeType: 'audio/wav', data: b } }, { text: '이 한국어 음성을 들리는 그대로 받아 적어 줘. 받아 적은 글만 출력.' }] }] }),
     })
     const d = await r.json()
     if (!d.error) return d.candidates[0].content.parts[0].text.trim()
-    await new Promise((r) => setTimeout(r, 5000))
+    await new Promise((r) => setTimeout(r, 1500))
   }
   return '(받아쓰기 실패)'
 }
@@ -87,11 +89,24 @@ function similarity(a, b) {
 
 const only = process.env.ONLY?.split(',')
 let todo = items.filter((x) => !only || only.includes(x.id))
-if (!only) {
+if (!only && !items.every((x) => fs.existsSync(path.join(V, `nar_${x.id}.wav`)))) {
   // 한 번 호출: 장면 사이를 빈 줄로 띄워 긴 쉼을 만든다
   const pcm = path.join(V, 'all.pcm')
   if (!fs.existsSync(pcm)) { console.log('TTS (전체 한 번)'); fs.writeFileSync(pcm, await tts(todo.map((x) => x.text).join('\n\n...\n\n'))) }
-  const sil = detect(pcm).sort((a, b) => (b.en - b.st) - (a.en - a.st)).slice(0, todo.length - 1).sort((a, b) => a.st - b.st)
+  // 경계마다 글자 수 비율로 예상 위치를 잡고, 그 근처의 쉼을 고른다(가장 긴 쉼만 고르면 문장 중간 쉼에 걸린다)
+  const all = detect(pcm)
+  const total = pcmDur(pcm), chars = todo.map((x) => x.text.replace(/\s/g, '').length), sum = chars.reduce((a, b) => a + b, 0)
+  const sil = []
+  let acc = 0, from = 0
+  for (let k = 0; k < todo.length - 1; k++) {
+    acc += chars[k]
+    const target = total * acc / sum
+    const cand = all.slice(from).map((s, i) => ({ s, i: i + from, score: Math.abs((s.st + s.en) / 2 - target) - (s.en - s.st) * 2 }))
+    if (!cand.length) break
+    const best = cand.sort((a, b) => a.score - b.score)[0]
+    sil.push(best.s)
+    from = best.i + 1
+  }
   if (sil.length === todo.length - 1) {
     const bounds = [0, ...sil.flatMap((s) => [s.st, s.en]), pcmDur(pcm)]
     todo.forEach((x, i) => cut(pcm, bounds[i * 2], bounds[i * 2 + 1], path.join(V, `nar_${x.id}.wav`)))
