@@ -9,7 +9,7 @@ export const TAIL = 0.35;
 export const END_PAD = 1.4;
 export const beatFrames = (narDur: number) => Math.round((narDur + LEAD + TAIL) * FPS);
 
-export type Beat = {id: string; badge: string | null; narration: string; videos?: string[]; sfx?: 'whoosh' | 'boom'; chain: {kind: string}[]};
+export type Beat = {id: string; badge: string | null; narration: string; videos?: (string | {src: string; dur: number})[]; sfx?: 'whoosh' | 'boom'; chain: {kind: string}[]};
 export type EpisodeV2 = {version: 2; title: string; subtitle: string; watermark?: string; emphasis?: string[]; beats: Beat[];
 	end: {portraits: string[]; lines: string[]; url: string; narration: string}};
 export type Timing = Record<string, {duration: number; words: {text: string; start: number; end: number}[]}>;
@@ -74,18 +74,24 @@ const Captions: React.FC<{words: Timing[string]['words']; emphasis: string[]}> =
 	);
 };
 
-// 박자 화면: 체인 영상을 차례로(각각 남은 길이에 맞춰), 마지막 영상은 끝 프레임을 잡아 둔다
-const BeatVideos: React.FC<{ep: string; videos: string[]; frames: number}> = ({ep, videos, frames}) => {
-	const per = Math.floor(frames / videos.length);
+// 박자 화면: 체인 영상을 차례로. 영상 길이(dur)에 비례해 시간을 나누고, 슬롯이 영상보다 길면 살짝 느리게 재생해 끝이 비지 않게 한다
+type Vid = string | {src: string; dur: number};
+const BeatVideos: React.FC<{ep: string; videos: Vid[]; frames: number}> = ({ep, videos, frames}) => {
+	const vs = videos.map((v) => (typeof v === 'string' ? {src: v, dur: 8} : v));
+	const total = vs.reduce((a, v) => a + v.dur, 0);
+	let at = 0;
 	return (
 		<>
-			{videos.map((v, i) => {
-				const len = i === videos.length - 1 ? frames - i * per : per;
-				return (
-					<Sequence key={v} from={i * per} durationInFrames={len}>
-						<OffthreadVideo src={staticFile(`${ep}/${v}`)} volume={0.2} style={{width: '100%', height: '100%', objectFit: 'cover'}} />
+			{vs.map((v, i) => {
+				const len = i === vs.length - 1 ? frames - at : Math.round((frames * v.dur) / total);
+				const rate = Math.min(1, Math.max(0.8, (v.dur * FPS) / len));
+				const el = (
+					<Sequence key={v.src} from={at} durationInFrames={len}>
+						<OffthreadVideo src={staticFile(`${ep}/${v.src}`)} playbackRate={rate} volume={0.2} style={{width: '100%', height: '100%', objectFit: 'cover'}} />
 					</Sequence>
 				);
+				at += len;
+				return el;
 			})}
 		</>
 	);
