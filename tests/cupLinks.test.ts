@@ -51,3 +51,15 @@ describe('월드컵 연결', () => {
     expect(src).toContain('장수 월드컵 선택과 우승 결과')
   })
 })
+
+describe('CupWithLink 렌더', () => {
+  test('후보면 링크(44px 이상), 초상화 대기·모르는 id면 빈 출력', async () => {
+    const { renderToStaticMarkup } = await import('react-dom/server')
+    const { default: CupWithLink } = await import('@/components/cup/CupWithLink')
+    const html = renderToStaticMarkup(CupWithLink({ id: 'lvbu', label: '테스트' }) as never)
+    expect(html).toContain('href="/samguk/cup/warrior?with=lvbu"')
+    expect(html).toContain('min-h-[44px]')
+    expect(CupWithLink({ id: 'nobody', label: '테스트' })).toBeNull()
+    expect(CupWithLink({ id: [...PENDING_PORTRAIT_IDS][0], label: '테스트' })).toBeNull()
+  })
+})

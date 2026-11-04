@@ -286,7 +286,7 @@ public/
 | 판 구성 | `warrior` = `stats.무력` 상위 16(동점 `통솔`), `strategist` = `stats.지력` 상위 16(동점 `정치`, `huatuo` 제외), `women` = `gender '여'` 전원(16명 이상이면 무작위 16, 8~15명이면 무작위 8), `random` = 전원에서 무작위 16. 동점은 id 오름차순. 출전자는 초상화가 있는 인물(`samgukCharacters`)만. 능력치 기준 설명은 "코에이 스타일 무력/지력 기준"으로 쓰고 "역사적 강함"이라 쓰지 않는다 |
 | 저장 | `people_votes` 표(`docs/people-votes.sql`)에 `kind 'cup_match'`(target = `pairKey(a,b)`, 판과 무관, option = 고른 id)와 `kind 'cup_win'`(target = 판 키, option = 우승 id). 개인정보는 열전 투표와 같은 방식(해시만 저장) |
 | API | `POST /api/people/cup`(JSON만, 같은 사이트 Origin만, 열전 투표와 **따로** IP당 10분 200회). 투표자 판별은 열전과 같은 `pv` 쿠키·`resolveVoter`. 환경변수는 열전과 같고 없으면 503(화면은 숫자를 숨김) |
-| SQL | `docs/cup-votes.sql`(집계 함수 `cup_pair_stats`·`cup_win_counts`·`cup_match_wins`와 `(kind, target)` 색인). **아직 Supabase에서 실행하지 않았다.** 배포 전에 사용자 승인을 받고 컨트롤러가 실행한다. 실행 전에는 집계 함수가 없어 API가 503, 순위 페이지는 숫자 없이 나온다. `docs/people-votes.sql`은 `cup_match`·`cup_win` 종류를 이미 허용한다(실행 완료) |
+| SQL | `docs/cup-votes.sql`(집계 함수 `cup_pair_stats`·`cup_win_counts`·`cup_match_wins`와 `(kind, target)` 색인). **아직 Supabase에서 실행하지 않았다.** 배포 전에 사용자 승인을 받고 컨트롤러가 실행한다. API가 503을 주는 때는 환경변수가 없을 때뿐이다. 환경변수가 있는데 SQL이 아직이면 표는 그대로 저장되고(표는 이미 `cup_match`·`cup_win`을 허용), 쌍 집계 읽기만 실패해 API는 200에 `others: null`을 돌려주며 화면은 `지금은 다른 사람 선택을 불러오지 못했어요`를 보이고, 판 고르기·순위 페이지는 숫자를 숨긴다. `docs/people-votes.sql`은 `cup_match`·`cup_win` 종류를 이미 허용한다(실행 완료) |
 | GA | `TestName`에 `'cup'`. `cup_start(result_id=<판>)`, `cup_end(result_id=<판>_<우승 id>)`, 공유는 `share_click(test_name='cup')`. 값은 24자 이하(`strategist_huangyueying` 23자가 최장, 판 키+후보 id 전 조합을 테스트로 확인) |
 
 **표시 규칙**

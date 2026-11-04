@@ -65,9 +65,9 @@ export default function PrivacyPage() {
             </section>
 
             <section className="mb-8">
-                <h2 className="text-xl font-bold mb-4">6. 삼국지 인물열전 응원·투표</h2>
+                <h2 className="text-xl font-bold mb-4">6. 삼국지 인물열전 응원·투표와 장수 월드컵</h2>
                 <p>
-                    삼국지 인물열전에서 응원하기나 투표를 누르면 서비스 서버(Supabase)에 기록합니다. Google 애널리틱스와는 별개이며 Google로 보내지 않습니다.
+                    삼국지 인물열전에서 응원하기나 투표를 누르거나 삼국지 장수 월드컵에서 장수를 고르면 서비스 서버(Supabase)에 기록합니다. Google 애널리틱스와는 별개이며 Google로 보내지 않습니다.
                 </p>
                 <ul className="list-disc ml-6 mt-2 space-y-1">
                     <li>삼국지 인물열전의 응원·투표는 고른 항목과 날짜, 그리고 기기·접속 정보를 되돌릴 수 없게 바꾼 값(해시)만 저장합니다. IP 주소와 쿠키 값 자체는 저장하지 않습니다.</li>

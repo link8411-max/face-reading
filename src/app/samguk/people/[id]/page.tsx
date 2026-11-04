@@ -241,9 +241,7 @@ export default async function PersonPage({ params }: Props) {
               },
             }}
           />
-          <div className="mt-3 flex justify-center">
-            <CupWithLink id={id} label="이 장수로 월드컵 하기" />
-          </div>
+          <CupWithLink id={id} label="이 장수로 월드컵 하기" wrapClassName="mt-3" />
         </section>
         <section id="scene-vote" className="mt-8">
           <VotePoll

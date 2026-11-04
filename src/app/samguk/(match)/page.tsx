@@ -236,9 +236,7 @@ export default function SamgukPage() {
                   <Link href={`/samguk/people/${result.character.id}#cheer`} className="underline underline-offset-2">내가 닮은 장수 응원하기</Link>
                 </p>
               )}
-              <div className="mt-2 flex justify-center">
-                <CupWithLink id={result.character.id} label="닮은 장수로 월드컵 하기" />
-              </div>
+              <CupWithLink id={result.character.id} label="닮은 장수로 월드컵 하기" wrapClassName="mt-2" />
               <div className="mt-2">
                 <CoupangBanner subId="samguk" />
               </div>

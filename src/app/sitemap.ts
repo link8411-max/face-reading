@@ -61,7 +61,7 @@ export const LAST_MODIFIED: Record<string, string> = {
     ...Object.fromEntries(DUEL_GENERAL_ROUTES.map((r) => [r, '2026-10-28'])),
     '/samguk/people': '2026-11-04',
     '/samguk/people/ranking': '2026-11-03',
-    ...Object.fromEntries(PEOPLE_ROUTES.map((r) => [r, '2026-11-03'])),
+    ...Object.fromEntries(PEOPLE_ROUTES.map((r) => [r, '2026-11-04'])),
     '/samguk/cup': '2026-11-04',
     '/samguk/cup/ranking': '2026-11-04',
     ...Object.fromEntries(MBTI_SLUGS.map((s) => [`/mbti/${s}`, '2026-10-26'])),
