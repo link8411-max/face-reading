@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useId, useState, type ReactNode } from 'react'
+import { useEffect, useId, useState, useSyncExternalStore, type ReactNode } from 'react'
 import { track } from '@/lib/analytics'
 import { gaVideoId, isNew, isVideoId, viewsLabel } from '@/lib/videos/format'
 import type { Video, VideoSlot } from '@/lib/videos/types'
@@ -24,6 +24,8 @@ export function SubscribeLink({
   )
 }
 
+const subscribeNever = () => () => {}
+
 function PlayMark() {
   return (
     <span className="pointer-events-none absolute inset-0 flex items-center justify-center">
@@ -40,9 +42,14 @@ export default function VideoPlayer({
   video, slot, className = '', nowMs,
 }: { video: Video; slot: VideoSlot; className?: string; nowMs?: number }) {
   const [playing, setPlaying] = useState(false)
-  const [now, setNow] = useState<number | null>(nowMs ?? null)
+  const [clock] = useState<{ at: number | null }>(() => ({ at: null }))
+  // 서버·하이드레이션 첫 렌더는 nowMs ?? null, 마운트 뒤에는 한 번만 잰 Date.now()
+  const now = useSyncExternalStore(
+    subscribeNever,
+    () => nowMs ?? (clock.at ??= Date.now()),
+    () => nowMs ?? null,
+  )
   const token = useId()
-  useEffect(() => setNow(Date.now()), [])
   const playable = isVideoId(video.id)
 
   useEffect(() => {
