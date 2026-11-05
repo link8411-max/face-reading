@@ -149,20 +149,21 @@ public/
 - 테스트 `npx vitest run tests/dailyEngine`(60×60 분포 고정). 홈 번들에 `fortuneDB`·`DailyFortuneCard`를 넣지 않는다(stage4a 테스트).
 
 ## 아침 운세 푸시
-- 구조: 오늘의 운세 카드의 `PushToggle` → `/api/push/subscribe` → Supabase `push_subscriptions`(년주만 저장) → pg_cron이 매일 08:30 KST에 `/api/push/send` 호출 → web-push 발송 → 알림 클릭 시 `/fortune/daily?gz=<년주>` 착지.
+- 구조: 오늘의 운세 카드의 `PushToggle` → `/api/push/subscribe` → Supabase `push_subscriptions`(년주·희망 발송 시각 `send_at` 저장) → pg_cron이 30분마다 `/api/push/send` 호출(그 시각 창의 구독만 발송) → web-push 발송 → 알림 클릭 시 `/fortune/daily?gz=<년주>` 착지.
 - 파일: `src/lib/push/{text,validate,store,send,guard,client}.ts`, `src/app/api/push/{subscribe,send}/route.ts`, `src/components/fortune/PushToggle.tsx`, `public/sw.js`(push·notificationclick), `docs/push-subscriptions.sql`, 설계 `docs/superpowers/specs/2026-11-05-daily-push-design.md`.
 - 환경변수 4개(Vercel): `NEXT_PUBLIC_VAPID_PUBLIC_KEY`, `VAPID_PRIVATE_KEY`, `VAPID_SUBJECT`(`mailto:…`), `PUSH_CRON_SECRET`. 없으면 버튼이 숨고 API는 503(빌드는 없이도 통과). **환경변수를 넣거나 바꾼 뒤에는 재배포가 필요하다**(`NEXT_PUBLIC` 키는 빌드 때 코드에 박힌다). VAPID 키 생성: `npx web-push generate-vapid-keys`.
 - **VAPID 키는 교체하지 않는다.** 교체하면 기존 구독자 전원이 403으로 끊기고 5일 뒤 삭제된다; 꼭 교체해야 하면 사용자가 버튼을 다시 눌러야 한다.
-- DB·스케줄: `docs/push-subscriptions.sql`을 Supabase SQL Editor에서 실행 -> 확장(pg_cron·pg_net)은 SQL 또는 Dashboard > Database > Extensions에서 켜고 -> 파일의 '한 번만 실행' 블록으로 Vault에 `push_cron_secret` 넣고(중복 실행 금지) -> 그 아래 cron 블록 주석 해제(UTC 23:30·23:45·00:00 = KST 08:30 본발송, 08:45·09:00 보정).
-- 롤백: `select cron.unschedule('daily-push-0830'); select cron.unschedule('daily-push-0845-retry'); select cron.unschedule('daily-push-0900-retry');`
+- DB·스케줄: `docs/push-subscriptions.sql`을 Supabase SQL Editor에서 실행 -> 확장(pg_cron·pg_net)은 SQL 또는 Dashboard > Database > Extensions에서 켜고 -> 파일의 '한 번만 실행' 블록으로 Vault에 `push_cron_secret` 넣고(중복 실행 금지) -> 그 아래 cron 블록 주석 해제(cron 하나: `*/30 * * * *`, 이름 `daily-push-every-30m`). 이전 3개 스케줄(`daily-push-0830`·`-0845-retry`·`-0900-retry`)이 남아 있으면 `cron.unschedule`로 지운다.
+- 알림 시각: 30분 단위 슬롯 05:00~23:30, 기본 08:30(열 `send_at`, check·인덱스는 SQL 파일). 호출 시각(KST)이 `to`이면 발송 창은 `(to−60분, to]` — 직전 회차를 놓쳐도 다음 회차가 보정한다. 자정에서 잘리므로 23:30 슬롯은 재시도가 없다(`slotWindow`, `src/lib/push/send.ts`). 슬롯 라벨은 `src/lib/push/slotLabel.ts`.
+- 롤백: `select cron.unschedule('daily-push-every-30m');` (하나)
 - 아침 점검(SQL Editor):
-  1. `select * from push_send_log order by id desc limit 5;`
-  2. `select j.jobname, d.status, d.start_time, d.return_message from cron.job_run_details d join cron.job j using (jobid) order by d.start_time desc limit 6;`
+  1. `select * from push_send_log order by id desc limit 10;`(최근 회차들, `slot_to`로 회차 구분)
+  2. `select j.jobname, d.status, d.start_time, d.return_message from cron.job_run_details d join cron.job j using (jobid) order by d.start_time desc limit 10;` (최근 10회차)
   3. `select id, status_code, error_msg, created from net._http_response order by created desc limit 6;` (6시간만 보관)
   4. `select ganji, count(*), count(*) filter (where fail_count > 0) as failing from push_subscriptions group by rollup (ganji) order by ganji;`
 - 로그 행이 없으면 실패다(401 비밀 불일치·503 환경변수·500 Supabase/VAPID). cron 행은 요청을 큐에 넣기만 해서 항상 succeeded로 보인다. 서버 로그엔 `[push] send failed: unauthorized|disabled|error`만 남는다(500이면 0건 행도 기록).
-- 수동 발송: `curl -X POST -H "Authorization: Bearer $PUSH_CRON_SECRET" https://unse-ai.com/api/push/send` (www 말고 정규 도메인). 그날 KST 발송으로 기록되니(기기당 하루 1회) 자정 뒤에 시험하면 다음 날 몫이 소진된다.
-- 규칙: 기기당 하루 1회(`last_sent_on`, KST). 실패는 하루 1회만 집계(`push_bump_fail`)·5회 누적 삭제, 404/410은 즉시 삭제. 구독 endpoint는 허용 호스트(fcm·mozilla·apple·windows·samsung)만. 기기별 발송 타임아웃 10초, 한 번 호출 예산 40초(maxDuration 60). 응답·로그의 `sent`는 실제 발송 수이고 `unrecorded`는 그중 `last_sent_on` 기록에 실패한 수(다음 보정 발송에서 한 번 더 갈 수 있음). 생년은 저장·전송하지 않고 년주 2글자만. endpoint는 로그에 남기지 않는다.
+- 수동 발송: `curl -X POST -H "Authorization: Bearer $PUSH_CRON_SECRET" https://unse-ai.com/api/push/send` (www 말고 정규 도메인). 지금 KST 시각 기준 한 시간 창의 구독만 보낸다. 그날 KST 발송으로 기록되니(기기당 하루 1회) 자정 뒤에 시험하면 다음 날 몫이 소진된다.
+- 규칙: 기기당 하루 1회(`last_sent_on`, KST). 실패는 하루 1회만 집계(`push_bump_fail`)·5회 누적 삭제, 404/410은 즉시 삭제. 구독 endpoint는 허용 호스트(fcm·mozilla·apple·windows·samsung)만. 기기별 발송 타임아웃 10초, 한 번 호출 예산 40초(maxDuration 60). 응답·로그의 `sent`는 실제 발송 수이고 `unrecorded`는 그중 `last_sent_on` 기록에 실패한 수(다음 회차의 창에 걸리면 한 번 더 갈 수 있음). 생년은 저장·전송하지 않고 년주 2글자만. endpoint는 로그에 남기지 않는다.
 - 로그: `push_send_log`
 
 | 컬럼 | 뜻 |
@@ -170,7 +171,9 @@ public/
 | day, finished_at | KST 날짜, 행을 넣은 시각(호출이 끝난 때) |
 | sent, failed, removed | 성공·실패·삭제 수 |
 | ms | 소요 시간 |
+| slot_to | 이 회차의 창 끝 시각(KST, `HH:MM`) |
 
+- 버튼에는 `알림 시각` select(30분 슬롯)가 있다. 다른 년주의 운세를 보는 중이면 잠기고(내 구독 년주와 다르므로), 시각을 바꾸면 저장된 년주로 다시 구독한다.
 - 버튼 상태 순서(`pushUiState`): 카카오톡 인앱(`kakao`) > iOS 비설치(`ios_install`) > 미지원·키 없음(`unsupported`, 숨김) > 권한 거부(`denied`) > `off` > `on`. iOS는 홈 화면에 추가한 뒤에만 구독 가능, 카카오톡 인앱은 외부 브라우저로 열어야 한다.
 - 테스트 `npx vitest run tests/push`.
 
