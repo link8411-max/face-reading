@@ -55,7 +55,7 @@ export async function runDailySend(deps: RunDeps): Promise<{ day: string; sent: 
     return p
   }
 
-  const okEndpoints: string[] = []
+  let sent = 0
   let failed = 0
   let removed = 0
   let processed = 0
@@ -69,11 +69,12 @@ export async function runDailySend(deps: RunDeps): Promise<{ day: string; sent: 
         return r
       }),
     )
+    const waveOk: string[] = []
     for (let k = 0; k < wave.length; k++) {
       const row = wave[k]
       const r = results[k]
       try {
-        if (r === 'ok') okEndpoints.push(row.endpoint)
+        if (r === 'ok') waveOk.push(row.endpoint)
         else if (r === 'gone') { await store.deleteSubscription(cfg, row.endpoint); removed++ }
         else { await store.bumpFail(cfg, row.endpoint); failed++ }
       } catch {
@@ -81,9 +82,17 @@ export async function runDailySend(deps: RunDeps): Promise<{ day: string; sent: 
       }
     }
     processed += wave.length
+    sent += waveOk.length
+    if (waveOk.length) {
+      // 성공은 묶음마다 기록한다. 한 번 재시도해도 실패하면 진행을 기록할 수 없으니 더 보내지 않는다
+      let recorded = false
+      for (let attempt = 0; attempt < 2 && !recorded; attempt++) {
+        try { await store.markSent(cfg, waveOk, day); recorded = true } catch { /* 재시도 */ }
+      }
+      if (!recorded) break
+    }
   }
-  if (okEndpoints.length) await store.markSent(cfg, okEndpoints, day)
   const ms = now().getTime() - start
-  await store.logRun(cfg, { day, sent: okEndpoints.length, failed, removed, ms }).catch(() => {})
-  return { day, sent: okEndpoints.length, failed, removed, remaining: rows.length - processed }
+  await store.logRun(cfg, { day, sent, failed, removed, ms }).catch(() => {})
+  return { day, sent, failed, removed, remaining: rows.length - processed }
 }

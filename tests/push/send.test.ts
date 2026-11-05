@@ -38,3 +38,18 @@ test('시간 예산이 끝나면 멈추고 remaining을 돌려준다', async () 
   const r = await runDailySend({ store: f.store, cfg, sender, now: () => new Date(Date.UTC(2026, 10, 4, 23, 30, 0) + t), budgetMs: 100, concurrency: 1 })
   expect(r.sent).toBeGreaterThan(0); expect(r.sent).toBeLessThan(50); expect(r.remaining).toBe(50 - r.sent)
 })
+test('markSent가 한 번 실패해도 재시도해서 모두 기록한다', async () => {
+  const f = fakeStore(Array.from({ length: 5 }, (_, i) => ({ endpoint: 'e' + i, ganji: '경오' })))
+  let calls = 0
+  const store = { ...f.store, markSent: async (c: unknown, eps: string[], d: string) => { if (calls++ === 0) throw new Error('x'); return f.store.markSent(c, eps, d) } }
+  const r = await runDailySend({ store, cfg, sender: async () => 'ok', now: at('2026-11-04T23:30:00Z'), concurrency: 5 })
+  expect(r).toMatchObject({ sent: 5, remaining: 0 })
+  expect(f.db.every((x) => x.last_sent_on === '2026-11-05')).toBe(true)
+})
+test('markSent가 계속 실패하면 첫 묶음 뒤 멈춘다', async () => {
+  const f = fakeStore(Array.from({ length: 6 }, (_, i) => ({ endpoint: 'e' + i, ganji: '경오' })))
+  const sent: string[] = []
+  const store = { ...f.store, markSent: async () => { throw new Error('x') } }
+  const r = await runDailySend({ store, cfg, sender: async (s) => { sent.push(s.endpoint); return 'ok' }, now: at('2026-11-04T23:30:00Z'), concurrency: 2 })
+  expect(r.sent).toBe(2); expect(r.remaining).toBe(4); expect(sent.length).toBe(2)
+})
