@@ -1,4 +1,4 @@
-import { 천간, 지지, 천간오행 } from '@/lib/saju'
+import { 천간, 지지, 오행, 천간오행 } from '@/lib/saju'
 
 export type 천간관계 = '합' | '충' | '인성' | '비겁' | '재성' | '식상' | '관살'
 export type 지지관계 = '육합' | '삼합' | '무관' | '복음' | '형' | '충'
@@ -23,6 +23,8 @@ function 다음(순환: string[], 오행: string): string {
 }
 
 export function 오행관계판정(내오행: string, 상대오행: string): { 관계: 오행관계; 점수: number } {
+  if (!(오행 as readonly string[]).includes(내오행)) throw new Error(`모르는 오행: ${내오행}`)
+  if (!(오행 as readonly string[]).includes(상대오행)) throw new Error(`모르는 오행: ${상대오행}`)
   let 관계: 오행관계
   if (내오행 === 상대오행) 관계 = '비겁'
   else if (다음(생순환, 상대오행) === 내오행) 관계 = '인성'
@@ -38,6 +40,9 @@ const 천간합 = 쌍(['갑기', '을경', '병신', '정임', '무계'])
 const 천간충 = 쌍(['갑경', '을신', '병임', '정계'])
 
 export function 천간관계판정(내천간: string, 일간: string): { 관계: 천간관계; 점수: number } {
+  for (const x of [내천간, 일간]) {
+    if (!(천간 as readonly string[]).includes(x)) throw new Error(`모르는 천간: ${x}`)
+  }
   const key = 내천간 + 일간
   if (천간합.has(key)) return { 관계: '합', 점수: 천간점수.합 }
   if (천간충.has(key)) return { 관계: '충', 점수: 천간점수.충 }
@@ -57,6 +62,9 @@ const 지지형 = new Set([
 ])
 
 export function 지지관계판정(내지지: string, 일지: string): { 관계: 지지관계; 점수: number } {
+  for (const x of [내지지, 일지]) {
+    if (!(지지 as readonly string[]).includes(x)) throw new Error(`모르는 지지: ${x}`)
+  }
   const key = 내지지 + 일지
   let 관계: 지지관계
   if (지지충.has(key)) 관계 = '충'
