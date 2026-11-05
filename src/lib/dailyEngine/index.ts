@@ -33,8 +33,8 @@ export const 별점계산 = (점수: number): 1 | 2 | 3 | 4 | 5 => {
 const 상태순서: 상태[] = ['조심', '보통', '좋음']
 const 기본상태: Record<지지관계, 상태> = { 육합: '좋음', 삼합: '좋음', 무관: '보통', 복음: '보통', 형: '조심', 충: '조심' }
 
-const 색: Record<string, string> = { 목: '초록', 화: '빨강', 토: '노랑', 금: '하양', 수: '검정' }
-const 방향: Record<string, string> = { 목: '동쪽', 화: '남쪽', 토: '중앙(가까운 곳)', 금: '서쪽', 수: '북쪽' }
+const 색: Record<string, string> = { 목: '초록', 화: '빨강', 토: '노랑', 금: '흰색', 수: '파랑' }
+const 방향: Record<string, string> = { 목: '동', 화: '남', 토: '중앙(가까운 곳)', 금: '서', 수: '북' }
 
 const 생: Record<string, string> = { 목: '화', 화: '토', 토: '금', 금: '수', 수: '목' }
 const 극: Record<string, string> = { 목: '토', 토: '수', 수: '화', 화: '금', 금: '목' }
