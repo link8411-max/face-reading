@@ -25,7 +25,7 @@ npm run test:e2e     # E2E (next build 후 3200 포트): 전 페이지 로딩·�
 - **AI 호출 없음**: 결과는 규칙 계산 + 미리 작성한 해석 데이터 (Gemini 제거됨)
 - **얼굴인식**: @mediapipe/tasks-vision FaceLandmarker 478점 (삼국지·동물상), @vladmandic/face-api 68점 (관상만, 추후 이전)
 - **OG 이미지**: @vercel/og (동적 생성)
-- **PWA**: manifest.ts + sw.js (홈화면 설치 가능)
+- **PWA**: manifest.ts + sw.js v2(캐시 + push 핸들러) + PNG 아이콘 `icon-192/512`·`apple-touch-icon-180`·`badge-96`(`scripts/make-push-icons.mjs`로 생성) (홈화면 설치 가능)
 
 ---
 
@@ -48,7 +48,7 @@ npm run test:e2e     # E2E (next build 후 3200 포트): 전 페이지 로딩·�
 - 공유하기: `hooks/useResultShare`. 카카오톡 인앱이면 카카오톡 공유(`lib/kakao.ts`, Kakao SDK 2.7.4, 피드 카드: 1인칭 문구·결과 미리보기 이미지·나도 해보기) → 그 밖엔 `lib/share.ts` `shareResult`: 결과 링크+문구를 기본 공유창으로, 없으면 링크 복사. GA share_click method: kakao·link.
   - 카카오디벨로퍼스 앱 "운명을 읽다"(ID 1623598). JavaScript 키(공개 값)는 등록한 도메인(https://unse-ai.com, http://localhost:3200)에서만 동작한다. 도메인이 바뀌면 콘솔 > 플랫폼 키 > JavaScript 키 > SDK 도메인에 추가. **공유 카드를 눌러 이동하려면 별도로 앱 설정 > 제품 링크 관리 > 웹 도메인에 https://unse-ai.com이 있어야 한다**(없으면 카드는 보이지만 눌러도 반응이 없다, 2026-10-27 등록). 운세는 결과 링크가 없어 `useScreenshot().share`(이미지)를 쓰고, 카카오톡 안에서는 `kakao` 옵션의 카드로 보낸다(신년운세는 그 띠의 `/fortune/2027/[띠]`, 오늘의 운세는 `/fortune/daily`, 생년월일·출생 연도는 넣지 않음).
 - 결과 공유 링크 (`lib/shareLinks.ts`): `/animal/r/[유형]?s=점수`, `/samguk/r/[장수id]?s=점수`, `/face2/r/[유형키]`, MBTI는 `/mbti/r/infp-entj` (계산기 `/mbti/match`는 정적·검색 노출 유지). 링크에는 유형 키·점수(50~99)·utm(source=share, medium=friend_link)만. 허용 목록 밖이면 테스트 시작 화면으로.
-  - 착지 페이지 `components/share/SharePage.tsx`: 서버 `generateMetadata`로 1인칭 문구 미리보기(카톡·인스타 봇은 JS를 실행하지 않음), noindex, canonical은 원래 테스트, 사이트맵 제외. GA `shared_landing`.
+  - 착지 페이지 `components/share/SharePage.tsx`: 서버 `generateMetadata`로 1인칭 문구 미리보기(카톡·인스타 봇은 JS를 실행하지 않음), noindex, canonical은 원래 테스트, 사이트맵 제외. GA `shared_landing`, `push_subscribe`(result_id: 유형 키)·`push_unsubscribe`·`push_blocked(result_id: denied·ios_install·server·kakao)`.
   - 미리보기 이미지 `/api/og/result?kind=animal|samguk|face|mbti&…` (1200×630, 삼국지는 도트 초상화). `lib/ogQuery.ts`로 종류별 허용 매개변수·점수(50~99 두 자리)만 받고 CDN에 1년 캐시(초상화를 못 받으면 5분).
 - 결과 캡처는 `no-screenshot` 요소와 iframe을 뺀다(`lib/capture.ts`). 운세의 생년월일 줄은 화면에만. 운세 공유 이미지는 결과가 나오면 미리 만들어 두고(`useScreenshot(result)`), 공유하기는 누르자마자 공유창을 연다.
 - 얼굴 궁합·우리 팀은 분석 중에 입력(관계·성별·사진·별칭·인원)을 잠근다.
@@ -148,6 +148,24 @@ public/
 - 생년은 GA·공유·저장 이미지에 넣지 않는다. 캡처 제목은 "경오년 말띠".
 - 테스트 `npx vitest run tests/dailyEngine`(60×60 분포 고정). 홈 번들에 `fortuneDB`·`DailyFortuneCard`를 넣지 않는다(stage4a 테스트).
 
+## 아침 운세 푸시
+- 구조: 오늘의 운세 카드의 `PushToggle` → `/api/push/subscribe` → Supabase `push_subscriptions`(년주만 저장) → pg_cron이 매일 08:30 KST에 `/api/push/send` 호출 → web-push 발송 → 알림 클릭 시 `/fortune/daily?gz=<년주>` 착지.
+- 파일: `src/lib/push/{text,validate,store,send,guard,client}.ts`, `src/app/api/push/{subscribe,send}/route.ts`, `src/components/fortune/PushToggle.tsx`, `public/sw.js`(push·notificationclick), `docs/push-subscriptions.sql`, 설계 `docs/superpowers/specs/2026-11-05-daily-push-design.md`.
+- 환경변수 4개(Vercel): `NEXT_PUBLIC_VAPID_PUBLIC_KEY`, `VAPID_PRIVATE_KEY`, `VAPID_SUBJECT`, `PUSH_CRON_SECRET`. 없으면 버튼이 숨고 API는 503(빌드는 없이도 통과).
+- DB·스케줄: `docs/push-subscriptions.sql`을 Supabase SQL Editor에서 실행 -> Vault에 `push_cron_secret` 넣고 -> 파일 아래 cron 블록 주석 해제(UTC 23:30·23:45·00:00 = KST 08:30 본발송, 08:45·09:00 보정).
+- 수동 발송: `curl -X POST -H "Authorization: Bearer $PUSH_CRON_SECRET" https://unse-ai.com/api/push/send` (www 말고 정규 도메인).
+- 규칙: 기기당 하루 1회(`last_sent_on`, KST). 실패는 하루 1회만 집계(`push_bump_fail`)·5회 누적 삭제, 404/410은 즉시 삭제. 구독 endpoint는 허용 호스트(fcm·mozilla·apple·windows·samsung)만. 기기별 발송 타임아웃 10초, 한 번 호출 예산 45초(maxDuration 60). 생년은 저장·전송하지 않고 년주 2글자만. endpoint는 로그에 남기지 않는다.
+- 로그: `push_send_log`
+
+| 컬럼 | 뜻 |
+|------|-----|
+| day, started_at | KST 날짜, 시작 시각 |
+| sent, failed, removed | 성공·실패·삭제 수 |
+| ms | 소요 시간 |
+
+- 버튼 상태 순서(`pushUiState`): 카카오톡 인앱(`kakao`) > iOS 비설치(`ios_install`) > 미지원·키 없음(`unsupported`, 숨김) > 권한 거부(`denied`) > `off` > `on`. iOS는 홈 화면에 추가한 뒤에만 구독 가능, 카카오톡 인앱은 외부 브라우저로 열어야 한다.
+- 테스트 `npx vitest run tests/push`.
+
 ## 페이지별 기능
 
 | 경로 | 기능 | 제한 | 사용 기술 |
@@ -230,7 +248,8 @@ public/
 
 ### PWA
 - `manifest.ts` → Next.js가 자동으로 `/manifest.webmanifest` 생성
-- `sw.js` - 서비스 워커 (캐싱, 오프라인 지원)
+- `sw.js` v2 - 서비스 워커 (캐싱, 오프라인 지원, `push`·`notificationclick` 핸들러)
+- PNG 아이콘 `public/icons/{icon-192,icon-512,apple-touch-icon-180,badge-96}.png` (`scripts/make-push-icons.mjs`)
 - 홈화면 추가 가능 (iOS Safari, Android Chrome)
 
 ---
@@ -338,6 +357,7 @@ public/
 | 페이지 설명 본문/FAQ | `src/content/pageGuides.ts` |
 | 홈 FAQ(화면·구조화 데이터) | `src/content/homeFaq.ts` |
 | 오늘의 운세 문장 | `src/content/dailyFortuneText.ts` (검증 `npx vitest run tests/dailyEngine`) |
+| 푸시 알림 문구 | `src/lib/push/text.ts` |
 | sitemap | `src/app/sitemap.ts` (내용 바꾸면 `LAST_MODIFIED` 날짜 갱신) |
 
 ---
