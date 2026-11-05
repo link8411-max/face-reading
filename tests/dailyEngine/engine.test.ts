@@ -82,3 +82,12 @@ test('년생 모드는 정수가 아닌 연도를 거부한다', () => {
   expect(() => dailyFortune({ kind: '년생', year: NaN, isEarlyYear: false }, D)).toThrow('잘못된 연도: NaN')
   expect(() => dailyFortune({ kind: '년생', year: 1990.5, isEarlyYear: false }, D)).toThrow('잘못된 연도')
 })
+
+test('년주 모드: 경오 = 1990년생과 같은 결과, 생년 없음', () => {
+  const a = dailyFortune({ kind: '년주', 천간: '경', 지지: '오' }, D)
+  const b = dailyFortune({ kind: '년생', year: 1990, isEarlyYear: false }, D)
+  expect(a).toEqual(b)
+  expect(a.나).toEqual({ 띠: '말', 띠이모지: '🐎', 지지: '오', 천간: '경', 년주표기: '경오' })
+  expect(() => dailyFortune({ kind: '년주', 천간: '가', 지지: '오' }, D)).toThrow('모르는 년주')
+  expect(() => dailyFortune({ kind: '년주', 천간: '경', 지지: '나' }, D)).toThrow('모르는 년주')
+})

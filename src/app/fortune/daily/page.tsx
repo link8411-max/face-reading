@@ -12,7 +12,7 @@ import { sanitizeDigits, validateBirthYear } from "@/lib/birthDate";
 import Link from "next/link";
 import { useScreenshot } from "@/hooks/useScreenshot";
 import { SITE } from "@/lib/shareLinks";
-import { dailyFortune, type DailyFortune } from "@/lib/dailyEngine";
+import { dailyFortune, type DailyFortune, type DailyInput } from "@/lib/dailyEngine";
 import { kstDate, onDayMaybeChanged } from "@/lib/kst";
 import DailyFortuneCard from "@/components/fortune/DailyFortuneCard";
 import { dailyDateLine, dayLabel } from "@/lib/dailyEngine/format";
@@ -27,11 +27,14 @@ export default function DailyFortunePage() {
   const { ref: resultRef, isCapturing, download, share, shareNotice } = useScreenshot(result);
 
   // 자정 갱신 콜백이 최신 결과·입력을 읽도록 ref에 둔다
-  const live = useRef<{ result: DailyFortune | null; year: string; early: boolean }>({ result: null, year: "", early: false });
+  const live = useRef<{ result: DailyFortune | null; input: DailyInput | null }>({ result: null, input: null });
+  // 년주(?gz=)로 들어오면 생년이 없으므로 카드의 생년 줄을 숨긴다
+  const [fromGz, setFromGz] = useState(false);
 
   const compute = (yearText: string, early: boolean) => {
-    const fortune = dailyFortune({ kind: "년생", year: Number(yearText), isEarlyYear: early }, new Date());
-    live.current = { result: fortune, year: yearText, early };
+    const input: DailyInput = { kind: "년생", year: Number(yearText), isEarlyYear: early };
+    const fortune = dailyFortune(input, new Date());
+    live.current = { result: fortune, input };
     setResult(fortune);
     track("fortune_submit", { test_name: "daily" });
     track("result_view", { test_name: "daily", result_id: fortune.나.띠 });
@@ -43,8 +46,8 @@ export default function DailyFortunePage() {
       setToday(now);
       // 결과를 연 채로 자정을 넘기면 오늘 날짜로 다시 계산한다(GA는 다시 보내지 않는다)
       const cur = live.current;
-      if (cur.result && cur.result.날짜 !== now) {
-        const fresh = dailyFortune({ kind: "년생", year: Number(cur.year), isEarlyYear: cur.early }, new Date());
+      if (cur.result && cur.input && cur.result.날짜 !== now) {
+        const fresh = dailyFortune(cur.input, new Date());
         live.current = { ...cur, result: fresh };
         setResult(fresh);
       }
@@ -60,7 +63,23 @@ export default function DailyFortunePage() {
       setIsEarlyYear(early);
       if (validateBirthYear(y).ok) compute(y, early);
     }
-    if (q.has("year") || q.has("early")) {
+    const gz = q.get("gz");
+    if (!(y && /^\d{4}$/.test(y)) && gz && gz.length === 2) {
+      // 푸시 링크: 년주(천간+지지)로 바로 보여 준다. 엔진이 모르는 글자면 입력 화면 그대로 둔다
+      try {
+        const input: DailyInput = { kind: '년주', 천간: gz[0], 지지: gz[1] };
+        const fortune = dailyFortune(input, new Date());
+        live.current = { result: fortune, input };
+        setFromGz(true);
+        setResult(fortune);
+        track("result_view", { test_name: "daily", result_id: fortune.나.띠 });
+        if (q.get("utm_source") === "push") track("shared_landing", { test_name: "daily", result_id: "push" });
+      } catch {
+        /* 잘못된 gz는 무시 */
+      }
+    }
+    if (q.has("year") || q.has("early") || q.has("gz")) {
+      q.delete("gz");
       q.delete("year");
       q.delete("early");
       history.replaceState(null, "", location.pathname + (q.toString() ? "?" + q.toString() : "") + location.hash);
@@ -93,7 +112,8 @@ export default function DailyFortunePage() {
   };
 
   const resetAll = () => {
-    live.current = { result: null, year: "", early: false };
+    live.current = { result: null, input: null };
+    setFromGz(false);
     setBirthYear("");
     setIsEarlyYear(false);
     setResult(null);
@@ -162,7 +182,7 @@ export default function DailyFortunePage() {
           <div className="space-y-4 animate-fade-in">
             {/* 캡쳐 영역 시작 */}
             <div ref={resultRef} className="space-y-3 bg-card rounded-[30px] p-4">
-            <DailyFortuneCard fortune={result} birthYearLabel={`${birthYear}년생${isEarlyYear ? " (입춘 전)" : ""}`} />
+            <DailyFortuneCard fortune={result} birthYearLabel={fromGz ? null : `${birthYear}년생${isEarlyYear ? " (입춘 전)" : ""}`} />
             </div>
             {/* 캡쳐 영역 끝 */}
 
