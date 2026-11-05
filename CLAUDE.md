@@ -36,6 +36,7 @@ npm run test:e2e     # E2E (next build 후 3200 포트): 전 페이지 로딩·�
 ### 토큰 (`globals.css` `@theme`)
 `bg-paper`(#FBF6F1) `bg-card`(#ECE5D9) `bg-card-2`(#F1EBE2) `border-line`(#E6DED2) `text-ink`(#2E2A27) `text-muted`(#6B6259) `text-accent`(#A4553A, 포인트는 이것 하나) `blush`(#E9BCA8, 얼굴 그림 볼 홍조만) · 삼국지 카드 전용 `bg-navy-game`(#23263A) `text-gold-game`(#E8B547)
 - 글꼴: 제목 `font-serif`(Gowun Batang 400/700), 본문 `font-sans`(Noto Sans KR 400/700), 삼국지 카드 픽셀 글씨 `font-pixel`(Silkscreen). 900 굵기 금지(테스트).
+  - 자체 호스팅(`next/font/local`, 2026-11-05): woff2와 OFL 라이선스는 `src/fonts/`, `layout.tsx`에서 읽는다. Google Fonts(`next/font/google`)는 쓰지 않는다 — Vercel 빌드가 폰트 다운로드 실패로 깨진 적이 있다(테스트로 막음). 한글 글꼴은 `scripts/font-subset.mjs`로 KS X 1001 2350자 + 라틴·기호 + src 코드에 나오는 글자만 남긴다(원본·사용법은 스크립트 머리말). 2350 밖 한글을 새 문구에 쓰면 스크립트를 다시 돌린다.
 - 모양: 카드 `rounded-[22px]`~`rounded-[30px]`, 버튼 pill(`rounded-full`), 주 버튼 `h-[52px] bg-ink text-paper`.
 - 옛 민화 색(#F5E6D3, #C41E3A 등)과 옛 토큰 이름(vermilion, gold, navy, paper-2)은 테스트로 막는다.
 

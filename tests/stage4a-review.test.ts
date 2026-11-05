@@ -3,8 +3,13 @@ import { CATEGORIES } from '@/content/navigation'
 
 test('글꼴은 쓰는 굵기만: Sans 400·700, Gowun Batang 400·700', () => {
   const layout = readFileSync('src/app/layout.tsx', 'utf8')
-  expect(layout).toMatch(/Noto_Sans_KR\(\{[\s\S]*?weight: \["400", "700"\]/)
-  expect(layout).toMatch(/Gowun_Batang\(\{[\s\S]*?weight: \["400", "700"\]/)
+  // next/font/local: 파일마다 굵기를 적는다. 400·700 말고 다른 굵기 파일은 싣지 않는다
+  for (const name of ['NotoSansKR', 'GowunBatang']) {
+    expect(layout).toMatch(new RegExp(`${name}-Regular\\.woff2", weight: "400"`))
+    expect(layout).toMatch(new RegExp(`${name}-Bold\\.woff2", weight: "700"`))
+  }
+  const weights = [...layout.matchAll(/weight: "(\d+)"/g)].map((m) => m[1])
+  expect(new Set(weights)).toEqual(new Set(['400', '700']))
 })
 
 test('globals.css의 body 규칙이 글꼴·배경·글자색을 덮어쓰지 않는다', () => {

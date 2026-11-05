@@ -1,16 +1,25 @@
-import { readFileSync } from 'node:fs'
+import { existsSync, readFileSync } from 'node:fs'
 import { renderToStaticMarkup } from 'react-dom/server'
 import { Icon, ICON_NAMES, SmileFace } from '@/components/icons'
 
 const css = readFileSync('src/app/globals.css', 'utf8')
 
-test('한글 글꼴: 제목 Gowun Batang, 본문 Noto Sans KR', () => {
+test('한글 글꼴: 제목 Gowun Batang, 본문 Noto Sans KR — 자체 호스팅(next/font/local)', () => {
   const layout = readFileSync('src/app/layout.tsx', 'utf8')
-  expect(layout).toContain('Gowun_Batang')
-  expect(layout).toContain('Noto_Sans_KR')
-  expect(layout).toContain('Silkscreen')
-  expect(layout).not.toContain('Noto_Serif_KR')
+  expect(layout).toContain('next/font/local')
+  expect(layout).not.toContain('next/font/google') // Vercel 빌드가 Google Fonts 다운로드에 기대지 않게
+  expect(layout).toContain('GowunBatang-Regular.woff2')
+  expect(layout).toContain('NotoSansKR-Regular.woff2')
+  expect(layout).toContain('Silkscreen-Regular.woff2')
+  expect(layout).not.toMatch(/Noto.?Serif/)
   expect(layout).not.toContain('Geist')
+})
+
+test('자체 호스팅 글꼴 파일과 OFL 라이선스가 src/fonts에 있다', () => {
+  for (const f of ['NotoSansKR-Regular', 'NotoSansKR-Bold', 'GowunBatang-Regular', 'GowunBatang-Bold', 'Silkscreen-Regular']) {
+    expect(existsSync(`src/fonts/${f}.woff2`), f).toBe(true)
+  }
+  for (const f of ['OFL-NotoSansCJK', 'OFL-GowunBatang', 'OFL-Silkscreen']) expect(existsSync(`src/fonts/${f}.txt`), f).toBe(true)
 })
 
 const TOKENS: [string, string][] = [

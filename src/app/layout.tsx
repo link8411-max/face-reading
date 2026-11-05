@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Gowun_Batang, Noto_Sans_KR, Silkscreen } from "next/font/google";
+import localFont from "next/font/local";
 import { Analytics } from "@vercel/analytics/react";
 import Script from "next/script";
 import { GA_ID, PROD_HOST_SOURCE } from "@/lib/analytics";
@@ -8,26 +8,30 @@ import BottomTabBar from "@/components/BottomTabBar";
 import { CATEGORIES } from "@/content/navigation";
 import "./globals.css";
 
-// 한글 본문·제목 글꼴 (Korean 글리프는 unicode-range로 필요한 만큼만 받는다)
-const notoSans = Noto_Sans_KR({
+// 글꼴은 자체 호스팅(src/fonts, SIL OFL). Google Fonts를 빌드 때 내려받지 않으므로 Vercel 빌드가 네트워크에 기대지 않는다.
+// 한글 글꼴은 scripts/font-subset.mjs로 KS X 1001 완성형 2350자 + 라틴·기호만 남긴 woff2. 쓰는 굵기(400·700)만 싣는다.
+const notoSans = localFont({
   variable: "--font-noto-sans-kr",
-  weight: ["400", "700"],
-  subsets: ["latin"],
+  src: [
+    { path: "../fonts/NotoSansKR-Regular.woff2", weight: "400", style: "normal" },
+    { path: "../fonts/NotoSansKR-Bold.woff2", weight: "700", style: "normal" },
+  ],
   display: "swap",
 });
 
-const gowunBatang = Gowun_Batang({
+const gowunBatang = localFont({
   variable: "--font-gowun-batang",
-  weight: ["400", "700"],
-  subsets: ["latin"],
+  src: [
+    { path: "../fonts/GowunBatang-Regular.woff2", weight: "400", style: "normal" },
+    { path: "../fonts/GowunBatang-Bold.woff2", weight: "700", style: "normal" },
+  ],
   display: "swap",
 });
 
 // 삼국지 결과 카드의 픽셀 글씨 (영문·숫자만)
-const silkscreen = Silkscreen({
+const silkscreen = localFont({
   variable: "--font-silkscreen",
-  weight: ["400"],
-  subsets: ["latin"],
+  src: [{ path: "../fonts/Silkscreen-Regular.woff2", weight: "400", style: "normal" }],
   display: "swap",
   preload: false,
 });

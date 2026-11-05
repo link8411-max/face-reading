@@ -4,7 +4,7 @@ import { samgukCharacters } from '@/lib/samgukDB'
 import type { Metadata } from 'next'
 
 // 루트 레이아웃의 next/font는 테스트 환경에서 동작하지 않으므로 가짜로 바꾼다
-vi.mock('next/font/google', () => { const f = () => ({ variable: '', className: '' }); return { Noto_Sans_KR: f, Gowun_Batang: f, Silkscreen: f } })
+vi.mock('next/font/local', () => ({ default: () => ({ variable: '', className: '' }) }))
 import { renderToStaticMarkup } from 'react-dom/server'
 import { metadata as root } from '@/app/layout'
 import { metadata as face2 } from '@/app/face2/layout'
