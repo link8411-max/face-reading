@@ -154,10 +154,11 @@ public/
 - 환경변수 4개(Vercel): `NEXT_PUBLIC_VAPID_PUBLIC_KEY`, `VAPID_PRIVATE_KEY`, `VAPID_SUBJECT`(`mailto:…`), `PUSH_CRON_SECRET`. 없으면 버튼이 숨고 API는 503(빌드는 없이도 통과). **환경변수를 넣거나 바꾼 뒤에는 재배포가 필요하다**(`NEXT_PUBLIC` 키는 빌드 때 코드에 박힌다). VAPID 키 생성: `npx web-push generate-vapid-keys`.
 - **VAPID 키는 교체하지 않는다.** 교체하면 기존 구독자 전원이 403으로 끊기고 5일 뒤 삭제된다; 꼭 교체해야 하면 사용자가 버튼을 다시 눌러야 한다.
 - DB·스케줄: `docs/push-subscriptions.sql`을 Supabase SQL Editor에서 실행 -> 확장(pg_cron·pg_net)은 SQL 또는 Dashboard > Database > Extensions에서 켜고 -> 파일의 '한 번만 실행' 블록으로 Vault에 `push_cron_secret` 넣고(중복 실행 금지) -> 그 아래 cron 블록 주석 해제(cron 하나: `*/30 * * * *`, 이름 `daily-push-every-30m`). 이전 3개 스케줄(`daily-push-0830`·`-0845-retry`·`-0900-retry`)이 남아 있으면 `cron.unschedule`로 지운다.
-- 알림 시각: 30분 단위 슬롯 05:00~23:30, 기본 08:30(열 `send_at`, check·인덱스는 SQL 파일). 호출 시각(KST)이 `to`이면 발송 창은 `(to−60분, to]` — 직전 회차를 놓쳐도 다음 회차가 보정한다. 자정에서 잘리므로 23:30 슬롯은 재시도가 없다(`slotWindow`, `src/lib/push/send.ts`). 슬롯 라벨은 `src/lib/push/slotLabel.ts`.
+- 알림 시각: 30분 단위 슬롯 05:00~23:30, 기본 08:30(열 `send_at`, check·인덱스는 SQL 파일). 호출 시각(KST)을 30분 경계로 스냅(+5분 허용, `snapSlot`)한 값이 `to`이면 발송 창은 `(to−60분, to]` — 직전 회차를 놓쳐도 다음 회차가 보정한다. 자정에서 잘리므로 23:30 슬롯은 재시도가 없다(`slotWindow`, `src/lib/push/send.ts`). 슬롯 라벨은 `src/lib/push/slotLabel.ts`.
+- 엣지: 구독은 됐는데 IndexedDB 쓰기가 실패하면 sendAt이 유실돼 서버 기본값 08:30으로 간다.
 - 롤백: `select cron.unschedule('daily-push-every-30m');` (하나)
 - 아침 점검(SQL Editor):
-  1. `select * from push_send_log order by id desc limit 10;`(최근 회차들, `slot_to`로 회차 구분)
+  1. `select * from push_send_log where sent + failed + removed > 0 or day = current_date order by id desc limit 10;`(최근 회차들, `slot_to`로 회차 구분) + 일별 요약 `select day, count(*) runs, sum(sent) sent, sum(failed) failed, sum(removed) removed from push_send_log group by day order by day desc limit 7;`
   2. `select j.jobname, d.status, d.start_time, d.return_message from cron.job_run_details d join cron.job j using (jobid) order by d.start_time desc limit 10;` (최근 10회차)
   3. `select id, status_code, error_msg, created from net._http_response order by created desc limit 6;` (6시간만 보관)
   4. `select ganji, count(*), count(*) filter (where fail_count > 0) as failing from push_subscriptions group by rollup (ganji) order by ganji;`

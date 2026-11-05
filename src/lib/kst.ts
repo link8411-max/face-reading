@@ -14,3 +14,9 @@ export function onDayMaybeChanged(update: () => void): () => void {
     window.removeEventListener('focus', update)
   }
 }
+
+// 한국 시간 'HH:MM' (24시간제, 자정은 00:00). 클라이언트에서도 쓰므로 서버 모듈을 가져오지 않는다
+export function kstHHMM(now: Date): string {
+  const s = new Intl.DateTimeFormat('en-GB', { timeZone: 'Asia/Seoul', hour: '2-digit', minute: '2-digit', hourCycle: 'h23' }).format(now)
+  return s.startsWith('24:') ? '00' + s.slice(2) : s
+}

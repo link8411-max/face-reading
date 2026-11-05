@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { euro } from "@/lib/josa";
 import { Icon } from "@/components/icons";
 import { track } from "@/lib/analytics";
 import { SEND_SLOTS } from "@/lib/push/validate";
@@ -58,12 +59,14 @@ export default function PushToggle({ fortune }: { fortune: DailyFortune | null }
         setStored(null);
         return;
       }
+      const wasOn = state === "on";
       const r = await subscribe(ganji, sendAt);
       if (r === "ok") {
         track("push_subscribe", { test_name: "daily", result_id: ganji });
         setState("on");
         setStored(ganji);
-        setNotice(`알림을 켰어요. ${nextDeliveryWord(sendAt, new Date())} ${formatSlot(sendAt)}에 처음 와요`);
+        // 이미 켜 둔 상태에서 년주만 바꾸면 last_sent_on이 유지되므로 "오늘"을 약속하지 않는다
+        setNotice(wasOn ? `받는 년주를 바꿨어요. 매일 ${formatSlot(sendAt)}에 와요` : `알림을 켰어요. ${nextDeliveryWord(sendAt, new Date())} ${formatSlot(sendAt)}에 처음 와요`);
       } else if (r === "denied") {
         track("push_blocked", { test_name: "daily", result_id: "denied" });
         setState(typeof Notification !== "undefined" && Notification.permission === "denied" ? "denied" : state);
@@ -91,7 +94,7 @@ export default function PushToggle({ fortune }: { fortune: DailyFortune | null }
       // 시각만 바꾸는 것이므로 구독돼 있는 년주(stored)를 그대로 쓴다
       const r = await subscribe(stored ?? ganji, value);
       if (r === "ok") {
-        setNotice(`알림 시각을 바꿨어요. ${nextDeliveryWord(value, new Date())} ${formatSlot(value)}에 와요`);
+        setNotice(`알림 시각을 바꿨어요. 매일 ${formatSlot(value)}에 와요`);
       } else {
         setSendAt(prev);
         setNotice("지금은 등록이 안 돼요. 잠시 뒤 다시 눌러 주세요");
@@ -143,12 +146,13 @@ export default function PushToggle({ fortune }: { fortune: DailyFortune | null }
       {state === "on" && (
         <>
           {slotSelect}
+          {slotLocked && <p className="text-xs text-muted mb-2">먼저 이 년주로 바꿔 받기를 눌러 주세요</p>}
           <button onClick={onClick} disabled={busy} className={PILL}>
             <Icon name="bell" size={16} />
             {stored === ganji ? "아침 운세 알림 끄기" : "이 년주로 바꿔 받기"}
           </button>
           {stored === ganji && fortune && (
-            <p className="mt-1 text-xs text-center text-muted">{ganji}년 {fortune.나.띠}띠 · {formatSlot(sendAt)}로 받고 있어요</p>
+            <p className="mt-1 text-xs text-center text-muted">{ganji}년 {fortune.나.띠}띠 · {euro(formatSlot(sendAt))} 받고 있어요</p>
           )}
         </>
       )}

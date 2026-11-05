@@ -1,9 +1,10 @@
 -- 오늘의 운세 웹 푸시 구독. Supabase SQL Editor에서 한 번 실행(배포 전 사용자 승인 뒤).
+-- 슬롯을 바꾸려면 이 SQL의 check와 src/lib/push/validate.ts의 SEND_SLOTS, slotLabel.ts의 formatSlot을 함께 고친다.
 -- 설계: docs/superpowers/specs/2026-11-05-daily-push-design.md
 -- 초안으로 만든 표가 이미 있으면 아래 한 줄을 먼저 실행한다(없으면 무해).
 alter table if exists push_subscriptions add column if not exists last_fail_on date;
 alter table if exists push_subscriptions add column if not exists send_at text not null default '08:30'
-  check (send_at ~ '^([01][0-9]|2[0-3]):(00|30)$' and send_at >= '05:00');
+  constraint push_subscriptions_send_at_slot check (send_at ~ '^([01][0-9]|2[0-3]):(00|30)$' and send_at >= '05:00');
 alter table if exists push_send_log add column if not exists slot_to text;
 
 create table if not exists push_subscriptions (
@@ -16,7 +17,7 @@ create table if not exists push_subscriptions (
   fail_count int not null default 0,
   last_fail_on date,                     -- 실패 집계는 하루 1회(보정 발송이 같은 날 여러 번 돌아도 한 번만 센다)
   send_at text not null default '08:30'  -- 알림 시각(KST, 30분 단위 05:00~23:30)
-    check (send_at ~ '^([01][0-9]|2[0-3]):(00|30)$' and send_at >= '05:00')
+    constraint push_subscriptions_send_at_slot check (send_at ~ '^([01][0-9]|2[0-3]):(00|30)$' and send_at >= '05:00')
 );
 create index if not exists push_subscriptions_pending_idx on push_subscriptions (last_sent_on);
 create index if not exists push_subscriptions_slot_idx on push_subscriptions (send_at, last_sent_on);

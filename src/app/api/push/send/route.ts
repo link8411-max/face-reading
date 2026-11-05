@@ -1,7 +1,7 @@
 import { timingSafeEqual } from 'node:crypto'
 import { NextResponse } from 'next/server'
-import { runDailySend, webPushSender } from '@/lib/push/send'
-import { kstDate } from '@/lib/kst'
+import { runDailySend, snapSlot, webPushSender } from '@/lib/push/send'
+import { kstDate, kstHHMM } from '@/lib/kst'
 import * as store from '@/lib/push/store'
 
 export const runtime = 'nodejs'
@@ -41,7 +41,7 @@ export async function POST(request: Request) {
   } catch {
     console.error('[push] send failed: error')
     try {
-      await store.logRun(cfg, { day: kstDate(new Date()), sent: 0, failed: 0, removed: 0, ms: Date.now() - t0 })
+      await store.logRun(cfg, { day: kstDate(new Date()), sent: 0, failed: 0, removed: 0, ms: Date.now() - t0, slot_to: snapSlot(kstHHMM(new Date())) })
     } catch { /* 기록 실패는 무시 */ }
     return NextResponse.json({ ok: false }, { status: 500 })
   }

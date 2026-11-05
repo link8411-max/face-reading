@@ -1,6 +1,6 @@
 import webpush from 'web-push'
 import { dailyFortune } from '@/lib/dailyEngine'
-import { kstDate } from '@/lib/kst'
+import { kstDate, kstHHMM } from '@/lib/kst'
 import type { StoreConfig } from '@/lib/people/store'
 import { buildPayload, type PushPayload } from './text'
 import type * as Store from './store'
@@ -27,10 +27,12 @@ export function webPushSender(keys: { publicKey: string; privateKey: string; sub
   }
 }
 
-/** 한국 시간 'HH:MM' */
-export function kstHHMM(now: Date): string {
-  const s = new Intl.DateTimeFormat('en-GB', { timeZone: 'Asia/Seoul', hour: '2-digit', minute: '2-digit', hour12: false }).format(now)
-  return s.startsWith('24') ? '00' + s.slice(2) : s
+/** 'HH:MM'을 30분 경계로 맞춘다(+5분 허용: 08:00~08:24→08:00, 08:25~08:54→08:30, 08:55→09:00). 24시가 되면 00:00 */
+export function snapSlot(hhmm: string): string {
+  const [h, m] = hhmm.split(':').map(Number)
+  const total = h * 60 + Math.floor((m + 5) / 30) * 30
+  if (total >= 24 * 60) return '00:00'
+  return `${String(Math.floor(total / 60)).padStart(2, '0')}:${String(total % 60).padStart(2, '0')}`
 }
 
 /** 발송 창: send_at ∈ (from, to]. to = hhmm, from = hhmm - 60분(00:00 아래로는 내려가지 않는다) */
@@ -58,7 +60,7 @@ export async function runDailySend(deps: RunDeps): Promise<{ day: string; window
   const started = now()
   const start = started.getTime()
   const day = kstDate(started)
-  const window = slotWindow(kstHHMM(started))
+  const window = slotWindow(snapSlot(kstHHMM(started)))
   const rows = await store.listPending(cfg, day, limit, window)
   const cache = new Map<string, PushPayload>()
   const payloadFor = (ganji: string) => {

@@ -1,4 +1,5 @@
-import { kstHHMM, runDailySend, slotWindow, type Sender } from '@/lib/push/send'
+import { kstHHMM } from '@/lib/kst'
+import { runDailySend, slotWindow, snapSlot, type Sender } from '@/lib/push/send'
 function fakeStore(rows: { endpoint: string; ganji: string; send_at?: string; last_sent_on?: string | null; fail_count?: number; last_fail_on?: string | null }[]) {
   const db = rows.map((r) => ({ p256dh: 'p', auth: 'a', send_at: '08:30', last_sent_on: null, last_fail_on: null as string | null, fail_count: 0, ...r }))
   return { db, store: {
@@ -65,6 +66,9 @@ test('kstHHMM·slotWindow', () => {
   expect(slotWindow('08:30')).toEqual({ from: '07:30', to: '08:30' })
   expect(slotWindow('00:30')).toEqual({ from: '00:00', to: '00:30' })
   expect(slotWindow('00:00')).toEqual({ from: '00:00', to: '00:00' })
+})
+test('snapSlot: 30분 경계, +5분 허용', () => {
+  for (const [a, b] of [['08:29', '08:30'], ['08:31', '08:30'], ['08:44', '08:30'], ['08:55', '09:00'], ['08:00', '08:00'], ['23:58', '00:00']]) expect(snapSlot(a)).toBe(b)
 })
 test('슬롯 창: 08:30 구독자는 08:30·09:00 회차에만, 09:30엔 제외; 자정 회차는 어제 23:30을 안 줍는다', async () => {
   const f = fakeStore([
