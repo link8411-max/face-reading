@@ -162,7 +162,7 @@ public/
   4. `select ganji, count(*), count(*) filter (where fail_count > 0) as failing from push_subscriptions group by rollup (ganji) order by ganji;`
 - 로그 행이 없으면 실패다(401 비밀 불일치·503 환경변수·500 Supabase/VAPID). cron 행은 요청을 큐에 넣기만 해서 항상 succeeded로 보인다. 서버 로그엔 `[push] send failed: unauthorized|disabled|error`만 남는다(500이면 0건 행도 기록).
 - 수동 발송: `curl -X POST -H "Authorization: Bearer $PUSH_CRON_SECRET" https://unse-ai.com/api/push/send` (www 말고 정규 도메인). 그날 KST 발송으로 기록되니(기기당 하루 1회) 자정 뒤에 시험하면 다음 날 몫이 소진된다.
-- 규칙: 기기당 하루 1회(`last_sent_on`, KST). 실패는 하루 1회만 집계(`push_bump_fail`)·5회 누적 삭제, 404/410은 즉시 삭제. 구독 endpoint는 허용 호스트(fcm·mozilla·apple·windows·samsung)만. 기기별 발송 타임아웃 10초, 한 번 호출 예산 45초(maxDuration 60). 생년은 저장·전송하지 않고 년주 2글자만. endpoint는 로그에 남기지 않는다.
+- 규칙: 기기당 하루 1회(`last_sent_on`, KST). 실패는 하루 1회만 집계(`push_bump_fail`)·5회 누적 삭제, 404/410은 즉시 삭제. 구독 endpoint는 허용 호스트(fcm·mozilla·apple·windows·samsung)만. 기기별 발송 타임아웃 10초, 한 번 호출 예산 40초(maxDuration 60). 응답·로그의 `sent`는 실제 발송 수이고 `unrecorded`는 그중 `last_sent_on` 기록에 실패한 수(다음 보정 발송에서 한 번 더 갈 수 있음). 생년은 저장·전송하지 않고 년주 2글자만. endpoint는 로그에 남기지 않는다.
 - 로그: `push_send_log`
 
 | 컬럼 | 뜻 |
