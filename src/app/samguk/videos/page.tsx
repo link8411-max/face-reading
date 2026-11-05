@@ -4,14 +4,16 @@ import VideosBrowser, { type Faces } from "@/components/videos/VideosBrowser";
 import { hasPerson } from "@/content/samgukPeople/ids";
 import { characterById } from "@/lib/people/characters";
 import { portraitSrc } from "@/lib/people/portrait";
-import { getChannelVideos } from "@/lib/videos/fetch";
+import LongVideoCard from "@/components/videos/LongVideoCard";
+import { getChannelVideos, getLongVideos } from "@/lib/videos/fetch";
 import { isVideoId } from "@/lib/videos/format";
 import { itemListJsonLd } from "@/lib/videos/jsonld";
 
 export const revalidate = 3600;
 
 export default async function VideosPage() {
-  const videos = (await getChannelVideos()).filter((v) => isVideoId(v.id));
+  const [shorts, longVideos] = await Promise.all([getChannelVideos(), getLongVideos()]);
+  const videos = shorts.filter((v) => isVideoId(v.id));
 
   // 클라이언트에는 열전 본문 없이 이름·초상화·열전 유무만 넘긴다.
   const faces: Faces = {};
@@ -58,6 +60,8 @@ export default async function VideosPage() {
         ) : (
           <VideosBrowser videos={videos} faces={faces} />
         )}
+
+        <LongVideoCard videos={longVideos} slot="videos" />
 
         <CoupangBanner subId="videos-hub" />
       </main>
