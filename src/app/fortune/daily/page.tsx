@@ -2,48 +2,75 @@
 
 import SeasonPicks from "@/components/SeasonPicks";
 import { track } from "@/lib/analytics";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import CoupangBanner from "@/components/CoupangBanner";
 import { useBackOrHome } from "@/hooks/useBackOrHome";
 import TestHeader from "@/components/test/TestHeader";
 import { Icon } from "@/components/icons";
 import { FORTUNE_YEAR } from "@/lib/fortuneYear";
 import { sanitizeDigits, validateBirthYear } from "@/lib/birthDate";
-import { 띠찾기 } from "@/lib/saju";
-
-const 요일목록 = ["일요일", "월요일", "화요일", "수요일", "목요일", "금요일", "토요일"];
 import Link from "next/link";
-import { fortuneDB } from "@/lib/fortuneDB";
 import { useScreenshot } from "@/hooks/useScreenshot";
 import { SITE } from "@/lib/shareLinks";
+import { dailyFortune, type DailyFortune } from "@/lib/dailyEngine";
+import { kstDate, onDayMaybeChanged } from "@/lib/kst";
+import DailyFortuneCard, { dailyDateLine } from "@/components/fortune/DailyFortuneCard";
 
+const 요일목록 = ["일요일", "월요일", "화요일", "수요일", "목요일", "금요일", "토요일"];
+
+// 입력 화면용 날짜 'YYYY-MM-DD' -> '11월 5일 목요일'
+function dateLabel(ymd: string) {
+  const [y, m, d] = ymd.split("-").map(Number);
+  return `${m}월 ${d}일 ${요일목록[new Date(Date.UTC(y, m - 1, d)).getUTCDay()]}`;
+}
 
 export default function DailyFortunePage() {
   const goBack = useBackOrHome();
   const [birthYear, setBirthYear] = useState("");
   const [isEarlyYear, setIsEarlyYear] = useState(false);
-  const [result, setResult] = useState<{
-    띠: string;
-    운세: { rating: number; 한마디: string; 행운시간: string; 행운색: string };
-  } | null>(null);
+  const [result, setResult] = useState<DailyFortune | null>(null);
+  const [today, setToday] = useState<string | null>(null);
 
   const { ref: resultRef, isCapturing, download, share, shareNotice } = useScreenshot(result);
 
-  const today = new Date();
-  const 오늘요일 = 요일목록[today.getDay()];
-  const 오늘날짜 = `${today.getMonth() + 1}월 ${today.getDate()}일 ${오늘요일}`;
+  const compute = (yearText: string, early: boolean) => {
+    const fortune = dailyFortune({ kind: "년생", year: Number(yearText), isEarlyYear: early }, new Date());
+    setResult(fortune);
+    track("fortune_submit", { test_name: "daily" });
+    track("result_view", { test_name: "daily", result_id: fortune.나.띠 });
+  };
+
+  useEffect(() => {
+    const update = () => setToday(kstDate(new Date()));
+    update();
+    const off = onDayMaybeChanged(update);
+    // 주소의 ?year=&early=1 로 입력을 채우고 바로 보여 준다. 읽은 뒤 주소에서 지운다
+    const q = new URLSearchParams(location.search);
+    const y = q.get("year");
+    if (y && /^\d{4}$/.test(y)) {
+      const early = q.get("early") === "1";
+      setBirthYear(y);
+      setIsEarlyYear(early);
+      if (validateBirthYear(y).ok) compute(y, early);
+    }
+    history.replaceState(null, "", location.pathname);
+    return off;
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  const 날짜줄 = result ? dailyDateLine(result) : "";
 
   const getShareOptions = () => ({
-    fileName: `오늘의운세_${result?.띠}띠`,
-    shareTitle: `오늘의 ${result?.띠}띠 운세`,
-    shareText: `${오늘날짜} - ${result?.운세.한마디}`,
+    fileName: `오늘의운세_${result?.나.띠}띠`,
+    shareTitle: `오늘의 ${result?.나.띠}띠 운세`,
+    shareText: `${날짜줄} - ${result?.한마디}`,
     testName: "daily" as const,
     // 카카오톡 카드는 출생 연도 없이 오늘의 운세 페이지로 보낸다
     kakao: result ? {
-      title: `오늘의 ${result.띠}띠 운세`,
-      text: `오늘 ${result.띠}띠 운세는 '${result.운세.한마디}'래. 너도 봐줄까?`,
+      title: `오늘의 ${result.나.띠}띠 운세`,
+      text: `오늘 ${result.나.년주표기}년 ${result.나.띠}띠 운세는 '${result.한마디}'래. 너도 봐줄까?`,
       url: `${SITE}/fortune/daily?utm_source=share&utm_medium=friend_link&utm_campaign=daily`,
-      imageUrl: `${SITE}/api/og?title=${encodeURIComponent("오늘의 운세")}&subtitle=${encodeURIComponent(`${오늘날짜} ${result.띠}띠 운세`)}`,
+      imageUrl: `${SITE}/api/og?title=${encodeURIComponent("오늘의 운세")}&subtitle=${encodeURIComponent(`${날짜줄} ${result.나.띠}띠 운세`)}`,
     } : undefined,
   });
 
@@ -51,20 +78,7 @@ export default function DailyFortunePage() {
 
   const handleSubmit = () => {
     if (!yearCheck.ok) return;
-    const year = Number(birthYear);
-
-    // 사주의 해는 입춘(2월 4일)에 바뀐다
-    const 띠 = 띠찾기(year, isEarlyYear ? 1 : 3, 1);
-    const 요일데이터 = fortuneDB.일간운세[오늘요일 as keyof typeof fortuneDB.일간운세];
-    const 운세 = 요일데이터[띠 as keyof typeof 요일데이터];
-
-    setResult({ 띠, 운세 });
-    track("fortune_submit", { test_name: "daily" });
-    track("result_view", { test_name: "daily", result_id: 띠 });
-  };
-
-  const renderStars = (rating: number) => {
-    return "★".repeat(rating) + "☆".repeat(5 - rating);
+    compute(birthYear, isEarlyYear);
   };
 
   const resetAll = () => {
@@ -80,7 +94,7 @@ export default function DailyFortunePage() {
         {!result && (
           <div className="mt-2.5 mb-6">
             <h2 className="font-serif font-bold text-[27px] leading-[1.4] break-keep">오늘, 내 띠의<br />하루는?</h2>
-            <p className="mt-2.5 text-sm text-muted">{오늘날짜}</p>
+            <p className="mt-2.5 text-sm text-muted">{today ? dateLabel(today) : "\u00A0"}</p>
           </div>
         )}
 
@@ -136,62 +150,7 @@ export default function DailyFortunePage() {
           <div className="space-y-4 animate-fade-in">
             {/* 캡쳐 영역 시작 */}
             <div ref={resultRef} className="space-y-3 bg-card rounded-[30px] p-4">
-            {/* 기본 정보 */}
-            <div className="bg-white rounded-[22px] p-5 text-center border border-line">
-              <p className="text-xs font-medium text-accent">{오늘날짜}</p>
-              <h2 className="font-serif text-[25px] font-bold mt-1">{result.띠}띠</h2>
-              {/* 출생 연도는 화면에만, 저장·공유 이미지에는 넣지 않는다 */}
-              <p className="text-muted text-sm no-screenshot">
-                {birthYear}년생 {isEarlyYear && "(입춘 전)"}
-              </p>
-            </div>
-
-            {/* 오늘의 운세 */}
-            <div className="bg-white rounded-[22px] p-5 border border-line">
-              <div className="flex justify-between items-center mb-4">
-                <h3 className="font-serif font-bold text-lg">오늘의 운세</h3>
-                <span className="text-accent text-xl tracking-wider">
-                  {renderStars(result.운세.rating)}
-                </span>
-              </div>
-
-              <div className="bg-card-2 rounded-xl p-4 mb-4 border border-line">
-                <p className="text-xl text-center font-medium text-accent">
-                  "{result.운세.한마디}"
-                </p>
-              </div>
-
-              <div className="grid grid-cols-2 gap-3">
-                <div className="bg-card-2 rounded-xl p-3 text-center border border-line">
-                  <p className="text-xs text-muted mb-1">행운의 시간</p>
-                  <p className="text-lg font-bold text-accent">{result.운세.행운시간}</p>
-                </div>
-                <div className="bg-card-2 rounded-xl p-3 text-center border border-line">
-                  <p className="text-xs text-muted mb-1">행운의 색</p>
-                  <p className="text-lg font-bold text-accent">{result.운세.행운색}</p>
-                </div>
-              </div>
-            </div>
-
-            {/* 띠별 특성 */}
-            <div className="bg-white rounded-[22px] p-5 border border-line">
-              <h3 className="font-serif font-bold text-lg mb-3">{result.띠}띠 특성</h3>
-              <p className="text-muted text-sm leading-relaxed">
-                {fortuneDB.띠[result.띠 as keyof typeof fortuneDB.띠].성격}
-              </p>
-              <div className="flex flex-wrap gap-2 mt-3">
-                {fortuneDB.띠[result.띠 as keyof typeof fortuneDB.띠].장점.map((장점, i) => (
-                  <span key={i} className="px-3 py-1 bg-card-2 text-accent rounded-full text-xs border border-line">
-                    {장점}
-                  </span>
-                ))}
-              </div>
-            </div>
-
-              <div className="flex justify-between items-center px-1 text-[11px] text-muted">
-                <span className="font-serif font-bold text-xs text-ink">운명을 읽다</span>
-                <span>unse-ai.com</span>
-              </div>
+            <DailyFortuneCard fortune={result} birthYearLabel={`${birthYear}년생${isEarlyYear ? " (입춘 전)" : ""}`} />
             </div>
             {/* 캡쳐 영역 끝 */}
 

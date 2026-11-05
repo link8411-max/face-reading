@@ -45,7 +45,7 @@ export const LAST_MODIFIED: Record<string, string> = {
     '/face2': '2026-10-26',
     '/fortune': '2026-10-26',
     '/fortune/mbti': '2026-10-27',
-    '/fortune/daily': '2026-10-26',
+    '/fortune/daily': '2026-11-05',
     '/samguk': '2026-10-28',
     '/animal': '2026-10-26',
     '/face-tests': '2026-10-26',
