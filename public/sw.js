@@ -174,6 +174,7 @@ self.addEventListener('pushsubscriptionchange', (event) => {
       try {
         const ganji = await idbGet('ganji');
         if (!ganji) return;
+        const sendAt = await idbGet('sendAt');
         let key =
           event.oldSubscription &&
           event.oldSubscription.options &&
@@ -195,6 +196,7 @@ self.addEventListener('pushsubscriptionchange', (event) => {
             endpoint: sub.endpoint,
             keys: { p256dh: keys.p256dh, auth: keys.auth },
             ganji,
+            ...(sendAt ? { sendAt } : {}),
           }),
         });
       } catch (e) {

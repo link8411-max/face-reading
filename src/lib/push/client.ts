@@ -65,7 +65,7 @@ function idb(): Promise<IDBDatabase> {
   })
 }
 
-async function readStored(key: 'ganji' | 'vapid'): Promise<string | null> {
+async function readStored(key: 'ganji' | 'vapid' | 'sendAt'): Promise<string | null> {
   try {
     const db = await idb()
     return await new Promise((resolve) => {
@@ -78,13 +78,14 @@ async function readStored(key: 'ganji' | 'vapid'): Promise<string | null> {
   }
 }
 
-async function saveStored(ganji: string, publicKey: string): Promise<void> {
+async function saveStored(ganji: string, publicKey: string, sendAt: string): Promise<void> {
   try {
     const db = await idb()
     await new Promise<void>((resolve) => {
       const tx = db.transaction('push', 'readwrite')
       tx.objectStore('push').put(ganji, 'ganji')
       tx.objectStore('push').put(publicKey, 'vapid')
+      tx.objectStore('push').put(sendAt, 'sendAt')
       tx.oncomplete = () => resolve()
       tx.onerror = () => resolve()
       tx.onabort = () => resolve()
@@ -98,6 +99,7 @@ async function clearStored(): Promise<void> {
     await new Promise<void>((resolve) => {
       const tx = db.transaction('push', 'readwrite')
       tx.objectStore('push').delete('ganji')
+      tx.objectStore('push').delete('sendAt')
       tx.oncomplete = () => resolve()
       tx.onerror = () => resolve()
       tx.onabort = () => resolve()
@@ -106,8 +108,9 @@ async function clearStored(): Promise<void> {
 }
 
 export const readStoredGanji = () => readStored('ganji')
+export const readStoredSendAt = () => readStored('sendAt')
 
-export async function subscribe(ganji: string): Promise<'ok' | 'denied' | 'server'> {
+export async function subscribe(ganji: string, sendAt: string): Promise<'ok' | 'denied' | 'server'> {
   const publicKey = process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY
   if (!publicKey) return 'server'
   const perm = await Notification.requestPermission()
@@ -128,13 +131,13 @@ export async function subscribe(ganji: string): Promise<'ok' | 'denied' | 'serve
     const res = await fetch('/api/push/subscribe', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ endpoint: sub.endpoint, keys: { p256dh: json.keys?.p256dh, auth: json.keys?.auth }, ganji }),
+      body: JSON.stringify({ endpoint: sub.endpoint, keys: { p256dh: json.keys?.p256dh, auth: json.keys?.auth }, ganji, sendAt }),
     }).catch(() => null)
     if (!res || !res.ok) {
       if (!existing) await sub.unsubscribe().catch(() => false)
       return 'server'
     }
-    await saveStored(ganji, publicKey)
+    await saveStored(ganji, publicKey, sendAt)
     return 'ok'
   } catch {
     return 'server'
