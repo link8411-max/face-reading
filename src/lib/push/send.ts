@@ -17,7 +17,7 @@ export function webPushSender(keys: { publicKey: string; privateKey: string; sub
       await webpush.sendNotification(
         { endpoint: sub.endpoint, keys: { p256dh: sub.p256dh, auth: sub.auth } },
         JSON.stringify(payload),
-        { TTL: 14400, urgency: 'normal' },
+        { TTL: 14400, urgency: 'normal', timeout: 10000 },
       )
       return 'ok'
     } catch (e) {
@@ -42,14 +42,15 @@ export async function runDailySend(deps: RunDeps): Promise<{ day: string; sent: 
   const budgetMs = deps.budgetMs ?? 45000
   const concurrency = Math.max(1, deps.concurrency ?? 20)
   const limit = deps.limit ?? 1000
-  const start = now().getTime()
-  const day = kstDate(now())
+  const started = now()
+  const start = started.getTime()
+  const day = kstDate(started)
   const rows = await store.listPending(cfg, day, limit)
   const cache = new Map<string, PushPayload>()
   const payloadFor = (ganji: string) => {
     let p = cache.get(ganji)
     if (!p) {
-      p = buildPayload(dailyFortune({ kind: '년주', 천간: ganji[0], 지지: ganji[1] }, now()))
+      p = buildPayload(dailyFortune({ kind: '년주', 천간: ganji[0], 지지: ganji[1] }, started))
       cache.set(ganji, p)
     }
     return p
@@ -76,7 +77,7 @@ export async function runDailySend(deps: RunDeps): Promise<{ day: string; sent: 
       try {
         if (r === 'ok') waveOk.push(row.endpoint)
         else if (r === 'gone') { await store.deleteSubscription(cfg, row.endpoint); removed++ }
-        else { await store.bumpFail(cfg, row.endpoint); failed++ }
+        else { await store.bumpFail(cfg, row.endpoint, day); failed++ }
       } catch {
         if (r !== 'ok') failed++
       }

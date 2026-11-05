@@ -8,7 +8,8 @@ create table if not exists push_subscriptions (
   ganji text not null check (char_length(ganji) = 2),  -- 년주 60갑자, 예 '경오'
   created_at timestamptz not null default now(),
   last_sent_on date,                     -- KST 날짜. 같은 날 두 번 보내지 않는 기준
-  fail_count int not null default 0
+  fail_count int not null default 0,
+  last_fail_on date                      -- 실패 집계는 하루 1회(보정 발송이 같은 날 여러 번 돌아도 한 번만 센다)
 );
 create index if not exists push_subscriptions_pending_idx on push_subscriptions (last_sent_on);
 alter table push_subscriptions enable row level security;  -- 정책 없음: service key만
@@ -21,16 +22,18 @@ create table if not exists push_send_log (
 );
 alter table push_send_log enable row level security;
 
--- 발송 실패 1회 기록: fail_count + 1, 5 이상이면 삭제
-create or replace function push_bump_fail(p_endpoint text) returns void
+-- 발송 실패 기록: 하루 1회만 fail_count + 1, 5 이상이면 삭제
+create or replace function push_bump_fail(p_endpoint text, p_day date) returns void
 language plpgsql security definer set search_path = public as $$
 begin
-  update push_subscriptions set fail_count = fail_count + 1 where endpoint = p_endpoint;
+  update push_subscriptions
+     set fail_count = fail_count + 1, last_fail_on = p_day
+   where endpoint = p_endpoint and last_fail_on is distinct from p_day;
   delete from push_subscriptions where endpoint = p_endpoint and fail_count >= 5;
 end;
 $$;
-revoke all on function push_bump_fail(text) from public, anon, authenticated;
-grant execute on function push_bump_fail(text) to service_role;
+revoke all on function push_bump_fail(text, date) from public, anon, authenticated;
+grant execute on function push_bump_fail(text, date) to service_role;
 
 -- ===== pg_cron·pg_net 설정 (SQL Editor, 웹 검증 뒤 사용자 승인 후 실행) =====
 -- 비밀값은 Supabase Vault에 넣고 SQL에서 읽는다. pg_cron은 UTC 기준: 23:30 UTC = 08:30 KST.

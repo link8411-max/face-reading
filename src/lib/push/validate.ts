@@ -12,7 +12,7 @@ export function isAllowedEndpoint(endpoint: string): boolean {
   if (typeof endpoint !== 'string' || endpoint.length > 2048) return false
   let u: URL
   try { u = new URL(endpoint) } catch { return false }
-  if (u.protocol !== 'https:') return false
+  if (u.protocol !== 'https:' || u.username || u.password || u.port) return false
   const host = u.hostname.toLowerCase()
   return ALLOWED_PUSH_HOSTS.some((h) => (h.startsWith('*.') ? host.endsWith(h.slice(1)) && host.length > h.length - 1 : host === h))
 }

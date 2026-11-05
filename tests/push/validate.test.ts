@@ -1,7 +1,7 @@
 import { isAllowedEndpoint, isGanji, parseSubscribeBody } from '@/lib/push/validate'
 test('허용 호스트', () => {
   for (const u of ['https://fcm.googleapis.com/fcm/send/abc', 'https://updates.push.services.mozilla.com/wpush/v2/x', 'https://web.push.apple.com/QW', 'https://db5p.notify.windows.com/w/?token=1', 'https://kr-sea.push.samsungosp.com/x']) expect(isAllowedEndpoint(u)).toBe(true)
-  for (const u of ['http://fcm.googleapis.com/x', 'https://evil.example/x', 'https://fcm.googleapis.com.evil.example/x', 'https://' + 'a'.repeat(2100)]) expect(isAllowedEndpoint(u)).toBe(false)
+  for (const u of ['http://fcm.googleapis.com/x', 'https://evil.example/x', 'https://fcm.googleapis.com.evil.example/x', 'https://evil-fcm.googleapis.com/x', 'https://push.services.mozilla.com/x', 'https://user:pw@fcm.googleapis.com/x', 'https://fcm.googleapis.com:8443/x', 'https://' + 'a'.repeat(2100)]) expect(isAllowedEndpoint(u)).toBe(false)
 })
 test('ganji·본문', () => {
   expect(isGanji('경오')).toBe(true); expect(isGanji('갑축')).toBe(false); expect(isGanji(12)).toBe(false)

@@ -19,7 +19,7 @@ export async function upsertSubscription(cfg: StoreConfig, row: SubRow): Promise
   const res = await fetch(`${cfg.url}/rest/v1/${T}?on_conflict=endpoint`, {
     method: 'POST',
     headers: headers(cfg, 'resolution=merge-duplicates'),
-    body: JSON.stringify({ endpoint: row.endpoint, p256dh: row.p256dh, auth: row.auth, ganji: row.ganji }),
+    body: JSON.stringify({ endpoint: row.endpoint, p256dh: row.p256dh, auth: row.auth, ganji: row.ganji, fail_count: 0 }),
     signal: AbortSignal.timeout(5000),
   })
   if (!res.ok) throw new Error(`upsert ${res.status}`)
@@ -58,11 +58,11 @@ export async function markSent(cfg: StoreConfig, endpoints: string[], today: str
   }
 }
 
-export async function bumpFail(cfg: StoreConfig, endpoint: string): Promise<void> {
+export async function bumpFail(cfg: StoreConfig, endpoint: string, day: string): Promise<void> {
   const res = await fetch(`${cfg.url}/rest/v1/rpc/push_bump_fail`, {
     method: 'POST',
     headers: headers(cfg),
-    body: JSON.stringify({ p_endpoint: endpoint }),
+    body: JSON.stringify({ p_endpoint: endpoint, p_day: day }),
     signal: AbortSignal.timeout(5000),
   })
   if (!res.ok) throw new Error(`bump ${res.status}`)
