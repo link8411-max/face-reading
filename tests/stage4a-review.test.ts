@@ -22,7 +22,7 @@ test('오늘의 운세는 요일별 내용이라 "매일"이라고 과장하지 
 test('홈 클라이언트 번들에 운세 DB 전체를 싣지 않는다(일간운세만)', () => {
   const src = readFileSync('src/components/home/ZodiacPicker.tsx', 'utf8')
   expect(src).not.toContain('@/lib/fortuneDB')
-  expect(src).toContain('@/lib/dailyFortune')
+  expect(src).toContain('@/lib/dailyEngine')
 })
 
 test('푸터 묶음 제목은 h4가 아니다(제목 단계 건너뜀 방지)', () => {
