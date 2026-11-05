@@ -65,6 +65,7 @@ export function dailyFortune(input: DailyInput, now: Date = new Date()): DailyFo
   let 이모지: string
   let 년주표기: string | null = null
   if (input.kind === '년생') {
+    if (!Number.isInteger(input.year)) throw new Error('잘못된 연도: ' + input.year)
     const j = 년주계산(input.year, input.isEarlyYear ? 1 : 3, 1)
     내지지 = j.지지; 내천간 = j.천간; 띠 = j.띠; 이모지 = j.띠이모지; 년주표기 = j.천간 + j.지지
   } else {

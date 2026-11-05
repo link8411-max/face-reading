@@ -30,7 +30,7 @@ test('FAQ는 5개 이상이고 사실과 맞는 문구다', () => {
   expect(text).not.toMatch(/Gemini|하루 1회|수백 개/)
 })
 
-test('띠 고르기는 요일을 마운트 뒤에 계산한다(서버·브라우저 날짜 불일치 방지)', () => {
+test('띠 고르기는 날짜를 마운트 뒤에 계산한다(서버·브라우저 날짜 불일치 방지)', () => {
   const src = readFileSync('src/components/home/ZodiacPicker.tsx', 'utf8')
   expect(src).toContain('useEffect')
   expect(src).not.toMatch(/^const .*new Date\(\)/m)

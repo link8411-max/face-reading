@@ -13,10 +13,11 @@ test('globals.css의 body 규칙이 글꼴·배경·글자색을 덮어쓰지 �
   expect(body).not.toMatch(/font-family|background|color/)
 })
 
-test('오늘의 운세는 요일별 내용이라 "매일"이라고 과장하지 않는다', () => {
+test('오늘의 운세는 일진으로 날마다 바뀌므로 요일별이라고 쓰지 않는다', () => {
   const unse = CATEGORIES.find((c) => c.key === 'unse')!
   const text = JSON.stringify(unse)
-  expect(text).not.toMatch(/매일/)
+  expect(text).not.toMatch(/요일/)
+  expect(text).toMatch(/매일|날마다/)
 })
 
 test('홈 클라이언트 번들에 운세 DB 전체를 싣지 않는다(일간운세만)', () => {

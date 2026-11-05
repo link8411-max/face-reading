@@ -60,7 +60,11 @@ export default function DailyFortunePage() {
       setIsEarlyYear(early);
       if (validateBirthYear(y).ok) compute(y, early);
     }
-    history.replaceState(null, "", location.pathname);
+    if (q.has("year") || q.has("early")) {
+      q.delete("year");
+      q.delete("early");
+      history.replaceState(null, "", location.pathname + (q.toString() ? "?" + q.toString() : "") + location.hash);
+    }
     return off;
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);

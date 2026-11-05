@@ -140,6 +140,14 @@ public/
   - 공유 `/fortune/mbti/r/[type]`(소문자, 날짜 없음, 친구의 '오늘' 운세 + 내 MBTI로 보기), 미리보기 `/api/og/result?kind=mbti-daily&type=`. GA test_name `mbti_daily`.
 - 운세 묶음은 `CategoryItem.group`으로 "생년월일로 보는 운세 / MBTI로 보는 운세" 소제목을 나눈다(`CategoryList`).
 
+## 오늘의 운세 (일진 엔진)
+- 계산: 내 년주(60갑자) × 오늘 일진의 천간 합·충·생극 + 지지 육합·삼합·형·충 → 별점·한마디·근거·영역 4(재물·연애·일·건강)·행운 색/시간/방향. 결정적 순수 함수.
+- 파일: `src/lib/dailyEngine/{relations,index,format}.ts`, 문장 `src/content/dailyFortuneText.ts`(조사는 `lib/josa.ts`), 설계 `docs/superpowers/specs/2026-11-05-daily-fortune-engine-design.md`.
+- 날짜는 `kstDate` 기준이고 브라우저에서는 마운트 뒤 계산(정적 HTML의 어제 방지). 띠 모드(홈 `ZodiacPicker`)는 일간 오행 × 띠 오행으로 계산한다.
+- `/fortune/daily?year=1990&early=1` 딥링크는 읽은 뒤 `year`/`early`만 주소에서 지운다(utm은 유지).
+- 생년은 GA·공유·저장 이미지에 넣지 않는다. 캡처 제목은 "경오년 말띠".
+- 테스트 `npx vitest run tests/dailyEngine`(60×60 분포 고정). 홈 번들에 `fortuneDB`·`DailyFortuneCard`를 넣지 않는다(stage4a 테스트).
+
 ## 페이지별 기능
 
 | 경로 | 기능 | 제한 | 사용 기술 |
@@ -150,7 +158,7 @@ public/
 | `/samguk` | 삼국지 닮은꼴 | 무제한 | MediaPipe + 프로필 매칭 |
 | `/samguk/videos` | 삼국지 쇼츠 모음(격자·세로 피드) | - | YouTube API/RSS, ISR 1시간 |
 | `/fortune` | 신년운세 | - | DB 기반 |
-| `/fortune/daily` | 오늘의 운세 | - | DB 기반 |
+| `/fortune/daily` | 오늘의 운세 | - | 일진 엔진(`lib/dailyEngine`) |
 
 ---
 
@@ -329,6 +337,7 @@ public/
 | 메인 페이지 | `src/app/page.tsx` |
 | 페이지 설명 본문/FAQ | `src/content/pageGuides.ts` |
 | 홈 FAQ(화면·구조화 데이터) | `src/content/homeFaq.ts` |
+| 오늘의 운세 문장 | `src/content/dailyFortuneText.ts` (검증 `npx vitest run tests/dailyEngine`) |
 | sitemap | `src/app/sitemap.ts` (내용 바꾸면 `LAST_MODIFIED` 날짜 갱신) |
 
 ---
