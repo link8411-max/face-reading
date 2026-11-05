@@ -5,16 +5,20 @@ import { fortuneDB } from "@/lib/fortuneDB";
 const 요일목록 = ["일요일", "월요일", "화요일", "수요일", "목요일", "금요일", "토요일"];
 const 상태기호 = { 좋음: "●", 보통: "◐", 조심: "○" } as const;
 
+// 'YYYY-MM-DD' -> '11월 5일 목요일'
+export function dayLabel(ymd: string): string {
+  const [y, m, d] = ymd.split("-").map(Number);
+  return `${m}월 ${d}일 ${요일목록[new Date(Date.UTC(y, m - 1, d)).getUTCDay()]}`;
+}
+
 // 'YYYY-MM-DD' -> '11월 5일 목요일 · 계미일' (한국 날짜 문자열 기준, 실행 환경 시간대와 무관)
 export function dailyDateLine(f: DailyFortune): string {
-  const [y, m, d] = f.날짜.split("-").map(Number);
-  const 요일 = 요일목록[new Date(Date.UTC(y, m - 1, d)).getUTCDay()];
-  return `${m}월 ${d}일 ${요일} · ${f.일진.표기}`;
+  return `${dayLabel(f.날짜)} · ${f.일진.표기}`;
 }
 
 export default function DailyFortuneCard({ fortune, birthYearLabel }: { fortune: DailyFortune; birthYearLabel: string | null }) {
   const { 나, 별점, 영역, 행운 } = fortune;
-  const 제목 = 나.년주표기 && birthYearLabel ? `${birthYearLabel} ${나.년주표기}년 ${나.띠}띠` : `${나.띠}띠`;
+  const 제목 = 나.년주표기 ? `${나.년주표기}년 ${나.띠}띠` : `${나.띠}띠`;
   const 특성 = fortuneDB.띠[나.띠 as keyof typeof fortuneDB.띠];
 
   return (
@@ -30,7 +34,7 @@ export default function DailyFortuneCard({ fortune, birthYearLabel }: { fortune:
       <div className="bg-white rounded-[22px] p-5 border border-line">
         <div className="flex justify-between items-center mb-3">
           <h3 className="font-serif font-bold text-lg">오늘의 운세</h3>
-          <span className="text-accent text-xl tracking-wider" aria-label={`별 ${별점}개`}>
+          <span className="text-accent text-xl tracking-wider" role="img" aria-label={`별 ${별점}개`}>
             {"★".repeat(별점) + "☆".repeat(5 - 별점)}
           </span>
         </div>

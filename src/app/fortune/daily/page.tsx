@@ -2,7 +2,7 @@
 
 import SeasonPicks from "@/components/SeasonPicks";
 import { track } from "@/lib/analytics";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import CoupangBanner from "@/components/CoupangBanner";
 import { useBackOrHome } from "@/hooks/useBackOrHome";
 import TestHeader from "@/components/test/TestHeader";
@@ -14,15 +14,7 @@ import { useScreenshot } from "@/hooks/useScreenshot";
 import { SITE } from "@/lib/shareLinks";
 import { dailyFortune, type DailyFortune } from "@/lib/dailyEngine";
 import { kstDate, onDayMaybeChanged } from "@/lib/kst";
-import DailyFortuneCard, { dailyDateLine } from "@/components/fortune/DailyFortuneCard";
-
-const 요일목록 = ["일요일", "월요일", "화요일", "수요일", "목요일", "금요일", "토요일"];
-
-// 입력 화면용 날짜 'YYYY-MM-DD' -> '11월 5일 목요일'
-function dateLabel(ymd: string) {
-  const [y, m, d] = ymd.split("-").map(Number);
-  return `${m}월 ${d}일 ${요일목록[new Date(Date.UTC(y, m - 1, d)).getUTCDay()]}`;
-}
+import DailyFortuneCard, { dailyDateLine, dayLabel } from "@/components/fortune/DailyFortuneCard";
 
 export default function DailyFortunePage() {
   const goBack = useBackOrHome();
@@ -33,15 +25,29 @@ export default function DailyFortunePage() {
 
   const { ref: resultRef, isCapturing, download, share, shareNotice } = useScreenshot(result);
 
+  // 자정 갱신 콜백이 최신 결과·입력을 읽도록 ref에 둔다
+  const live = useRef<{ result: DailyFortune | null; year: string; early: boolean }>({ result: null, year: "", early: false });
+
   const compute = (yearText: string, early: boolean) => {
     const fortune = dailyFortune({ kind: "년생", year: Number(yearText), isEarlyYear: early }, new Date());
+    live.current = { result: fortune, year: yearText, early };
     setResult(fortune);
     track("fortune_submit", { test_name: "daily" });
     track("result_view", { test_name: "daily", result_id: fortune.나.띠 });
   };
 
   useEffect(() => {
-    const update = () => setToday(kstDate(new Date()));
+    const update = () => {
+      const now = kstDate(new Date());
+      setToday(now);
+      // 결과를 연 채로 자정을 넘기면 오늘 날짜로 다시 계산한다(GA는 다시 보내지 않는다)
+      const cur = live.current;
+      if (cur.result && cur.result.날짜 !== now) {
+        const fresh = dailyFortune({ kind: "년생", year: Number(cur.year), isEarlyYear: cur.early }, new Date());
+        live.current = { ...cur, result: fresh };
+        setResult(fresh);
+      }
+    };
     update();
     const off = onDayMaybeChanged(update);
     // 주소의 ?year=&early=1 로 입력을 채우고 바로 보여 준다. 읽은 뒤 주소에서 지운다
@@ -82,6 +88,7 @@ export default function DailyFortunePage() {
   };
 
   const resetAll = () => {
+    live.current = { result: null, year: "", early: false };
     setBirthYear("");
     setIsEarlyYear(false);
     setResult(null);
@@ -94,7 +101,7 @@ export default function DailyFortunePage() {
         {!result && (
           <div className="mt-2.5 mb-6">
             <h2 className="font-serif font-bold text-[27px] leading-[1.4] break-keep">오늘, 내 띠의<br />하루는?</h2>
-            <p className="mt-2.5 text-sm text-muted">{today ? dateLabel(today) : "\u00A0"}</p>
+            <p className="mt-2.5 text-sm text-muted">{today ? dayLabel(today) : "\u00A0"}</p>
           </div>
         )}
 
