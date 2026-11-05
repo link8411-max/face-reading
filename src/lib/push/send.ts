@@ -27,6 +27,19 @@ export function webPushSender(keys: { publicKey: string; privateKey: string; sub
   }
 }
 
+/** 한국 시간 'HH:MM' */
+export function kstHHMM(now: Date): string {
+  const s = new Intl.DateTimeFormat('en-GB', { timeZone: 'Asia/Seoul', hour: '2-digit', minute: '2-digit', hour12: false }).format(now)
+  return s.startsWith('24') ? '00' + s.slice(2) : s
+}
+
+/** 발송 창: send_at ∈ (from, to]. to = hhmm, from = hhmm - 60분(00:00 아래로는 내려가지 않는다) */
+export function slotWindow(hhmm: string): { from: string; to: string } {
+  const [h, m] = hhmm.split(':').map(Number)
+  const f = Math.max(0, h * 60 + m - 60)
+  return { from: `${String(Math.floor(f / 60)).padStart(2, '0')}:${String(f % 60).padStart(2, '0')}`, to: hhmm }
+}
+
 export interface RunDeps {
   store: Pick<typeof Store, 'listPending' | 'markSent' | 'bumpFail' | 'deleteSubscription' | 'logRun'>
   cfg: StoreConfig
@@ -37,7 +50,7 @@ export interface RunDeps {
   limit?: number
 }
 
-export async function runDailySend(deps: RunDeps): Promise<{ day: string; sent: number; failed: number; removed: number; remaining: number; unrecorded: number }> {
+export async function runDailySend(deps: RunDeps): Promise<{ day: string; window: { from: string; to: string }; sent: number; failed: number; removed: number; remaining: number; unrecorded: number }> {
   const { store, cfg, sender, now } = deps
   const budgetMs = deps.budgetMs ?? 40000
   const concurrency = Math.max(1, deps.concurrency ?? 20)
@@ -45,7 +58,8 @@ export async function runDailySend(deps: RunDeps): Promise<{ day: string; sent: 
   const started = now()
   const start = started.getTime()
   const day = kstDate(started)
-  const rows = await store.listPending(cfg, day, limit)
+  const window = slotWindow(kstHHMM(started))
+  const rows = await store.listPending(cfg, day, limit, window)
   const cache = new Map<string, PushPayload>()
   const payloadFor = (ganji: string) => {
     let p = cache.get(ganji)
@@ -93,6 +107,6 @@ export async function runDailySend(deps: RunDeps): Promise<{ day: string; sent: 
     }
   }
   const ms = now().getTime() - start
-  await store.logRun(cfg, { day, sent, failed, removed, ms }).catch(() => {})
-  return { day, sent, failed, removed, remaining: rows.length - processed, unrecorded }
+  await store.logRun(cfg, { day, sent, failed, removed, ms, slot_to: window.to }).catch(() => {})
+  return { day, window, sent, failed, removed, remaining: rows.length - processed, unrecorded }
 }

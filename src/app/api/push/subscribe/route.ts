@@ -34,7 +34,7 @@ export async function POST(request: Request) {
     return fail(503, { reason: 'disabled' })
   }
   try {
-    await upsertSubscription(cfg, { endpoint: sub.endpoint, p256dh: sub.keys.p256dh, auth: sub.keys.auth, ganji: sub.ganji })
+    await upsertSubscription(cfg, { endpoint: sub.endpoint, p256dh: sub.keys.p256dh, auth: sub.keys.auth, ganji: sub.ganji, send_at: sub.sendAt })
   } catch {
     return fail(502)
   }

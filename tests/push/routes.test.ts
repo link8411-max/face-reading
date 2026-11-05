@@ -53,6 +53,16 @@ test('subscribe upsert 본문에 last_sent_on이 없다', async () => {
   expect(body).toContain(EP)
 })
 
+test('subscribe: sendAt 검증과 기본값', async () => {
+  const f = vi.spyOn(globalThis, 'fetch').mockResolvedValue(new Response(null, { status: 201 }))
+  expect((await POST(req('POST', { ...good, sendAt: '08:15' }))).status).toBe(400)
+  expect(f).not.toHaveBeenCalled()
+  await POST(req('POST', good))
+  expect(String((f.mock.calls[0][1] as RequestInit).body)).toContain('"send_at":"08:30"')
+  await POST(req('POST', { ...good, sendAt: '21:00' }))
+  expect(String((f.mock.calls[1][1] as RequestInit).body)).toContain('"send_at":"21:00"')
+})
+
 test('delete: 400 for bad endpoint, 200 otherwise', async () => {
   const f = vi.spyOn(globalThis, 'fetch').mockResolvedValue(new Response(null, { status: 204 }))
   expect((await DELETE(req('DELETE', { endpoint: 'https://evil.com/x' }))).status).toBe(400)

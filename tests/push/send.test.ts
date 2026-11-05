@@ -1,8 +1,8 @@
-import { runDailySend, type Sender } from '@/lib/push/send'
-function fakeStore(rows: { endpoint: string; ganji: string; last_sent_on?: string | null; fail_count?: number; last_fail_on?: string | null }[]) {
-  const db = rows.map((r) => ({ p256dh: 'p', auth: 'a', last_sent_on: null, last_fail_on: null as string | null, fail_count: 0, ...r }))
+import { kstHHMM, runDailySend, slotWindow, type Sender } from '@/lib/push/send'
+function fakeStore(rows: { endpoint: string; ganji: string; send_at?: string; last_sent_on?: string | null; fail_count?: number; last_fail_on?: string | null }[]) {
+  const db = rows.map((r) => ({ p256dh: 'p', auth: 'a', send_at: '08:30', last_sent_on: null, last_fail_on: null as string | null, fail_count: 0, ...r }))
   return { db, store: {
-    listPending: async (_c: unknown, today: string, limit: number) => db.filter((r) => !r.last_sent_on || r.last_sent_on < today).slice(0, limit).map(({ endpoint, p256dh, auth, ganji }) => ({ endpoint, p256dh, auth, ganji })),
+    listPending: async (_c: unknown, today: string, limit: number, w: { from: string; to: string }) => db.filter((r) => (!r.last_sent_on || r.last_sent_on < today) && r.send_at > w.from && r.send_at <= w.to).slice(0, limit).map(({ endpoint, p256dh, auth, ganji, send_at }) => ({ endpoint, p256dh, auth, ganji, send_at })),
     markSent: async (_c: unknown, eps: string[], today: string) => { for (const r of db) if (eps.includes(r.endpoint)) { r.last_sent_on = today; r.fail_count = 0 } },
     bumpFail: async (_c: unknown, ep: string, day: string) => { const r = db.find((x) => x.endpoint === ep); if (!r || r.last_fail_on === day) return; r.last_fail_on = day; r.fail_count++; if (r.fail_count >= 5) db.splice(db.indexOf(r), 1) },
     deleteSubscription: async (_c: unknown, ep: string) => { const i = db.findIndex((x) => x.endpoint === ep); if (i >= 0) db.splice(i, 1) },
@@ -58,4 +58,27 @@ test('같은 날 보정 발송이 여러 번 돌아도 실패는 하루 1회만 
   const sender: Sender = async () => 'error'
   for (const t of ['2026-11-04T23:30:00Z', '2026-11-04T23:45:00Z', '2026-11-05T00:00:00Z']) await runDailySend({ store: f.store, cfg, sender, now: at(t) })
   expect(f.db[0].fail_count).toBe(1)
+})
+test('kstHHMM·slotWindow', () => {
+  expect(kstHHMM(new Date('2026-11-04T23:30:00Z'))).toBe('08:30')
+  expect(kstHHMM(new Date('2026-11-04T15:00:00Z'))).toBe('00:00')
+  expect(slotWindow('08:30')).toEqual({ from: '07:30', to: '08:30' })
+  expect(slotWindow('00:30')).toEqual({ from: '00:00', to: '00:30' })
+  expect(slotWindow('00:00')).toEqual({ from: '00:00', to: '00:00' })
+})
+test('슬롯 창: 08:30 구독자는 08:30·09:00 회차에만, 09:30엔 제외; 자정 회차는 어제 23:30을 안 줍는다', async () => {
+  const f = fakeStore([
+    { endpoint: 'a', ganji: '경오', send_at: '08:30' },
+    { endpoint: 'b', ganji: '경오', send_at: '09:00' },
+    { endpoint: 'c', ganji: '경오', send_at: '23:30', last_sent_on: '2026-11-04' },
+  ])
+  const sent: string[] = []; const sender: Sender = async (s) => { sent.push(s.endpoint); return 'ok' }
+  const r1 = await runDailySend({ store: f.store, cfg, sender, now: at('2026-11-04T23:30:00Z') })   // 08:30 KST
+  expect(r1.window).toEqual({ from: '07:30', to: '08:30' }); expect(sent).toEqual(['a'])
+  const r2 = await runDailySend({ store: f.store, cfg, sender, now: at('2026-11-05T00:00:00Z') })   // 09:00 KST
+  expect(sent).toEqual(['a', 'b']); expect(r2.sent).toBe(1)
+  const r3 = await runDailySend({ store: f.store, cfg, sender, now: at('2026-11-05T00:30:00Z') })   // 09:30 KST
+  expect(r3.sent).toBe(0)
+  const r4 = await runDailySend({ store: f.store, cfg, sender, now: at('2026-11-05T15:00:00Z') })   // 다음 날 00:00 KST
+  expect(r4.window).toEqual({ from: '00:00', to: '00:00' }); expect(r4.sent).toBe(0); expect(sent).toEqual(['a', 'b'])
 })

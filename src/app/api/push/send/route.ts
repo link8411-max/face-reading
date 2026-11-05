@@ -36,7 +36,7 @@ export async function POST(request: Request) {
       sender: webPushSender({ publicKey, privateKey, subject }),
       now: () => new Date(),
     })
-    console.log(`[push] day=${result.day} sent=${result.sent} failed=${result.failed} removed=${result.removed} remaining=${result.remaining} unrecorded=${result.unrecorded}`)
+    console.log(`[push] day=${result.day} window=${result.window.from}-${result.window.to} sent=${result.sent} failed=${result.failed} removed=${result.removed} remaining=${result.remaining} unrecorded=${result.unrecorded}`)
     return NextResponse.json({ ok: true, ...result })
   } catch {
     console.error('[push] send failed: error')
