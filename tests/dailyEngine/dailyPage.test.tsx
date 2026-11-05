@@ -36,3 +36,11 @@ test('페이지: 요일표를 쓰지 않고, 쿼리 연도는 지우며, 공유 
   expect(src).not.toMatch(/track\([^)]*birthYear/)
   expect(LAST_MODIFIED['/fortune/daily']).toBe('2026-11-05')
 })
+
+test('페이지: gz 쿼리로 년주 모드, 잘못된 gz는 무시, gz도 주소에서 지운다', () => {
+  const src = readFileSync('src/app/fortune/daily/page.tsx', 'utf8')
+  expect(src).toContain('q.get("gz")')
+  expect(src).toContain('q.delete("gz")')
+  expect(src).toContain("kind: '년주'")
+  expect(src).toContain('isGanji(')
+})

@@ -1,4 +1,4 @@
-import { 년주계산, 일주계산, 지지, 지지오행, 천간오행, 띠동물, 띠이모지 } from '@/lib/saju'
+import { 년주계산, 일주계산, 천간, 지지, 지지오행, 천간오행, 띠동물, 띠이모지 } from '@/lib/saju'
 import { kstDate } from '@/lib/kst'
 import { 오행관계판정, 지지관계판정, 천간관계판정 } from './relations'
 import type { 오행관계, 지지관계, 천간관계 } from './relations'
@@ -7,7 +7,7 @@ import {
 } from '@/content/dailyFortuneText'
 import type { 상태, 영역 } from '@/content/dailyFortuneText'
 
-export type DailyInput = { kind: '년생'; year: number; isEarlyYear: boolean } | { kind: '띠'; 띠: string }
+export type DailyInput = { kind: '년생'; year: number; isEarlyYear: boolean } | { kind: '띠'; 띠: string } | { kind: '년주'; 천간: string; 지지: string }
 
 export interface DailyFortune {
   날짜: string
@@ -68,6 +68,10 @@ export function dailyFortune(input: DailyInput, now: Date = new Date()): DailyFo
     if (!Number.isInteger(input.year)) throw new Error('잘못된 연도: ' + input.year)
     const j = 년주계산(input.year, input.isEarlyYear ? 1 : 3, 1)
     내지지 = j.지지; 내천간 = j.천간; 띠 = j.띠; 이모지 = j.띠이모지; 년주표기 = j.천간 + j.지지
+  } else if (input.kind === '년주') {
+    const i = (지지 as readonly string[]).indexOf(input.지지)
+    if (i < 0 || !(천간 as readonly string[]).includes(input.천간)) throw new Error('모르는 년주: ' + input.천간 + input.지지)
+    내지지 = input.지지; 내천간 = input.천간; 띠 = 띠동물[i]; 이모지 = 띠이모지[i]; 년주표기 = input.천간 + input.지지
   } else {
     const i = (띠동물 as readonly string[]).indexOf(input.띠)
     if (i < 0) throw new Error('모르는 띠: ' + input.띠)

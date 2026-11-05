@@ -25,7 +25,7 @@ npm run test:e2e     # E2E (next build 후 3200 포트): 전 페이지 로딩·�
 - **AI 호출 없음**: 결과는 규칙 계산 + 미리 작성한 해석 데이터 (Gemini 제거됨)
 - **얼굴인식**: @mediapipe/tasks-vision FaceLandmarker 478점 (삼국지·동물상), @vladmandic/face-api 68점 (관상만, 추후 이전)
 - **OG 이미지**: @vercel/og (동적 생성)
-- **PWA**: manifest.ts + sw.js (홈화면 설치 가능)
+- **PWA**: manifest.ts + sw.js v2(캐시 + push 핸들러) + PNG 아이콘 `icon-192/512`·`apple-touch-icon-180`·`badge-96`(`scripts/make-push-icons.mjs`로 생성) (홈화면 설치 가능)
 
 ---
 
@@ -48,7 +48,7 @@ npm run test:e2e     # E2E (next build 후 3200 포트): 전 페이지 로딩·�
 - 공유하기: `hooks/useResultShare`. 카카오톡 인앱이면 카카오톡 공유(`lib/kakao.ts`, Kakao SDK 2.7.4, 피드 카드: 1인칭 문구·결과 미리보기 이미지·나도 해보기) → 그 밖엔 `lib/share.ts` `shareResult`: 결과 링크+문구를 기본 공유창으로, 없으면 링크 복사. GA share_click method: kakao·link.
   - 카카오디벨로퍼스 앱 "운명을 읽다"(ID 1623598). JavaScript 키(공개 값)는 등록한 도메인(https://unse-ai.com, http://localhost:3200)에서만 동작한다. 도메인이 바뀌면 콘솔 > 플랫폼 키 > JavaScript 키 > SDK 도메인에 추가. **공유 카드를 눌러 이동하려면 별도로 앱 설정 > 제품 링크 관리 > 웹 도메인에 https://unse-ai.com이 있어야 한다**(없으면 카드는 보이지만 눌러도 반응이 없다, 2026-10-27 등록). 운세는 결과 링크가 없어 `useScreenshot().share`(이미지)를 쓰고, 카카오톡 안에서는 `kakao` 옵션의 카드로 보낸다(신년운세는 그 띠의 `/fortune/2027/[띠]`, 오늘의 운세는 `/fortune/daily`, 생년월일·출생 연도는 넣지 않음).
 - 결과 공유 링크 (`lib/shareLinks.ts`): `/animal/r/[유형]?s=점수`, `/samguk/r/[장수id]?s=점수`, `/face2/r/[유형키]`, MBTI는 `/mbti/r/infp-entj` (계산기 `/mbti/match`는 정적·검색 노출 유지). 링크에는 유형 키·점수(50~99)·utm(source=share, medium=friend_link)만. 허용 목록 밖이면 테스트 시작 화면으로.
-  - 착지 페이지 `components/share/SharePage.tsx`: 서버 `generateMetadata`로 1인칭 문구 미리보기(카톡·인스타 봇은 JS를 실행하지 않음), noindex, canonical은 원래 테스트, 사이트맵 제외. GA `shared_landing`.
+  - 착지 페이지 `components/share/SharePage.tsx`: 서버 `generateMetadata`로 1인칭 문구 미리보기(카톡·인스타 봇은 JS를 실행하지 않음), noindex, canonical은 원래 테스트, 사이트맵 제외. GA `shared_landing`, `push_subscribe`(result_id: 유형 키)·`push_unsubscribe`·`push_blocked(result_id: denied·ios_install·server·kakao)`.
   - 미리보기 이미지 `/api/og/result?kind=animal|samguk|face|mbti&…` (1200×630, 삼국지는 도트 초상화). `lib/ogQuery.ts`로 종류별 허용 매개변수·점수(50~99 두 자리)만 받고 CDN에 1년 캐시(초상화를 못 받으면 5분).
 - 결과 캡처는 `no-screenshot` 요소와 iframe을 뺀다(`lib/capture.ts`). 운세의 생년월일 줄은 화면에만. 운세 공유 이미지는 결과가 나오면 미리 만들어 두고(`useScreenshot(result)`), 공유하기는 누르자마자 공유창을 연다.
 - 얼굴 궁합·우리 팀은 분석 중에 입력(관계·성별·사진·별칭·인원)을 잠근다.
@@ -148,6 +148,36 @@ public/
 - 생년은 GA·공유·저장 이미지에 넣지 않는다. 캡처 제목은 "경오년 말띠".
 - 테스트 `npx vitest run tests/dailyEngine`(60×60 분포 고정). 홈 번들에 `fortuneDB`·`DailyFortuneCard`를 넣지 않는다(stage4a 테스트).
 
+## 아침 운세 푸시
+- 구조: 오늘의 운세 카드의 `PushToggle` → `/api/push/subscribe` → Supabase `push_subscriptions`(년주·희망 발송 시각 `send_at` 저장) → pg_cron이 30분마다 `/api/push/send` 호출(그 시각 창의 구독만 발송) → web-push 발송 → 알림 클릭 시 `/fortune/daily?gz=<년주>` 착지.
+- 파일: `src/lib/push/{text,validate,store,send,guard,client}.ts`, `src/app/api/push/{subscribe,send}/route.ts`, `src/components/fortune/PushToggle.tsx`, `public/sw.js`(push·notificationclick), `docs/push-subscriptions.sql`, 설계 `docs/superpowers/specs/2026-11-05-daily-push-design.md`.
+- 환경변수 4개(Vercel): `NEXT_PUBLIC_VAPID_PUBLIC_KEY`, `VAPID_PRIVATE_KEY`, `VAPID_SUBJECT`(`mailto:…`), `PUSH_CRON_SECRET`. 없으면 버튼이 숨고 API는 503(빌드는 없이도 통과). **환경변수를 넣거나 바꾼 뒤에는 재배포가 필요하다**(`NEXT_PUBLIC` 키는 빌드 때 코드에 박힌다). VAPID 키 생성: `npx web-push generate-vapid-keys`.
+- **VAPID 키는 교체하지 않는다.** 교체하면 기존 구독자 전원이 403으로 끊기고 5일 뒤 삭제된다; 꼭 교체해야 하면 사용자가 버튼을 다시 눌러야 한다.
+- DB·스케줄: `docs/push-subscriptions.sql`을 Supabase SQL Editor에서 실행 -> 확장(pg_cron·pg_net)은 SQL 또는 Dashboard > Database > Extensions에서 켜고 -> 파일의 '한 번만 실행' 블록으로 Vault에 `push_cron_secret` 넣고(중복 실행 금지) -> 그 아래 cron 블록 주석 해제(cron 하나: `*/30 * * * *`, 이름 `daily-push-every-30m`). 이전 3개 스케줄(`daily-push-0830`·`-0845-retry`·`-0900-retry`)이 남아 있으면 `cron.unschedule`로 지운다.
+- 알림 시각: 30분 단위 슬롯 05:00~23:30, 기본 08:30(열 `send_at`, check·인덱스는 SQL 파일). 호출 시각(KST)을 30분 경계로 스냅(+5분 허용, `snapSlot`)한 값이 `to`이면 발송 창은 `(to−60분, to]` — 직전 회차를 놓쳐도 다음 회차가 보정한다. 자정에서 잘리므로 23:30 슬롯은 재시도가 없다(`slotWindow`, `src/lib/push/send.ts`). 슬롯 라벨은 `src/lib/push/slotLabel.ts`.
+- 엣지: 구독은 됐는데 IndexedDB 쓰기가 실패하면 sendAt이 유실돼 서버 기본값 08:30으로 간다.
+- 롤백: `select cron.unschedule('daily-push-every-30m');` (하나)
+- 아침 점검(SQL Editor):
+  1. `select * from push_send_log where sent + failed + removed > 0 or day = current_date order by id desc limit 10;`(최근 회차들, `slot_to`로 회차 구분) + 일별 요약 `select day, count(*) runs, sum(sent) sent, sum(failed) failed, sum(removed) removed from push_send_log group by day order by day desc limit 7;`
+  2. `select j.jobname, d.status, d.start_time, d.return_message from cron.job_run_details d join cron.job j using (jobid) order by d.start_time desc limit 10;` (최근 10회차)
+  3. `select id, status_code, error_msg, created from net._http_response order by created desc limit 6;` (6시간만 보관)
+  4. `select ganji, count(*), count(*) filter (where fail_count > 0) as failing from push_subscriptions group by rollup (ganji) order by ganji;`
+- 로그 행이 없으면 실패다(401 비밀 불일치·503 환경변수·500 Supabase/VAPID). cron 행은 요청을 큐에 넣기만 해서 항상 succeeded로 보인다. 서버 로그엔 `[push] send failed: unauthorized|disabled|error`만 남는다(500이면 0건 행도 기록).
+- 수동 발송: `curl -X POST -H "Authorization: Bearer $PUSH_CRON_SECRET" https://unse-ai.com/api/push/send` (www 말고 정규 도메인). 지금 KST 시각 기준 한 시간 창의 구독만 보낸다. 그날 KST 발송으로 기록되니(기기당 하루 1회) 자정 뒤에 시험하면 다음 날 몫이 소진된다.
+- 규칙: 기기당 하루 1회(`last_sent_on`, KST). 실패는 하루 1회만 집계(`push_bump_fail`)·5회 누적 삭제, 404/410은 즉시 삭제. 구독 endpoint는 허용 호스트(fcm·mozilla·apple·windows·samsung)만. 기기별 발송 타임아웃 10초, 한 번 호출 예산 40초(maxDuration 60). 응답·로그의 `sent`는 실제 발송 수이고 `unrecorded`는 그중 `last_sent_on` 기록에 실패한 수(다음 회차의 창에 걸리면 한 번 더 갈 수 있음). 생년은 저장·전송하지 않고 년주 2글자만. endpoint는 로그에 남기지 않는다.
+- 로그: `push_send_log`
+
+| 컬럼 | 뜻 |
+|------|-----|
+| day, finished_at | KST 날짜, 행을 넣은 시각(호출이 끝난 때) |
+| sent, failed, removed | 성공·실패·삭제 수 |
+| ms | 소요 시간 |
+| slot_to | 이 회차의 창 끝 시각(KST, `HH:MM`) |
+
+- 버튼에는 `알림 시각` select(30분 슬롯)가 있다. 다른 년주의 운세를 보는 중이면 잠기고(내 구독 년주와 다르므로), 시각을 바꾸면 저장된 년주로 다시 구독한다.
+- 버튼 상태 순서(`pushUiState`): 카카오톡 인앱(`kakao`) > iOS 비설치(`ios_install`) > 미지원·키 없음(`unsupported`, 숨김) > 권한 거부(`denied`) > `off` > `on`. iOS는 홈 화면에 추가한 뒤에만 구독 가능, 카카오톡 인앱은 외부 브라우저로 열어야 한다.
+- 테스트 `npx vitest run tests/push`.
+
 ## 페이지별 기능
 
 | 경로 | 기능 | 제한 | 사용 기술 |
@@ -181,7 +211,7 @@ public/
 
 ## 방문 통계 (GA4)
 - 측정 ID `G-L99JPMPT9D` (`src/lib/analytics.ts`), `layout.tsx`의 `ga4-init` 스크립트. 운영 주소(unse-ai.com, `PROD_HOST_SOURCE`)가 아니면(로컬·Vercel 미리보기) gtag.js를 받지 않고 config도 안 해서 실제 통계에 안 섞인다(E2E는 `dataLayer`로 검사).
-- 이벤트는 `track()`만 쓴다: `photo_selected`, `test_start`, `photo_fail(result_id: noface·frontal·read·tool)`, `result_view(result_id)`, `share_click(method: link·save_image·share)`, `fortune_submit`, `shared_landing`.
+- 이벤트는 `track()`만 쓴다: `photo_selected`, `test_start`, `photo_fail(result_id: noface·frontal·read·tool)`, `result_view(result_id)`, `share_click(method: link·save_image·share)`, `fortune_submit`, `shared_landing`, 푸시 `push_subscribe(result_id=년주 2글자)`, `push_unsubscribe`, `push_blocked(result_id: kakao·ios_install·denied·server)`.
 - **사진 분석 실패 모니터링**: GA 탐색에서 `photo_fail` 이벤트를 `result_id`(이유) × 브라우저·OS로 본다. `test_start` 대비 `result_view` 사용자 수가 특정 브라우저에서만 떨어지면 그 환경의 문제. 실패 문구는 `lib/face/analyzePhoto.ts` `failText`(고개 돌림은 방향·정도 숫자까지). GA 준비 전 이벤트는 잠시 모았다가 보낸다. / `test_name`: face·animal·samguk·fortune·daily·mbti_match
 - **사진·생년월일·얼굴 수치는 보내지 않는다.** `track()`은 허용 키(test_name, result_id, method)와 유형 키 형식(한글·영문·숫자 24자 이내, 숫자 4자리 연속 금지)만 통과시킨다. 결과는 유형 키만(fox, caocao, 재물상, 띠, INFP_ENTJ).
 - 일기토 퍼널(값은 `result_id`에 인코딩, 키 추가 없음): `duel_wave`(보스 웨이브 도달, `w06`~`w36`), `duel_end`(`<시작장수>_<c|l>_<마지막으로 넘은 보스>` 예 `guanyu_l_w18`), `duel_resume`, `duel_abandon`.
@@ -230,7 +260,8 @@ public/
 
 ### PWA
 - `manifest.ts` → Next.js가 자동으로 `/manifest.webmanifest` 생성
-- `sw.js` - 서비스 워커 (캐싱, 오프라인 지원)
+- `sw.js` v2 - 서비스 워커 (캐싱, 오프라인 지원, `push`·`notificationclick` 핸들러)
+- PNG 아이콘 `public/icons/{icon-192,icon-512,apple-touch-icon-180,badge-96}.png` (`scripts/make-push-icons.mjs`)
 - 홈화면 추가 가능 (iOS Safari, Android Chrome)
 
 ---
@@ -338,6 +369,7 @@ public/
 | 페이지 설명 본문/FAQ | `src/content/pageGuides.ts` |
 | 홈 FAQ(화면·구조화 데이터) | `src/content/homeFaq.ts` |
 | 오늘의 운세 문장 | `src/content/dailyFortuneText.ts` (검증 `npx vitest run tests/dailyEngine`) |
+| 푸시 알림 문구 | `src/lib/push/text.ts` |
 | sitemap | `src/app/sitemap.ts` (내용 바꾸면 `LAST_MODIFIED` 날짜 갱신) |
 
 ---

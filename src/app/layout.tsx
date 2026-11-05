@@ -105,7 +105,7 @@ export default function RootLayout({
         <meta name="apple-mobile-web-app-title" content="운명을읽다" />
         <meta name="mobile-web-app-capable" content="yes" />
         <meta name="theme-color" content="#FBF6F1" />
-        <link rel="apple-touch-icon" href="/icons/icon-192x192.svg" />
+        <link rel="apple-touch-icon" href="/icons/apple-touch-icon-180.png" />
         {/* 애드센스: 태그 위치는 그대로(심사 중). adsbygoogle.js가 하이드레이션 전에 이 태그 바로 뒤에 show_ads_impl 스크립트를 끼워 넣어
             React가 아래 <script> 두 개를 한 칸씩 밀린 노드와 비교하며 하이드레이션 경고를 낸다(개발 서버 "1 Issue").
             이 태그와 뒤따르는 <script> 두 개에 suppressHydrationWarning을 달아 경고만 끈다(DOM 내용은 서버 HTML 그대로) */}
