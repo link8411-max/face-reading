@@ -37,9 +37,9 @@ export interface RunDeps {
   limit?: number
 }
 
-export async function runDailySend(deps: RunDeps): Promise<{ day: string; sent: number; failed: number; removed: number; remaining: number }> {
+export async function runDailySend(deps: RunDeps): Promise<{ day: string; sent: number; failed: number; removed: number; remaining: number; unrecorded: number }> {
   const { store, cfg, sender, now } = deps
-  const budgetMs = deps.budgetMs ?? 45000
+  const budgetMs = deps.budgetMs ?? 40000
   const concurrency = Math.max(1, deps.concurrency ?? 20)
   const limit = deps.limit ?? 1000
   const started = now()
@@ -60,6 +60,7 @@ export async function runDailySend(deps: RunDeps): Promise<{ day: string; sent: 
   let failed = 0
   let removed = 0
   let processed = 0
+  let unrecorded = 0
   for (let i = 0; i < rows.length; i += concurrency) {
     if (now().getTime() - start > budgetMs) break
     const wave = rows.slice(i, i + concurrency)
@@ -71,17 +72,15 @@ export async function runDailySend(deps: RunDeps): Promise<{ day: string; sent: 
       }),
     )
     const waveOk: string[] = []
+    const jobs: Promise<void>[] = []
     for (let k = 0; k < wave.length; k++) {
       const row = wave[k]
       const r = results[k]
-      try {
-        if (r === 'ok') waveOk.push(row.endpoint)
-        else if (r === 'gone') { await store.deleteSubscription(cfg, row.endpoint); removed++ }
-        else { await store.bumpFail(cfg, row.endpoint, day); failed++ }
-      } catch {
-        if (r !== 'ok') failed++
-      }
+      if (r === 'ok') waveOk.push(row.endpoint)
+      else if (r === 'gone') jobs.push(store.deleteSubscription(cfg, row.endpoint).then(() => { removed++ }, (e) => { failed++; throw e }))
+      else jobs.push(store.bumpFail(cfg, row.endpoint, day).then(() => { failed++ }, (e) => { failed++; throw e }))
     }
+    await Promise.allSettled(jobs)
     processed += wave.length
     sent += waveOk.length
     if (waveOk.length) {
@@ -90,10 +89,10 @@ export async function runDailySend(deps: RunDeps): Promise<{ day: string; sent: 
       for (let attempt = 0; attempt < 2 && !recorded; attempt++) {
         try { await store.markSent(cfg, waveOk, day); recorded = true } catch { /* 재시도 */ }
       }
-      if (!recorded) break
+      if (!recorded) { unrecorded += waveOk.length; break }
     }
   }
   const ms = now().getTime() - start
   await store.logRun(cfg, { day, sent, failed, removed, ms }).catch(() => {})
-  return { day, sent, failed, removed, remaining: rows.length - processed }
+  return { day, sent, failed, removed, remaining: rows.length - processed, unrecorded }
 }

@@ -1,5 +1,7 @@
 -- 오늘의 운세 웹 푸시 구독. Supabase SQL Editor에서 한 번 실행(배포 전 사용자 승인 뒤).
 -- 설계: docs/superpowers/specs/2026-11-05-daily-push-design.md
+-- 초안으로 만든 표가 이미 있으면 아래 한 줄을 먼저 실행한다(없으면 무해).
+alter table if exists push_subscriptions add column if not exists last_fail_on date;
 
 create table if not exists push_subscriptions (
   endpoint text primary key,             -- 푸시 서비스 주소. 기기 식별자 성격이라 로그에 남기지 않는다
@@ -17,7 +19,7 @@ alter table push_subscriptions enable row level security;  -- 정책 없음: ser
 create table if not exists push_send_log (
   id bigserial primary key,
   day date not null,
-  started_at timestamptz not null default now(),
+  finished_at timestamptz not null default now(),   -- 행을 넣은 시각(= 호출이 끝난 시각)
   sent int not null, failed int not null, removed int not null, ms int not null
 );
 alter table push_send_log enable row level security;
@@ -35,13 +37,18 @@ $$;
 revoke all on function push_bump_fail(text, date) from public, anon, authenticated;
 grant execute on function push_bump_fail(text, date) to service_role;
 
+-- ===== 한 번만 실행 (Vault 비밀) =====
+-- 두 번 실행하면 같은 이름이 중복된다. 값은 Vercel PUSH_CRON_SECRET과 같게.
+-- select vault.create_secret('<PUSH_CRON_SECRET>', 'push_cron_secret');
+
 -- ===== pg_cron·pg_net 설정 (SQL Editor, 웹 검증 뒤 사용자 승인 후 실행) =====
 -- 비밀값은 Supabase Vault에 넣고 SQL에서 읽는다. pg_cron은 UTC 기준: 23:30 UTC = 08:30 KST.
 -- 호출 주소는 정규 도메인(www는 307이라 pg_net이 따라가지 않는다).
+-- (확장은 SQL 또는 Dashboard > Database > Extensions에서 켠다.)
+-- 순서: 확장 켜기 -> 아래 '한 번만 실행' 블록으로 Vault 비밀 넣기 -> cron 블록 실행.
 --
 -- create extension if not exists pg_cron;
 -- create extension if not exists pg_net;
--- select vault.create_secret('<PUSH_CRON_SECRET>', 'push_cron_secret');  -- 한 번만, 값은 Vercel 환경변수와 같게
 -- select cron.schedule('daily-push-0830', '30 23 * * *', $$
 --   select net.http_post(
 --     url := 'https://unse-ai.com/api/push/send',

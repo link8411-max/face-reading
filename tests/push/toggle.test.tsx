@@ -31,6 +31,12 @@ describe('PushToggle 소스', () => {
     expect(toggle).not.toContain('requestPermission')
     expect(read('src/lib/push/client.ts')).toContain('requestPermission')
   })
+  it('마운트 효과: 안내 상태를 먼저 정하고 구독 조회는 3초 제한', () => {
+    expect(toggle.indexOf('pushUiState(')).toBeGreaterThan(0)
+    expect(toggle.indexOf('pushUiState(')).toBeLessThan(toggle.indexOf('getSubscription('))
+    expect(toggle).toContain('3000')
+    expect(toggle).toContain('Promise.race')
+  })
   it('privacy·analytics', () => {
     expect(read('src/app/privacy/page.tsx')).toContain('아침 운세 알림을 켜면 브라우저가 발급한 푸시 주소와 키, 선택한 년주(태어난 해의 60갑자)만 저장합니다. 생년·이름·기기 정보는 저장하지 않으며, 알림 끄기를 누르거나 브라우저에서 알림을 차단하면 자동으로 삭제됩니다.')
     const a = read('src/lib/analytics.ts')

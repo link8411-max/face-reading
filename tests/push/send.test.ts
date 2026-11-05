@@ -43,7 +43,7 @@ test('markSent가 한 번 실패해도 재시도해서 모두 기록한다', asy
   let calls = 0
   const store = { ...f.store, markSent: async (c: unknown, eps: string[], d: string) => { if (calls++ === 0) throw new Error('x'); return f.store.markSent(c, eps, d) } }
   const r = await runDailySend({ store, cfg, sender: async () => 'ok', now: at('2026-11-04T23:30:00Z'), concurrency: 5 })
-  expect(r).toMatchObject({ sent: 5, remaining: 0 })
+  expect(r).toMatchObject({ sent: 5, remaining: 0, unrecorded: 0 })
   expect(f.db.every((x) => x.last_sent_on === '2026-11-05')).toBe(true)
 })
 test('markSent가 계속 실패하면 첫 묶음 뒤 멈춘다', async () => {
@@ -51,7 +51,7 @@ test('markSent가 계속 실패하면 첫 묶음 뒤 멈춘다', async () => {
   const sent: string[] = []
   const store = { ...f.store, markSent: async () => { throw new Error('x') } }
   const r = await runDailySend({ store, cfg, sender: async (s) => { sent.push(s.endpoint); return 'ok' }, now: at('2026-11-04T23:30:00Z'), concurrency: 2 })
-  expect(r.sent).toBe(2); expect(r.remaining).toBe(4); expect(sent.length).toBe(2)
+  expect(r.sent).toBe(2); expect(r.unrecorded).toBe(2); expect(r.remaining).toBe(4); expect(sent.length).toBe(2)
 })
 test('같은 날 보정 발송이 여러 번 돌아도 실패는 하루 1회만 센다', async () => {
   const f = fakeStore([{ endpoint: 'bad', ganji: '경오' }])

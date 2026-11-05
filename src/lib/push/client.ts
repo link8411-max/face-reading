@@ -65,11 +65,11 @@ function idb(): Promise<IDBDatabase> {
   })
 }
 
-export async function readStoredGanji(): Promise<string | null> {
+async function readStored(key: 'ganji' | 'vapid'): Promise<string | null> {
   try {
     const db = await idb()
     return await new Promise((resolve) => {
-      const r = db.transaction('push').objectStore('push').get('ganji')
+      const r = db.transaction('push').objectStore('push').get(key)
       r.onsuccess = () => resolve(typeof r.result === 'string' ? r.result : null)
       r.onerror = () => resolve(null)
     })
@@ -105,6 +105,8 @@ async function clearStored(): Promise<void> {
   } catch { /* 무시 */ }
 }
 
+export const readStoredGanji = () => readStored('ganji')
+
 export async function subscribe(ganji: string): Promise<'ok' | 'denied' | 'server'> {
   const publicKey = process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY
   if (!publicKey) return 'server'
@@ -112,6 +114,15 @@ export async function subscribe(ganji: string): Promise<'ok' | 'denied' | 'serve
   if (perm !== 'granted') return 'denied'
   try {
     const reg = await navigator.serviceWorker.ready
+    let existing = await reg.pushManager.getSubscription()
+    if (existing) {
+      // VAPID 키가 바뀐 뒤의 옛 구독은 서버가 403으로 거절한다 → 지우고 새 키로 다시 등록
+      const storedKey = await readStored('vapid')
+      if (storedKey && storedKey !== publicKey) {
+        await existing.unsubscribe().catch(() => false)
+        existing = null
+      }
+    }
     const sub = await reg.pushManager.subscribe({ userVisibleOnly: true, applicationServerKey: urlBase64ToUint8Array(publicKey) })
     const json = sub.toJSON()
     const res = await fetch('/api/push/subscribe', {
@@ -120,7 +131,7 @@ export async function subscribe(ganji: string): Promise<'ok' | 'denied' | 'serve
       body: JSON.stringify({ endpoint: sub.endpoint, keys: { p256dh: json.keys?.p256dh, auth: json.keys?.auth }, ganji }),
     }).catch(() => null)
     if (!res || !res.ok) {
-      await sub.unsubscribe().catch(() => false)
+      if (!existing) await sub.unsubscribe().catch(() => false)
       return 'server'
     }
     await saveStored(ganji, publicKey)

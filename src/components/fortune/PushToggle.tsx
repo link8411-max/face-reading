@@ -19,13 +19,19 @@ export default function PushToggle({ fortune }: { fortune: DailyFortune | null }
     if (!ganji) return;
     let alive = true;
     (async () => {
-      const sub = await getSubscription();
-      const saved = sub ? await readStoredGanji() : null;
-      const s = pushUiState(readPushEnv(!!sub));
+      // 안내 상태(kakao·ios_install·denied·unsupported)는 서비스워커를 기다리지 않고 먼저 정한다
+      const s = pushUiState(readPushEnv(false));
       if (!alive) return;
-      setStored(saved);
       setState(s);
       if (s === "ios_install" || s === "kakao") track("push_blocked", { test_name: "daily", result_id: s });
+      if (s !== "off") return;
+      // SW 설치가 실패하면 ready가 영영 안 끝날 수 있어 3초만 기다린다
+      const sub = await Promise.race([getSubscription(), new Promise<null>((r) => setTimeout(() => r(null), 3000))]);
+      if (!alive || !sub) return;
+      const saved = await readStoredGanji();
+      if (!alive) return;
+      setStored(saved);
+      setState("on");
     })();
     return () => { alive = false; };
   }, [ganji]);
@@ -56,6 +62,7 @@ export default function PushToggle({ fortune }: { fortune: DailyFortune | null }
         setState(typeof Notification !== "undefined" && Notification.permission === "denied" ? "denied" : state);
       } else {
         track("push_blocked", { test_name: "daily", result_id: "server" });
+        // 이미 켜 둔 상태(on)면 그대로 두고 안내만 보인다
         setNotice("지금은 등록이 안 돼요. 잠시 뒤 다시 눌러 주세요");
       }
     } finally {
@@ -64,7 +71,8 @@ export default function PushToggle({ fortune }: { fortune: DailyFortune | null }
   };
 
   const openExternal = () => {
-    window.location.href = `kakaotalk://web/openExternal?url=${encodeURIComponent(window.location.href)}`;
+    const target = `${window.location.origin}/fortune/daily?gz=${encodeURIComponent(ganji)}`;
+    window.location.href = `kakaotalk://web/openExternal?url=${encodeURIComponent(target)}`;
   };
 
   return (

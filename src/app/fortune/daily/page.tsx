@@ -14,6 +14,7 @@ import { useScreenshot } from "@/hooks/useScreenshot";
 import { SITE } from "@/lib/shareLinks";
 import { dailyFortune, type DailyFortune, type DailyInput } from "@/lib/dailyEngine";
 import { kstDate, onDayMaybeChanged } from "@/lib/kst";
+import { isGanji } from "@/lib/push/validate";
 import PushToggle from "@/components/fortune/PushToggle";
 import DailyFortuneCard from "@/components/fortune/DailyFortuneCard";
 import { dailyDateLine, dayLabel } from "@/lib/dailyEngine/format";
@@ -65,7 +66,7 @@ export default function DailyFortunePage() {
       if (validateBirthYear(y).ok) compute(y, early);
     }
     const gz = q.get("gz");
-    if (!(y && /^\d{4}$/.test(y)) && gz && gz.length === 2) {
+    if (!(y && /^\d{4}$/.test(y)) && gz && isGanji(gz)) {
       // 푸시 링크: 년주(천간+지지)로 바로 보여 준다. 엔진이 모르는 글자면 입력 화면 그대로 둔다
       try {
         const input: DailyInput = { kind: '년주', 천간: gz[0], 지지: gz[1] };

@@ -151,15 +151,23 @@ public/
 ## 아침 운세 푸시
 - 구조: 오늘의 운세 카드의 `PushToggle` → `/api/push/subscribe` → Supabase `push_subscriptions`(년주만 저장) → pg_cron이 매일 08:30 KST에 `/api/push/send` 호출 → web-push 발송 → 알림 클릭 시 `/fortune/daily?gz=<년주>` 착지.
 - 파일: `src/lib/push/{text,validate,store,send,guard,client}.ts`, `src/app/api/push/{subscribe,send}/route.ts`, `src/components/fortune/PushToggle.tsx`, `public/sw.js`(push·notificationclick), `docs/push-subscriptions.sql`, 설계 `docs/superpowers/specs/2026-11-05-daily-push-design.md`.
-- 환경변수 4개(Vercel): `NEXT_PUBLIC_VAPID_PUBLIC_KEY`, `VAPID_PRIVATE_KEY`, `VAPID_SUBJECT`, `PUSH_CRON_SECRET`. 없으면 버튼이 숨고 API는 503(빌드는 없이도 통과).
-- DB·스케줄: `docs/push-subscriptions.sql`을 Supabase SQL Editor에서 실행 -> Vault에 `push_cron_secret` 넣고 -> 파일 아래 cron 블록 주석 해제(UTC 23:30·23:45·00:00 = KST 08:30 본발송, 08:45·09:00 보정).
-- 수동 발송: `curl -X POST -H "Authorization: Bearer $PUSH_CRON_SECRET" https://unse-ai.com/api/push/send` (www 말고 정규 도메인).
+- 환경변수 4개(Vercel): `NEXT_PUBLIC_VAPID_PUBLIC_KEY`, `VAPID_PRIVATE_KEY`, `VAPID_SUBJECT`(`mailto:…`), `PUSH_CRON_SECRET`. 없으면 버튼이 숨고 API는 503(빌드는 없이도 통과). **환경변수를 넣거나 바꾼 뒤에는 재배포가 필요하다**(`NEXT_PUBLIC` 키는 빌드 때 코드에 박힌다). VAPID 키 생성: `npx web-push generate-vapid-keys`.
+- **VAPID 키는 교체하지 않는다.** 교체하면 기존 구독자 전원이 403으로 끊기고 5일 뒤 삭제된다; 꼭 교체해야 하면 사용자가 버튼을 다시 눌러야 한다.
+- DB·스케줄: `docs/push-subscriptions.sql`을 Supabase SQL Editor에서 실행 -> 확장(pg_cron·pg_net)은 SQL 또는 Dashboard > Database > Extensions에서 켜고 -> 파일의 '한 번만 실행' 블록으로 Vault에 `push_cron_secret` 넣고(중복 실행 금지) -> 그 아래 cron 블록 주석 해제(UTC 23:30·23:45·00:00 = KST 08:30 본발송, 08:45·09:00 보정).
+- 롤백: `select cron.unschedule('daily-push-0830'); select cron.unschedule('daily-push-0845-retry'); select cron.unschedule('daily-push-0900-retry');`
+- 아침 점검(SQL Editor):
+  1. `select * from push_send_log order by id desc limit 5;`
+  2. `select j.jobname, d.status, d.start_time, d.return_message from cron.job_run_details d join cron.job j using (jobid) order by d.start_time desc limit 6;`
+  3. `select id, status_code, error_msg, created from net._http_response order by created desc limit 6;` (6시간만 보관)
+  4. `select ganji, count(*), count(*) filter (where fail_count > 0) as failing from push_subscriptions group by rollup (ganji) order by ganji;`
+- 로그 행이 없으면 실패다(401 비밀 불일치·503 환경변수·500 Supabase/VAPID). cron 행은 요청을 큐에 넣기만 해서 항상 succeeded로 보인다. 서버 로그엔 `[push] send failed: unauthorized|disabled|error`만 남는다(500이면 0건 행도 기록).
+- 수동 발송: `curl -X POST -H "Authorization: Bearer $PUSH_CRON_SECRET" https://unse-ai.com/api/push/send` (www 말고 정규 도메인). 그날 KST 발송으로 기록되니(기기당 하루 1회) 자정 뒤에 시험하면 다음 날 몫이 소진된다.
 - 규칙: 기기당 하루 1회(`last_sent_on`, KST). 실패는 하루 1회만 집계(`push_bump_fail`)·5회 누적 삭제, 404/410은 즉시 삭제. 구독 endpoint는 허용 호스트(fcm·mozilla·apple·windows·samsung)만. 기기별 발송 타임아웃 10초, 한 번 호출 예산 45초(maxDuration 60). 생년은 저장·전송하지 않고 년주 2글자만. endpoint는 로그에 남기지 않는다.
 - 로그: `push_send_log`
 
 | 컬럼 | 뜻 |
 |------|-----|
-| day, started_at | KST 날짜, 시작 시각 |
+| day, finished_at | KST 날짜, 행을 넣은 시각(호출이 끝난 때) |
 | sent, failed, removed | 성공·실패·삭제 수 |
 | ms | 소요 시간 |
 
@@ -199,7 +207,7 @@ public/
 
 ## 방문 통계 (GA4)
 - 측정 ID `G-L99JPMPT9D` (`src/lib/analytics.ts`), `layout.tsx`의 `ga4-init` 스크립트. 운영 주소(unse-ai.com, `PROD_HOST_SOURCE`)가 아니면(로컬·Vercel 미리보기) gtag.js를 받지 않고 config도 안 해서 실제 통계에 안 섞인다(E2E는 `dataLayer`로 검사).
-- 이벤트는 `track()`만 쓴다: `photo_selected`, `test_start`, `photo_fail(result_id: noface·frontal·read·tool)`, `result_view(result_id)`, `share_click(method: link·save_image·share)`, `fortune_submit`, `shared_landing`.
+- 이벤트는 `track()`만 쓴다: `photo_selected`, `test_start`, `photo_fail(result_id: noface·frontal·read·tool)`, `result_view(result_id)`, `share_click(method: link·save_image·share)`, `fortune_submit`, `shared_landing`, 푸시 `push_subscribe(result_id=년주 2글자)`, `push_unsubscribe`, `push_blocked(result_id: kakao·ios_install·denied·server)`.
 - **사진 분석 실패 모니터링**: GA 탐색에서 `photo_fail` 이벤트를 `result_id`(이유) × 브라우저·OS로 본다. `test_start` 대비 `result_view` 사용자 수가 특정 브라우저에서만 떨어지면 그 환경의 문제. 실패 문구는 `lib/face/analyzePhoto.ts` `failText`(고개 돌림은 방향·정도 숫자까지). GA 준비 전 이벤트는 잠시 모았다가 보낸다. / `test_name`: face·animal·samguk·fortune·daily·mbti_match
 - **사진·생년월일·얼굴 수치는 보내지 않는다.** `track()`은 허용 키(test_name, result_id, method)와 유형 키 형식(한글·영문·숫자 24자 이내, 숫자 4자리 연속 금지)만 통과시킨다. 결과는 유형 키만(fox, caocao, 재물상, 띠, INFP_ENTJ).
 - 일기토 퍼널(값은 `result_id`에 인코딩, 키 추가 없음): `duel_wave`(보스 웨이브 도달, `w06`~`w36`), `duel_end`(`<시작장수>_<c|l>_<마지막으로 넘은 보스>` 예 `guanyu_l_w18`), `duel_resume`, `duel_abandon`.

@@ -96,7 +96,14 @@ self.addEventListener('push', (event) => {
 self.addEventListener('notificationclick', (event) => {
   event.notification.close();
   const url = (event.notification.data && event.notification.data.url) || '/fortune/daily';
-  const absolute = new URL(url, self.location.origin).href;
+  let absolute = new URL('/fortune/daily', self.location.origin).href;
+  try {
+    const u = new URL(url, self.location.origin);
+    // 같은 출처 주소만 연다
+    if (u.origin === self.location.origin) absolute = u.href;
+  } catch (e) {
+    // 기본 주소 사용
+  }
   event.waitUntil(
     self.clients
       .matchAll({ type: 'window', includeUncontrolled: true })
@@ -104,11 +111,11 @@ self.addEventListener('notificationclick', (event) => {
         const client = list.find((c) => c.url.startsWith(self.location.origin));
         if (client) {
           try {
-            if (client.navigate) await client.navigate(absolute);
+            const navigated = client.navigate ? await client.navigate(absolute) : null;
+            if (navigated) return navigated.focus();
           } catch (e) {
-            // navigate 미지원 → focus만
+            // 아래에서 새 창으로 대체
           }
-          return client.focus();
         }
         return self.clients.openWindow(absolute);
       })
@@ -127,8 +134,13 @@ function urlBase64ToUint8Array(base64String) {
 function idbGet(key) {
   return new Promise((resolve) => {
     try {
-      const open = indexedDB.open('unmyeong');
+      const open = indexedDB.open('unmyeong', 1);
       open.onerror = () => resolve(undefined);
+      // 앱이 만든 적 없는 DB면 빈 DB를 만들지 않고 취소한다
+      open.onupgradeneeded = (event) => {
+        try { event.target.transaction.abort(); } catch (e) { /* 무시 */ }
+        resolve(undefined);
+      };
       open.onsuccess = () => {
         try {
           const db = open.result;
@@ -160,6 +172,8 @@ self.addEventListener('pushsubscriptionchange', (event) => {
   event.waitUntil(
     (async () => {
       try {
+        const ganji = await idbGet('ganji');
+        if (!ganji) return;
         let key =
           event.oldSubscription &&
           event.oldSubscription.options &&
@@ -173,8 +187,6 @@ self.addEventListener('pushsubscriptionchange', (event) => {
           userVisibleOnly: true,
           applicationServerKey: key,
         });
-        const ganji = await idbGet('ganji');
-        if (!ganji) return;
         const keys = sub.toJSON().keys || {};
         await fetch('/api/push/subscribe', {
           method: 'POST',

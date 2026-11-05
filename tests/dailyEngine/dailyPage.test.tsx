@@ -42,5 +42,5 @@ test('페이지: gz 쿼리로 년주 모드, 잘못된 gz는 무시, gz도 주�
   expect(src).toContain('q.get("gz")')
   expect(src).toContain('q.delete("gz")')
   expect(src).toContain("kind: '년주'")
-  expect(src).toMatch(/length === 2|\/\^\[가-힣\]\{2\}\$\//)
+  expect(src).toContain('isGanji(')
 })
