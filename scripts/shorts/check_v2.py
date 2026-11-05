@@ -23,6 +23,11 @@ if max(pk) > -1: probs.append("최대 음량 -1dB 초과")
 for name, a, _ in bounds[1:]:
     i = int(a * 100); win = pk[max(0, i - 15): i + 15]; ctx = pk[max(0, i - 60): i - 15] + pk[i + 15: i + 60]
     if win and ctx and max(win) > sorted(ctx)[len(ctx) // 2] + 18: probs.append(f"{name} 경계({a:.2f}s) 튀는 소리 {max(win):.1f}dB")
+# 장면(클립) 이음새의 '치직': 박자 경계만 보면 놓친다(2026-11-05 삼고초려 쇼츠 57초). 3kHz 위 소리가 앞 0.2초보다 25dB 넘게 갑자기 튀는 곳을 찾는다.
+err2 = subprocess.run([FF, "-hide_banner", "-i", str(MP4), "-vn", "-af", "highpass=f=3000,asetnsamples=480,astats=metadata=1:reset=1,ametadata=print:key=lavfi.astats.Overall.Peak_level", "-f", "null", "-"], capture_output=True, text=True).stderr
+hf = [-120.0 if "inf" in v else float(v) for v in re.findall(r"Peak_level=([-0-9.inf]+)", err2)]  # 10ms(48kHz 기준) 단위
+for i in range(20, len(hf)):
+    if hf[i] > -12 and hf[i] > max(hf[i - 20:i]) + 25: probs.append(f"{i/100:.2f}s 고음 튐 {hf[i]:.1f}dB(이음새 딸깍 의심)")
 print("문제:", probs or "없음")
 R = EP / "work/review"; rows = []
 for name, a, b in bounds:

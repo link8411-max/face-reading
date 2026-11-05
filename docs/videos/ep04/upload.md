@@ -1,7 +1,7 @@
 # 관우의 최후 업로드 글
 
 영상: `ep04-guanyu-end-v4-small.mp4` (67.2초, 9:16)
-유튜브: https://youtube.com/shorts/FNE4RbXC6M8 (2026-11-05 공개)
+유튜브: https://youtube.com/shorts/FNE4RbXC6M8 (2026-11-05 공개). 같은 날 저녁 제목을 "천하무적 관우는 왜 허수아비를 세우고 성을 빠져나왔을까? 관우의 최후 #삼국지 #shorts"로 바꾸고 설명의 '머리' 표현을 뺐다(피드 노출 실험, analytics-log.md). 아래는 처음 올린 글
 
 ## 유튜브 쇼츠
 **제목**

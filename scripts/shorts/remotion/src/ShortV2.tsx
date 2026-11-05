@@ -18,7 +18,15 @@ export type ShortV2Props = {ep: string; episode?: EpisodeV2; timing?: Timing; fr
 const GOLD = '#E8B547';
 const FONT = '"Apple SD Gothic Neo", "Noto Sans KR", sans-serif';
 
-const TitleBar: React.FC<{ep: EpisodeV2}> = ({ep}) => (
+const TitleBar: React.FC<{ep: EpisodeV2}> = ({ep}) => {
+	const {width, height} = useVideoConfig();
+	if (width > height) return (
+		<AbsoluteFill style={{pointerEvents: 'none', fontFamily: FONT}}>
+			<div style={{position: 'absolute', top: 36, left: 44, fontSize: 40, fontWeight: 800, color: GOLD, textShadow: '0 0 8px #000, 0 0 3px #000'}}>{ep.title}</div>
+			<div style={{position: 'absolute', top: 44, right: 48, fontSize: 28, fontWeight: 700, color: 'rgba(255,255,255,0.9)', textShadow: '0 0 6px #000, 0 0 3px #000, 0 0 2px #000'}}>{ep.watermark ?? 'unse-ai.com'}</div>
+		</AbsoluteFill>
+	);
+	return (
 	<AbsoluteFill style={{pointerEvents: 'none'}}>
 		<div style={{position: 'absolute', top: 120, left: 0, right: 0, height: 150, background: 'rgba(0,0,0,0.45)', textAlign: 'center', fontFamily: FONT}}>
 			<div style={{fontSize: 76, fontWeight: 800, color: GOLD, marginTop: 10, textShadow: '0 0 6px #000'}}>{ep.title}</div>
@@ -26,18 +34,20 @@ const TitleBar: React.FC<{ep: EpisodeV2}> = ({ep}) => (
 		</div>
 		<div style={{position: 'absolute', top: 284, width: '100%', textAlign: 'center', fontFamily: FONT, fontSize: 32, color: 'rgba(255,255,255,0.75)', textShadow: '0 0 4px #000'}}>{ep.watermark ?? 'unse-ai.com'}</div>
 	</AbsoluteFill>
-);
+	);
+};
 
 // 출처 도장: 연의(붉은색) / 정사(푸른색). 박자 시작에 쿵 찍히듯 들어온다
 const Badge: React.FC<{text: string}> = ({text}) => {
 	const f = useCurrentFrame();
-	const {fps} = useVideoConfig();
+	const {fps, width, height} = useVideoConfig();
 	const s = spring({frame: f - 4, fps, config: {damping: 10, stiffness: 220}});
 	const red = text.startsWith('연의');
+	const land = width > height;
 	return (
-		<div style={{position: 'absolute', top: 340, right: 50, transform: `rotate(-6deg) scale(${0.6 + 0.4 * s})`, opacity: s, fontFamily: FONT,
+		<div style={{position: 'absolute', top: land ? 100 : 340, right: land ? 48 : 50, fontSize: land ? 34 : 40, transform: `rotate(-6deg) scale(${0.6 + 0.4 * s})`, opacity: s, fontFamily: FONT,
 			border: `6px solid ${red ? '#C8403A' : '#3F78B5'}`, color: red ? '#C8403A' : '#3F78B5', background: 'rgba(0,0,0,0.7)',
-			borderRadius: 10, padding: '6px 18px', fontSize: 40, fontWeight: 900, letterSpacing: 2}}>{text}</div>
+			borderRadius: 10, padding: '6px 18px', fontWeight: 900, letterSpacing: 2}}>{text}</div>
 	);
 };
 
@@ -45,7 +55,8 @@ const Badge: React.FC<{text: string}> = ({text}) => {
 // 핵심어만 금색으로 고정한다. 페이지가 바뀌는 순간만 살짝 튀어 오른다(쉼 위치라 정확함).
 const Captions: React.FC<{words: Timing[string]['words']; emphasis: string[]}> = ({words, emphasis}) => {
 	const f = useCurrentFrame();
-	const {fps} = useVideoConfig();
+	const {fps, width, height} = useVideoConfig();
+	const land = width > height;
 	const now = f / fps - LEAD;
 	const pages: (typeof words)[] = [];
 	let cur: typeof words = [];
@@ -59,9 +70,9 @@ const Captions: React.FC<{words: Timing[string]['words']; emphasis: string[]}> =
 	const pageStart = Math.round((page[0].start + LEAD) * fps);
 	const pop = spring({frame: f - pageStart, fps, config: {damping: 14, stiffness: 180}});
 	const chars = page.reduce((a, w) => a + w.text.length, 0);
-	const size = chars > 16 ? 64 : chars > 11 ? 72 : 80;
+	const size = land ? (chars > 24 ? 58 : 66) : chars > 16 ? 64 : chars > 11 ? 72 : 80;
 	return (
-		<div style={{position: 'absolute', top: 1250, left: 50, right: 50, textAlign: 'center', fontFamily: FONT, transform: `scale(${0.9 + 0.1 * pop})`}}>
+		<div style={{position: 'absolute', ...(land ? {bottom: 70} : {top: 1250}), left: land ? 160 : 50, right: land ? 160 : 50, textAlign: 'center', fontFamily: FONT, transform: `scale(${0.9 + 0.1 * pop})`}}>
 			{page.map((w, i) => {
 				const key = emphasis.some((e) => w.text.includes(e));
 				return (
@@ -89,7 +100,8 @@ const BeatVideos: React.FC<{ep: string; videos: Vid[]; frames: number}> = ({ep, 
 				const el = (
 					<Sequence key={v.src} from={at} durationInFrames={len}>
 						{/* 오른쪽 아래 Veo 표시가 화면 밖으로 나가도록 왼쪽 위 기준으로 살짝 키운다 */}
-						<OffthreadVideo src={staticFile(`${ep}/${v.src}`)} playbackRate={rate} volume={0.2} style={{width: '100%', height: '100%', objectFit: 'cover', transform: 'scale(1.07)', transformOrigin: '0 0'}} />
+						{/* 클립 소리가 뚝 끊기거나 시작되면 장면이 바뀔 때 '치직' 소리가 난다(2026-11-05) → 앞뒤 5프레임 페이드 */}
+						<OffthreadVideo src={staticFile(`${ep}/${v.src}`)} playbackRate={rate} volume={(fr) => 0.2 * Math.max(0, Math.min(1, fr / 5, (len - 1 - fr) / 5))} style={{width: '100%', height: '100%', objectFit: 'cover', transform: 'scale(1.07)', transformOrigin: '0 0'}} />
 						{v.badge && <Badge text={v.badge} />}
 					</Sequence>
 				);
@@ -117,11 +129,13 @@ const Twist: React.FC<{ep: string; freeze: string; frames: number}> = ({ep, free
 const EndCard: React.FC<{ep: string; end: EpisodeV2['end']}> = ({ep, end}) => {
 	const f = useCurrentFrame();
 	const {fps} = useVideoConfig();
+	const {width, height} = useVideoConfig();
+	const land = width > height;
 	const n = end.portraits.length;
-	const size = n <= 2 ? 400 : 300;
+	const size = land ? 280 : n === 1 ? 520 : n <= 2 ? 400 : 300;
 	return (
 		<AbsoluteFill style={{backgroundColor: '#23263A', fontFamily: FONT, alignItems: 'center'}}>
-			<div style={{display: 'flex', gap: 30, marginTop: 380, justifyContent: 'center'}}>
+			<div style={{display: 'flex', gap: 30, marginTop: land ? 180 : n === 1 ? 470 : 380, justifyContent: 'center'}}>
 				{end.portraits.map((p, i) => {
 					const s = spring({frame: f - i * 5, fps, config: {damping: 12}});
 					return (
@@ -132,9 +146,9 @@ const EndCard: React.FC<{ep: string; end: EpisodeV2['end']}> = ({ep, end}) => {
 					);
 				})}
 			</div>
-			<div style={{color: 'white', fontSize: 64, fontWeight: 900, marginTop: 70, textAlign: 'center', padding: '0 60px', opacity: interpolate(f, [10, 20], [0, 1], {extrapolateRight: 'clamp'})}}>{end.lines[0]}</div>
+			<div style={{color: 'white', fontSize: 64, fontWeight: 900, marginTop: land ? 50 : 70, textAlign: 'center', padding: '0 60px', opacity: interpolate(f, [10, 20], [0, 1], {extrapolateRight: 'clamp'})}}>{end.lines[0]}</div>
 			{end.lines.slice(1).map((l) => <div key={l} style={{color: 'white', fontSize: 44, marginTop: 20}}>{l}</div>)}
-			<div style={{color: GOLD, fontSize: 80, fontWeight: 900, marginTop: 50, transform: `scale(${1 + 0.04 * Math.sin(f / 6)})`}}>{end.url}</div>
+			<div style={{color: GOLD, fontSize: 80, fontWeight: 900, marginTop: land ? 30 : 50, transform: `scale(${1 + 0.04 * Math.sin(f / 6)})`}}>{end.url}</div>
 			<Sequence from={Math.round(LEAD * FPS)}><Audio src={staticFile(`${ep}/nar_end.wav`)} /></Sequence>
 			<Audio src={staticFile('sfx/whoosh.wav')} volume={0.35} />
 		</AbsoluteFill>
