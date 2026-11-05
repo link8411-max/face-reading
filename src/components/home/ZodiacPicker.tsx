@@ -3,7 +3,8 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { dailyFortune, type DailyFortune } from "@/lib/dailyEngine";
-import { dailyDateLine } from "@/components/fortune/DailyFortuneCard";
+import { dailyDateLine, dayLabel } from "@/lib/dailyEngine/format";
+import { kstDate } from "@/lib/kst";
 import { ZODIAC_SLUGS, zodiac2027, type ZodiacSlug } from "@/content/fortune2027Zodiac";
 import { FORTUNE_YEAR } from "@/lib/fortuneYear";
 
@@ -17,7 +18,7 @@ export default function ZodiacPicker() {
   }, []);
 
   const z = selected ? zodiac2027[selected] : null;
-  const fortune: DailyFortune | null = z && now ? dailyFortune({ kind: '띠', 띠: z.띠 } as Parameters<typeof dailyFortune>[0], now) : null;
+  const fortune: DailyFortune | null = z && now ? dailyFortune({ kind: '띠', 띠: z.띠 }, now) : null;
 
   return (
     <section aria-label="띠 바로 고르기">
@@ -25,7 +26,7 @@ export default function ZodiacPicker() {
         <h2 className="font-serif font-bold text-[19px]">오늘, 내 띠는?</h2>
         <Link href="/fortune/2027" className="text-[13px] text-muted">{FORTUNE_YEAR.year} 신년운세</Link>
       </div>
-      <p className="text-xs text-muted mt-1">{fortune ? dailyDateLine(fortune) : "\u00a0"} · 띠를 눌러 보세요</p>
+      <p className="text-xs text-muted mt-1">{fortune ? dailyDateLine(fortune) : now ? dayLabel(kstDate(now)) : "\u00a0"} · 띠를 눌러 보세요</p>
       <div className="flex flex-wrap gap-2 mt-3.5">
         {ZODIAC_SLUGS.map((s) => (
           <button

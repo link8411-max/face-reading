@@ -23,6 +23,8 @@ test('홈 클라이언트 번들에 운세 DB 전체를 싣지 않는다(일간�
   const src = readFileSync('src/components/home/ZodiacPicker.tsx', 'utf8')
   expect(src).not.toContain('@/lib/fortuneDB')
   expect(src).toContain('@/lib/dailyEngine')
+  expect(src).not.toContain('components/fortune/DailyFortuneCard')
+  expect(src).not.toContain('fortuneDB')
 })
 
 test('푸터 묶음 제목은 h4가 아니다(제목 단계 건너뜀 방지)', () => {

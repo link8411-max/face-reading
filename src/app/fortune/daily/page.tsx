@@ -14,7 +14,8 @@ import { useScreenshot } from "@/hooks/useScreenshot";
 import { SITE } from "@/lib/shareLinks";
 import { dailyFortune, type DailyFortune } from "@/lib/dailyEngine";
 import { kstDate, onDayMaybeChanged } from "@/lib/kst";
-import DailyFortuneCard, { dailyDateLine, dayLabel } from "@/components/fortune/DailyFortuneCard";
+import DailyFortuneCard from "@/components/fortune/DailyFortuneCard";
+import { dailyDateLine, dayLabel } from "@/lib/dailyEngine/format";
 
 export default function DailyFortunePage() {
   const goBack = useBackOrHome();
