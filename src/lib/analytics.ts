@@ -32,6 +32,10 @@ type Events = {
   video_play: { slot: string; result_id: string }
   video_subscribe_click: { slot: string }
   video_test_click: { slot: string }
+  // 아침 운세 푸시 알림. result_id는 년주(60갑자 2글자) 또는 막힌 이유. 생년은 보내지 않는다
+  push_subscribe: { test_name: TestName; result_id: string }
+  push_unsubscribe: { test_name: TestName }
+  push_blocked: { test_name: TestName; result_id: 'denied' | 'ios_install' | 'server' | 'kakao' }
 }
 
 const ALLOWED_KEYS = new Set(['test_name', 'result_id', 'method', 'slot', 'keyword'])

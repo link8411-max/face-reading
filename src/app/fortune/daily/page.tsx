@@ -14,6 +14,7 @@ import { useScreenshot } from "@/hooks/useScreenshot";
 import { SITE } from "@/lib/shareLinks";
 import { dailyFortune, type DailyFortune, type DailyInput } from "@/lib/dailyEngine";
 import { kstDate, onDayMaybeChanged } from "@/lib/kst";
+import PushToggle from "@/components/fortune/PushToggle";
 import DailyFortuneCard from "@/components/fortune/DailyFortuneCard";
 import { dailyDateLine, dayLabel } from "@/lib/dailyEngine/format";
 
@@ -202,6 +203,7 @@ export default function DailyFortunePage() {
                   다시하기
                 </button>
               </div>
+              <PushToggle fortune={result} />
             </div>
 
             <SeasonPicks slot="daily" />
