@@ -34,6 +34,12 @@ describe('PushToggle 소스', () => {
     expect(read('public/sw.js')).toContain('sendAt')
     expect(read('src/app/privacy/page.tsx')).toContain('알림 시각')
   })
+  it('시각 변경: 구독된 년주 사용·실패 시 복구', () => {
+    expect(toggle).toContain('subscribe(stored ?? ganji, value)')
+    expect(toggle).toContain('setSendAt(prev)')
+    expect(toggle).toContain('slotLocked')
+    expect(toggle).toContain('먼저 이 년주로 바꿔 받기를 눌러 주세요')
+  })
   it('requestPermission은 마운트 효과에서 호출하지 않는다', () => {
     expect(toggle).not.toMatch(/useEffect\(\s*\(\)\s*=>\s*\{[^]*?requestPermission[^]*?\}\s*,\s*\[/)
     expect(toggle).not.toContain('requestPermission')

@@ -78,17 +78,22 @@ export default function PushToggle({ fortune }: { fortune: DailyFortune | null }
   };
 
   const onSlotChange = async (value: string) => {
+    const prev = sendAt;
+    if (state !== "on") {
+      setSendAt(value);
+      return;
+    }
+    if (busy) return;
     setSendAt(value);
-    if (state !== "on" || busy) return;
     setBusy(true);
     setNotice("");
     try {
-      const r = await subscribe(ganji, value);
+      // 시각만 바꾸는 것이므로 구독돼 있는 년주(stored)를 그대로 쓴다
+      const r = await subscribe(stored ?? ganji, value);
       if (r === "ok") {
-        track("push_subscribe", { test_name: "daily", result_id: ganji });
-        setStored(ganji);
         setNotice(`알림 시각을 바꿨어요. ${nextDeliveryWord(value, new Date())} ${formatSlot(value)}에 와요`);
       } else {
+        setSendAt(prev);
         setNotice("지금은 등록이 안 돼요. 잠시 뒤 다시 눌러 주세요");
       }
     } finally {
@@ -96,8 +101,9 @@ export default function PushToggle({ fortune }: { fortune: DailyFortune | null }
     }
   };
 
+  const slotLocked = state === "on" && stored !== ganji;
   const slotSelect = (
-    <select aria-label="알림 시각" value={sendAt} disabled={busy} onChange={(e) => onSlotChange(e.target.value)} className={SELECT}>
+    <select aria-label="알림 시각" value={sendAt} disabled={busy || slotLocked} title={slotLocked ? "먼저 이 년주로 바꿔 받기를 눌러 주세요" : undefined} onChange={(e) => onSlotChange(e.target.value)} className={SELECT}>
       {SEND_SLOTS.map((t) => (
         <option key={t} value={t}>{formatSlot(t)}</option>
       ))}
