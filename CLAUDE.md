@@ -388,6 +388,11 @@ public/
 ### PageGuide (서버 렌더 본문)
 테스트 페이지는 `"use client"`라 서버 HTML에 글이 거의 없다. 그래서 각 layout이 `<PageGuide>`(서버 컴포넌트)를 렌더한다. 처음엔 2~3줄 `summary`만 보이고 소개·특징은 "자세히 보기"(details)로 접힌다(HTML에는 남아 색인됨). 기술·개인정보 설명은 본문이 아니라 FAQ에 둔다. 그 밖에 FAQ(+페이지별 FAQPage JSON-LD), 다른 테스트 링크를 HTML에 넣는다. 섹션에는 `no-screenshot` 클래스가 있어 결과 캡처에 섞이지 않는다. 테스트: `npm test`
 
+### IndexNow (네이버·빙 색인 알림)
+- 네이버 '웹 페이지 수집 요청'은 하루 50건이 한도라, 페이지를 많이 바꾸면 IndexNow로 한 번에 알린다. 네이버(`searchadvisor.naver.com/indexnow`)와 공용(`api.indexnow.org`, 빙 등에 공유) 두 곳에 보낸다.
+- 키 파일 `public/bdd5889660e497f527dd0a32a46b7f0f.txt`(공개값, 규격상 노출). 스크립트 `scripts/indexnow.mjs`의 `KEY`와 같아야 한다.
+- 배포가 끝난 뒤: `node scripts/indexnow.mjs`(사이트맵 전체) 또는 `node scripts/indexnow.mjs /경로 /경로`(바꾼 페이지만), 미리 보기는 `--dry-run`. 200·202면 접수, 403은 키 파일 확인 실패.
+
 ### 새 페이지 추가 시 SEO 체크리스트
 1. `layout.tsx` 생성 (메타데이터 + JSON-LD)
 2. `src/app/sitemap.ts`의 `SITEMAP_ROUTES`와 `LAST_MODIFIED`에 추가
