@@ -56,6 +56,15 @@ async function viaRss(): Promise<Video[]> {
 
 // 롱폼을 뺀 쇼츠만, 최신순. 어떤 실패도 던지지 않는다.
 export async function getChannelVideos(): Promise<Video[]> {
+  return (await getAllVideos()).filter((v) => v.isShort)
+}
+
+// 롱폼만, 최신순. RSS로 받으면 길이를 몰라 모두 쇼츠로 치므로 API 키가 있을 때만 나온다.
+export async function getLongVideos(): Promise<Video[]> {
+  return (await getAllVideos()).filter((v) => !v.isShort)
+}
+
+async function getAllVideos(): Promise<Video[]> {
   const key = process.env.YOUTUBE_API_KEY
   let list: Video[] | null = null
   if (key) {
@@ -73,5 +82,5 @@ export async function getChannelVideos(): Promise<Video[]> {
       return []
     }
   }
-  return list.filter((v) => v.isShort)
+  return list
 }
