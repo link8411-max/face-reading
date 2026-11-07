@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { extractFeatures, checkFrontal, type FeatureVector } from "@/lib/face/landmarkFeatures";
 import { toZ } from "@/lib/face/featureStats";
+import { extractGuansangFeatures, type GuansangFeatureVector } from "@/lib/face/guansangFeatures";
 import { matchCharacter, type Gender } from "@/lib/samguk/matcher";
 import { samgukCharacters } from "@/lib/samgukDB";
 import calibration from "@/lib/samguk/calibration.json";
@@ -14,6 +15,7 @@ export interface LabRow {
   detected: boolean;
   frontal?: { ok: boolean; yawRatio: number };
   features?: FeatureVector;
+  guansang?: GuansangFeatureVector;
   matchedId?: string;
   similarity?: number;
 }
@@ -40,7 +42,7 @@ export default function FaceLab() {
         if (!lm) { out.push({ ...job, detected: false }); continue; }
         const features = extractFeatures(lm);
         const m = matchCharacter(toZ(features, job.gender), job.gender, calibration.bias);
-        out.push({ ...job, detected: true, frontal: checkFrontal(lm), features, matchedId: m.character.id, similarity: m.similarity });
+        out.push({ ...job, detected: true, frontal: checkFrontal(lm), features, guansang: extractGuansangFeatures(lm), matchedId: m.character.id, similarity: m.similarity });
         setRows([...out]);
       }
       // face-api(관상) 원시 측정값: 구간 경계 점검용 (scripts/measure-faceapi-thresholds.mjs)

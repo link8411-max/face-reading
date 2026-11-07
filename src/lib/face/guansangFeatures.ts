@@ -10,8 +10,8 @@ export const GUANSANG_KEYS = [
 export type GuansangKey = typeof GUANSANG_KEYS[number]
 export type GuansangFeatureVector = Record<GuansangKey, number>
 
-// 상정(이마) 비율이 이 범위 밖이면 앞머리 등으로 이마 위쪽이 불확실하다고 본다. 초기값, Task 2에서 실측으로 갱신.
-export const ZONE_UP_RANGE = { min: 0.22, max: 0.45 }
+// 상정(이마) 비율이 이 범위 밖이면 앞머리 등으로 이마 위쪽이 불확실하다고 본다. 2026-11-07 실측 zoneUp 0.1219~0.1962(n=20)에 범위의 20%씩 여유.
+export const ZONE_UP_RANGE = { min: 0.107, max: 0.211 }
 
 type P = [number, number]
 const dist = (a: P, b: P) => Math.hypot(a[0] - b[0], a[1] - b[1])

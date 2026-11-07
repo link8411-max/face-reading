@@ -48,7 +48,7 @@ export const FEATURE_STATS_BY_GENDER: Record<Gender, Record<FeatureKey, { mean: 
 
 export type ZVector = Record<FeatureKey, number>
 
-const Z_LIMIT = 3
+export const Z_LIMIT = 3
 
 // 표본(AI 생성 정면 얼굴)은 실제 셀카보다 고르게 정렬돼 있어 편차가 작게 잡힌다.
 // 그대로 쓰면 비율이 1~2%만 달라도 z가 크게 튀어 특정 인물로 쏠릴 수 있으니 1.5배로 넓혀 쓴다.
