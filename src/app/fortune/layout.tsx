@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 
 // 검색 결과 제목·설명 (클릭률 위주, 길이 상한은 tests/seo-snippets.test.tsx). og·트위터도 같은 문구
-const TITLE = "2027 신년운세 무료 사주풀이 | 정미년 총운·재물·연애운 – 운명을 읽다";
+const TITLE = "2027 신년운세 무료 | 정미년 총운·재물·연애운 – 운명을 읽다";
 const DESCRIPTION = "2027년 정미년 신년운세를 사주로 무료로 풀어 드려요. 양력·음력 생년월일로 총운·재물운·애정운·직장운·건강운까지, 가입 없이 바로 확인하세요.";
 
 export const metadata: Metadata = {

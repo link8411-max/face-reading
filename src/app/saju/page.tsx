@@ -3,7 +3,7 @@ import SajuClient from "./SajuClient";
 import PageGuide from "@/components/PageGuide";
 
 const TITLE = "무료 사주 풀이 | 내 사주를 쉬운 말로, 10년 대운까지 – 운명을 읽다";
-const DESCRIPTION = "생년월일과 태어난 시간으로 네 기둥, 오행의 균형, 십신, 10년 대운과 올해 흐름을 쉬운 말로 풀어요. 절기 시각 기준으로 계산하고 가입 없이 무료예요.";
+const DESCRIPTION = "무료 만세력으로 네 기둥을 뽑고 오행, 십신, 10년 대운과 올해 흐름까지 쉬운 말로 풀어요. 한국천문연구원 절기 시각 기준이고 가입 없이 무료예요.";
 
 export const metadata: Metadata = {
   title: TITLE,

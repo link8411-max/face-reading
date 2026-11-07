@@ -126,5 +126,5 @@ test('/saju 가이드: 네 기둥·절기·십신·대운·세운을 말하고 �
   expect(g.faqs.length).toBeGreaterThanOrEqual(4)
   const text = JSON.stringify(g)
   for (const t of ['네 기둥', '절기', '십신', '대운', '세운', '저장']) expect(text).toContain(t)
-  expect(g.related).toEqual(['/fortune', '/fortune/daily'])
+  expect(g.related).toEqual(['/fortune', '/fortune/daily', '/face2'])
 })
