@@ -1,3 +1,4 @@
+import { FORTUNE_YEAR } from "@/lib/fortuneYear";
 import { NextRequest, NextResponse } from 'next/server'
 import { computeSaju } from '@/lib/saju/engine'
 import { isHourSlotKey, type HourSlotKey } from '@/lib/saju/keys'
@@ -29,7 +30,8 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ ok: false, reason: outOfRange ? 'range' : 'invalid' }, { status: 400 })
   }
 
-  const asOfYear = new Date(Date.now() + 9 * 3600e3).getUTCFullYear()
+  // '올해'는 사이트 신년운세 기준 연도(FORTUNE_YEAR)와 실제 올해 중 늦은 쪽. 11~12월에도 다가오는 해(정미년)를 보여 준다
+  const asOfYear = Math.max(new Date(Date.now() + 9 * 3600e3).getUTCFullYear(), FORTUNE_YEAR.year)
   const result = computeSaju({
     year: year as number,
     month: month as number,

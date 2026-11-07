@@ -107,7 +107,7 @@ export default function SajuClient() {
           <>
             <div className="mt-2.5 mb-6">
               <h2 className="font-serif font-bold text-[27px] leading-[1.4] break-keep">생년월일시로 읽는<br />내 사주 풀이</h2>
-              <p className="mt-2.5 text-sm text-muted">네 기둥·십신·대운을 쉬운 말로 풀어 드려요</p>
+              <p className="mt-2.5 text-sm text-muted">타고난 성향과 10년 흐름, 올해를 쉬운 말로 풀어 드려요</p>
             </div>
             <div className="bg-white rounded-[28px] p-6 mb-6 border border-line">
               <div className="flex justify-center gap-2 mb-4">
@@ -151,7 +151,7 @@ export default function SajuClient() {
               </div>
 
               <div className="mb-6">
-                <p className="block text-sm text-muted mb-1">성별 (대운 방향에 써요)</p>
+                <p className="block text-sm text-muted mb-1">성별 (10년 흐름의 방향을 정하는 데 써요)</p>
                 <GenderPills value={gender} onChange={chooseGender} />
               </div>
 

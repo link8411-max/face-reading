@@ -1,172 +1,139 @@
 // 사주 풀이 문구. 규칙은 tests/saju/copy.test.ts가 막는다(해요체, 이모지·금지어·평가어·예언어 없음, 난수 없음).
-// 설계: docs/superpowers/specs/2026-11-07-saju-engine-design.md ("신뢰 장치", "쉬운 말 번역")
-import { ELEMENTS, type Element, type RelationKind, type Stem, type TenGod } from '@/lib/saju/keys';
+// 설계: docs/superpowers/specs/2026-11-07-saju-engine-design.md ("신뢰 장치", "쉬운 말 규칙 추가")
+// 모든 풀이는 { text, basis }: text(본문)에는 전통 용어(십신·간지·오행 한자·대운·세운·일간·일지)를 쓰지 않고,
+// 전통 용어는 작은 회색 꼬리 줄 basis에만 둔다.
+import { ELEMENTS, STEMS, type Branch, type Element, type RelationKind, type Stem, type TenGod } from '@/lib/saju/keys';
 
-/** 일간 10종: 나를 비유하는 한 줄. 좋고 나쁨이 아니라 결의 차이로만 말한다 */
-export const DAY_MASTER_COPY: Record<Stem, { title: string; line: string }> = {
-  갑: { title: '나는 큰 나무예요', line: '곧게 위로 뻗는 결이라, 방향이 정해지면 꾸준히 자라는 힘으로 풀어요.' },
-  을: { title: '나는 들꽃이에요', line: '바람에 휘어도 다시 피어나는 결이라, 환경에 맞춰 부드럽게 길을 찾는 힘으로 풀어요.' },
-  병: { title: '나는 한낮의 해예요', line: '넓게 비추는 결이라, 있는 곳을 밝고 환하게 만드는 힘으로 풀어요.' },
-  정: { title: '나는 촛불이에요', line: '가까이서 따뜻하게 밝히는 결이라, 한 사람 한 사람을 세심하게 챙기는 힘으로 풀어요.' },
-  무: { title: '나는 너른 산이에요', line: '묵직하게 자리를 지키는 결이라, 주변이 기대어 쉴 수 있는 중심이 되는 힘으로 풀어요.' },
-  기: { title: '나는 기름진 밭이에요', line: '무엇이든 품어 키우는 결이라, 사람과 일을 차분히 자라게 하는 힘으로 풀어요.' },
-  경: { title: '나는 바위예요', line: '단단하고 곧은 결이라, 한번 마음먹으면 흔들리지 않고 해내는 힘으로 풀어요.' },
-  신: { title: '나는 보석이에요', line: '섬세하게 빛나는 결이라, 작은 차이까지 알아보고 다듬는 힘으로 풀어요.' },
-  임: { title: '나는 큰 강이에요', line: '넓게 흐르는 결이라, 많은 것을 담아 멀리 가는 힘으로 풀어요.' },
-  계: { title: '나는 봄비예요', line: '조용히 스며드는 결이라, 눈에 띄지 않게 마음을 적시고 생각을 깊게 하는 힘으로 풀어요.' },
+export type Reading = { text: string; basis: string };
+
+/** 일간 10종: "나는 ○○ 같은 사람이에요" + 행동 한 문장 + 어떤 상황에 좋은지 한 문장 */
+export const DAY_MASTER_COPY: Record<Stem, { title: string; text: string; basis: string }> = {
+  갑: { title: '나는 큰 나무 같은 사람이에요', text: '한 번 방향을 잡으면 곧게 위로 뻗어 가는 편이에요. 목표가 분명한 일을 꾸준히 키워 갈 때 잘 맞아요.', basis: '갑목 일간 · 새싹(목)' },
+  을: { title: '나는 들꽃 같은 사람이에요', text: '환경이 바뀌어도 부드럽게 맞춰 가며 길을 찾는 편이에요. 변화가 많은 곳이나 사람 사이를 잇는 일에 잘 맞아요.', basis: '을목 일간 · 새싹(목)' },
+  병: { title: '나는 한낮의 해 같은 사람이에요', text: '있는 자리를 밝고 환하게 만드는 편이에요. 사람들 앞에 서거나 분위기를 띄워야 하는 일에 잘 맞아요.', basis: '병화 일간 · 불꽃(화)' },
+  정: { title: '나는 촛불 같은 사람이에요', text: '가까운 사람을 세심하게 챙기며 따뜻하게 밝혀 주는 편이에요. 한 사람 한 사람과 깊게 마주하는 일에 잘 맞아요.', basis: '정화 일간 · 불꽃(화)' },
+  무: { title: '나는 너른 산 같은 사람이에요', text: '쉽게 흔들리지 않고 묵직하게 자리를 지키는 편이에요. 주변이 기대어 쉴 중심이 필요한 일에 잘 맞아요.', basis: '무토 일간 · 대지(토)' },
+  기: { title: '나는 기름진 밭 같은 사람이에요', text: '사람과 일을 품어 차분히 자라게 하는 편이에요. 오래 돌보고 키워야 하는 일에 잘 맞아요.', basis: '기토 일간 · 대지(토)' },
+  경: { title: '나는 바위 같은 사람이에요', text: '한번 정하면 깔끔하게 끊고 가는 편이에요. 결단이 필요한 일이나 원칙을 지켜야 하는 일에 잘 맞아요.', basis: '경금 일간 · 칼날(금)' },
+  신: { title: '나는 보석 같은 사람이에요', text: '작은 차이까지 알아보고 섬세하게 다듬는 편이에요. 완성도가 중요한 일이나 세밀한 작업에 잘 맞아요.', basis: '신금 일간 · 칼날(금)' },
+  임: { title: '나는 큰 강 같은 사람이에요', text: '생각과 마음이 넓게 흘러서 많은 것을 담고 멀리 가는 편이에요. 여러 분야를 넘나들거나 큰 그림을 그리는 일에 잘 맞아요.', basis: '임수 일간 · 물결(수)' },
+  계: { title: '나는 봄비 같은 사람이에요', text: '조용히 스며들듯 마음을 헤아리고 생각을 깊게 하는 편이에요. 차분히 듣고 살펴야 하는 일에 잘 맞아요.', basis: '계수 일간 · 물결(수)' },
 };
 
-/** 십신: 쉬운 이름 + 뜻 + 많을 때·없을 때(둘 다 긍정 프레이밍) */
-export const TEN_GOD_COPY: Record<TenGod, { easy: string; meaning: string; many: string; none: string }> = {
-  비견: {
-    easy: '나란히',
-    meaning: '나와 같은 결의 기운이라, 곁에서 나란히 걷는 힘으로 풀어요.',
-    many: '믿는 사람과 나란히 갈 때 힘이 나고, 내 중심이 단단한 쪽으로 풀어요.',
-    none: '혼자 길을 내는 힘이 있어, 스스로 정하고 움직이는 일이 편한 쪽으로 풀어요.',
-  },
-  겁재: {
-    easy: '승부욕',
-    meaning: '나와 같은 결이지만 겨루는 맛이 있는 기운이라, 지고 싶지 않은 마음으로 풀어요.',
-    many: '경쟁할 때 집중력이 올라가고, 목표가 생기면 끝까지 밀어붙이는 쪽으로 풀어요.',
-    none: '남과 견주기보다 내 속도로 가는 쪽이라, 마음이 한결 느긋한 쪽으로 풀어요.',
-  },
-  식신: {
-    easy: '즐기는 재주',
-    meaning: '내 안의 것을 편안하게 내놓는 기운이라, 좋아하는 일을 즐기며 해내는 힘으로 풀어요.',
-    many: '만들고 먹고 놀면서 재주를 키우는 쪽이라, 여유 있게 결과를 내는 쪽으로 풀어요.',
-    none: '즐기기보다 목표를 향해 곧장 가는 쪽이라, 집중해서 해내는 힘이 두드러지는 쪽으로 풀어요.',
-  },
-  상관: {
-    easy: '톡톡 표현',
-    meaning: '생각을 숨기지 않고 꺼내는 기운이라, 새롭고 솔직하게 표현하는 힘으로 풀어요.',
-    many: '아이디어와 말솜씨가 풍성해서, 틀을 깨는 새 시도에 강한 쪽으로 풀어요.',
-    none: '말을 고르고 고르는 쪽이라, 신중하고 차분하게 의견을 전하는 쪽으로 풀어요.',
-  },
-  편재: {
-    easy: '넓은 활동',
-    meaning: '움직이는 만큼 기회가 따르는 기운이라, 사람과 일을 넓게 다루는 힘으로 풀어요.',
-    many: '사람을 만나고 판을 넓힐수록 활기가 도는 쪽이라, 기회를 잘 알아보는 쪽으로 풀어요.',
-    none: '한 분야를 깊게 파는 쪽이라, 차분히 쌓아 가는 힘이 두드러지는 쪽으로 풀어요.',
-  },
-  정재: {
-    easy: '꼼꼼한 살림',
-    meaning: '정해진 것을 차곡차곡 쌓는 기운이라, 꼼꼼하게 관리하는 힘으로 풀어요.',
-    many: '계획을 세워 꾸준히 모으고 지키는 쪽이라, 안정적으로 쌓아 가는 쪽으로 풀어요.',
-    none: '정해진 틀에 매이지 않는 쪽이라, 상황에 맞춰 유연하게 움직이는 쪽으로 풀어요.',
-  },
-  편관: {
-    easy: '도전 압력',
-    meaning: '나를 몰아붙여 키우는 기운이라, 어려운 과제 앞에서 힘이 나는 쪽으로 풀어요.',
-    many: '부담되는 일 앞에서 오히려 집중하고, 도전을 통해 크게 자라는 쪽으로 풀어요.',
-    none: '남이 정해 준 압박이 적은 쪽이라, 내 페이스로 일을 이끌기 좋은 쪽으로 풀어요.',
-  },
-  정관: {
-    easy: '반듯한 틀',
-    meaning: '질서와 약속을 지키는 기운이라, 반듯하게 책임을 다하는 힘으로 풀어요.',
-    many: '규칙과 신뢰를 중요하게 여기는 쪽이라, 맡은 일을 믿음직하게 해내는 쪽으로 풀어요.',
-    none: '틀에 얽매이지 않는 쪽이라, 자유롭게 방식을 만들어 가는 쪽으로 풀어요.',
-  },
-  편인: {
-    easy: '특별한 배움',
-    meaning: '남다른 관심에서 오는 기운이라, 독특한 분야를 파고드는 힘으로 풀어요.',
-    many: '한 가지에 깊이 빠져 남다른 시각을 만드는 쪽이라, 직관이 잘 살아나는 쪽으로 풀어요.',
-    none: '배움이 현실과 맞닿는 쪽이라, 배운 것을 바로 써먹는 힘이 두드러지는 쪽으로 풀어요.',
-  },
-  정인: {
-    easy: '든든한 배움',
-    meaning: '받아들여 내 것으로 만드는 기운이라, 차근차근 배우고 보살핌을 받는 힘으로 풀어요.',
-    many: '공부와 자격, 좋은 어른의 도움이 닿기 쉬워서, 배운 만큼 든든해지는 쪽으로 풀어요.',
-    none: '스스로 부딪히며 배우는 쪽이라, 몸으로 익힌 경험이 단단한 쪽으로 풀어요.',
-  },
+/** 십신 10종: 짧은 이름표 + 두 문장(text) + 대운용 한 줄(period) + 세운용 한 문장(year). 꼬리 줄은 tenGodBasis */
+export const TEN_GOD_COPY: Record<TenGod, { label: string; text: string; period: string; year: string }> = {
+  비견: { label: '독립심', text: '무슨 일이든 내 힘으로 해내려는 편이에요. 믿는 사람과 나란히 달릴 때 힘이 더 나요.', period: '내 힘을 믿고 나아가는 시기', year: '올해는 내 뜻대로 밀고 나가려는 마음이 커지는 해예요.' },
+  겁재: { label: '승부욕', text: '지고 싶지 않은 마음이 들면 집중력이 확 올라가는 편이에요. 경쟁이 있거나 목표가 뚜렷한 일에서 빛나요.', period: '겨루며 실력을 키우는 시기', year: '올해는 경쟁심이 살아나서 목표에 힘을 쏟기 쉬운 해예요.' },
+  식신: { label: '즐기는 재주', text: '좋아하는 일은 여유롭게 즐기면서 결과까지 내는 편이에요. 만들기나 요리처럼 손으로 하는 일에 잘 맞아요.', period: '좋아하는 일을 즐기며 키우는 시기', year: '올해는 하고 싶은 일을 편하게 풀어 내기 좋은 해예요.' },
+  상관: { label: '톡톡 표현', text: '생각이 떠오르면 숨기지 않고 솔직하게 꺼내는 편이에요. 새 아이디어가 필요한 일이나 사람 앞에 서는 일에 잘 맞아요.', period: '나를 표현하며 드러내는 시기', year: '올해는 하고 싶은 말과 새 아이디어가 많아지는 해예요.' },
+  편재: { label: '넓은 활동', text: '사람을 만나고 판을 넓힐수록 기운이 나는 편이에요. 여러 곳을 오가거나 기회를 찾아다니는 일에 잘 맞아요.', period: '기회를 넓게 찾아 나서는 시기', year: '올해는 새 사람과 기회를 만날 일이 늘어나기 쉬운 해예요.' },
+  정재: { label: '꼼꼼한 살림', text: '계획을 세워 차곡차곡 모으고 지키는 편이에요. 돈이나 시간을 관리하는 일에 잘 맞아요.', period: '돈을 꾸준히 모으는 시기', year: '올해는 내 살림을 차분히 정리하기 좋은 해예요.' },
+  편관: { label: '도전 의욕', text: '어려운 과제를 만나면 오히려 머리가 또렷해지는 편이에요. 부담이 큰 프로젝트나 빠르게 돌아가는 현장에 잘 맞아요.', period: '큰 과제에 부딪히며 자라는 시기', year: '올해는 부담되는 일이 생겨도 해내는 힘이 붙기 쉬운 해예요.' },
+  정관: { label: '책임감', text: '맡은 일은 끝까지 해내는 편이에요. 규칙이 분명하고 신뢰가 중요한 곳에서 더 잘 돼요.', period: '신뢰를 차곡차곡 쌓는 시기', year: '올해는 맡은 일에 대한 믿음이 쌓이기 쉬운 해예요.' },
+  편인: { label: '남다른 관심', text: '남들이 잘 안 보는 분야에 깊이 빠져드는 편이에요. 독특한 아이디어나 연구가 필요한 일에 잘 맞아요.', period: '나만의 관심사를 파고드는 시기', year: '올해는 낯선 분야에 눈길이 가기 쉬운 해예요.' },
+  정인: { label: '든든한 배움', text: '차근차근 배우고 도움을 받아 내 것으로 만드는 편이에요. 공부나 자격 준비처럼 쌓아 가는 일에 잘 맞아요.', period: '배우며 든든히 채우는 시기', year: '올해는 배움과 도움이 따르기 쉬운 해예요.' },
 };
 
-/** 오행 쉬운 이름 + 강할 때·약할 때 한 줄 */
-export const ELEMENT_COPY: Record<Element, { easy: string; strong: string; weak: string }> = {
-  목: { easy: '새싹(목)', strong: '새싹(목)이 많아서 시작하고 뻗어 나가는 힘이 넉넉한 쪽으로 풀어요.', weak: '새싹(목)이 적은 편이라 한 번에 하나씩 천천히 키우는 쪽이 어울려요.' },
-  화: { easy: '불꽃(화)', strong: '불꽃(화)이 많아서 열정과 표현이 빠르게 올라오는 쪽으로 풀어요.', weak: '불꽃(화)이 적은 편이라 차분하게 온도를 조절하며 가는 쪽이 어울려요.' },
-  토: { easy: '대지(토)', strong: '대지(토)가 많아서 믿음직하고 중심이 단단한 쪽으로 풀어요.', weak: '대지(토)가 적은 편이라 가볍고 빠르게 움직이는 쪽이 어울려요.' },
-  금: { easy: '칼날(금)', strong: '칼날(금)이 많아서 결단력과 마무리 힘이 또렷한 쪽으로 풀어요.', weak: '칼날(금)이 적은 편이라 부드럽게 흐름을 맞추는 쪽이 어울려요.' },
-  수: { easy: '물결(수)', strong: '물결(수)이 많아서 생각이 깊고 적응이 빠른 쪽으로 풀어요.', weak: '물결(수)이 적은 편이라 눈앞의 일에 곧바로 뛰어드는 쪽이 어울려요.' },
+/** 십신 꼬리 줄: "정재 2개" */
+export function tenGodBasis(g: TenGod, count: number): string {
+  return `${g} ${count}개`;
+}
+
+/** 오행 쉬운 이름(본문에 써도 되는 이름)과 한자(작은 회색으로만) */
+export const ELEMENT_COPY: Record<Element, { easy: string; hanja: string }> = {
+  목: { easy: '새싹', hanja: '木' },
+  화: { easy: '불꽃', hanja: '火' },
+  토: { easy: '대지', hanja: '土' },
+  금: { easy: '칼날', hanja: '金' },
+  수: { easy: '물결', hanja: '水' },
 };
 
-/** 일지와 올해 지지의 관계. 강한 관계(합·충)와 약한 관계(반합·파·해)는 문구 강도를 다르게 */
+/** 일간 기준 다른 천간의 십신 (엔진 stemTenGod와 같은 결과. 클라이언트 번들에 만세력 라이브러리를 싣지 않으려고 따로 둔다) */
+const STEM_ELEMENT: Record<Stem, number> = { 갑: 0, 을: 0, 병: 1, 정: 1, 무: 2, 기: 2, 경: 3, 신: 3, 임: 4, 계: 4 };
+export function tenGodOfStem(day: Stem, target: Stem): TenGod {
+  const d = STEM_ELEMENT[day];
+  const t = STEM_ELEMENT[target];
+  const same = STEMS.indexOf(day) % 2 === STEMS.indexOf(target) % 2;
+  const diff = (t - d + 5) % 5;
+  const pairs: [TenGod, TenGod][] = [['비견', '겁재'], ['식신', '상관'], ['편재', '정재'], ['편관', '정관'], ['편인', '정인']];
+  const [a, b] = pairs[diff];
+  return same ? a : b;
+}
+
+/** 일지와 올해 지지의 관계를 쉬운 말로 (세운 본문의 둘째 문장) */
 export const RELATION_COPY: Record<RelationKind, string> = {
-  합: '서로 끌어당겨 어우러져요',
-  충: '부딪히며 변화가 생겨요',
-  형: '마찰이 있지만 다듬는 과정이에요',
-  파: '계획이 살짝 틀어질 수 있어 점검해 두면 좋아요',
-  해: '사소한 오해가 생길 수 있어 소통을 챙기면 좋아요',
-  반합: '슬며시 손을 잡는 정도라 은근히 어우러져요',
-  같음: '같은 글자라 익숙한 흐름이에요',
-  없음: '특별한 합·충 없이 담담한 해예요',
+  합: '내 사주와 잘 맞는 기운이 와서 사람이나 일이 자연스럽게 어우러지기 쉬워요.',
+  충: '내 사주와 부딪히는 기운이 와서 변화가 생기기 쉬워요.',
+  형: '나를 다듬는 기운이 와서 마찰이 있어도 배우는 것이 많아요.',
+  파: '계획이 살짝 틀어질 수 있는 기운이 와서 미리 점검해 두면 좋아요.',
+  해: '사소한 오해가 생길 수 있는 기운이 와서 소통을 챙기면 좋아요.',
+  반합: '은근히 손을 잡아 주는 기운이 와서 조금씩 어우러져요.',
+  같음: '내 사주와 같은 기운이 와서 익숙하고 편안한 흐름이에요.',
+  없음: '내 사주와 특별히 얽히는 기운이 없어서 담담하게 흐르는 해예요.',
 };
 
-/** 대운 한 구간. countingAge는 세는 나이 */
-export const DAEUN_TEMPLATE = (p: { countingAge: number; korean: string; tenGodEasy: string }): string =>
-  `약 ${p.countingAge}세(세는 나이)부터 ${p.korean} 대운이에요. ${p.tenGodEasy} 쪽 기운이 도는 10년으로 풀어요. 정해진 길이 아니라 참고용이에요.`;
-
-/** 올해(세운)와 나 */
-export const SEUN_TEMPLATE = (p: { dayMasterTitle: string; tenGodEasy: string; relationLine: string }): string =>
-  `${p.dayMasterTitle}. 올해는 ${p.tenGodEasy} 쪽 흐름이 들어오는 해로 풀어요. 내 일지와는 ${p.relationLine}. 어떻게 쓸지는 내 몫이에요.`;
-
-const NUM = ['없', '하나', '둘', '셋', '넷', '다섯', '여섯', '일곱', '여덟'];
 function hasBatchim(s: string): boolean {
   const c = s.charCodeAt(s.length - 1) - 0xac00;
   return c >= 0 && c <= 11171 && c % 28 !== 0;
 }
-function countWord(n: number): string {
-  return NUM[n] && n > 0 ? NUM[n] : String(n);
-}
-/** 숫자 단어 뒤에 "라/이라"를 붙인다 (하나라, 둘이라, 셋이라) */
-function withRa(word: string): string {
-  return hasBatchim(word) ? `${word}이라` : `${word}라`;
+
+/** 대운 한 구간. countingAge는 세는 나이: "37세부터 46세까지는 '돈을 꾸준히 모으는 시기'예요" */
+export function daeunCopy(p: { countingAge: number; korean: string; tenGod: TenGod }): Reading {
+  const from = p.countingAge;
+  return {
+    text: `${from}세부터 ${from + 9}세까지는 '${TEN_GOD_COPY[p.tenGod].period}'예요. 큰 흐름의 참고일 뿐이고, 어떻게 보낼지는 내 몫이에요.`,
+    basis: `${p.korean} 대운 · ${p.tenGod}`,
+  };
 }
 
-/** 근거 꼬리: "정재가 둘이라" */
-export function evidenceTail(tenGod: TenGod, count: number): string {
-  const josa = hasBatchim(tenGod) ? '이' : '가';
-  if (count <= 0) return `${tenGod}${josa} 없어서`;
-  return `${tenGod}${josa} ${withRa(countWord(count))}`;
+/** 올해 운(세운): 제목 "2027년은 나에게". 본문은 올해 기운의 성격 + 내 일지와의 관계를 쉬운 말로 */
+export function seunCopy(p: { korean: string; tenGod: TenGod; relation: RelationKind; dayBranch: Branch }): Reading {
+  const gwa = hasBatchim(p.dayBranch) ? '과' : '와';
+  const rel =
+    p.relation === '없음' ? `일지 ${p.dayBranch}${gwa} 특별한 관계 없음`
+    : p.relation === '같음' ? `일지 ${p.dayBranch}${gwa} 같은 글자`
+    : `일지 ${p.dayBranch}${gwa} ${p.relation}`;
+  return {
+    text: `${TEN_GOD_COPY[p.tenGod].year} ${RELATION_COPY[p.relation]}`,
+    basis: `${p.korean}년 · ${p.tenGod} · ${rel}`,
+  };
 }
 
 type CautionCopy = { situation: string; action: string };
 
 const CAUTION_MANY: Record<Element, CautionCopy> = {
-  목: { situation: '새싹(목)이 많으면 계획을 자꾸 넓히다가 하나를 놓치기 쉬운 해예요.', action: '이번 달 할 일을 세 가지로만 줄여 적어 보세요.' },
-  화: { situation: '불꽃(화)이 많으면 결정을 빨리 내리려고 하기 쉬운 해예요.', action: '큰 결정은 하룻밤 지나서 한 번 더 읽어 보고 확정하세요.' },
-  토: { situation: '대지(토)가 많으면 익숙한 자리를 지키느라 새 시도를 미루기 쉬운 상황이에요.', action: '이번 주에 안 해 본 일을 하나만 가볍게 해 보세요.' },
-  금: { situation: '칼날(금)이 많으면 기준이 엄격해져 스스로를 몰아붙이기 쉬운 해예요.', action: '하루 끝에 잘한 일을 한 줄 적고 마무리하세요.' },
-  수: { situation: '물결(수)이 많으면 생각이 꼬리를 물어 행동이 늦어지기 쉬운 상황이에요.', action: '고민이 길어지면 타이머 10분을 맞추고 일단 한 걸음 움직이세요.' },
+  목: { situation: '새싹 기운이 많아서 계획을 자꾸 넓히다가 하나를 놓치기 쉬운 해예요.', action: '이번 달 할 일을 세 가지로만 줄여 적어 보세요.' },
+  화: { situation: '불꽃 기운이 많아서 결정을 빨리 내리려고 하기 쉬운 해예요.', action: '큰 결정은 하룻밤 지나서 한 번 더 읽어 보고 확정하세요.' },
+  토: { situation: '대지 기운이 많아서 익숙한 자리를 지키느라 새 시도를 미루기 쉬운 상황이에요.', action: '이번 주에 안 해 본 일을 하나만 가볍게 해 보세요.' },
+  금: { situation: '칼날 기운이 많아서 기준이 엄격해져 스스로를 몰아붙이기 쉬운 해예요.', action: '하루 끝에 잘한 일을 한 줄 적고 마무리하세요.' },
+  수: { situation: '물결 기운이 많아서 생각이 꼬리를 물어 행동이 늦어지기 쉬운 상황이에요.', action: '고민이 길어지면 타이머 10분을 맞추고 일단 한 걸음 움직이세요.' },
 };
 
 const CAUTION_NONE: Record<Element, CautionCopy> = {
-  목: { situation: '뻗어 나가는 새싹(목)이 없어, 시작할 때 한 발 늦춰지기 쉬운 상황이에요.', action: '작은 시작 하나를 오늘 안에 해 보세요.' },
-  화: { situation: '따뜻하게 달궈 주는 불꽃(화)이 없어, 마음을 겉으로 꺼내기 어려워지기 쉬운 상황이에요.', action: '고마운 마음을 한 사람에게 말로 전해 보세요.' },
-  토: { situation: '중심을 잡아 주는 대지(토)가 없어, 마음이 바쁘게 움직이기 쉬워요.', action: '하루 한 번 같은 시간에 쉬는 루틴을 정해 두세요.' },
-  금: { situation: '매듭을 지어 주는 칼날(금)이 없어, 일을 벌여 놓고 마무리가 늘어지기 쉬운 상황이에요.', action: '진행 중인 일마다 마감일을 하나씩 적어 두세요.' },
-  수: { situation: '식혀 주는 물결(수)이 없어, 쉬어야 할 때도 계속 움직이기 쉬운 상황이에요.', action: '잠들기 전 10분은 화면을 끄고 조용히 보내 보세요.' },
+  목: { situation: '뻗어 나가게 해 주는 새싹 기운이 없어서 시작할 때 한 발 늦춰지기 쉬운 상황이에요.', action: '작은 시작 하나를 오늘 안에 해 보세요.' },
+  화: { situation: '따뜻하게 달궈 주는 불꽃 기운이 없어서 마음을 겉으로 꺼내기 어려워지기 쉬운 상황이에요.', action: '고마운 마음을 한 사람에게 말로 전해 보세요.' },
+  토: { situation: '중심을 잡아 주는 대지 기운이 없어서 마음이 바쁘게 움직이기 쉬워요.', action: '하루 한 번 같은 시간에 쉬는 루틴을 잡아 두세요.' },
+  금: { situation: '매듭을 지어 주는 칼날 기운이 없어서 일을 벌여 놓고 마무리가 늘어지기 쉬운 상황이에요.', action: '진행 중인 일마다 마감일을 하나씩 적어 두세요.' },
+  수: { situation: '식혀 주는 물결 기운이 없어서 쉬어야 할 때도 계속 움직이기 쉬운 상황이에요.', action: '잠들기 전 10분은 화면을 끄고 조용히 보내 보세요.' },
 };
 
 const CAUTION_BALANCED: CautionCopy = {
-  situation: '다섯 기운이 고르게 있어 어느 한쪽으로 크게 치우치지 않는 해예요.',
+  situation: '다섯 기운이 고르게 있어서 어느 한쪽으로 크게 치우치지 않는 해예요.',
   action: '이번 달에 가장 하고 싶은 일 하나를 골라 먼저 시작하세요.',
 };
 
-/** 조심할 점 하나: 가장 많은 오행 → 없는 오행(목화토금수 순 첫째) → 균형형 */
-export function cautionFor(elements: Record<Element, number>, total: number): { situation: string; action: string; basis: string } {
+/** 조심할 점 하나: 가장 많은 오행 → 없는 오행(목화토금수 순 첫째) → 균형형. text = situation + action, basis에 전통 표기 */
+export function cautionFor(elements: Record<Element, number>, total: number): { situation: string; action: string; text: string; basis: string } {
   const threshold = Math.max(1, Math.round(total / 2));
   let top: Element | null = null;
   for (const e of ELEMENTS) {
     if (elements[e] >= threshold && (top === null || elements[e] > elements[top])) top = e;
   }
-  if (top) {
-    return { ...CAUTION_MANY[top], basis: `${ELEMENT_COPY[top].easy}이 ${withRa(countWord(elements[top]))}` };
-  }
+  const pack = (c: CautionCopy, basis: string) => ({ ...c, text: `${c.situation} ${c.action}`, basis });
+  if (top) return pack(CAUTION_MANY[top], `${ELEMENT_COPY[top].easy}(${top}) ${elements[top]}개`);
   const none = ELEMENTS.find((e) => elements[e] === 0);
-  if (none) {
-    return { ...CAUTION_NONE[none], basis: `${ELEMENT_COPY[none].easy}이 없어서` };
-  }
-  return { ...CAUTION_BALANCED, basis: '다섯 기운이 고르게 있어서' };
+  if (none) return pack(CAUTION_NONE[none], `${ELEMENT_COPY[none].easy}(${none}) 0개`);
+  return pack(CAUTION_BALANCED, '다섯 기운이 고르게 있어요');
 }
 
 /** "어떻게 계산했나요" 접이식 4줄 + 시간 모름 + 경계 안내 */

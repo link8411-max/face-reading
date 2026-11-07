@@ -1,7 +1,7 @@
 import { renderToStaticMarkup } from 'react-dom/server'
 import SajuResultView from '@/components/saju/SajuResultView'
 import { computeSaju, type SajuResult } from '@/lib/saju/engine'
-import { SOURCE_LINE, BASIS_COPY, TEN_GOD_COPY } from '@/content/saju'
+import { SOURCE_LINE, BASIS_COPY, TEN_GOD_COPY, DAY_MASTER_COPY, tenGodBasis } from '@/content/saju'
 
 const run = (o: Partial<Parameters<typeof computeSaju>[0]> = {}): SajuResult => {
   const r = computeSaju({ year: 1990, month: 5, day: 15, hourSlot: 'mi', isLunar: false, isLeapMonth: false, gender: '남', asOfYear: 2027, ...o })
@@ -13,13 +13,21 @@ const html = (r: SajuResult, birthLine?: string) => renderToStaticMarkup(<SajuRe
 test('1990-05-15 미시 남: 네 기둥·일간·십신·대운·세운·근거가 나온다', () => {
   const r = run()
   const h = html(r, '1990년 5월 15일생 · 양력')
-  for (const t of ['>庚<', '>午<', '계미', '나는', '만 7세부터', '2027 정미년과 나', '어떻게 계산했나요', SOURCE_LINE]) expect(h).toContain(t)
-  for (const g of r.tenGods.top) expect(h).toContain(TEN_GOD_COPY[g].easy)
+  for (const t of ['>庚<', '>午<', '나는 바위 같은 사람이에요', '경금 일간', '내 사주에서 제일 센 것 두 가지', '다섯 기운', '지금 10년의 흐름', '8~17세', '2027년은 나에게', '정미년 · ', '조심할 점 하나', '어떻게 계산했나요', SOURCE_LINE]) expect(h).toContain(t)
+  for (const g of r.tenGods.top.slice(0, 2)) {
+    expect(h).toContain(TEN_GOD_COPY[g].label)
+    expect(h).toContain(tenGodBasis(g, r.tenGods.counts[g]))
+  }
+  expect(h).toContain(DAY_MASTER_COPY.경.text)
+  // 꼬리 줄은 작은 회색 줄
+  expect(h).toMatch(/text-\[11px\] text-muted[^>]*>경금 일간/)
+  // 옛 제목은 없다
+  for (const t of ['두드러지는 십신', '다섯 기운의 균형', '만 7세부터', '이렇게 읽었어요']) expect(h).not.toContain(t)
   // 십신은 둘만, 시주 열은 "모름"이 아님
   expect(h).not.toContain('모름')
   // 생년월일 줄과 조심할 점은 캡처에서 빠진다
   expect(h).toMatch(/class="no-screenshot[^"]*"[^>]*>1990년 5월 15일생/)
-  expect(h).toMatch(/no-screenshot[^>]*>\s*<h3[^>]*>조심할 점/)
+  expect(h).toMatch(/no-screenshot[^>]*>\s*<h3[^>]*>조심할 점 하나/)
 })
 
 test('시간 모름: 모름 열과 안내 문구', () => {
