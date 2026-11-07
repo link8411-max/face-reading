@@ -29,7 +29,7 @@ const dist = (a: P, b: P) => Math.hypot(a[0] - b[0], a[1] - b[1])
 const mid = (a: P, b: P): P => [(a[0] + b[0]) / 2, (a[1] + b[1]) / 2]
 
 // 두 눈 중심이 수평이 되도록 회전한 좌표를 돌려준다
-function aligned(lm: Landmark[]): (i: number) => P {
+export function aligned(lm: Landmark[]): (i: number) => P {
   const eyeL = mid([lm[IDX.eyeOuterL].x, lm[IDX.eyeOuterL].y], [lm[IDX.eyeInnerL].x, lm[IDX.eyeInnerL].y])
   const eyeR = mid([lm[IDX.eyeOuterR].x, lm[IDX.eyeOuterR].y], [lm[IDX.eyeInnerR].x, lm[IDX.eyeInnerR].y])
   const angle = Math.atan2(eyeR[1] - eyeL[1], eyeR[0] - eyeL[0])

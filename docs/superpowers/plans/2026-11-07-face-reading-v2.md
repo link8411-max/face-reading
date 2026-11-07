@@ -82,6 +82,9 @@
 - [ ] **Step 6: 실측** `npx next dev -p 3311` 띄우고 `node scripts/measure-guansang-stats.mjs` → 출력을 `guansangStats.ts`에 붙여 넣고 "추정" 주석을 "2026-11-xx 실측 여 N·남 N"으로. `ZONE_UP_RANGE`를 실측 zoneUp의 min·max에 20% 여유를 둔 값으로 갱신. dev 서버 종료.
 - [ ] **Step 7: 통과 확인** `npx vitest run tests/guansang` → PASS. **Commit** `feat(guansang): 성별 통계·샘플링·실측 스크립트`
 
+### Task 0 (Task 4가 먼저 만든다): 공용 키 파일
+`src/lib/face/guansangKeys.ts` — SHAPE_KEYS·ShapeKey·ZONE_KEYS·ZoneKey·GuansangTypeKey·GUANSANG_TYPE_KEYS(15개, shape 순 × zone 순)·PALACE_KEYS·PalaceKey·PalaceLabel('strong'|'even'|'grow')·`isGuansangTypeKey(s: string): s is GuansangTypeKey`. 값만 있고 로직 없음. Task 3·4·6이 모두 여기서 import한다.
+
 ### Task 3: 분류기·자리 판독·보정·분포 테스트
 
 **Files:**
@@ -92,17 +95,12 @@
 - Consumes: `ZVector`(기존 15특징 z, `toZ`), `GuansangZ`(Task 2), `GuansangFeatureVector`(zone 원값).
 - Produces:
   ```ts
-  export const SHAPE_KEYS = ['wood','fire','earth','metal','water'] as const; export type ShapeKey = ...
-  export const ZONE_KEYS = ['up','mid','down'] as const; export type ZoneKey = ...
-  export type GuansangTypeKey = `${ShapeKey}-${ZoneKey}`
-  export const GUANSANG_TYPE_KEYS: readonly GuansangTypeKey[] // 15개
+  // 키·타입은 guansangKeys.ts(Task 0)에서 import
   export interface GuansangInput { z: ZVector; g: GuansangZ; zones: { up: number; mid: number; down: number } }
   export interface GuansangResult { type: GuansangTypeKey; shape: ShapeKey; zone: ZoneKey; balanced: boolean; foreheadUncertain: boolean; palaces: PalaceResult[] }
   export interface Calibration { seed: number; n: number; shapeBias: Record<ShapeKey, number>; zoneBias: Record<ZoneKey, number> }
   export function classifyGuansang(input: GuansangInput, cal?: Calibration): GuansangResult
   // palaces.ts
-  export const PALACE_KEYS = ['money','work','love','people','base'] as const; export type PalaceKey = ...
-  export type PalaceLabel = 'strong' | 'even' | 'grow'
   export interface PalaceResult { key: PalaceKey; label: PalaceLabel; z: number }
   export function readPalaces(z: ZVector, g: GuansangZ): PalaceResult[] // 항상 5개, 순서 고정 money·work·love·people·base
   // guansangSimulate.ts
