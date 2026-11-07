@@ -1,0 +1,16 @@
+{
+  "seed": 20261107,
+  "n": 8000,
+  "shapeBias": {
+    "wood": 0,
+    "fire": 0,
+    "earth": 0,
+    "metal": 0,
+    "water": 0
+  },
+  "zoneBias": {
+    "up": 0,
+    "mid": 0,
+    "down": 0
+  }
+}
