@@ -1,9 +1,11 @@
-import { TEN_GOD_COPY, tenGodBasis } from "@/content/saju";
+import { TEN_GOD_COPY, TEN_GOD_TIED, tenGodBasis } from "@/content/saju";
 import type { SajuResult } from "@/lib/saju/engine";
 
 // 십신은 많은 순 둘만 보여 준다 (없는 십신은 표시하지 않음). 본문은 쉬운 말, 전통 이름은 회색 꼬리 줄
 export default function TenGodSummary({ tenGods }: { tenGods: SajuResult["tenGods"] }) {
   return (
+    <>
+    {tenGods.tied && <p className="text-sm leading-relaxed text-muted mb-3">{TEN_GOD_TIED.lead}</p>}
     <ul className="space-y-3">
       {tenGods.top.slice(0, 2).map((g) => (
         <li key={g} className="text-sm leading-relaxed">
@@ -13,5 +15,6 @@ export default function TenGodSummary({ tenGods }: { tenGods: SajuResult["tenGod
         </li>
       ))}
     </ul>
+    </>
   );
 }

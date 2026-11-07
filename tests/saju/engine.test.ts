@@ -123,3 +123,17 @@ test('일간 갑이면 세운 정은 상관', () => {
   expect(r.dayMaster.stem).toBe('갑')
   expect(r.seun.stemTenGod).toBe('상관')
 })
+
+test('십신 동률: 개수가 같으면 태어난 달(월지 → 월간) 십신을 먼저, 셋째와 같으면 tied', () => {
+  for (const o of [{}, { year: 1995, hourSlot: null }, { year: 1988, month: 2, day: 3 }] as Partial<SajuInput>[]) {
+    const r = ok(o)
+    const [a, b] = r.tenGods.top
+    const c = r.tenGods.counts
+    expect(c[a]).toBeGreaterThanOrEqual(c[b])
+    const third = TEN_GODS.filter((g) => g !== a && g !== b && c[g] > 0).sort((x, y) => c[y] - c[x])[0]
+    expect(r.tenGods.tied).toBe(third !== undefined && c[third] === c[b])
+    const m = r.tenGods.byPillar.month
+    const tiedWithTop = TEN_GODS.filter((g) => c[g] === c[a])
+    if (tiedWithTop.includes(m.branch)) expect(a).toBe(m.branch)
+  }
+})

@@ -1,11 +1,13 @@
 import { ELEMENTS } from "@/lib/saju/keys";
-import { ELEMENT_COPY } from "@/content/saju";
+import { ELEMENT_COPY, elementSummary } from "@/content/saju";
 import type { Element } from "@/lib/saju/keys";
 
 // 오행 다섯 막대: 쉬운 이름 + 전통 한자, 개수, 막대 길이는 개수/전체
 export default function ElementBars({ elements }: { elements: Record<Element, number> }) {
   const total = ELEMENTS.reduce((a, e) => a + elements[e], 0) || 1;
+  const summary = elementSummary(elements);
   return (
+    <div>
     <ul className="space-y-2">
       {ELEMENTS.map((e) => (
         <li key={e} className="flex items-center gap-3 text-sm">
@@ -19,5 +21,8 @@ export default function ElementBars({ elements }: { elements: Record<Element, nu
         </li>
       ))}
     </ul>
+    <p className="mt-3 text-sm leading-relaxed">{summary.text}</p>
+    <p className="mt-1 text-[11px] text-muted">{summary.basis}</p>
+    </div>
   );
 }

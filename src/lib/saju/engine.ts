@@ -63,6 +63,8 @@ export interface SajuResult {
     counts: Record<TenGod, number>
     byPillar: { year: TG; month: TG; day: { branch: TenGod }; hour: TG | null }
     top: TenGod[]
+    /** 많이 나타난 개수가 셋째와 같아 둘을 확실히 고를 수 없을 때 true (화면은 "고르게 섞인" 문구로 바꾼다) */
+    tied: boolean
   }
   daeun: { startAge: number; countingAge: number; forward: boolean; korean: string; hanja: string; isCurrent: boolean }[]
   seun: { year: number; korean: string; hanja: string; stemTenGod: TenGod; dayBranchRelation: { kind: RelationKind; strength: RelationStrength } }
@@ -190,10 +192,13 @@ export function computeSaju(input: SajuInput): SajuResult | SajuFailure {
   add(tg.month.stem); add(tg.month.branch)
   add(tg.day.branch)
   if (hourKnown) { add(tg.hour.stem); add(tg.hour.branch) }
-  const top = [...TEN_GODS]
+  // 개수가 같으면 태어난 달(월지 → 월간)에 있는 십신을 먼저 본다(월령을 중시하는 전통 기준), 그다음 목록 순서
+  const monthRank = (g: TenGod) => (g === tg.month.branch ? 0 : g === tg.month.stem ? 1 : 2)
+  const ranked = [...TEN_GODS]
     .filter((g) => counts[g] > 0)
-    .sort((a, b) => counts[b] - counts[a] || TEN_GODS.indexOf(a) - TEN_GODS.indexOf(b))
-    .slice(0, 2)
+    .sort((a, b) => counts[b] - counts[a] || monthRank(a) - monthRank(b) || TEN_GODS.indexOf(a) - TEN_GODS.indexOf(b))
+  const top = ranked.slice(0, 2)
+  const tied = ranked.length > 2 && counts[ranked[1]] === counts[ranked[2]]
 
   const dayStem = pillars.day.stem
   const dayMaster = {
@@ -238,6 +243,7 @@ export function computeSaju(input: SajuInput): SajuResult | SajuFailure {
         hour: hourKnown ? { stem: tg.hour.stem, branch: tg.hour.branch } : null,
       },
       top,
+      tied,
     },
     daeun,
     seun: {

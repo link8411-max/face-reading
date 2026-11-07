@@ -1,4 +1,4 @@
-import { TEN_GOD_COPY, daeunCopy, tenGodOfStem } from "@/content/saju";
+import { TEN_GOD_COPY, daeunCopy, nextDaeunCopy, tenGodOfStem } from "@/content/saju";
 import type { SajuResult } from "@/lib/saju/engine";
 import type { Stem } from "@/lib/saju/keys";
 
@@ -8,6 +8,8 @@ export default function DaeunTimeline({ daeun, dayStem }: { daeun: SajuResult["d
   const items = daeun.slice(0, 8).map((d) => ({ d, tenGod: tenGodOfStem(dayStem, d.korean[0] as Stem) }));
   const cur = items.find((i) => i.d.isCurrent);
   const curCopy = cur ? daeunCopy({ countingAge: cur.d.countingAge, korean: cur.d.korean, tenGod: cur.tenGod }) : null;
+  const next = cur ? items[items.indexOf(cur) + 1] : undefined;
+  const nextCopy = next ? nextDaeunCopy({ countingAge: next.d.countingAge, korean: next.d.korean, tenGod: next.tenGod }) : null;
   return (
     <div>
       <div className="-mx-1 overflow-x-auto pb-1">
@@ -30,6 +32,12 @@ export default function DaeunTimeline({ daeun, dayStem }: { daeun: SajuResult["d
         <div className="mt-3 px-1">
           <p className="text-sm leading-relaxed">{curCopy.text}</p>
           <p className="mt-1 text-[11px] text-muted">{curCopy.basis}</p>
+          {nextCopy && (
+            <>
+              <p className="mt-2.5 text-sm leading-relaxed">{nextCopy.text}</p>
+              <p className="mt-1 text-[11px] text-muted">{nextCopy.basis}</p>
+            </>
+          )}
         </div>
       )}
     </div>

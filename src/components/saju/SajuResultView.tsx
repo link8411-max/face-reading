@@ -1,10 +1,11 @@
 import type { Ref } from "react";
-import { DAY_MASTER_COPY, DISCLAIMER, SOURCE_LINE, BASIS_COPY, cautionFor } from "@/content/saju";
+import { DAY_MASTER_COPY, DISCLAIMER, SOURCE_LINE, BASIS_COPY, TEN_GOD_TIED, cautionFor } from "@/content/saju";
 import { ELEMENTS } from "@/lib/saju/keys";
 import type { SajuResult } from "@/lib/saju/engine";
 import SajuTable from "./SajuTable";
 import ElementBars from "./ElementBars";
 import TenGodSummary from "./TenGodSummary";
+import AreaLines from "./AreaLines";
 import DaeunTimeline from "./DaeunTimeline";
 import SeunCard from "./SeunCard";
 import BasisDetails, { boundaryText } from "./BasisDetails";
@@ -45,12 +46,17 @@ export default function SajuResultView({ result, captureRef, actions, after, bir
         </div>
 
         <div className="bg-white rounded-[22px] border border-line px-5 py-4">
+          <h3 className="font-serif font-bold text-base mb-3">연애·일·돈·사람으로 보면</h3>
+          <AreaLines tenGods={result.tenGods} />
+        </div>
+
+        <div className="bg-white rounded-[22px] border border-line px-5 py-4">
           <h3 className="font-serif font-bold text-base mb-3">다섯 기운</h3>
           <ElementBars elements={result.elements} />
         </div>
 
         <div className="bg-white rounded-[22px] border border-line px-5 py-4">
-          <h3 className="font-serif font-bold text-base mb-3">내 사주에서 제일 센 것 두 가지</h3>
+          <h3 className="font-serif font-bold text-base mb-3">{result.tenGods.tied ? TEN_GOD_TIED.heading : "내 사주에서 제일 센 것 두 가지"}</h3>
           <TenGodSummary tenGods={result.tenGods} />
         </div>
 

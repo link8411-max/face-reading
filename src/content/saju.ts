@@ -99,6 +99,124 @@ export function seunCopy(p: { korean: string; tenGod: TenGod; relation: Relation
   };
 }
 
+/** 다음 대운 한 줄: "다음 10년(47~56세)은 '…'예요" */
+export function nextDaeunCopy(p: { countingAge: number; korean: string; tenGod: TenGod }): Reading {
+  const from = p.countingAge;
+  return {
+    text: `다음 10년(${from}~${from + 9}세)은 '${TEN_GOD_COPY[p.tenGod].period}'로 이어져요.`,
+    basis: `다음 ${p.korean} 대운 · ${p.tenGod}`,
+  };
+}
+
+/** 많이 나온 것이 셋 이상 같은 수일 때 "제일 센 것 두 가지" 대신 쓰는 제목과 한 줄 */
+export const TEN_GOD_TIED = {
+  heading: '내 사주에 고르게 섞인 기운',
+  lead: '어느 하나가 크게 앞서지 않고 여러 기운이 비슷하게 있어요. 그중 태어난 달에 가까운 두 가지를 먼저 보여 드려요.',
+} as const;
+
+// ---- 다섯 기운 한 줄 풀이 ----
+const ELEMENT_TRAIT: Record<Element, { many: string; none: string }> = {
+  목: { many: '새로 시작하고 넓혀 가는 힘', none: '새로 시작하는 힘' },
+  화: { many: '표현하고 밀어붙이는 열정', none: '마음을 겉으로 꺼내는 힘' },
+  토: { many: '버티고 지키는 묵직함', none: '중심을 잡고 쉬어 가는 힘' },
+  금: { many: '정리하고 매듭짓는 힘', none: '마무리하고 매듭짓는 힘' },
+  수: { many: '생각하고 헤아리는 깊이', none: '한 템포 쉬며 식히는 힘' },
+};
+
+function eunNeun(word: string): string { return hasBatchim(word) ? '은' : '는'; }
+function iGa(word: string): string { return hasBatchim(word) ? '이' : '가'; }
+function gwaWa(word: string): string { return hasBatchim(word) ? '과' : '와'; }
+
+/** 다섯 기운 막대 아래 한 줄: 가장 많은 기운의 성격 + 없는 기운은 챙기면 좋은 점. 고르면 균형형 */
+export function elementSummary(elements: Record<Element, number>): Reading {
+  const max = Math.max(...ELEMENTS.map((e) => elements[e]));
+  const most = ELEMENTS.filter((e) => elements[e] === max);
+  const none = ELEMENTS.filter((e) => elements[e] === 0);
+  const min = Math.min(...ELEMENTS.map((e) => elements[e]));
+  const counts = ELEMENTS.map((e) => `${ELEMENT_COPY[e].easy}(${e}) ${elements[e]}`).join(' · ');
+  if (max - min <= 1) {
+    return { text: '다섯 기운이 고르게 있어서 상황에 따라 여러 면을 꺼내 쓰는 편이에요.', basis: counts };
+  }
+  const names = most.slice(0, 2).map((e) => ELEMENT_COPY[e].easy);
+  const subject = names.length === 2 ? `${names[0]}${gwaWa(names[0])} ${names[1]}` : names[0];
+  const traits = most.slice(0, 2).map((e) => ELEMENT_TRAIT[e].many);
+  const traitText = traits.length === 2 ? `${traits[0]}${gwaWa(traits[0])} ${traits[1]}${iGa(traits[1])}` : `${traits[0]}${iGa(traits[0])}`;
+  let text = `${subject}${iGa(subject)} 가장 많아서 ${traitText} 돋보이는 편이에요.`;
+  if (none.length > 0) {
+    const n = ELEMENT_COPY[none[0]].easy;
+    const t = ELEMENT_TRAIT[none[0]].none;
+    text += ` ${n}${eunNeun(n)} 없으니 ${t}${eunNeun(t)} 의식해서 챙기면 좋아요.`;
+  }
+  return { text, basis: counts };
+}
+
+// ---- 연애·일·돈·사람: 가장 많은 십신 무리(다섯 갈래)로 고른다 ----
+export type TenGodGroup = 'self' | 'express' | 'wealth' | 'duty' | 'learn';
+export const TEN_GOD_GROUP: Record<TenGod, TenGodGroup> = {
+  비견: 'self', 겁재: 'self', 식신: 'express', 상관: 'express', 편재: 'wealth', 정재: 'wealth', 편관: 'duty', 정관: 'duty', 편인: 'learn', 정인: 'learn',
+};
+const GROUP_ORDER: TenGodGroup[] = ['self', 'express', 'wealth', 'duty', 'learn'];
+const GROUP_BASIS: Record<TenGodGroup, string> = {
+  self: '비겁(비견·겁재)', express: '식상(식신·상관)', wealth: '재성(편재·정재)', duty: '관성(편관·정관)', learn: '인성(편인·정인)',
+};
+export const AREAS = [
+  { key: 'love', label: '연애' },
+  { key: 'work', label: '일' },
+  { key: 'money', label: '돈' },
+  { key: 'people', label: '사람' },
+] as const;
+export type AreaKey = (typeof AREAS)[number]['key'];
+
+export const AREA_COPY: Record<TenGodGroup, Record<AreaKey, string>> = {
+  self: {
+    love: '연애에서도 내 속도와 생각이 분명한 편이에요. 서로의 시간을 지켜 주는 사람과 오래 가요.',
+    work: '혼자 맡아서 끝까지 밀고 가는 일에 강해요. 함께 달리는 동료가 있으면 힘이 더 나요.',
+    money: '돈도 내 손으로 벌어서 쓰는 걸 좋아하는 편이에요. 친한 사이의 돈 약속은 금액과 날짜를 적어 두면 좋아요.',
+    people: '또래나 친구와 나란히 어울릴 때 마음이 편한 편이에요. 내 생각을 말한 다음 상대 생각도 한 번 물어 보세요.',
+  },
+  express: {
+    love: '좋아하는 마음을 숨기지 않고 표현하는 편이에요. 말뿐 아니라 작은 행동으로 보여 줄 때 더 잘 전해져요.',
+    work: '아이디어를 내고 만들어 보여 주는 일에 강해요. 마감 날짜를 먼저 적어 두면 떠오른 생각이 결과로 이어져요.',
+    money: '재주가 돈으로 이어지기 쉬운 편이에요. 좋아하는 일로 작게 벌어 보는 시도가 잘 맞아요.',
+    people: '분위기를 풀고 대화를 이끄는 편이에요. 농담이 길어질 땐 상대 표정을 한 번 살펴 주세요.',
+  },
+  wealth: {
+    love: '상대를 현실적으로 챙기고 함께할 계획을 잘 세우는 편이에요. 계획 사이사이 마음을 표현하는 말도 섞어 주세요.',
+    work: '결과와 숫자가 보이는 일에 강해요. 사람을 만나고 기회를 연결하는 자리에서 실력이 잘 드러나요.',
+    money: '돈의 흐름을 읽고 관리하는 감각이 있는 편이에요. 들어오고 나가는 돈을 한 달에 한 번 적어 보면 더 잘 보여요.',
+    people: '필요한 사람을 잘 알아보고 넓게 이어 주는 편이에요. 바쁠수록 가까운 사람과 보내는 시간을 따로 잡아 두세요.',
+  },
+  duty: {
+    love: '약속을 잘 지키고 믿음을 주는 연애를 하는 편이에요. 가끔은 계획 밖의 즉흥 데이트도 즐겨 보세요.',
+    work: '책임이 분명한 자리에서 믿음을 쌓아 가는 일에 강해요. 맡은 일이 많아지면 먼저 할 일 세 개만 고르세요.',
+    money: '계획한 대로 꾸준히 모으는 편이에요. 자동이체처럼 저절로 쌓이는 방법이 잘 맞아요.',
+    people: '예의와 선을 잘 지켜서 믿을 만한 사람으로 보이는 편이에요. 친한 사이에는 조금 더 편하게 기대도 괜찮아요.',
+  },
+  learn: {
+    love: '상대를 깊이 이해하려 하고 대화가 통하는 연애를 좋아하는 편이에요. 생각만 하지 말고 마음을 먼저 말해 보세요.',
+    work: '배우고 정리해서 내 것으로 만드는 일에 강해요. 공부한 것을 짧게라도 밖으로 꺼내 보이면 기회가 늘어요.',
+    money: '돈을 쓰기 전에 충분히 알아보고 신중하게 고르는 편이에요. 배움이나 자격에 쓰는 돈은 오래 남는 쪽이에요.',
+    people: '도움을 주고받는 관계를 소중히 여기는 편이에요. 받은 도움은 짧은 말 한마디로라도 돌려주세요.',
+  },
+};
+
+/** 가장 많은 십신 무리. 같으면 태어난 달(월지 → 월간) 무리, 그다음 목록 순서 */
+export function dominantGroup(counts: Record<TenGod, number>, month: { stem: TenGod; branch: TenGod }): { group: TenGodGroup; count: number } {
+  const sum = (g: TenGodGroup) => (Object.keys(counts) as TenGod[]).filter((t) => TEN_GOD_GROUP[t] === g).reduce((a, t) => a + counts[t], 0);
+  const rank = (g: TenGodGroup) => (TEN_GOD_GROUP[month.branch] === g ? 0 : TEN_GOD_GROUP[month.stem] === g ? 1 : 2);
+  const group = [...GROUP_ORDER].sort((a, b) => sum(b) - sum(a) || rank(a) - rank(b) || GROUP_ORDER.indexOf(a) - GROUP_ORDER.indexOf(b))[0];
+  return { group, count: sum(group) };
+}
+
+/** 연애·일·돈·사람 네 줄과 꼬리 줄 */
+export function areaReadings(counts: Record<TenGod, number>, month: { stem: TenGod; branch: TenGod }): { lines: { key: AreaKey; label: string; text: string }[]; basis: string } {
+  const { group, count } = dominantGroup(counts, month);
+  return {
+    lines: AREAS.map((a) => ({ key: a.key, label: a.label, text: AREA_COPY[group][a.key] })),
+    basis: `가장 많은 무리: ${GROUP_BASIS[group]} ${count}개`,
+  };
+}
+
 type CautionCopy = { situation: string; action: string };
 
 const CAUTION_MANY: Record<Element, CautionCopy> = {

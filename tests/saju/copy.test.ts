@@ -1,6 +1,7 @@
 import {
   DAY_MASTER_COPY, TEN_GOD_COPY, ELEMENT_COPY, RELATION_COPY, daeunCopy, seunCopy, tenGodBasis, tenGodOfStem,
   cautionFor, BASIS_COPY, SOURCE_LINE, DISCLAIMER,
+  AREA_COPY, TEN_GOD_TIED, elementSummary, nextDaeunCopy, areaReadings,
 } from '@/content/saju';
 import { STEMS, BRANCHES, TEN_GODS, ELEMENTS, type Element, type RelationKind } from '@/lib/saju/keys';
 import { stemTenGod } from '@/lib/saju/relations';
@@ -33,6 +34,7 @@ function allReadings(): { text: string; basis: string }[] {
     for (const target of STEMS) {
       const tenGod = tenGodOfStem(day, target);
       out.push(daeunCopy({ countingAge: 37, korean: `${target}유`, tenGod }));
+      out.push(nextDaeunCopy({ countingAge: 47, korean: `${target}술`, tenGod }));
       for (const kind of RELATIONS) out.push(seunCopy({ korean: `${target}미`, tenGod, relation: kind, dayBranch: '진' }));
     }
   }
@@ -44,6 +46,16 @@ function allReadings(): { text: string; basis: string }[] {
   const bal = cautionFor({ 목: 2, 화: 1, 토: 2, 금: 1, 수: 2 }, 8);
   out.push({ text: bal.text, basis: bal.basis });
   for (const r of Object.values(RELATION_COPY)) out.push({ text: r, basis: '관계' });
+  for (const g of Object.values(AREA_COPY)) for (const t of Object.values(g)) out.push({ text: t, basis: '무리' });
+  out.push({ text: `${TEN_GOD_TIED.heading} ${TEN_GOD_TIED.lead}`, basis: '동률' });
+  // 다섯 기운 한 줄: 많음 1·2개, 없음, 균형 조합
+  for (const a of ELEMENTS) for (const b of ELEMENTS) {
+    const el = { 목: 1, 화: 1, 토: 1, 금: 1, 수: 1 }; el[a] = 3; if (b !== a) el[b] = 0;
+    out.push(elementSummary(el));
+    const two = { 목: 1, 화: 1, 토: 1, 금: 1, 수: 1 }; two[a] = 3; two[b] = 3;
+    out.push(elementSummary(two));
+  }
+  out.push(elementSummary({ 목: 2, 화: 2, 토: 1, 금: 2, 수: 1 }));
   return out;
 }
 /** 일반 문구(계산 기준·고지)도 금지어 검사 대상 */
@@ -212,3 +224,25 @@ describe('왜 믿을 수 있나요', () => {
     for (const w of ['백호', '흉운', '액운', '재앙', '수명']) expect(all).not.toContain(w)
   })
 })
+
+describe('결과 내용 키우기 (2026-11-08)', () => {
+  it('연애·일·돈·사람: 다섯 무리 × 네 영역이 모두 두 문장이고 서로 다르다', () => {
+    const texts = Object.values(AREA_COPY).flatMap((g) => Object.values(g));
+    expect(texts).toHaveLength(20);
+    expect(new Set(texts).size).toBe(20);
+    for (const t of texts) expect(sentences(t), t).toBe(2);
+  });
+
+  it('가장 많은 무리가 같으면 태어난 달 무리를 고른다', () => {
+    const counts = Object.fromEntries(TEN_GODS.map((g) => [g, 0])) as Record<(typeof TEN_GODS)[number], number>;
+    counts.비견 = 2; counts.정관 = 2;
+    expect(areaReadings(counts, { stem: '식신', branch: '정관' }).basis).toContain('관성');
+    expect(areaReadings(counts, { stem: '식신', branch: '편재' }).basis).toContain('비겁');
+  });
+
+  it('다섯 기운 한 줄: 조사가 받침에 맞고, 없는 기운을 챙길 점으로 말한다', () => {
+    expect(elementSummary({ 목: 1, 화: 4, 토: 0, 금: 2, 수: 1 }).text).toBe('불꽃이 가장 많아서 표현하고 밀어붙이는 열정이 돋보이는 편이에요. 대지는 없으니 중심을 잡고 쉬어 가는 힘은 의식해서 챙기면 좋아요.');
+    expect(elementSummary({ 목: 1, 화: 1, 토: 3, 금: 0, 수: 3 }).text).toContain('대지와 물결이 가장 많아서');
+    expect(elementSummary({ 목: 2, 화: 2, 토: 1, 금: 2, 수: 1 }).text).toContain('고르게');
+  });
+});
