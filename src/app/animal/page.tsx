@@ -122,7 +122,7 @@ export default function AnimalTypePage() {
         {!result && (
           <TestStart
             heading={"나는 어떤 동물을\n닮았을까?"}
-            desc="눈매와 얼굴형으로 강아지상, 고양이상, 여우상 중 가장 닮은 동물을 찾아요."
+            desc="사진 한 장으로 보는 동물상 테스트예요. 눈매와 얼굴형으로 강아지상, 고양이상, 여우상 등 8가지 중 가장 닮은 동물을 찾아요."
             tips={["정면 사진이 좋아요", "밝은 곳에서"]}
             analyzeLabel="동물상 찾기"
             image={image}

@@ -142,7 +142,7 @@ export default function Face2Page() {
         {!result && (
           <TestStart
             heading={"웃는 사진 한 장이면\n충분해요"}
-            desc="눈매, 콧날, 입꼬리로 타고난 복과 연애운을 풀어드려요."
+            desc="사진 한 장으로 보는 무료 관상이에요. 눈매, 콧날, 입꼬리로 타고난 복과 연애운, 초년·중년·말년운을 풀어드려요."
             tips={["앞머리는 살짝 넘겨주세요", "밝은 곳에서"]}
             analyzeLabel="관상 보기"
             image={image}

@@ -1,0 +1,20 @@
+# 운명을 읽다 (unse-ai.com)
+
+> 사진 한 장으로 보는 무료 AI 관상·동물상·삼국지 인물 닮은꼴 테스트와 2027 정미년 띠별 운세, 오늘의 운세, MBTI 16유형 해설 사이트예요. 가입이 필요 없고 사진은 브라우저 안에서만 분석해 서버에 저장하지 않아요. 결과는 오락·참고용이며 과학적 근거를 주장하지 않아요.
+> Free Korean AI face-reading (gwansang), animal-face and Three Kingdoms look-alike tests, 2027 zodiac horoscopes, daily fortune and MBTI guides. No signup; photos never leave the browser. For entertainment only.
+
+## 핵심 페이지 / Key pages
+- [AI 관상 테스트](https://unse-ai.com/face2): 사진 한 장으로 보는 무료 관상(재물상·복덕상·리더상·귀인상·학자상·예술가상)
+- [동물상 테스트](https://unse-ai.com/animal): 강아지상·고양이상·여우상·곰상·토끼상·사슴상·호랑이상·독수리상 8가지
+- [삼국지 인물 테스트](https://unse-ai.com/samguk): 얼굴로 찾는 닮은 장수 111명
+- [삼국지 인물열전](https://unse-ai.com/samguk/people): 127명의 연의·정사 열전과 관계도
+- [삼국지 장수 월드컵](https://unse-ai.com/samguk/cup): 무장·책사·여인 판 16강
+- [2027 띠별 운세](https://unse-ai.com/fortune/2027): 정미년 12띠 총운·재물·연애·직장운과 분기별 흐름
+- [오늘의 운세](https://unse-ai.com/fortune/daily): 태어난 해로 보는 오늘의 별점·한마디·행운 요소
+- [MBTI 16유형](https://unse-ai.com/mbti): 유형별 별명·궁합·연애 스타일·직업
+- [얼굴 궁합](https://unse-ai.com/face-match): 두 얼굴의 동물상으로 보는 친구·연인 궁합
+
+## Optional
+- [사이트맵](https://unse-ai.com/sitemap.xml)
+- [서비스 소개](https://unse-ai.com/about)
+- [개인정보처리방침](https://unse-ai.com/privacy)

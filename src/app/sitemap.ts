@@ -53,7 +53,7 @@ export const LAST_MODIFIED: Record<string, string> = {
     '/about': '2026-10-26',
     '/privacy': '2026-11-04',
     '/fortune/2027': '2026-10-26',
-    ...Object.fromEntries(ZODIAC_SLUGS.map((s) => [`/fortune/2027/${s}`, '2026-10-26'])),
+    ...Object.fromEntries(ZODIAC_SLUGS.map((s) => [`/fortune/2027/${s}`, '2026-11-07'])),
     '/mbti': '2026-10-26',
     '/mbti/match': '2026-10-26',
     '/face-match': '2026-10-27',
@@ -66,7 +66,7 @@ export const LAST_MODIFIED: Record<string, string> = {
     '/samguk/cup': '2026-11-04',
     '/samguk/cup/ranking': '2026-11-04',
     '/samguk/videos': '2026-11-05',
-    ...Object.fromEntries(MBTI_SLUGS.map((s) => [`/mbti/${s}`, '2026-10-26'])),
+    ...Object.fromEntries(MBTI_SLUGS.map((s) => [`/mbti/${s}`, '2026-11-07'])),
 }
 
 type ChangeFrequency = MetadataRoute.Sitemap[number]['changeFrequency']
