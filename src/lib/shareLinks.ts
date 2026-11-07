@@ -14,7 +14,7 @@ import { SITE, UTM } from '@/lib/shareBase'
 export { josa, SITE }
 export type ShareKind = 'animal' | 'samguk' | 'face'
 
-const FACE_TYPES: Record<string, string> = { wealth: '재물상', blessing: '복덕상', leader: '리더상', noble: '귀인상', scholar: '학자상', artist: '예술가상' }
+export const FACE_TYPES: Record<string, string> = { wealth: '재물상', blessing: '복덕상', leader: '리더상', noble: '귀인상', scholar: '학자상', artist: '예술가상' }
 const TEST_PATH: Record<ShareKind, string> = { animal: '/animal', samguk: '/samguk', face: '/face2' }
 export const TEST_NAME: Record<ShareKind, string> = { animal: '동물상 테스트', samguk: '나는 삼국지 속 누구?', face: 'AI 관상 테스트' }
 

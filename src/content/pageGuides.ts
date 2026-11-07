@@ -9,6 +9,9 @@ export type GuideRoute = '/face2' | '/animal' | '/samguk' | '/samguk/duel' | '/f
 // 가이드가 없어도 관련 링크로 걸 수 있는 페이지
 export type RelatedRoute = GuideRoute | '/samguk/team'
 
+export interface GuideSectionItem { title: string; body: string; href?: string }
+export interface GuideSection { heading: string; items: GuideSectionItem[] }
+
 export interface PageGuideData {
   heading: string
   summary: string // 처음 보이는 2~3줄. 나머지(intro, highlights)는 '자세히 보기'로 접힌다
@@ -16,6 +19,7 @@ export interface PageGuideData {
   highlights: { title: string; body: string }[]
   faqs: { q: string; a: string }[]
   related: RelatedRoute[]
+  sections?: GuideSection[] // 결과 유형 미리보기 같은 짧은 카드 목록(접지 않고 요약 아래에 보임)
 }
 
 export const TEST_LINKS: Record<RelatedRoute, { label: string }> = {
@@ -74,6 +78,29 @@ export const pageGuides: Record<GuideRoute, PageGuideData> = {
       { q: '관상 결과를 믿어도 되나요?', a: '관상은 전통적으로 전해 오는 해석이고 과학적으로 검증된 것은 아니에요. 나를 돌아보는 재미있는 계기로 가볍게 즐겨 주세요.' },
     ],
     related: ['/animal', '/samguk', '/fortune'],
+    sections: [
+      {
+        heading: '관상 결과 유형 6가지',
+        items: [
+          { title: '재물상', body: '콧대가 길고 콧방울이 넉넉하며 턱선이 단단한 얼굴에서 자주 나와요. 실속 있고 든든한 인상이에요.' },
+          { title: '복덕상', body: '눈이 크고 입술이 도톰하며 턱이 둥근 계란형 얼굴에서 자주 나와요. 따뜻하고 편안해서 사람이 모이는 인상이에요.' },
+          { title: '리더상', body: '각진 얼굴형에 큰 입과 높은 이마가 더해진 얼굴에서 자주 나와요. 결단력 있고 앞에 나서는 인상이에요.' },
+          { title: '귀인상', body: '눈매가 차분하고 콧대가 길며 입술이 얇고 이마가 높은 얼굴에서 자주 나와요. 단정하고 믿음직한 인상이에요.' },
+          { title: '학자상', body: '이마가 높고 콧대가 가늘며 갸름하고 긴 얼굴형에서 자주 나와요. 차분하고 사색적인 인상이에요.' },
+          { title: '예술가상', body: '입술이 도톰하고 콧대가 가늘며 턱이 뾰족한 얼굴에서 자주 나와요. 섬세하고 감각적인 인상이에요.' },
+        ],
+      },
+      {
+        heading: '부위별로 보는 관상',
+        items: [
+          { title: '눈', body: '관상에서는 마음이 드러나는 창으로 보아 가장 비중 있게 다뤄요. 눈의 크기와 두 눈 사이 간격에 따라 풀이가 달라져요.' },
+          { title: '코', body: '재물과 자존심을 나타내는 부위로 봐요. 콧대의 길이와 콧방울의 넓이에 따라 인상과 풀이가 달라져요.' },
+          { title: '입', body: '말씨와 애정을 나타내는 부위로 봐요. 입의 크기와 입술의 두께에 따라 풀이가 달라져요.' },
+          { title: '이마', body: '초년의 흐름을 나타내는 부위로 봐요. 이마가 높은지 낮은지에 따라 지적인 인상과 실용적인 인상으로 나뉘어요.' },
+          { title: '턱', body: '말년의 안정을 나타내는 부위로 봐요. 턱이 뾰족한지, 둥근지, 각진지에 따라 섬세하거나 온화하거나 단단한 인상이에요.' },
+        ],
+      },
+    ],
   },
 
   '/animal': {
@@ -97,6 +124,21 @@ export const pageGuides: Record<GuideRoute, PageGuideData> = {
       { q: '무료인가요?', a: '네, 횟수 제한 없이 무료이고 회원가입도 필요 없어요.' },
     ],
     related: ['/face2', '/samguk', '/fortune/daily'],
+    sections: [
+      {
+        heading: '동물상 8가지, 나는 어느 쪽일까',
+        items: [
+          { title: '강아지상', body: '큰 눈과 둥근 얼굴형이 특징이에요. 순하고 밝아서 처음 보는 사람도 편하게 느끼는 인상이에요.' },
+          { title: '고양이상', body: '눈꼬리가 살짝 올라간 날카로운 눈매와 갸름한 얼굴형이 특징이에요. 신비롭고 도도해 보이는 인상이에요.' },
+          { title: '여우상', body: '가늘고 길게 빠진 눈매와 뾰족한 턱선이 특징이에요. 영리하고 센스 있어 보이는 인상이에요.' },
+          { title: '곰상', body: '크고 부드러운 이목구비와 넓은 얼굴형이 특징이에요. 듬직하고 따뜻해서 안정감을 주는 인상이에요.' },
+          { title: '토끼상', body: '크고 동그란 눈과 작고 오똑한 코가 특징이에요. 맑고 말랑해서 다가가기 쉬운 인상이에요.' },
+          { title: '사슴상', body: '맑고 긴 눈망울과 갸름한 얼굴형이 특징이에요. 우아하고 단정해서 조용히 존재감이 느껴지는 인상이에요.' },
+          { title: '호랑이상', body: '또렷한 눈매와 각진 얼굴형이 특징이에요. 당당하고 카리스마가 느껴지는 인상이에요.' },
+          { title: '독수리상', body: '깊고 날카로운 눈매와 뚜렷한 이목구비가 특징이에요. 강렬하고 시크해서 눈에 확 들어오는 인상이에요.' },
+        ],
+      },
+    ],
   },
 
   '/samguk': {
@@ -121,6 +163,30 @@ export const pageGuides: Record<GuideRoute, PageGuideData> = {
       { q: '무료인가요?', a: '네, 무료이고 회원가입도 필요 없어요.' },
     ],
     related: ['/samguk/duel', '/face2', '/animal', '/fortune'],
+    sections: [
+      {
+        heading: '이런 얼굴이면 이 장수',
+        items: [
+          { title: '조조', href: '/samguk/people/caocao', body: '입꼬리가 차분하게 내려가고 눈썹이 눈에서 여유 있게 떨어진 얼굴과 가까워요. 천하를 내다보는 영웅의 카리스마가 느껴지는 인상이에요.' },
+          { title: '유비', href: '/samguk/people/liubei', body: '눈썹이 눈에서 멀찍이 떨어지고 콧대가 길게 뻗은 얼굴과 가까워요. 사람을 품는 너그러운 인덕이 느껴지는 인상이에요.' },
+          { title: '관우', href: '/samguk/people/guanyu', body: '길게 뻗은 눈매와 올라간 눈꼬리, 힘 있게 뻗은 눈썹을 가진 얼굴과 가까워요. 의리로 천하를 울린 무신의 기품이 느껴지는 인상이에요.' },
+          { title: '장비', href: '/samguk/people/zhangfei', body: '둥글고 큰 눈에 눈꼬리가 올라가고 콧방울이 넉넉한 얼굴과 가까워요. 거침없고 호탕한 호걸의 기운이 느껴지는 인상이에요.' },
+          { title: '제갈량', href: '/samguk/people/zhugeliang', body: '턱선이 갸름하고 눈이 맑고 또렷한 얼굴과 가까워요. 천하를 꿰뚫는 맑은 지략이 느껴지는 단정한 인상이에요.' },
+          { title: '조운', href: '/samguk/people/zhaoyun', body: '갸름한 얼굴에 맑고 또렷한 눈, 눈과 가까운 눈썹이 어우러진 얼굴과 가까워요. 흠잡을 데 없는 충직함과 용맹이 느껴지는 인상이에요.' },
+          { title: '여포', href: '/samguk/people/lvbu', body: '턱이 길고 입술이 얇은 편이며 눈꼬리가 올라간 얼굴과 가까워요. 천하무적이라 불린 압도적인 존재감이 느껴지는 인상이에요.' },
+          { title: '주유', href: '/samguk/people/zhouyu', body: '갸름하고 길쭉한 얼굴선에 콧대가 길게 뻗은 얼굴과 가까워요. 음악을 아는 미주랑의 풍류가 느껴지는 우아한 인상이에요.' },
+          { title: '초선', href: '/samguk/people/diaochan', body: '길게 뻗은 눈매와 밝게 올라간 입꼬리가 두드러진 얼굴과 가까워요. 달빛처럼 빛나는 아름다움이 느껴지는 인상이에요.' },
+        ],
+      },
+      {
+        heading: '닮은 장수는 이렇게 찾아요',
+        items: [
+          { title: '얼굴 기준점 478개 측정', body: '사진에서 얼굴 기준점 478개를 찾아 눈·눈썹·코·입·얼굴형의 비율 15가지로 바꿔요. 비율로 재서 얼굴 크기나 위치와 상관없어요.' },
+          { title: '고른 성별 기준으로 비교', body: '내가 고른 성별의 평균과 견줘 어떤 특징이 뚜렷한지 계산하고, 같은 성별의 장수들 중에서 닮은 사람을 찾아요.' },
+          { title: '장수 프로필과 거리 계산', body: '장수마다 초상화에서 잰 얼굴 프로필이 있어요. 내 특징과의 거리를 계산해 가장 가까운 장수를 고르고, 같은 사진이면 결과도 같아요.' },
+        ],
+      },
+    ],
   },
 
   '/samguk/duel': {

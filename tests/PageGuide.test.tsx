@@ -18,3 +18,16 @@ test('데이터 없는 라우트는 아무것도 렌더하지 않는다', () => 
   if (!missing) return
   expect(renderToStaticMarkup(<PageGuide route={missing} />)).toBe('')
 })
+
+test('/animal sections 카드는 자세히 보기(details) 앞에 렌더된다', () => {
+  const g = pageGuides['/animal']
+  const html = renderToStaticMarkup(<PageGuide route="/animal" />)
+  const before = html.slice(0, html.indexOf('<details'))
+  expect(before).toContain(g.summary)
+  for (const sec of g.sections!) {
+    expect(before).toContain(sec.heading)
+    for (const it of sec.items) expect(before).toContain(it.title)
+  }
+  expect(before).not.toContain(g.intro[0])
+  expect(html).toContain(g.intro[0])
+})

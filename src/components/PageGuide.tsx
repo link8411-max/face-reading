@@ -15,6 +15,24 @@ export default function PageGuide({ route }: { route: GuideRoute }) {
 
         <p className="leading-relaxed text-center text-muted">{guide.summary}</p>
 
+        {guide.sections?.map((s) => (
+          <div key={s.heading}>
+            <h3 className="font-serif font-bold text-lg mb-3">{s.heading}</h3>
+            <ul className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+              {s.items.map((it) => (
+                <li key={it.title} className="bg-white rounded-[18px] border border-line px-4 py-3">
+                  {it.href ? (
+                    <Link href={it.href} className="font-bold hover:text-accent">{it.title}</Link>
+                  ) : (
+                    <p className="font-bold">{it.title}</p>
+                  )}
+                  <p className="mt-1 text-[14px] leading-relaxed text-muted">{it.body}</p>
+                </li>
+              ))}
+            </ul>
+          </div>
+        ))}
+
         {/* 본문은 접어 두되 HTML에는 남겨 검색엔진이 읽게 한다 */}
         <details className="group bg-white rounded-[22px] border border-line px-5 py-4">
           <summary className="font-bold cursor-pointer list-none flex justify-between items-center">

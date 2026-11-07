@@ -1,5 +1,9 @@
 import { pageGuides, faqJsonLd, type GuideRoute } from '@/content/pageGuides'
 import { SITEMAP_ROUTES } from '@/app/sitemap'
+import { FACE_TYPES } from '@/lib/shareLinks'
+import { animalTypeDB, animalTypeList } from '@/lib/animalTypeDB'
+import { PEOPLE_ID_LIST } from '@/content/samgukPeople/ids'
+import { PENDING_PORTRAIT_IDS } from '@/lib/samgukDB'
 
 const routes = Object.keys(pageGuides) as GuideRoute[]
 
@@ -64,4 +68,51 @@ test('운세 가이드는 바뀐 계산 방식(음력 변환, 입춘 기준, 근
   expect(fortune).toContain('하루 정도')
   expect(daily).not.toContain('음력 설')
   expect(daily).toContain('입춘')
+})
+
+// ---- 도구 페이지 sections (결과 유형 미리보기 카드) ----
+const emojiRe = /\p{Extended_Pictographic}/u
+const sectionRoutes: GuideRoute[] = ['/face2', '/animal', '/samguk']
+
+test('/face2 sections: 6유형 + 5부위', () => {
+  const s = pageGuides['/face2'].sections!
+  expect(s).toHaveLength(2)
+  expect(s[0].items).toHaveLength(6)
+  expect(new Set(s[0].items.map((i) => i.title))).toEqual(new Set(Object.values(FACE_TYPES)))
+  expect(s[1].items).toHaveLength(5)
+})
+
+test('/animal sections: 8종 전부', () => {
+  const s = pageGuides['/animal'].sections!
+  expect(s).toHaveLength(1)
+  expect(s[0].items).toHaveLength(8)
+  expect(new Set(s[0].items.map((i) => i.title))).toEqual(new Set(animalTypeList.map((k) => animalTypeDB[k].name)))
+})
+
+test('/samguk sections: 대표 장수 열전 링크 + 매칭 방식 3카드', () => {
+  const s = pageGuides['/samguk'].sections!
+  expect(s).toHaveLength(2)
+  expect(s[0].items.length).toBeGreaterThanOrEqual(8)
+  for (const it of s[0].items) {
+    const m = /^\/samguk\/people\/([a-z0-9_-]+)$/.exec(it.href ?? '')
+    expect(m, it.title).not.toBeNull()
+    expect(PEOPLE_ID_LIST, it.href).toContain(m![1])
+    expect(PENDING_PORTRAIT_IDS.has(m![1]), it.href).toBe(false)
+  }
+  expect(s[1].items).toHaveLength(3)
+})
+
+test.each(sectionRoutes)('%s sections 카드 글 규칙', (route) => {
+  for (const sec of pageGuides[route].sections!) {
+    expect(sec.heading.length).toBeGreaterThan(0)
+    for (const it of sec.items) {
+      expect(it.body.length, it.title).toBeGreaterThanOrEqual(40)
+      expect(it.body.length, it.title).toBeLessThanOrEqual(140)
+      expect(emojiRe.test(it.title + it.body + sec.heading), it.title).toBe(false)
+      if (it.href) expect(it.href.startsWith('/')).toBe(true)
+      for (const w of ['천문연구원', '근사', '윤달', '저장되지', '서버로 전송', 'Gemini', '당신']) {
+        expect(it.title + it.body, `${it.title}: ${w}`).not.toContain(w)
+      }
+    }
+  }
 })
