@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import SajuClient from "./SajuClient";
 import PageGuide from "@/components/PageGuide";
 
-const TITLE = "내 사주 풀이 | 네 기둥·십신·대운을 쉬운 말로 – 운명을 읽다";
+const TITLE = "무료 사주 풀이 | 내 사주를 쉬운 말로, 10년 대운까지 – 운명을 읽다";
 const DESCRIPTION = "생년월일과 태어난 시간으로 네 기둥, 오행의 균형, 십신, 10년 대운과 올해 흐름을 쉬운 말로 풀어요. 절기 시각 기준으로 계산하고 가입 없이 무료예요.";
 
 export const metadata: Metadata = {

@@ -37,8 +37,8 @@ const silkscreen = localFont({
 });
 
 // 검색 결과 제목·설명 (클릭률 위주, 길이 상한은 tests/seo-snippets.test.tsx). og·트위터도 같은 문구
-const TITLE = "무료 AI 관상·동물상 테스트 | 사진 한 장, 저장 없이 – 운명을 읽다";
-const DESCRIPTION = "사진 한 장으로 보는 무료 AI 관상·동물상·삼국지 닮은꼴 테스트. 가입 없이, 사진은 저장하지 않아요. 2027 신년운세와 오늘의 운세도 무료예요.";
+const TITLE = "무료 AI 관상·동물상 테스트와 사주 풀이 – 운명을 읽다";
+const DESCRIPTION = "사진 한 장으로 보는 무료 AI 관상·동물상 테스트와 생년월일로 보는 내 사주 풀이. 가입 없이, 사진은 저장하지 않아요. 2027 신년운세와 오늘의 운세도 무료예요.";
 
 export const metadata: Metadata = {
   title: TITLE,
