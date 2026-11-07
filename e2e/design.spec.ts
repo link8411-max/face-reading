@@ -3,7 +3,7 @@ import { test, expect } from '@playwright/test'
 test('본문에 한글 글꼴(Noto Sans KR)과 뉴트럴 바탕·글자색이 실제로 적용된다', async ({ page }) => {
   await page.goto('/')
   const s = await page.evaluate(() => { const c = getComputedStyle(document.body); return { font: c.fontFamily, bg: c.backgroundColor, color: c.color } })
-  expect(s.font).toMatch(/Noto_Sans_KR|Noto Sans KR/i)
+  expect(s.font).toMatch(/Noto_Sans_KR|Noto Sans KR|notoSans/i) // 자체 호스팅(next/font/local) 뒤 글꼴 이름이 notoSans로 나온다
   expect(s.bg).toBe('rgb(251, 246, 241)')
   expect(s.color).toBe('rgb(46, 42, 39)')
 })

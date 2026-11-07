@@ -14,15 +14,16 @@ async function faceResult(page: Page) {
 test.describe('관상 결과: 요약 카드 먼저, 공유하기', () => {
   test.skip(!existsSync(FACE), '개발용 테스트 얼굴이 없으면 건너뜀')
 
-  test('결과 카드에 워터마크, 상세 풀이는 접혀 있다', async ({ page }) => {
+  test('결과 카드에 워터마크, 풀이는 카드 아래 구역으로 나뉜다', async ({ page }) => {
     const errors = trackErrors(page)
     await faceResult(page)
     const card = page.locator('article').first()
     await expect(card).toContainText('운명을 읽다')
     await expect(card).toContainText('unse-ai.com')
-    await expect(card.getByRole('meter')).toHaveCount(3)
-    const details = page.locator('details', { hasText: '풀이 자세히 보기' })
-    await expect(details).not.toHaveAttribute('open', '')
+    // 2판: 막대 대신 얼굴형·힘이 실린 자리 칩, 풀이는 카드 아래 '왜 이 상인가요' 등으로 나뉜다
+    await expect(card.getByRole('meter')).toHaveCount(0)
+    await expect(page.getByRole('heading', { name: '왜 이 상인가요' })).toBeVisible()
+    await expect(page.getByRole('heading', { name: '조심할 점' })).toBeVisible()
     const y = async (l: import('@playwright/test').Locator) => (await l.boundingBox())!.y
     expect(await y(card)).toBeLessThan(await y(page.getByRole('button', { name: '공유하기' })))
     expect(errors).toEqual([])
@@ -38,7 +39,7 @@ test.describe('관상 결과: 요약 카드 먼저, 공유하기', () => {
     await page.getByRole('button', { name: '공유하기' }).click()
     await expect.poll(() => page.evaluate(() => (window as unknown as { __shared: ShareData[] }).__shared.length), { timeout: 20000 }).toBe(1)
     const sent = await page.evaluate(() => (window as unknown as { __shared: ShareData[] }).__shared[0])
-    expect(sent.url).toMatch(/^https:\/\/unse-ai\.com\/face2\/r\/[a-z]+\?utm_source=share&utm_medium=friend_link&utm_campaign=face$/)
+    expect(sent.url).toMatch(/^https:\/\/unse-ai\.com\/face2\/r\/[a-z-]+\?utm_source=share&utm_medium=friend_link&utm_campaign=face$/)
     expect(sent.text).toMatch(/^나는 .+이래\. 너 관상도 봐줄까\?$/)
     expect(sent.files).toBeUndefined()
     await expect(page.getByRole('status')).toHaveCount(0)
@@ -124,8 +125,8 @@ test.describe('카카오톡 인앱 브라우저', () => {
     await expect.poll(() => page.evaluate(() => (window as unknown as { __kakao: unknown[] }).__kakao.length), { timeout: 15000 }).toBe(1)
     const t = await page.evaluate(() => (window as unknown as { __kakao: { content: { title: string; imageUrl: string; link: { mobileWebUrl: string } }; buttons: { title: string }[] }[] }).__kakao[0])
     expect(t.content.title).toMatch(/^나는 .+이래\. 너 관상도 봐줄까\?$/)
-    expect(t.content.link.mobileWebUrl).toMatch(/^https:\/\/unse-ai\.com\/face2\/r\/[a-z]+\?utm_source=share/)
-    expect(t.content.imageUrl).toMatch(/\/api\/og\/result\?kind=face&key=[a-z]+$/)
+    expect(t.content.link.mobileWebUrl).toMatch(/^https:\/\/unse-ai\.com\/face2\/r\/[a-z-]+\?utm_source=share/)
+    expect(t.content.imageUrl).toMatch(/\/api\/og\/result\?kind=face&key=[a-z-]+$/)
     expect(t.buttons[0].title).toBe('나도 해보기')
     await expect(page.getByRole('status')).toHaveCount(0)
   })

@@ -19,8 +19,11 @@ test('친구 결과 링크(동물상): 서버 미리보기 메타·검색 제외
 test('친구 결과 링크(삼국지·관상) 착지 문구', async ({ page }) => {
   await page.goto('/samguk/r/zhaoyun?s=84')
   await expect(page.getByRole('heading', { name: '친구는 조운을 닮았대요' })).toBeVisible()
+  await page.goto('/face2/r/earth-mid')
+  await expect(page.getByRole('heading', { name: '친구는 곳간이 든든한 상이 나왔어요' })).toBeVisible()
+  // 옛 6유형 키(wealth)도 같은 새 결과로 착지한다
   await page.goto('/face2/r/wealth')
-  await expect(page.getByRole('heading', { name: '친구는 재물상이 나왔어요' })).toBeVisible()
+  await expect(page.getByRole('heading', { name: '친구는 곳간이 든든한 상이 나왔어요' })).toBeVisible()
 })
 
 test('잘못된 결과 링크는 테스트 시작 화면으로 보낸다 (예약 키 포함, 500 없음)', async ({ page, request }) => {

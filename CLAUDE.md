@@ -23,7 +23,7 @@ npm run test:e2e     # E2E (next build 후 3200 포트): 전 페이지 로딩·�
 - **프레임워크**: Next.js 16 (App Router) + TypeScript
 - **스타일**: Tailwind CSS 4
 - **AI 호출 없음**: 결과는 규칙 계산 + 미리 작성한 해석 데이터 (Gemini 제거됨)
-- **얼굴인식**: @mediapipe/tasks-vision FaceLandmarker 478점 (삼국지·동물상), @vladmandic/face-api 68점 (관상만, 추후 이전)
+- **얼굴인식**: @mediapipe/tasks-vision FaceLandmarker 478점 (삼국지·동물상·관상). @vladmandic/face-api는 성별 추정(tiny_face_detector + age_gender)에만 쓴다
 - **OG 이미지**: @vercel/og (동적 생성)
 - **PWA**: manifest.ts + sw.js v2(캐시 + push 핸들러) + PNG 아이콘 `icon-192/512`·`apple-touch-icon-180`·`badge-96`(`scripts/make-push-icons.mjs`로 생성) (홈화면 설치 가능)
 
@@ -44,7 +44,7 @@ npm run test:e2e     # E2E (next build 후 3200 포트): 전 페이지 로딩·�
 - 이모지는 제목·버튼·링크·메뉴에 쓰지 않는다(E2E `chrome-emoji.spec.ts`). 아이콘은 `src/components/icons.tsx`의 `Icon`(선 굵기 1.6) 한 세트, 얼굴 그림은 `SmileFace`, 장식은 `MoonDeco`.
 
 ### 공통 구성요소
-- 테스트 시작: `components/test/TestHeader`(h1 = 페이지 이름), `TestStart`(성별 pill 필수 → 큰 사진 영역 → 안내 → 분석 버튼. 사진·성별 없으면 버튼 비활성). 관상은 분석에 성별을 쓰지 않아 `needsGender={false}`로 묻지 않는다. 고른 내 성별은 이 기기에만 기억해(`lib/genderMemory.ts`, `useRememberedGender`) 동물상·삼국지·얼굴 궁합 "나" 칸에 미리 고른다
+- 테스트 시작: `components/test/TestHeader`(h1 = 페이지 이름), `TestStart`(성별 pill 필수 → 큰 사진 영역 → 안내 → 분석 버튼. 사진·성별 없으면 버튼 비활성). 관상 2판도 성별로 보정하므로 묻되, 사진을 고르면 추정해 미리 골라 둔다(아래 관상 2판 절). 고른 내 성별은 이 기기에만 기억해(`lib/genderMemory.ts`, `useRememberedGender`) 동물상·삼국지·얼굴 궁합 "나" 칸에 미리 고른다
 - 결과: `components/result/ResultCard`(캡처 한 장 완결, 워터마크 "운명을 읽다 · unse-ai.com"), `ResultActions`(1순위 공유하기, 이미지 저장, 다시하기)
 - 공유하기: `hooks/useResultShare`. 카카오톡 인앱이면 카카오톡 공유(`lib/kakao.ts`, Kakao SDK 2.7.4, 피드 카드: 1인칭 문구·결과 미리보기 이미지·나도 해보기) → 그 밖엔 `lib/share.ts` `shareResult`: 결과 링크+문구를 기본 공유창으로, 없으면 링크 복사. GA share_click method: kakao·link.
   - 카카오디벨로퍼스 앱 "운명을 읽다"(ID 1623598). JavaScript 키(공개 값)는 등록한 도메인(https://unse-ai.com, http://localhost:3200)에서만 동작한다. 도메인이 바뀌면 콘솔 > 플랫폼 키 > JavaScript 키 > SDK 도메인에 추가. **공유 카드를 눌러 이동하려면 별도로 앱 설정 > 제품 링크 관리 > 웹 도메인에 https://unse-ai.com이 있어야 한다**(없으면 카드는 보이지만 눌러도 반응이 없다, 2026-10-27 등록). 운세는 결과 링크가 없어 `useScreenshot().share`(이미지)를 쓰고, 카카오톡 안에서는 `kakao` 옵션의 카드로 보낸다(신년운세는 그 띠의 `/fortune/2027/[띠]`, 오늘의 운세는 `/fortune/daily`, 생년월일·출생 연도는 넣지 않음).
@@ -94,9 +94,7 @@ src/
 │   │   ├── matcher.ts        # 가중 거리 매칭 + 닮은 이유/얼굴 분석 문장
 │   │   ├── simulate.ts       # 분포 시뮬레이션 (시드 고정)
 │   │   └── calibration.json  # 쏠림 보정 bias (scripts/calibrate-samguk.ts로 생성)
-│   ├── faceDetection.ts      # face-api.js 얼굴 감지 (68 랜드마크)
-│   ├── faceReadingDB.ts      # 관상 해석 데이터베이스
-│   ├── faceAnalyzer.ts       # 특징 → 해석 변환
+│   ├── face/guansang*.ts · palaces.ts · genderGuess.ts · revealTimeline.ts  # 관상 2판 (분류·삼정·성별 추정·공개 모션 일정)
 │   ├── animalTypeDB.ts       # 동물상 데이터 (8종)
 │   ├── animal/               # 동물상 z 프로필·매칭·시뮬레이션·calibration.json
 │   ├── samgukDB.ts           # 삼국지 인물 데이터
@@ -106,9 +104,7 @@ src/
     └── useScreenshot.ts      # 결과 캡쳐/공유 훅
 
 public/
-├── models/                   # face-api.js 모델 + face_landmarker.task (MediaPipe)
-│   ├── ssd_mobilenetv1_*     # 얼굴 감지 모델
-│   └── face_landmark_68_*    # 랜드마크 모델
+├── models/                   # face_landmarker.task (MediaPipe) + tiny_face_detector_*·age_gender_* (성별 추정)
 ├── icons/                    # PWA 아이콘
 │   ├── icon-192x192.svg
 │   └── icon-512x512.svg
@@ -117,6 +113,15 @@ public/
 ```
 
 ---
+
+## 관상 2판 (오행 얼굴형 × 삼정, 2026-11-07)
+- 파이프라인: `lib/face/analyzePhoto.ts`의 `analyzePhotoDetailed`(MediaPipe 랜드마크·정면 검사·z·삼정 비율) → `classifyGuansang`(`lib/face/guansang.ts`, 얼굴형 5 × 힘이 실린 자리 3) → `readPalaces`(`palaces.ts`, 돈·일·사랑·사람·버팀 다섯 자리 강/보통/키울 곳). 화면은 `components/face/GuansangResultView`, 공개 모션은 `RevealMotion`.
+- 유형 키: `{shape}-{zone}` 15개 (`lib/face/guansangKeys.ts`; shape = wood/fire/earth/metal/water, zone = up/mid/down). 예: `/face2/r/earth-mid` = "곳간이 든든한 상". 옛 6유형 키(wealth 등)는 `LEGACY_FACE_KEYS`로 새 키에 연결돼 같은 결과로 착지한다.
+- 문구는 전부 `src/content/guansang.ts`. `tests/guansang/copy.test.ts`가 금지어(외모 비하·단정)를 검사한다. 수정하면 `npm test`.
+- 보정 재실행: `npx tsx --tsconfig tsconfig.json scripts/calibrate-guansang.ts` (결과 `lib/face/guansangCalibration.json`). 통계 재측정: dev 서버(3311)를 띄우고 `/dev/face-lab`을 연 상태에서 `node scripts/measure-guansang-stats.mjs` → 출력으로 `guansangStats.ts` 갱신.
+- 상정은 헤어라인이 아니라 MediaPipe 점 10을 기준으로 잰다(머리카락에 안 흔들림). 그래서 `ZONE_UP_RANGE`(`guansangFeatures.ts`)는 추측이 아니라 측정 최소·최대이며, 범위 밖이면 `foreheadUncertain`으로 이마 결론을 낮춘다. 통계를 다시 재면 같이 갱신한다.
+- 성별 미리 선택: `lib/face/genderGuess.ts`(`guessGender`, 확신 0.6 미만이면 비움, 4초 타임아웃). 모델은 face-api tiny_face_detector + age_gender만. 추정값은 사용자가 이미 고른 성별을 덮지 않고 GA에도 보내지 않는다.
+- `RevealMotion`: 사진 위에 삼정 띠가 그려지는 공개 모션. "건너뛰기" 버튼이 있고 `prefers-reduced-motion`이면 모션 없이 바로 결과(`revealTimeline.ts`의 `revealPlan`).
 
 ## 메뉴·메인 (4a)
 - 메뉴와 묶음은 `src/content/navigation.ts` 한 곳에서 정의한다(TABS, CATEGORIES, tabForPath). 홈 묶음 탭·허브(`/face-tests`, `/unse`)·하단 탭바·푸터가 모두 이걸 쓴다. 새 테스트를 추가하면 CATEGORIES에 항목을 넣는다.
@@ -184,7 +189,7 @@ public/
 | 경로 | 기능 | 제한 | 사용 기술 |
 |------|------|------|-----------|
 | `/` | 메인 | - | - |
-| `/face2` | 무료 관상 | 무제한 | face-api.js + DB |
+| `/face2` | 무료 관상 (오행 얼굴형 5 × 삼정 3 = 15유형) | 무제한 | MediaPipe + 15유형 분류 |
 | `/animal` | 동물상 테스트 | 무제한 | face-api.js + DB |
 | `/samguk` | 삼국지 닮은꼴 | 무제한 | MediaPipe + 프로필 매칭 |
 | `/samguk/videos` | 삼국지 쇼츠 모음(격자·세로 피드) | - | YouTube API/RSS, ISR 1시간 |
@@ -227,11 +232,7 @@ public/
 ## 주요 로직
 
 ### 무료 관상 (/face2) 흐름
-1. 이미지 업로드
-2. `faceDetection.ts` - face-api.js로 68개 랜드마크 감지
-3. `faceAnalyzer.ts` - 눈/코/입/얼굴형 등 특징 계산
-4. `faceReadingDB.ts` - 특징별 해석 텍스트 조회
-5. 결과 표시
+1. 이미지 업로드 (성별은 추정해 미리 선택) → 2. `analyzePhotoDetailed` → `classifyGuansang` → `readPalaces` → 3. RevealMotion 후 결과 표시. 자세한 내용은 아래 "관상 2판" 절
 
 ### 삼국지 닮은꼴 (/samguk) 흐름
 1. 성별 선택(남/여) + 이미지 업로드
@@ -363,7 +364,7 @@ public/
 
 | 작업 | 파일 |
 |------|------|
-| 관상 해석 텍스트 수정 | `src/lib/faceReadingDB.ts` |
+| 관상 해석 텍스트 수정 | `src/content/guansang.ts` (금지어 테스트 `tests/guansang/copy.test.ts`) |
 | 삼국지 인물 얼굴 프로필 | `src/lib/samguk/profiles.ts` |
 | 무료 관상 UI | `src/app/face2/page.tsx` |
 | 메인 페이지 | `src/app/page.tsx` |
@@ -416,10 +417,10 @@ public/
 
 ## 주의사항
 
-1. **face-api.js**: `'use client'` 필수 (브라우저 전용)
+1. **face-api.js(성별 추정)**: `'use client'` 필수 (브라우저 전용)
 2. **AI 제한**: localStorage 기반이라 브라우저별로 따로 카운트
 3. **이미지 캡쳐**: `modern-screenshot` 사용 (CSS lab() 호환)
-4. **모델 파일**: `/public/models/`에 있어야 face-api.js 작동
+4. **모델 파일**: `/public/models/`에 `face_landmarker.task`(MediaPipe)와 성별 추정용 tiny_face_detector·age_gender가 있어야 작동
 5. **페이지 추가/삭제 시**: 반드시 `src/app/sitemap.ts` 업데이트!
 6. **SEO**: 새 페이지는 layout.tsx + sitemap + canonical URL 필수
 

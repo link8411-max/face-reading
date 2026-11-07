@@ -29,7 +29,7 @@ test('결과 화면 맨 아래 버튼·배너가 탭바에 가리지 않는다',
   const barTop = (await page.getByRole('navigation', { name: '하단 메뉴' }).boundingBox())!.y
   const footer = page.locator('footer')
   const footerBottom = await footer.evaluate((el) => el.getBoundingClientRect().bottom)
-  expect(footerBottom).toBeLessThanOrEqual(barTop + 1)
+  expect(footerBottom).toBeLessThanOrEqual(barTop + 2) // 소수점 렌더링 오차 허용
 })
 
 test('삼국지 결과 저장 이미지에 탭바가 섞이지 않는다(no-screenshot)', async ({ page }) => {

@@ -27,7 +27,7 @@ test('홈 → 띠별 운세 → 양띠 → 사주로 자세히 보기', async ({
   await page.goto('/')
   await page.locator('main a[href="/fortune/2027"]').first().click()
   await expect(page).toHaveURL(/\/fortune\/2027$/)
-  await page.locator('a[href="/fortune/2027/sheep"]').click()
+  await page.locator('a[href="/fortune/2027/sheep"]').first().click() // 허브에 격자·비교표·삼재 링크가 있어 여러 개
   await expect(page.locator('h1')).toHaveText('2027년 양띠 운세')
   await page.getByRole('link', { name: /사주로 2027 운세 자세히 보기/ }).click()
   await expect(page).toHaveURL(/\/fortune$/)
