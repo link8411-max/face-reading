@@ -41,9 +41,9 @@ test('월주 경계: 1/6~2/3 축월(전년 간), 12/7 이후 자월', () => {
 })
 
 test('API: 잘못된 양력 날짜·형식은 친절한 오류, 음력 미래 날짜도 막는다', () => {
-  expect(computeFortune({ year: 2001, month: 2, day: 30, isLunar: false, isLeapMonth: false, hour: '모름' })).toEqual({ error: '올바른 생년월일을 입력해 주세요.' })
-  expect(computeFortune({ year: '2001' as unknown as number, month: 2, day: 3, isLunar: false, isLeapMonth: false, hour: '모름' })).toEqual({ error: '올바른 생년월일을 입력해 주세요.' })
-  expect(computeFortune({ year: 2026, month: 12, day: 30, isLunar: true, isLeapMonth: false, hour: '모름' }, new Date(2026, 9, 26))).toEqual({ error: '아직 오지 않은 날짜예요.' })
+  expect(computeFortune({ year: 2001, month: 2, day: 30, isLunar: false, isLeapMonth: false, hourSlot: null })).toEqual({ error: '올바른 생년월일을 입력해 주세요.' })
+  expect(computeFortune({ year: '2001' as unknown as number, month: 2, day: 3, isLunar: false, isLeapMonth: false, hourSlot: null })).toEqual({ error: '올바른 생년월일을 입력해 주세요.' })
+  expect(computeFortune({ year: 2026, month: 12, day: 30, isLunar: true, isLeapMonth: false, hourSlot: null }, new Date(2026, 9, 26))).toEqual({ error: '아직 오지 않은 날짜예요.' })
 })
 
 test('다시하기는 윤달 체크도 초기화한다', () => {

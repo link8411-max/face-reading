@@ -5,8 +5,8 @@ import { 띠찾기 } from '@/lib/saju'
 import { readFileSync } from 'node:fs'
 
 test('음력 생일은 양력으로 바꿔 같은 사주로 계산한다', () => {
-  const lunar = computeFortune({ year: 1990, month: 4, day: 21, isLunar: true, isLeapMonth: false, hour: '모름' })
-  const solar = computeFortune({ year: 1990, month: 5, day: 15, isLunar: false, isLeapMonth: false, hour: '모름' })
+  const lunar = computeFortune({ year: 1990, month: 4, day: 21, isLunar: true, isLeapMonth: false, hourSlot: null })
+  const solar = computeFortune({ year: 1990, month: 5, day: 15, isLunar: false, isLeapMonth: false, hourSlot: null })
   if ('error' in lunar || 'error' in solar) throw new Error('unexpected')
   expect(lunar.사주정보.사주).toEqual(solar.사주정보.사주)
   expect(lunar.사주정보.양력).toEqual({ year: 1990, month: 5, day: 15 })
@@ -16,15 +16,15 @@ test('윤달을 구분해서 변환한다', () => {
   const cal = new KoreanLunarCalendar()
   cal.setLunarDate(2023, 2, 15, true)
   const expected = cal.getSolarCalendar()
-  const leap = computeFortune({ year: 2023, month: 2, day: 15, isLunar: true, isLeapMonth: true, hour: '모름' })
-  const normal = computeFortune({ year: 2023, month: 2, day: 15, isLunar: true, isLeapMonth: false, hour: '모름' })
+  const leap = computeFortune({ year: 2023, month: 2, day: 15, isLunar: true, isLeapMonth: true, hourSlot: null })
+  const normal = computeFortune({ year: 2023, month: 2, day: 15, isLunar: true, isLeapMonth: false, hourSlot: null })
   if ('error' in leap || 'error' in normal) throw new Error('unexpected')
   expect(leap.사주정보.양력).toEqual({ year: expected.year, month: expected.month, day: expected.day })
   expect(leap.사주정보.양력).not.toEqual(normal.사주정보.양력)
 })
 
 test('없는 음력 날짜(윤달이 없는 해의 윤달)는 오류', () => {
-  expect(computeFortune({ year: 2024, month: 3, day: 1, isLunar: true, isLeapMonth: true, hour: '모름' })).toEqual({ error: '존재하지 않는 음력 날짜예요. 윤달 여부를 확인해 주세요.' })
+  expect(computeFortune({ year: 2024, month: 3, day: 1, isLunar: true, isLeapMonth: true, hourSlot: null })).toEqual({ error: '존재하지 않는 음력 날짜예요. 윤달 여부를 확인해 주세요.' })
 })
 
 test('음력은 일자를 30일까지 받는다', () => {

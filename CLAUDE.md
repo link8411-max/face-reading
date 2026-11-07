@@ -133,7 +133,7 @@ public/
 
 ## 신년운세 (연도별 갱신)
 - 기준 연도: `src/lib/fortuneYear.ts` (현재 2027 정미년). 해가 바뀌면 이 값과 `fortuneDB.띠별올해`·`오행.*.올해조언`, `src/content/fortune2027Zodiac.ts`(띠별 페이지 본문)를 함께 갱신한다.
-- 사주 계산 `src/lib/saju.ts`: 일주는 `korean-lunar-calendar`(천문연 데이터), 년주·월주는 입춘·절기 근사 날짜 기준(입춘 2/4 등). 음력 입력은 `src/lib/fortuneService.ts`에서 양력으로 변환(윤달 포함).
+- 사주 계산 `src/lib/saju/engine.ts`(`computeSaju`, manseryeok 래퍼, 절기 시각·자정 경계·서머타임 반영). `src/lib/fortuneService.ts`가 이를 불러 네 기둥(시간을 알 때)·오행 집계·세운을 만들고, 강한·약한 오행도 이 집계로 정한다. 시간 입력은 13칸(`HOUR_SLOTS`), 성별은 받지 않아 대운은 없다. 음력 입력은 양력으로 변환(윤달 포함) 후 계산. `src/lib/saju.ts`의 `년주계산` 등은 일진 엔진용 호환 래퍼.
 - 띠별 페이지: `/fortune/2027`(허브), `/fortune/2027/[zodiac]`(rat~pig, 정적 생성, 띠당 본문 1,500자 이상 테스트로 고정)
 - `/fortune/layout.tsx`에는 구조화 데이터를 두지 않는다 (하위 페이지에 중첩됨). `/fortune/page.tsx`에서 렌더.
 

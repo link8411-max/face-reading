@@ -44,7 +44,7 @@ export const SITEMAP_ROUTES = [
 export const LAST_MODIFIED: Record<string, string> = {
     '': '2026-10-26',
     '/face2': '2026-11-07',
-    '/fortune': '2026-10-26',
+    '/fortune': '2026-11-07',
     '/saju': '2026-11-07',
     '/fortune/mbti': '2026-10-27',
     '/fortune/daily': '2026-11-05',

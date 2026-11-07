@@ -42,13 +42,16 @@ test('모든 GuideRoute에 가이드가 있다', () => {
   for (const r of all) expect(pageGuides[r], r).toBeDefined()
 })
 
-test('/fortune 가이드는 코드가 하지 않는 시주·음력 계산을 주장하지 않는다', () => {
+test('/fortune 가이드는 절기 시각 기준과 시간을 알면 시주까지 계산함을 밝힌다', () => {
   const text = JSON.stringify(pageGuides['/fortune'])
   // 사주팔자 일반 정의(여덟 글자)는 허용, 우리 계산이 여덟 글자/네 기둥이라는 주장만 금지
   expect(text).not.toContain('여덟 글자를 보여')
   expect(text).not.toContain('네 기둥의 천간')
   expect(text).not.toContain('더 자세한 풀이')
-  expect(text).toContain('여섯 글자')
+  expect(text).toContain('절기')
+  expect(text).toContain('시주')
+  expect(text).not.toContain('여섯 글자')
+  expect(text).not.toContain('하루 정도')
   expect(text).toContain('양력')
 })
 
@@ -65,7 +68,7 @@ test('운세 가이드는 바뀐 계산 방식(음력 변환, 입춘 기준, 근
   expect(fortune).not.toContain('지금은 양력 생일을 기준으로 계산해요')
   expect(fortune).toContain('입춘')
   expect(fortune).toContain('윤달')
-  expect(fortune).toContain('하루 정도')
+  expect(fortune).toContain('절기')
   expect(daily).not.toContain('음력 설')
   expect(daily).toContain('입춘')
 })

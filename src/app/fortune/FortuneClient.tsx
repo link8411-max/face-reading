@@ -14,6 +14,13 @@ import { validateBirthDate } from "@/lib/birthDate";
 import Link from "next/link";
 import { useScreenshot } from "@/hooks/useScreenshot";
 import { SITE } from "@/lib/shareLinks";
+import { HOUR_SLOTS, type Element, type HourSlotKey } from "@/lib/saju/keys";
+import type { SajuResult } from "@/lib/saju/engine";
+import { ELEMENT_COPY } from "@/content/saju";
+import SajuTable from "@/components/saju/SajuTable";
+import ElementBars from "@/components/saju/ElementBars";
+import SeunCard from "@/components/saju/SeunCard";
+import BasisDetails from "@/components/saju/BasisDetails";
 
 interface FortuneResult {
   사주정보: {
@@ -23,7 +30,10 @@ interface FortuneResult {
     일간: string;
     일간오행: string;
     음양: string;
-    오행분포: Record<string, number>;
+    오행분포: SajuResult["elements"];
+    기둥: SajuResult["pillars"];
+    세운: SajuResult["seun"];
+    basis: SajuResult["basis"];
     강한오행: string;
     약한오행: string;
     역법: string;
@@ -43,7 +53,7 @@ interface FortuneResult {
 export default function FortuneClient() {
   const goBack = useBackOrHome();
   const [birthDate, setBirthDate] = useState({ year: "", month: "", day: "" });
-  const [birthHour, setBirthHour] = useState<string>("모름");
+  const [birthHour, setBirthHour] = useState<HourSlotKey | "">("");
   const [isLunar, setIsLunar] = useState(false);
   const [isLeapMonth, setIsLeapMonth] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -79,7 +89,7 @@ export default function FortuneClient() {
           year: parseInt(birthDate.year),
           month: parseInt(birthDate.month),
           day: parseInt(birthDate.day),
-          hour: birthHour,
+          hourSlot: birthHour || null,
           isLunar,
           isLeapMonth: isLunar && isLeapMonth,
         }),
@@ -101,39 +111,14 @@ export default function FortuneClient() {
 
   const resetAll = () => {
     setBirthDate({ year: "", month: "", day: "" });
-    setBirthHour("모름");
+    setBirthHour("");
     setIsLunar(false);
     setResult(null);
     setIsLeapMonth(false);
   };
 
-  // 시간 옵션 (12지지 시간)
-  const hourOptions = [
-    { value: "모름", label: "모름" },
-    { value: "자시", label: "자시 (23:00-01:00)" },
-    { value: "축시", label: "축시 (01:00-03:00)" },
-    { value: "인시", label: "인시 (03:00-05:00)" },
-    { value: "묘시", label: "묘시 (05:00-07:00)" },
-    { value: "진시", label: "진시 (07:00-09:00)" },
-    { value: "사시", label: "사시 (09:00-11:00)" },
-    { value: "오시", label: "오시 (11:00-13:00)" },
-    { value: "미시", label: "미시 (13:00-15:00)" },
-    { value: "신시", label: "신시 (15:00-17:00)" },
-    { value: "유시", label: "유시 (17:00-19:00)" },
-    { value: "술시", label: "술시 (19:00-21:00)" },
-    { value: "해시", label: "해시 (21:00-23:00)" },
-  ];
-
   const renderStars = (rating: number) => {
     return "★".repeat(rating) + "☆".repeat(5 - rating);
-  };
-
-  const 오행색상: Record<string, string> = {
-    목: "text-[#5F6B4E]",
-    화: "text-accent",
-    토: "text-[#8A6A3B]",
-    금: "text-muted",
-    수: "text-[#3F5468]",
   };
 
   return (
@@ -186,17 +171,18 @@ export default function FortuneClient() {
               <label className="block text-sm text-muted mb-1">태어난 시간 (시주)</label>
               <select
                 value={birthHour}
-                onChange={(e) => setBirthHour(e.target.value)}
+                onChange={(e) => setBirthHour(e.target.value as HourSlotKey | "")}
                 className="w-full px-4 py-3 bg-card-2 border border-line rounded-xl text-center text-lg text-ink focus:outline-none focus:ring-2 focus:ring-accent/40 appearance-none cursor-pointer"
               >
-                {hourOptions.map((option) => (
-                  <option key={option.value} value={option.value} className="bg-white">
-                    {option.label}
+                <option value="" className="bg-white">모름</option>
+                {HOUR_SLOTS.map((slot) => (
+                  <option key={slot.key} value={slot.key} className="bg-white">
+                    {slot.label}
                   </option>
                 ))}
               </select>
               <p className="text-xs text-muted mt-1 text-center">
-                모르면 &apos;모름&apos; 선택 (시주 제외하고 분석)
+                모르면 &apos;모름&apos;을 고르세요. 시간을 알면 네 번째 기둥까지 계산해요
               </p>
             </div>
 
@@ -238,37 +224,18 @@ export default function FortuneClient() {
                 )}
               </div>
 
-              {/* 사주 정보 */}
-              <div className={`grid ${result.사주정보.시주 ? "grid-cols-4" : "grid-cols-3"} gap-2 text-center text-sm bg-card-2 rounded-xl p-3 mb-4 border border-line`}>
-                <div>
-                  <p className="text-muted text-xs">년주</p>
-                  <p className="font-bold text-ink">{result.사주정보.사주.년주}</p>
-                </div>
-                <div>
-                  <p className="text-muted text-xs">월주</p>
-                  <p className="font-bold text-ink">{result.사주정보.사주.월주}</p>
-                </div>
-                <div>
-                  <p className="text-muted text-xs">일주</p>
-                  <p className="font-bold text-ink">{result.사주정보.사주.일주}</p>
-                </div>
-                {result.사주정보.시주 && (
-                  <div>
-                    <p className="text-muted text-xs">시주</p>
-                    <p className="font-bold text-accent">{result.사주정보.시주}</p>
-                  </div>
-                )}
+              <SajuTable pillars={result.사주정보.기둥} />
+              <div className="mt-4">
+                <ElementBars elements={result.사주정보.오행분포} />
               </div>
+              <p className="mt-3 text-xs text-muted text-center">
+                가장 많은 기운은 {ELEMENT_COPY[result.사주정보.강한오행 as Element].easy}, 가장 적은 기운은 {ELEMENT_COPY[result.사주정보.약한오행 as Element].easy}이에요
+              </p>
+            </div>
 
-              {/* 오행 분포 */}
-              <div className="flex justify-between text-sm bg-card-2 rounded-xl p-3">
-                {Object.entries(result.사주정보.오행분포).map(([오행, 값]) => (
-                  <div key={오행} className="text-center">
-                    <p className={`text-lg font-bold ${오행색상[오행]}`}>{오행}</p>
-                    <p className="text-muted">{값}</p>
-                  </div>
-                ))}
-              </div>
+            {/* 올해와 나 */}
+            <div className="bg-white rounded-[22px] p-5 border border-line">
+              <SeunCard seun={result.사주정보.세운} dayBranch={result.사주정보.기둥.day.branch} />
             </div>
 
             {/* 총운 */}
@@ -403,6 +370,8 @@ export default function FortuneClient() {
                 </div>
               </div>
             </div>
+
+            <BasisDetails basis={result.사주정보.basis} />
 
             <CoupangBanner subId="fortune" />
 

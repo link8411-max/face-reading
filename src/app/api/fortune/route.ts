@@ -1,16 +1,21 @@
 import { NextRequest, NextResponse } from "next/server";
 import { computeFortune } from "@/lib/fortuneService";
+import { isHourSlotKey } from "@/lib/saju/keys";
 
 export async function POST(request: NextRequest) {
   try {
-    const { year, month, day, hour, isLunar, isLeapMonth } = await request.json();
+    const { year, month, day, hourSlot, isLunar, isLeapMonth } = await request.json();
 
     if (!year || !month || !day) {
       return NextResponse.json({ error: "생년월일이 필요합니다." }, { status: 400 });
     }
 
+    if (hourSlot != null && !isHourSlotKey(hourSlot)) {
+      return NextResponse.json({ error: "올바른 생년월일을 입력해 주세요." }, { status: 400 });
+    }
+
     // DB 기반 계산 (AI 호출 없음)
-    const result = computeFortune({ year, month, day, hour, isLunar: !!isLunar, isLeapMonth: !!isLeapMonth });
+    const result = computeFortune({ year, month, day, hourSlot: hourSlot ?? null, isLunar: !!isLunar, isLeapMonth: !!isLeapMonth });
     if ("error" in result) return NextResponse.json(result, { status: 400 });
     return NextResponse.json(result);
   } catch (error) {
