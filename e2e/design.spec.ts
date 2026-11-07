@@ -13,7 +13,7 @@ test('홈 대표 제목(h1)은 사이트 이름과 핵심 키워드, 시즌 문�
   await expect(page.locator('h1')).toHaveCount(1)
   await expect(page.locator('h1')).toContainText('운명을 읽다')
   await expect(page.locator('h1')).toContainText('관상')
-  await expect(page.getByRole('heading', { level: 2, name: /붉은 양의 해/ })).toBeVisible()
+  await expect(page.getByRole('heading', { level: 2, name: /내 사주,\s*쉬운 말로/ })).toBeVisible()
 })
 
 test('띠를 고르면 결과가 스크린리더에 읽힌다(aria-live)', async ({ page }) => {

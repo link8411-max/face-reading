@@ -1,14 +1,14 @@
 import { test, expect } from '@playwright/test'
 import { trackErrors } from './helpers'
 
-test('얼굴 히어로 → 관상, 시즌 카드 → 신년운세', async ({ page }) => {
+test('관상 히어로 → 관상, 시즌 카드 → 내 사주 풀이', async ({ page }) => {
   await page.goto('/')
   await expect(page.getByRole('heading', { name: /내 얼굴에는/ })).toBeVisible()
-  await page.getByRole('link', { name: '내 얼굴 보러 가기' }).click()
+  await page.getByRole('link', { name: '내 관상 보러 가기' }).click()
   await expect(page).toHaveURL(/\/face2$/)
   await page.goto('/')
-  await page.getByRole('link', { name: /지금 확인하기/ }).click()
-  await expect(page).toHaveURL(/\/fortune$/)
+  await page.getByRole('link', { name: /내 사주 보기/ }).click()
+  await expect(page).toHaveURL(/\/saju$/)
 })
 
 test('띠 바로 고르기: 양띠를 누르면 오늘의 운세가 메인에 나오고 두 링크로 이어진다', async ({ page }) => {
@@ -22,11 +22,11 @@ test('띠 바로 고르기: 양띠를 누르면 오늘의 운세가 메인에 �
   expect(errors).toEqual([])
 })
 
-test('묶음 탭 전환: 운세·사주를 누르면 운세 항목이 보인다', async ({ page }) => {
+test('묶음 탭 전환: 사주·운세를 누르면 운세 항목이 보인다', async ({ page }) => {
   await page.goto('/')
   const tabs = page.getByRole('region', { name: '테스트 묶음' })
   await expect(tabs.locator('a[href="/samguk"]')).toBeVisible()
-  await tabs.getByRole('tab', { name: '운세·사주' }).click()
+  await tabs.getByRole('tab', { name: '사주·운세' }).click()
   await expect(tabs.locator('a[href="/fortune/daily"]')).toBeVisible()
   await tabs.getByRole('tab', { name: '궁합' }).click()
   await expect(tabs.locator('a[href="/mbti/match"]')).toBeVisible()
@@ -37,7 +37,7 @@ test('홈에서 6개 테스트에 두 번 탭 이내로 도달', async ({ page }
     await page.goto('/')
     const direct = page.locator(`main a[href="${href}"]:visible`).first()
     if (await direct.count()) { await direct.click() } else {
-      await page.getByRole('region', { name: '테스트 묶음' }).getByRole('tab', { name: '운세·사주' }).click()
+      await page.getByRole('region', { name: '테스트 묶음' }).getByRole('tab', { name: '사주·운세' }).click()
       await page.locator(`main a[href="${href}"]:visible`).first().click()
     }
     await expect(page).toHaveURL(new RegExp(`${href.replace(/\//g, '\\/')}$`))
@@ -52,14 +52,18 @@ test('홈: hydration 오류 없음', async ({ page }) => {
   expect(errors.filter((e) => /hydrat/i.test(e))).toEqual([])
 })
 
-test('홈 순서: 히어로 → 친구랑 같이 → 띠 고르기 → 쿠팡 배너 → 묶음 탭 (배너가 첫 흐름을 막지 않는다)', async ({ page }) => {
+test('홈 순서: 히어로 → 시즌 카드 → 띠 고르기 → 친구랑 같이 → 쿠팡 배너 → 묶음 탭 (배너가 첫 흐름을 막지 않는다)', async ({ page }) => {
   await page.goto('/')
   const y = async (loc: import('@playwright/test').Locator) => (await loc.boundingBox())!.y
-  const together = await y(page.getByRole('region', { name: '친구랑 같이 해봐요' }))
+  const hero = await y(page.getByRole('region', { name: /내 얼굴에는/ }))
+  const season = await y(page.getByRole('region', { name: '내 사주 풀이' }))
   const picker = await y(page.getByRole('region', { name: '띠 바로 고르기' }))
+  const together = await y(page.getByRole('region', { name: '친구랑 같이 해봐요' }))
   const banner = await y(page.locator('iframe[title="쿠팡 추천 상품"]'))
   const tabs = await y(page.getByRole('region', { name: '테스트 묶음' }))
-  expect(together).toBeLessThan(picker)
-  expect(picker).toBeLessThan(banner)
+  expect(hero).toBeLessThan(season)
+  expect(season).toBeLessThan(picker)
+  expect(picker).toBeLessThan(together)
+  expect(together).toBeLessThan(banner)
   expect(banner).toBeLessThan(tabs)
 })

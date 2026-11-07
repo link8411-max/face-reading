@@ -1,5 +1,6 @@
 import Link from "next/link";
 import CoupangBanner from "@/components/CoupangBanner";
+import NextSteps from "@/components/result/NextSteps";
 import ContentCta from "@/components/ContentCta";
 import ArticleShare from "@/components/share/ArticleShare";
 import MonthlyFortune from "@/components/mbti/MonthlyFortune";
@@ -118,6 +119,8 @@ export default function MbtiArticle({ type }: { type: MbtiType }) {
       <MonthlyFortune month={p.monthly.month} text={p.monthly.text} lucky={p.monthly.lucky} visibleAtBuild={monthly !== null} />
 
       <CoupangBanner subId={`mbti-${slug}`} />
+
+      <NextSteps from="mbti" className="" />
 
       <section className={card}>
         <h2 className={h2}>자주 묻는 질문</h2>

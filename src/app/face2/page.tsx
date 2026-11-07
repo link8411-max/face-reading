@@ -12,6 +12,7 @@ import { useScreenshot } from "@/hooks/useScreenshot";
 import ResultActions from "@/components/result/ResultActions";
 import CoupangBanner from "@/components/CoupangBanner";
 import NextTests from "@/components/result/NextTests";
+import NextSteps from "@/components/result/NextSteps";
 import GuansangResultView from "@/components/face/GuansangResultView";
 import RevealMotion from "@/components/face/RevealMotion";
 import { useHandedPhoto } from "@/hooks/useHandedPhoto";
@@ -154,6 +155,7 @@ export default function Face2Page() {
                 <>
                   <div className="mt-2"><CoupangBanner subId="face" /></div>
                   <NextTests current="face" image={result.image} />
+                  <NextSteps from="face" withPhoto />
                 </>
               }
             />

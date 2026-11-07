@@ -159,7 +159,7 @@ export default function RootLayout({
                   <div key={c.key} className="space-y-3">
                     <p className="text-accent font-bold text-sm"><Link href={c.href}>{c.title}</Link></p>
                     <ul className="text-sm space-y-2 text-muted">
-                      {c.items.map((i) => (
+                      {c.items.filter((i) => i.footer !== false).map((i) => (
                         <li key={i.href}><Link href={i.href} className="hover:text-accent">{i.title}</Link></li>
                       ))}
                     </ul>

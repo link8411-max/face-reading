@@ -19,9 +19,9 @@ export default function FaceHero() {
         <br />
         담겨 있을까?
       </h2>
-      <p className="relative text-sm leading-relaxed text-muted mt-3">사진 한 장으로 보는 관상과 동물상</p>
+      <p className="relative text-sm leading-relaxed text-muted mt-3">사진 한 장으로 읽는 15가지 관상, 오행 얼굴형과 삼정까지</p>
       <Link href="/face2" className="relative mt-[22px] h-[52px] rounded-full flex items-center justify-center bg-ink text-paper text-[15px] font-medium">
-        내 얼굴 보러 가기
+        내 관상 보러 가기
       </Link>
       <p className="relative mt-2.5 text-xs text-muted text-center">사진은 저장되지 않아요</p>
     </section>

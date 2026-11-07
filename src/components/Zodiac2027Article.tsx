@@ -1,5 +1,6 @@
 import Link from "next/link";
 import SeasonPicks from "@/components/SeasonPicks";
+import NextSteps from "@/components/result/NextSteps";
 import { birthYears, SAMJAE_2027, zodiac2027, zodiacOgPath, zodiacUrl, ZODIAC_SLUGS, type ZodiacSlug } from "@/content/fortune2027Zodiac";
 import { FORTUNE_YEAR } from "@/lib/fortuneYear";
 import CoupangBanner from "@/components/CoupangBanner";
@@ -120,6 +121,8 @@ export default function Zodiac2027Article({ slug }: { slug: ZodiacSlug }) {
         <ArticleShare testName="zodiac" title={`${FORTUNE_YEAR.year} ${z.띠}띠 운세 – 운명을 읽다`} text={`${FORTUNE_YEAR.year}년 ${z.띠}띠 운세예요. 너도 확인해 봐`} url={url} imageUrl={`https://unse-ai.com${zodiacOgPath(slug)}`} />
 
         <SeasonPicks slot={`zodiac_${slug}`} />
+
+        <NextSteps from="zodiac" className="" />
 
         <Link href="/fortune" className="block text-center h-[52px] leading-[52px] bg-ink rounded-full font-medium text-paper">
           내 생년월일 사주로 {FORTUNE_YEAR.year} 운세 자세히 보기

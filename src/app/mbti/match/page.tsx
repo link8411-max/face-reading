@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import MatchCalculator from "@/components/mbti/MatchCalculator";
+import NextSteps from "@/components/result/NextSteps";
 import CoupangBanner from "@/components/CoupangBanner";
 
 export const metadata: Metadata = {
@@ -17,6 +18,7 @@ export default function MatchPage() {
         <p className="text-sm text-muted mt-1">두 유형을 고르면 연애·친구·직장 궁합 점수와 잘 맞는 이유를 알려 드려요.</p>
       </header>
       <MatchCalculator />
+      <NextSteps from="mbti" className="" />
       <CoupangBanner subId="mbti-match" />
     </div>
   );

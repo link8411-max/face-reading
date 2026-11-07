@@ -4,6 +4,7 @@ import SeasonPicks from "@/components/SeasonPicks";
 import { track } from "@/lib/analytics";
 import { useEffect, useRef, useState } from "react";
 import CoupangBanner from "@/components/CoupangBanner";
+import NextSteps from "@/components/result/NextSteps";
 import { useBackOrHome } from "@/hooks/useBackOrHome";
 import TestHeader from "@/components/test/TestHeader";
 import { Icon } from "@/components/icons";
@@ -209,6 +210,8 @@ export default function DailyFortunePage() {
 
             <SeasonPicks slot="daily" />
             <CoupangBanner subId="daily" />
+
+            <NextSteps from="daily" className="" />
 
             <Link href="/mbti/match" className="block w-full py-3 text-center bg-white border border-line rounded-full font-medium">
               MBTI 궁합도 보기

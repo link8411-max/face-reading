@@ -2,9 +2,18 @@ import { readFileSync } from 'node:fs'
 import { SEASON } from '@/content/season'
 import { HOME_FAQS } from '@/content/homeFaq'
 
-test('시즌 히어로 설정: 2027 신년운세로 연결', () => {
-  expect(SEASON.cta.href).toBe('/fortune')
-  expect(SEASON.chip).toContain('2027')
+test('시즌 카드: 평소는 내 사주 풀이, 12~1월 신년운세 값은 주석으로 남아 있다', () => {
+  expect(SEASON.cta.href).toBe('/saju')
+  const src = readFileSync('src/content/season.ts', 'utf8')
+  expect(src).toMatch(/\/\/\s+cta: \{ label: '지금 확인하기', href: '\/fortune' \}/)
+})
+
+test('홈 순서: 관상 히어로 → 시즌 카드 → 띠 → 친구랑 → 쿠팡 → 묶음 탭 → FAQ, 하단 띠 칩 목록 없음', () => {
+  const src = readFileSync('src/app/page.tsx', 'utf8')
+  const order = ['<FaceHero', '<SeasonCard', '<ZodiacPicker', '<PlayTogether', '<CoupangBanner', '<SeasonPicks', '<CategoryTabs', 'HOME_FAQS.map((f)'].map((k) => src.indexOf(k))
+  expect(order.every((v) => v > 0)).toBe(true)
+  expect([...order].sort((a, b) => a - b)).toEqual(order)
+  expect(src).not.toContain('ZODIAC_SLUGS')
 })
 
 test('홈은 서버 페이지이고 시즌 설정·FAQ 데이터를 쓴다', () => {
@@ -46,7 +55,7 @@ test('홈에 "곧 열려요" 같은 열리지 않은 기능 안내가 없다', (
   for (const f of HOME_FILES) expect(readFileSync(f, 'utf8'), f).not.toContain('곧 열려요')
 })
 
-test('친구랑 같이 해봐요: 관상·동물상·삼국지·얼굴 궁합 4개', async () => {
+test('친구랑 같이 해봐요: 동물상·얼굴 궁합·MBTI 궁합·삼국지 (관상은 히어로가 맡음)', async () => {
   const { PLAY_TOGETHER } = await import('@/components/home/PlayTogether')
-  expect(PLAY_TOGETHER.map((c) => c.href)).toEqual(['/face2', '/animal', '/samguk', '/face-match'])
+  expect(PLAY_TOGETHER.map((c) => c.href)).toEqual(['/animal', '/face-match', '/mbti/match', '/samguk'])
 })

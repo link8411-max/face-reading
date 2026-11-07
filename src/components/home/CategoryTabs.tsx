@@ -5,7 +5,7 @@ import CategoryList from "@/components/CategoryList";
 import { CATEGORIES } from "@/content/navigation";
 import { Icon } from "@/components/icons";
 
-// 메인의 묶음 탭 (얼굴 테스트 / 운세·사주 / MBTI)
+// 메인의 묶음 탭 (관상 / 사주·운세 / 궁합)
 export default function CategoryTabs() {
   const [active, setActive] = useState(CATEGORIES[0].key);
   const category = CATEGORIES.find((c) => c.key === active)!;

@@ -1,7 +1,7 @@
 import { test, expect } from '@playwright/test'
 import { existsSync } from 'node:fs'
 
-const CASES: [string, string][] = [['/', '홈'], ['/face2', '얼굴'], ['/samguk', '얼굴'], ['/fortune', '운세'], ['/fortune/daily', '운세'], ['/fortune/2027/sheep', '운세'], ['/about', '홈']]
+const CASES: [string, string][] = [['/', '홈'], ['/face2', '관상'], ['/samguk', '관상'], ['/fortune', '사주·운세'], ['/fortune/daily', '사주·운세'], ['/fortune/2027/sheep', '사주·운세'], ['/about', '홈']]
 
 for (const [path, label] of CASES) {
   test(`${path}: 하단 탭바가 있고 "${label}" 탭이 현재 탭`, async ({ page }) => {
@@ -15,7 +15,7 @@ for (const [path, label] of CASES) {
 test('탭을 눌러 묶음 페이지로 이동', async ({ page }) => {
   await page.goto('/')
   const bar = page.getByRole('navigation', { name: '하단 메뉴' })
-  for (const [label, url] of [['얼굴', /\/face-tests$/], ['운세', /\/unse$/], ['궁합', /\/mbti$/], ['홈', /3200\/$/]] as const) {
+  for (const [label, url] of [['관상', /\/face-tests$/], ['사주·운세', /\/unse$/], ['궁합', /\/mbti$/], ['홈', /3200\/$/]] as const) {
     await bar.getByRole('link', { name: label }).click()
     await expect(page).toHaveURL(url)
   }

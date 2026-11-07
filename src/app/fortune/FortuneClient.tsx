@@ -12,6 +12,7 @@ import { FORTUNE_YEAR } from "@/lib/fortuneYear";
 import { SLUG_BY_띠 } from "@/content/fortune2027Zodiac";
 import { validateBirthDate } from "@/lib/birthDate";
 import Link from "next/link";
+import NextSteps from "@/components/result/NextSteps";
 import { useScreenshot } from "@/hooks/useScreenshot";
 import { SITE } from "@/lib/shareLinks";
 import { HOUR_SLOTS, type Element, type HourSlotKey } from "@/lib/saju/keys";
@@ -375,6 +376,8 @@ export default function FortuneClient() {
 
             <CoupangBanner subId="fortune" />
 
+            <NextSteps from="fortune" className="mb-4" />
+
             {/* 버튼 */}
             <Link
               href={`/fortune/2027/${SLUG_BY_띠[result.사주정보.띠]}`}
@@ -387,9 +390,6 @@ export default function FortuneClient() {
               className="block w-full mb-2 py-3 text-center bg-white border border-line rounded-full font-medium"
             >
               MBTI 궁합도 보기
-            </Link>
-            <Link href="/face2" className="block w-full py-3 text-center bg-white border border-line rounded-full font-medium">
-              내 얼굴 관상도 보기
             </Link>
           </div>
         )}

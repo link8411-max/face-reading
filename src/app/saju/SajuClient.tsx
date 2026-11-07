@@ -10,6 +10,7 @@ import TestHeader from "@/components/test/TestHeader";
 import GenderPills from "@/components/test/GenderPills";
 import BirthDateFields from "@/components/BirthDateFields";
 import ResultActions from "@/components/result/ResultActions";
+import NextSteps from "@/components/result/NextSteps";
 import CoupangBanner from "@/components/CoupangBanner";
 import SajuResultView from "@/components/saju/SajuResultView";
 import { validateBirthDate } from "@/lib/birthDate";
@@ -17,7 +18,6 @@ import { HOUR_SLOTS, isHourSlotKey } from "@/lib/saju/keys";
 import type { SajuResult } from "@/lib/saju/engine";
 import { DAY_MASTER_COPY } from "@/content/saju";
 import { ogImageUrl, parseShared, shareUrl } from "@/lib/shareLinks";
-import Link from "next/link";
 
 const FAIL_TEXT: Record<string, string> = {
   range: "1900년부터 올해까지의 날짜만 계산할 수 있어요. 음력은 2100년까지 볼 수 있어요.",
@@ -190,10 +190,7 @@ export default function SajuClient() {
             after={
               <>
                 <div className="mt-2"><CoupangBanner subId="saju" /></div>
-                <nav className="no-screenshot mt-4 grid grid-cols-2 gap-2" aria-label="다른 운세">
-                  <Link href="/fortune" className="h-12 rounded-full bg-white border border-line text-sm font-medium flex items-center justify-center">신년운세</Link>
-                  <Link href="/fortune/daily" className="h-12 rounded-full bg-white border border-line text-sm font-medium flex items-center justify-center">오늘의 운세</Link>
-                </nav>
+                <NextSteps from="saju" />
               </>
             }
           />

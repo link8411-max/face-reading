@@ -2,8 +2,8 @@ import { test, expect } from '@playwright/test'
 import { trackErrors } from './helpers'
 
 for (const [path, h1, links] of [
-  ['/face-tests', '얼굴 테스트', ['/samguk', '/animal', '/face2']],
-  ['/unse', '운세·사주', ['/fortune', '/fortune/2027', '/fortune/daily']],
+  ['/face-tests', '관상·얼굴 테스트', ['/face2', '/animal', '/samguk', '/samguk/videos']],
+  ['/unse', '사주·운세', ['/saju', '/fortune', '/fortune/2027', '/fortune/daily']],
 ] as const) {
   test(`${path} 허브: 항목 링크가 모두 있고 이동된다`, async ({ page }) => {
     const errors = trackErrors(page)

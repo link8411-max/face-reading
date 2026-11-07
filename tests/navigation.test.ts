@@ -1,8 +1,8 @@
 import { TABS, CATEGORIES, tabForPath } from '@/content/navigation'
 import { SITEMAP_ROUTES } from '@/app/sitemap'
 
-test('탭 4개: 홈·얼굴·운세·궁합 (주소는 그대로)', () => {
-  expect(TABS.map((t) => [t.label, t.href])).toEqual([['홈', '/'], ['얼굴', '/face-tests'], ['운세', '/unse'], ['궁합', '/mbti']])
+test('탭 4개: 홈·관상·사주·운세·궁합 (주소는 그대로)', () => {
+  expect(TABS.map((t) => [t.label, t.href])).toEqual([['홈', '/'], ['관상', '/face-tests'], ['사주·운세', '/unse'], ['궁합', '/mbti']])
 })
 
 test('메뉴 데이터에 이모지가 없다 (선 아이콘으로 대체)', () => {

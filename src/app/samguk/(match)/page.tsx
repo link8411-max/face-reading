@@ -12,6 +12,7 @@ import ResultActions from "@/components/result/ResultActions";
 import { duelCta } from "@/lib/duel/cta";
 import ResultVideos from "@/components/videos/ResultVideos";
 import NextTests from "@/components/result/NextTests";
+import NextSteps from "@/components/result/NextSteps";
 import { useHandedPhoto } from "@/hooks/useHandedPhoto";
 import { useResultShare } from "@/hooks/useResultShare";
 import { faceSlug, ogImageUrl, parseShared, shareUrl, SITE } from "@/lib/shareLinks";
@@ -243,6 +244,7 @@ export default function SamgukPage() {
               </div>
               <ResultVideos id={result.character.id} name={result.character.name} />
               {image && <NextTests current="samguk" image={image} />}
+              <NextSteps from="samguk" withPhoto={!!image} />
 
               <details className="group mt-4 bg-white border border-line rounded-[22px] px-5 py-4">
                 <summary className="font-bold cursor-pointer list-none flex justify-between items-center">

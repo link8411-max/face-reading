@@ -42,7 +42,7 @@ export const SITEMAP_ROUTES = [
 
 // 페이지 내용을 바꾸면 해당 라우트 날짜도 갱신할 것 (new Date()를 쓰면 매 요청마다 바뀌어 검색엔진이 무시함)
 export const LAST_MODIFIED: Record<string, string> = {
-    '': '2026-10-26',
+    '': '2026-11-07',
     '/face2': '2026-11-07',
     '/fortune': '2026-11-07',
     '/saju': '2026-11-07',
@@ -50,14 +50,14 @@ export const LAST_MODIFIED: Record<string, string> = {
     '/fortune/daily': '2026-11-05',
     '/samguk': '2026-11-07',
     '/animal': '2026-11-07',
-    '/face-tests': '2026-10-26',
-    '/unse': '2026-10-26',
+    '/face-tests': '2026-11-07',
+    '/unse': '2026-11-07',
     '/about': '2026-10-26',
     '/privacy': '2026-11-04',
     '/fortune/2027': '2026-11-07',
     ...Object.fromEntries(ZODIAC_SLUGS.map((s) => [`/fortune/2027/${s}`, '2026-11-07'])),
-    '/mbti': '2026-10-26',
-    '/mbti/match': '2026-10-26',
+    '/mbti': '2026-11-07',
+    '/mbti/match': '2026-11-07',
     '/face-match': '2026-10-27',
     '/samguk/team': '2026-10-27',
     '/samguk/duel': '2026-10-28',

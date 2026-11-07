@@ -24,9 +24,9 @@ for (const path of PAGES) {
 test('홈 → 각 테스트 → 돌아가기 → 홈', async ({ page }) => {
   for (const path of TEST_PAGES) {
     await page.goto('/')
-    // 4a 새 메인: 운세 항목은 '운세·사주' 묶음 탭 안에 있다
+    // 4a 새 메인: 운세 항목은 '사주·운세' 묶음 탭 안에 있다
     const direct = page.locator(`main a[href="${path}"]:visible`).first()
-    if (!(await direct.count())) await page.getByRole('region', { name: '테스트 묶음' }).getByRole('tab', { name: '운세·사주' }).click()
+    if (!(await direct.count())) await page.getByRole('region', { name: '테스트 묶음' }).getByRole('tab', { name: '사주·운세' }).click()
     await page.locator(`main a[href="${path}"]:visible`).first().click()
     await expect(page).toHaveURL(new RegExp(`${path}$`))
     await page.getByRole('button', { name: /돌아가기/ }).click()
