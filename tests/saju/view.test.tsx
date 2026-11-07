@@ -13,7 +13,7 @@ const html = (r: SajuResult, birthLine?: string) => renderToStaticMarkup(<SajuRe
 test('1990-05-15 미시 남: 네 기둥·일간·십신·대운·세운·근거가 나온다', () => {
   const r = run()
   const h = html(r, '1990년 5월 15일생 · 양력')
-  for (const t of ['>庚<', '>午<', '나는 바위 같은 사람이에요', '경금 일간', '내 사주에서 제일 센 것 두 가지', '다섯 기운', '지금 10년의 흐름', '8~17세', '2027년은 나에게', '정미년 · ', '조심할 점 하나', '어떻게 계산했나요', SOURCE_LINE]) expect(h).toContain(t)
+  for (const t of ['>庚<', '>午<', '나는 바위 같은 사람이에요', '경금 일간', '내 사주에서 제일 센 것 두 가지', '다섯 기운', '지금 10년의 흐름', '8~17세', '2027년은 나에게', '정미년 · ', '조심할 점 하나', '어떻게 계산했고, 왜 믿을 수 있나요', SOURCE_LINE]) expect(h).toContain(t)
   for (const g of r.tenGods.top.slice(0, 2)) {
     expect(h).toContain(TEN_GOD_COPY[g].label)
     expect(h).toContain(tenGodBasis(g, r.tenGods.counts[g]))

@@ -201,3 +201,14 @@ describe('사주 문구', () => {
     expect(RELATION_COPY['없음']).toContain('담담');
   });
 });
+
+describe('왜 믿을 수 있나요', () => {
+  it('근거 문구가 있고 금지어가 없다', async () => {
+    const { TRUST_COPY } = await import('@/content/saju')
+    expect(TRUST_COPY.lines.length).toBe(4)
+    const all = TRUST_COPY.lines.join(' ')
+    expect(all).toContain('한국천문연구원')
+    expect(all).toContain('달력 계산')
+    for (const w of ['백호', '흉운', '액운', '재앙', '수명']) expect(all).not.toContain(w)
+  })
+})
