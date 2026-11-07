@@ -17,6 +17,7 @@
     "@vladmandic/face-api": "^1.7.15",
     "html2canvas": "^1.4.1",
     "korean-lunar-calendar": "0.4.0",
+    "manseryeok": "2.0.0",
     "modern-screenshot": "^4.6.7",
     "next": "16.0.10",
     "phaser": "3.90.0",
