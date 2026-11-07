@@ -52,7 +52,7 @@ export const LAST_MODIFIED: Record<string, string> = {
     '/unse': '2026-10-26',
     '/about': '2026-10-26',
     '/privacy': '2026-11-04',
-    '/fortune/2027': '2026-10-26',
+    '/fortune/2027': '2026-11-07',
     ...Object.fromEntries(ZODIAC_SLUGS.map((s) => [`/fortune/2027/${s}`, '2026-11-07'])),
     '/mbti': '2026-10-26',
     '/mbti/match': '2026-10-26',
