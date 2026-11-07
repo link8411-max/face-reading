@@ -133,7 +133,7 @@ test.describe('카카오톡 인앱 브라우저', () => {
   // 운세는 결과 링크 대신 띠별 운세·오늘의 운세 페이지로 보낸다 (생년월일은 링크에 없음)
   for (const c of [
     { name: '신년운세', path: '/fortune', fill: async (page: Page) => { await page.getByPlaceholder('1990').fill('1991'); await page.getByPlaceholder('5', { exact: true }).fill('5'); await page.getByPlaceholder('15', { exact: true }).fill('15') }, link: /^https:\/\/unse-ai\.com\/fortune\/2027\/sheep\?utm_source=share&utm_medium=friend_link&utm_campaign=fortune$/, image: /^https:\/\/unse-ai\.com\/api\/og\?title=2027%EB%85%84/, title: /^2027년 양띠 운세는 '.+'래\. 너도 봐줄까\?$/, test: 'fortune' },
-    { name: '오늘의 운세', path: '/fortune/daily', fill: async (page: Page) => { await page.getByPlaceholder('예: 1990').fill('1991') }, link: /^https:\/\/unse-ai\.com\/fortune\/daily\?utm_source=share&utm_medium=friend_link&utm_campaign=daily$/, image: /^https:\/\/unse-ai\.com\/api\/og\?title=/, title: /^오늘 양띠 운세는 '.+'래\. 너도 봐줄까\?$/, test: 'daily' },
+    { name: '오늘의 운세', path: '/fortune/daily', fill: async (page: Page) => { await page.getByPlaceholder('예: 1990').fill('1991') }, link: /^https:\/\/unse-ai\.com\/fortune\/daily\?utm_source=share&utm_medium=friend_link&utm_campaign=daily$/, image: /^https:\/\/unse-ai\.com\/api\/og\?title=/, title: /^오늘 .+년 양띠 운세는 '.+'래\. 너도 봐줄까\?$/, test: 'daily' },
   ]) {
     test(`${c.name} 공유하기: 카카오톡 공유 카드(띠 페이지 링크·미리보기 이미지), 생년월일은 보내지 않는다`, async ({ page }) => {
       await page.addInitScript(() => {

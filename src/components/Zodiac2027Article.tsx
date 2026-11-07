@@ -1,8 +1,10 @@
 import Link from "next/link";
 import SeasonPicks from "@/components/SeasonPicks";
-import { birthYears, SAMJAE_2027, zodiac2027, ZODIAC_SLUGS, type ZodiacSlug } from "@/content/fortune2027Zodiac";
+import { birthYears, SAMJAE_2027, zodiac2027, zodiacOgPath, zodiacUrl, ZODIAC_SLUGS, type ZodiacSlug } from "@/content/fortune2027Zodiac";
 import { FORTUNE_YEAR } from "@/lib/fortuneYear";
 import CoupangBanner from "@/components/CoupangBanner";
+import ContentCta from "@/components/ContentCta";
+import ArticleShare from "@/components/share/ArticleShare";
 
 const card = "bg-white rounded-[22px] border border-line p-5";
 const h2 = "font-serif font-bold text-lg mb-2";
@@ -21,7 +23,7 @@ export default function Zodiac2027Article({ slug }: { slug: ZodiacSlug }) {
   const z = zodiac2027[slug];
   const years = birthYears(slug);
   const faqs = zodiacFaqs(slug);
-  const url = `https://unse-ai.com/fortune/2027/${slug}`;
+  const url = zodiacUrl(slug);
   const jsonLd = [
     {
       "@context": "https://schema.org", "@type": "Article",
@@ -88,6 +90,8 @@ export default function Zodiac2027Article({ slug }: { slug: ZodiacSlug }) {
           </ol>
         </section>
 
+        <ContentCta href="/face2" title={`${z.띠}띠인 내 얼굴은 무슨 상일까?`} desc="사진 한 장이면 관상 풀이가 1분 안에 나와요. 사진은 저장하지 않아요." label="내 관상 보기" />
+
         <section className={card}>
           <h2 className={h2}>{FORTUNE_YEAR.year}년 잘 맞는 띠</h2>
           <p className="leading-relaxed">{z.궁합}</p>
@@ -112,6 +116,8 @@ export default function Zodiac2027Article({ slug }: { slug: ZodiacSlug }) {
           <h2 className={h2}>한마디 조언</h2>
           <p className="leading-relaxed">{z.조언}</p>
         </section>
+
+        <ArticleShare testName="zodiac" title={`${FORTUNE_YEAR.year} ${z.띠}띠 운세 – 운명을 읽다`} text={`${FORTUNE_YEAR.year}년 ${z.띠}띠 운세예요. 너도 확인해 봐`} url={url} imageUrl={`https://unse-ai.com${zodiacOgPath(slug)}`} />
 
         <SeasonPicks slot={`zodiac_${slug}`} />
 

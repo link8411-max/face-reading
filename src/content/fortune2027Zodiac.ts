@@ -1,6 +1,7 @@
 // 2027 정미년(丁未年) 띠별 운세 본문 — /fortune/2027/[zodiac] 정적 페이지용
 // 정미년의 정화(丁火)·미토(未土)와 각 띠 지지의 합·충·형 관계를 바탕으로 썼다. 재미로 읽는 운세다.
 
+import { FORTUNE_YEAR } from '@/lib/fortuneYear'
 export const ZODIAC_SLUGS = ['rat', 'ox', 'tiger', 'rabbit', 'dragon', 'snake', 'horse', 'sheep', 'monkey', 'rooster', 'dog', 'pig'] as const
 export type ZodiacSlug = (typeof ZODIAC_SLUGS)[number]
 
@@ -283,3 +284,8 @@ export const zodiac2027: Record<ZodiacSlug, Zodiac2027> = {
     조언: '올해 돼지띠의 키워드는 결실이에요. 그동안 묵묵히 걸어온 길이 드디어 빛을 보는 해예요. 좋은 일이 생길수록 감사한 마음을 잊지 않으면 행운이 오래 머물러요. 넉넉할 때 나눈 정은 언젠가 더 큰 복으로 돌아와요.',
   },
 }
+
+// 띠 글의 정식 주소와 공유 미리보기 이미지 경로 (page.tsx의 메타데이터와 글 안 공유하기가 함께 쓴다)
+export const zodiacUrl = (slug: ZodiacSlug) => `https://unse-ai.com/fortune/2027/${slug}`
+export const zodiacOgPath = (slug: ZodiacSlug) =>
+  `/api/og?title=${encodeURIComponent(`${FORTUNE_YEAR.year}년 ${zodiac2027[slug].띠}띠 운세`)}&subtitle=${encodeURIComponent(`${FORTUNE_YEAR.간지}년 띠별 신년운세`)}`

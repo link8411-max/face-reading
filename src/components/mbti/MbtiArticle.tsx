@@ -1,7 +1,9 @@
 import Link from "next/link";
 import CoupangBanner from "@/components/CoupangBanner";
+import ContentCta from "@/components/ContentCta";
+import ArticleShare from "@/components/share/ArticleShare";
 import MonthlyFortune from "@/components/mbti/MonthlyFortune";
-import { mbtiProfiles, monthlyFor } from "@/content/mbtiTypes";
+import { mbtiOgPath, mbtiProfiles, mbtiUrl, monthlyFor } from "@/content/mbtiTypes";
 import { MBTI_TYPES, bestMatches, compatSummary, type MbtiType } from "@/lib/mbti/compat";
 
 const card = "bg-white border border-line rounded-3xl p-5";
@@ -20,7 +22,7 @@ export function mbtiFaqs(type: MbtiType) {
 export default function MbtiArticle({ type }: { type: MbtiType }) {
   const p = mbtiProfiles[type];
   const slug = type.toLowerCase();
-  const url = `https://unse-ai.com/mbti/${slug}`;
+  const url = mbtiUrl(type);
   const faqs = mbtiFaqs(type);
   const ranking = MBTI_TYPES.map((b) => ({ b, s: compatSummary(type, b) })).sort((x, y) => y.s.total - x.s.total || x.b.localeCompare(y.b));
   const jsonLd = [
@@ -95,6 +97,8 @@ export default function MbtiArticle({ type }: { type: MbtiType }) {
 
       <section className={card}><h2 className={h2}>{type}의 연애 스타일</h2><p className="leading-relaxed">{p.love}</p></section>
 
+      <ContentCta href="/face2" title={`${type}인 내 얼굴은 무슨 상일까?`} desc="사진 한 장이면 관상 풀이가 1분 안에 나와요. 사진은 저장하지 않아요." label="내 관상 보기" />
+
       <section className={card}>
         <h2 className={h2}>{type}와 잘 맞는 여행지</h2>
         <h3 className="font-bold text-sm mt-1">국내</h3>
@@ -108,6 +112,8 @@ export default function MbtiArticle({ type }: { type: MbtiType }) {
         <ul className="space-y-1.5 text-sm">{p.jobs.map((j) => <li key={j.title}><b>{j.title}</b> — {j.why}</li>)}</ul>
         <p className="leading-relaxed text-sm mt-3">{p.workStyle}</p>
       </section>
+
+      <ArticleShare testName="mbti" title={`${p.nickname} ${type} 특징·궁합 – 운명을 읽다`} text={`${type} 특징이랑 궁합 1위 정리해 둔 글이야. 너도 봐`} url={url} imageUrl={`https://unse-ai.com${mbtiOgPath(type)}`} />
 
       <MonthlyFortune month={p.monthly.month} text={p.monthly.text} lucky={p.monthly.lucky} visibleAtBuild={monthly !== null} />
 

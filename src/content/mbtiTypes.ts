@@ -476,3 +476,8 @@ export function pageText(type: MbtiType): string {
 }
 
 export const MBTI_SLUGS = MBTI_TYPES.map((t) => t.toLowerCase())
+
+// MBTI 글의 정식 주소와 공유 미리보기 이미지 경로 (page.tsx의 메타데이터와 글 안 공유하기가 함께 쓴다)
+export const mbtiUrl = (type: MbtiType) => `https://unse-ai.com/mbti/${type.toLowerCase()}`
+export const mbtiOgPath = (type: MbtiType) =>
+  `/api/og?title=${encodeURIComponent(`${type} ${mbtiProfiles[type].nickname}`)}&subtitle=${encodeURIComponent("MBTI 궁합·연애·직업")}`
