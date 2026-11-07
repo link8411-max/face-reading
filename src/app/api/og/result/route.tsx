@@ -15,7 +15,7 @@ import { mbtiProfiles } from '@/content/mbtiTypes';
 
 export const runtime = 'edge';
 
-const KINDS: ShareKind[] = ['animal', 'samguk', 'face'];
+const KINDS: ShareKind[] = ['animal', 'samguk', 'face', 'saju'];
 
 // 결과 공유 미리보기 이미지 (1200×630, 카카오 권장 비율). 값은 허용 목록·점수 범위로 검증한 것만 그린다.
 export async function GET(request: NextRequest) {
@@ -61,7 +61,7 @@ export async function GET(request: NextRequest) {
     const r = parseShared(kind as ShareKind, q.get('key') ?? '', q.get('s') ?? undefined);
     if (!r) return new Response('bad request', { status: 400 });
     big = r.name; score = r.score !== null ? `닮음 ${r.score}%` : ''; phrase = r.phrase;
-    label = kind === 'animal' ? '동물상 테스트' : kind === 'samguk' ? '나는 삼국지 속 누구?' : 'AI 관상 테스트';
+    label = kind === 'animal' ? '동물상 테스트' : kind === 'samguk' ? '나는 삼국지 속 누구?' : kind === 'saju' ? '내 사주 풀이' : 'AI 관상 테스트';
     if (r.image) await loadPortrait(r.image);
   } else if (kind === 'duel') {
     const key = q.get('key') ?? '';

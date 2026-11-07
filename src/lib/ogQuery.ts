@@ -5,6 +5,7 @@ const PARAMS: Record<string, string[]> = {
   animal: ['key', 's'],
   samguk: ['key', 's'],
   face: ['key'],
+  saju: ['key'],
   mbti: ['a', 'b'],
   'face-match': ['a', 'b', 'rel'],
   invite: ['key', 'rel'],

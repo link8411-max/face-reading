@@ -74,3 +74,20 @@ test('MBTI 공유 링크는 계산기와 다른 주소(/mbti/r/a-b)로, 대소�
   expect(new URL(mbtiShared('INFP', 'ENTJ')!.url).pathname).toBe('/mbti/r/infp-entj')
   expect(mbtiShared('infp', 'entj')?.a).toBe('INFP')
 })
+
+import { STEM_KEY } from '@/lib/saju/keys'
+import { DAY_MASTER_COPY } from '@/content/saju'
+import { STEMS } from '@/lib/saju/keys'
+
+test('사주: 일간 10키 전부 통과, 모르는 키는 null, 링크에 점수 없음', () => {
+  for (const st of STEMS) {
+    const r = parseShared('saju', STEM_KEY[st])!
+    expect(r.name).toBe(DAY_MASTER_COPY[st].title)
+    expect(r.phrase).toMatch(/^나는 .+(이래|래)\. 너는\?$/)
+    expect(r.phrase).not.toContain('나는 나는')
+    expect(r.testPath).toBe('/saju')
+  }
+  expect(parseShared('saju', 'bogus')).toBeNull()
+  expect(parseShared('saju', 'constructor')).toBeNull()
+  expect(shareUrl('saju', 'gyeong', 80)).toBe('https://unse-ai.com/saju/r/gyeong?utm_source=share&utm_medium=friend_link&utm_campaign=saju')
+})

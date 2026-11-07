@@ -6,7 +6,7 @@ import { samgukCharacters } from '@/lib/samgukDB'
 import { GUANSANG_TYPES } from '@/content/guansang'
 import { GUANSANG_TYPE_KEYS } from '@/lib/face/guansangKeys'
 
-export type GuideRoute = '/face2' | '/animal' | '/samguk' | '/samguk/duel' | '/fortune' | '/fortune/daily' | '/fortune/mbti'
+export type GuideRoute = '/face2' | '/animal' | '/samguk' | '/samguk/duel' | '/fortune' | '/fortune/daily' | '/fortune/mbti' | '/saju'
 
 // 가이드가 없어도 관련 링크로 걸 수 있는 페이지
 export type RelatedRoute = GuideRoute | '/samguk/team'
@@ -33,9 +33,31 @@ export const TEST_LINKS: Record<RelatedRoute, { label: string }> = {
   '/fortune': { label: '사주 신년운세' },
   '/fortune/daily': { label: '띠별 오늘의 운세' },
   '/fortune/mbti': { label: '오늘의 MBTI 운세' },
+  '/saju': { label: '내 사주 풀이' },
 }
 
 export const pageGuides: Record<GuideRoute, PageGuideData> = {
+  '/saju': {
+    heading: '내 사주 풀이, 이렇게 봐요',
+    summary: '생년월일과 태어난 시간으로 네 기둥과 오행의 균형, 십신, 10년 단위 대운과 올해 흐름을 쉬운 말로 풀어 드려요.',
+    intro: [
+      '사주는 태어난 해·달·날·시를 각각 하늘의 기운(천간)과 땅의 기운(지지) 두 글자로 나타낸 네 기둥, 모두 여덟 글자로 나를 읽는 오래된 해석 방법이에요. 태어난 시간을 모르면 시주를 뺀 세 기둥으로 풀어요.',
+      '운명을 읽다의 내 사주 풀이는 한 해의 경계를 1월 1일이 아니라 절기가 들어오는 시각으로 나눠 네 기둥을 계산해요. 그 위에서 나를 나타내는 일간, 다섯 기운(오행)의 균형, 나와 다른 글자의 관계를 이름 붙인 십신, 10년마다 바뀌는 대운, 올해(세운)와 내 일지의 관계를 한국어로 쉽게 설명해요. 전통 용어는 쉬운 이름 옆에 함께 적어 두어서 어디서 나온 말인지 확인할 수 있어요.',
+      '결과마다 어떤 글자 때문에 그렇게 읽었는지 근거를 같이 보여 드리고, 계산 기준은 결과 아래 어떻게 계산했나요에서 펼쳐 볼 수 있어요. 해석은 유파에 따라 달라질 수 있는 재미 삼아 보는 풀이이니, 중요한 결정의 근거로 삼기보다 나를 돌아보는 참고로 읽어 주세요.',
+    ],
+    highlights: [
+      { title: '네 기둥과 오행', body: '년·월·일·시 네 기둥을 한자와 한글로 보여 주고, 목·화·토·금·수 다섯 기운이 얼마나 있는지 막대로 보여 드려요.' },
+      { title: '십신과 대운', body: '많이 나타나는 십신 두 가지를 쉬운 이름으로 풀고, 10년마다 바뀌는 대운 여덟 구간에서 지금 어디에 있는지 알려 드려요.' },
+      { title: '올해와 나, 계산 근거', body: '올해 세운과 내 일지의 관계를 한 줄로 읽고, 절기·날짜 경계·서머타임 같은 계산 기준을 접어 둔 칸에서 확인할 수 있어요.' },
+    ],
+    faqs: [
+      { q: '태어난 시간을 몰라도 볼 수 있나요?', a: '네. 시간을 모르면 \'모름\'을 고르세요. 시주를 뺀 년·월·일 세 기둥으로 풀고, 시간을 알게 되면 다시 해서 시주까지 볼 수 있어요.' },
+      { q: '음력 생일도 되나요?', a: '네. 음력을 고르고 윤달이면 체크하세요. 음력 날짜를 양력으로 바꿔서 계산하고, 바꾼 양력 날짜도 결과에 함께 보여 드려요.' },
+      { q: '1월이나 2월 초에 태어났는데 띠와 해가 달라요.', a: '사주에서는 새해를 1월 1일이나 설이 아니라 입춘 절기가 들어오는 시각에 시작해요. 입춘 전에 태어났다면 전년도 기둥으로 보고, 절기가 바뀌는 날에 태어났는데 시간을 모르면 결과 위에 그 시각과 달라질 수 있는 기둥을 알려 드려요.' },
+      { q: '입력한 생년월일은 저장되나요?', a: '아니요. 생년월일과 시간, 성별은 계산에만 쓰고 저장하지 않으며 공유 링크와 공유 이미지에도 담기지 않아요. 친구에게 보내는 링크에는 내 일간(열 가지 중 하나)만 들어가요.' },
+    ],
+    related: ['/fortune', '/fortune/daily'],
+  },
   '/fortune/mbti': {
     heading: '오늘의 MBTI 운세, 이렇게 봐요',
     summary: 'MBTI만 고르면 생년월일 없이 오늘 하루의 한마디와 일·연애·관계 운, 행운의 색과 시간을 알려드려요.',

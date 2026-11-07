@@ -4,9 +4,10 @@ import CategoryList from '@/components/CategoryList'
 
 const cat = (k: string) => CATEGORIES.find((c) => c.key === k)!
 
-test('운세 묶음은 두 갈래: 생년월일로 보는 운세 3개 → MBTI로 보는 운세', () => {
+test('운세 묶음은 두 갈래: 생년월일로 보는 운세 4개 → MBTI로 보는 운세', () => {
   expect(cat('unse').items.map((i) => [i.group, i.href])).toEqual([
     ['생년월일로 보는 운세', '/fortune'],
+    ['생년월일로 보는 운세', '/saju'],
     ['생년월일로 보는 운세', '/fortune/2027'],
     ['생년월일로 보는 운세', '/fortune/daily'],
     ['MBTI로 보는 운세', '/fortune/mbti'],

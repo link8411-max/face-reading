@@ -11,14 +11,16 @@ import { josa } from '@/lib/josa'
 import { SITE, UTM } from '@/lib/shareBase'
 import { GUANSANG_TYPES, LEGACY_FACE_KEYS } from '@/content/guansang'
 import { isGuansangTypeKey } from '@/lib/face/guansangKeys'
+import { STEM_BY_KEY } from '@/lib/saju/keys'
+import { DAY_MASTER_COPY } from '@/content/saju'
 
 // 기존 호출처를 위해 다시 내보낸다. 일기토 공유 링크는 @/lib/duel/share (일기토 규칙이 다른 페이지에 실리지 않게)
 export { josa, SITE }
-export type ShareKind = 'animal' | 'samguk' | 'face'
+export type ShareKind = 'animal' | 'samguk' | 'face' | 'saju'
 
 export const FACE_TYPES: Record<string, string> = Object.fromEntries(Object.entries(GUANSANG_TYPES).map(([k, v]) => [k, v.nickname]))
-const TEST_PATH: Record<ShareKind, string> = { animal: '/animal', samguk: '/samguk', face: '/face2' }
-export const TEST_NAME: Record<ShareKind, string> = { animal: '동물상 테스트', samguk: '나는 삼국지 속 누구?', face: 'AI 관상 테스트' }
+const TEST_PATH: Record<ShareKind, string> = { animal: '/animal', samguk: '/samguk', face: '/face2', saju: '/saju' }
+export const TEST_NAME: Record<ShareKind, string> = { animal: '동물상 테스트', samguk: '나는 삼국지 속 누구?', face: 'AI 관상 테스트', saju: '내 사주 풀이' }
 
 export function faceSlug(type: string): string | null {
   return Object.entries(FACE_TYPES).find(([, v]) => v === type)?.[0] ?? null
@@ -49,6 +51,13 @@ export function parseShared(kind: ShareKind, key: string, s?: unknown): SharedRe
     const name = FACE_TYPES[k]
     return { ...base, key: k, score: null, name, phrase: `나는 ${josa(name, '이래', '래')}. 너 관상도 봐줄까?` }
   }
+  if (kind === 'saju') {
+    // 공유 링크에는 일간 10키만 담는다 (생년월일·사주 글자 없음)
+    if (!Object.hasOwn(STEM_BY_KEY, key)) return null
+    const title = DAY_MASTER_COPY[STEM_BY_KEY[key]].title
+    const noun = title.replace(/^나는 /, '').replace(/(이에요|예요)$/, '')
+    return { ...base, score: null, name: title, phrase: `나는 ${josa(noun, '이래', '래')}. 너는?` }
+  }
   const score = clampScore(s)
   if (score === null) return null
   if (kind === 'animal') {
@@ -62,7 +71,7 @@ export function parseShared(kind: ShareKind, key: string, s?: unknown): SharedRe
 }
 
 export function shareUrl(kind: ShareKind, key: string, score?: number): string {
-  const s = kind === 'face' || score === undefined ? null : clampScore(score)
+  const s = kind === 'face' || kind === 'saju' || score === undefined ? null : clampScore(score)
   return `${SITE}${TEST_PATH[kind]}/r/${encodeURIComponent(key)}?${s !== null ? `s=${s}&` : ''}${UTM(kind)}`
 }
 

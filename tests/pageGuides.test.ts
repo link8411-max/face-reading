@@ -38,7 +38,7 @@ test('faqJsonLd는 < 를 이스케이프한다', () => {
 })
 
 test('모든 GuideRoute에 가이드가 있다', () => {
-  const all: GuideRoute[] = ['/face2', '/animal', '/samguk', '/fortune', '/fortune/daily', '/fortune/mbti']
+  const all: GuideRoute[] = ['/face2', '/animal', '/samguk', '/fortune', '/fortune/daily', '/fortune/mbti', '/saju']
   for (const r of all) expect(pageGuides[r], r).toBeDefined()
 })
 
@@ -116,4 +116,12 @@ test.each(sectionRoutes)('%s sections 카드 글 규칙', (route) => {
       }
     }
   }
+})
+
+test('/saju 가이드: 네 기둥·절기·십신·대운·세운을 말하고 저장하지 않음을 밝힌다', () => {
+  const g = pageGuides['/saju']
+  expect(g.faqs.length).toBeGreaterThanOrEqual(4)
+  const text = JSON.stringify(g)
+  for (const t of ['네 기둥', '절기', '십신', '대운', '세운', '저장']) expect(text).toContain(t)
+  expect(g.related).toEqual(['/fortune', '/fortune/daily'])
 })

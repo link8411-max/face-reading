@@ -4,6 +4,8 @@ import { redirect } from "next/navigation";
 import { josa, ogImageUrl, parseShared, SITE, TEST_NAME, type ShareKind, type SharedResult } from "@/lib/shareLinks";
 import { animalTypeDB } from "@/lib/animalTypeDB";
 import { samgukCharacters } from "@/lib/samgukDB";
+import { DAY_MASTER_COPY } from "@/content/saju";
+import { STEM_BY_KEY } from "@/lib/saju/keys";
 import { getPerson } from "@/content/samgukPeople";
 import { MoonDeco, SmileFace } from "@/components/icons";
 import CoupangBanner from "@/components/CoupangBanner";
@@ -38,6 +40,7 @@ export async function shareMetadata(kind: ShareKind, params: P, searchParams: S)
 function summaryOf(r: SharedResult): string {
   if (r.kind === "animal") return animalTypeDB[r.key].description.split(/(?<=[.!?])\s/)[0];
   if (r.kind === "samguk") return samgukCharacters.find((c) => c.id === r.key)!.modernComment;
+  if (r.kind === "saju") return DAY_MASTER_COPY[STEM_BY_KEY[r.key]].line;
   return `${TEST_NAME.face}에서 ${josa(r.name, "이", "가")} 나왔어요. 얼굴형 5가지와 힘이 실린 자리 3곳으로 15가지 상을 나누고, 돈·일·사랑·사람·버팀 다섯 자리를 풀어 드려요.`;
 }
 
@@ -53,7 +56,7 @@ export async function SharePage({ kind, params, searchParams }: { kind: ShareKin
       <p className="text-sm text-muted">친구가 보낸 결과</p>
       <section className="relative overflow-hidden bg-card rounded-[30px] px-6 pt-7 pb-6 mt-3">
         <span className="absolute -right-3 -top-2 pointer-events-none"><MoonDeco size={130} /></span>
-        <h1 className="relative font-serif font-bold text-[26px] leading-[1.4] pr-16 break-keep">친구는 {kind === "samguk" ? `${josa(r.name, "을", "를")} 닮았대요` : `${josa(r.name, "이", "가")} 나왔어요`}</h1>
+        <h1 className="relative font-serif font-bold text-[26px] leading-[1.4] pr-16 break-keep">친구는 {kind === "saju" ? "친구가 풀어 본 사주예요" : kind === "samguk" ? `${josa(r.name, "을", "를")} 닮았대요` : `${josa(r.name, "이", "가")} 나왔어요`}</h1>
         {scoreLabel && <p className="relative text-accent font-medium mt-2">{scoreLabel}</p>}
         <div className="flex gap-4 items-center mt-5">
           {r.image ? (
@@ -62,7 +65,7 @@ export async function SharePage({ kind, params, searchParams }: { kind: ShareKin
           ) : (
             <SmileFace size={96} />
           )}
-          <p className="text-sm leading-relaxed text-muted">{summaryOf(r)}</p>
+          <p className="text-sm leading-relaxed text-muted">{kind === "saju" && <strong className="block mb-1 font-serif text-base text-ink">{r.name}</strong>}{summaryOf(r)}</p>
         </div>
       </section>
       <Link href={r.testPath} className="mt-5 h-[56px] rounded-full flex items-center justify-center bg-ink text-paper text-base font-medium">
@@ -73,7 +76,7 @@ export async function SharePage({ kind, params, searchParams }: { kind: ShareKin
           {r.name} 열전 보기
         </Link>
       )}
-      <p className="mt-3 text-xs text-center text-muted">사진은 내 폰 안에서만 보고 바로 지워요</p>
+      <p className="mt-3 text-xs text-center text-muted">{kind === "saju" ? "생년월일은 저장하지 않아요" : "사진은 내 폰 안에서만 보고 바로 지워요"}</p>
       <CoupangBanner subId={`share-${kind}`} />
       {samguk && <ResultVideoBlock name={r.name} personId={r.key} video={samguk.video} faces={samguk.faces} who="친구" />}
     </main>
