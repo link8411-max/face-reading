@@ -15,7 +15,7 @@ test('동물상 공유 링크 메타: 1인칭 문구, 결과 미리보기 이미
 
 test('삼국지·관상 메타 문구', async () => {
   expect((await run('samguk', 'zhaoyun', '84')).openGraph?.title).toBe('나는 조운이랑 84% 닮았대. 너는 삼국지 속 누구야?')
-  expect((await run('face', 'wealth')).openGraph?.title).toBe('나는 재물상이래. 너 관상도 봐줄까?')
+  expect((await run('face', 'wealth')).openGraph?.title).toBe('나는 곳간이 든든한 상이래. 너 관상도 봐줄까?')
 })
 
 test('잘못된 값이면 결과 메타를 만들지 않는다', async () => {

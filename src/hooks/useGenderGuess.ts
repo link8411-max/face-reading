@@ -32,8 +32,11 @@ export function useGenderGuess(
     if (!image || done.current === image) return;
     if (latest.current !== null) return;
     done.current = image;
+    const t0 = Date.now();
     guess(image)
       .then((g) => {
+        // 개발 확인용(운영 번들에는 없음): 추정값·소요 시간. 어디로도 보내지 않는다
+        if (process.env.NODE_ENV !== 'production') (window as unknown as { __genderGuess?: unknown }).__genderGuess = { g, ms: Date.now() - t0 };
         if (done.current !== image || !g || latest.current !== null) return;
         setRef.current(g);
       })

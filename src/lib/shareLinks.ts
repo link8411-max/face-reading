@@ -9,12 +9,14 @@ import { faceMatch, REL, REL_NAME, type Rel } from '@/lib/faceMatch/compat'
 import type { AnimalKey } from '@/lib/animal/matcher'
 import { josa } from '@/lib/josa'
 import { SITE, UTM } from '@/lib/shareBase'
+import { GUANSANG_TYPES, LEGACY_FACE_KEYS } from '@/content/guansang'
+import { isGuansangTypeKey } from '@/lib/face/guansangKeys'
 
 // 기존 호출처를 위해 다시 내보낸다. 일기토 공유 링크는 @/lib/duel/share (일기토 규칙이 다른 페이지에 실리지 않게)
 export { josa, SITE }
 export type ShareKind = 'animal' | 'samguk' | 'face'
 
-export const FACE_TYPES: Record<string, string> = { wealth: '재물상', blessing: '복덕상', leader: '리더상', noble: '귀인상', scholar: '학자상', artist: '예술가상' }
+export const FACE_TYPES: Record<string, string> = Object.fromEntries(Object.entries(GUANSANG_TYPES).map(([k, v]) => [k, v.nickname]))
 const TEST_PATH: Record<ShareKind, string> = { animal: '/animal', samguk: '/samguk', face: '/face2' }
 export const TEST_NAME: Record<ShareKind, string> = { animal: '동물상 테스트', samguk: '나는 삼국지 속 누구?', face: 'AI 관상 테스트' }
 
@@ -41,8 +43,11 @@ export function parseShared(kind: ShareKind, key: string, s?: unknown): SharedRe
   const base = { kind, key, testPath: TEST_PATH[kind] }
   if (kind === 'face') {
     // 객체 프로토타입 키(constructor 등)를 막으려 자기 키만 본다
-    const name = Object.hasOwn(FACE_TYPES, key) ? FACE_TYPES[key] : undefined
-    return name ? { ...base, score: null, name, phrase: `나는 ${josa(name, '이래', '래')}. 너 관상도 봐줄까?` } : null
+    // 옛 공유 링크(wealth 등 6개)는 새 유형 키로 옮겨 착지한다
+    const k = Object.hasOwn(LEGACY_FACE_KEYS, key) ? LEGACY_FACE_KEYS[key] : key
+    if (!isGuansangTypeKey(k)) return null
+    const name = FACE_TYPES[k]
+    return { ...base, key: k, score: null, name, phrase: `나는 ${josa(name, '이래', '래')}. 너 관상도 봐줄까?` }
   }
   const score = clampScore(s)
   if (score === null) return null

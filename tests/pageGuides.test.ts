@@ -74,10 +74,11 @@ test('운세 가이드는 바뀐 계산 방식(음력 변환, 입춘 기준, 근
 const emojiRe = /\p{Extended_Pictographic}/u
 const sectionRoutes: GuideRoute[] = ['/face2', '/animal', '/samguk']
 
-test('/face2 sections: 6유형 + 5부위', () => {
+test('/face2 sections: 15유형 + 5부위', () => {
   const s = pageGuides['/face2'].sections!
   expect(s).toHaveLength(2)
-  expect(s[0].items).toHaveLength(6)
+  expect(s[0].heading).toBe('관상 결과 유형 15가지')
+  expect(s[0].items).toHaveLength(15)
   expect(new Set(s[0].items.map((i) => i.title))).toEqual(new Set(Object.values(FACE_TYPES)))
   expect(s[1].items).toHaveLength(5)
 })

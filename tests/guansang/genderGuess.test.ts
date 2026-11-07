@@ -31,16 +31,16 @@ describe('guessGender', () => {
     }
     expect(await guessGender(img, { detect })).toBeNull()
   })
-  it('1.5초를 넘기면 null', async () => {
+  it('제한 시간(4초)을 넘기면 null', async () => {
     vi.useFakeTimers()
     try {
-      expect(GUESS_TIMEOUT_MS).toBe(1500)
+      expect(GUESS_TIMEOUT_MS).toBe(4000)
       const detect = () =>
         new Promise<{ gender: 'male'; probability: number }>((r) =>
-          setTimeout(() => r({ gender: 'male', probability: 0.99 }), 1600),
+          setTimeout(() => r({ gender: 'male', probability: 0.99 }), 4100),
         )
       const p = guessGender(img, { detect })
-      await vi.advanceTimersByTimeAsync(1600)
+      await vi.advanceTimersByTimeAsync(4100)
       expect(await p).toBeNull()
     } finally {
       vi.useRealTimers()

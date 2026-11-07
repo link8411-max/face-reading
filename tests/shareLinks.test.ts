@@ -1,3 +1,5 @@
+import { GUANSANG_TYPES, LEGACY_FACE_KEYS } from '@/content/guansang'
+import { GUANSANG_TYPE_KEYS } from '@/lib/face/guansangKeys'
 import { parseShared, shareUrl, clampScore, faceSlug, mbtiShared } from '@/lib/shareLinks'
 
 test('점수는 정수 50~99로 제한, 숫자가 아니면 null', () => {
@@ -24,12 +26,28 @@ test('삼국지: 받침에 맞는 조사(이랑/랑)', () => {
   expect(parseShared('samguk', '../../etc', '84')).toBeNull()
 })
 
-test('관상: 한글 유형을 영문 키로, 점수 없이', () => {
-  expect(faceSlug('재물상')).toBe('wealth')
+test('관상: 별명을 키로, 점수 없이', () => {
+  expect(faceSlug('곳간이 든든한 상')).toBe('earth-mid')
   expect(faceSlug('없는상')).toBeNull()
-  const r = parseShared('face', 'wealth')!
-  expect(r.phrase).toBe('나는 재물상이래. 너 관상도 봐줄까?')
+  const r = parseShared('face', 'earth-mid')!
+  expect(r.phrase).toBe('나는 곳간이 든든한 상이래. 너 관상도 봐줄까?')
   expect(r.testPath).toBe('/face2')
+})
+
+test('관상: 새 15키 전부 통과, 옛 6키는 새 키로 착지, 모르는 키는 null', () => {
+  for (const k of GUANSANG_TYPE_KEYS) {
+    const r = parseShared('face', k)!
+    expect(r.key).toBe(k)
+    expect(r.name).toBe(GUANSANG_TYPES[k].nickname)
+  }
+  for (const [old, now] of Object.entries(LEGACY_FACE_KEYS)) {
+    const r = parseShared('face', old)!
+    expect(r.key).toBe(now)
+    expect(r.name).toBe(GUANSANG_TYPES[now].nickname)
+  }
+  const w = parseShared('face', 'wealth')!
+  expect(w.name).toBe('곳간이 든든한 상')
+  expect(parseShared('face', 'nothing-here')).toBeNull()
 })
 
 test('MBTI 궁합: 두 유형 검증, 점수는 계산값', () => {
@@ -42,7 +60,7 @@ test('공유 주소: 유형 키와 점수, 유입 구분용 utm만 담는다', (
   const u = new URL(shareUrl('animal', 'cat', 86.6))
   expect(u.origin + u.pathname).toBe('https://unse-ai.com/animal/r/cat')
   expect(Object.fromEntries(u.searchParams)).toEqual({ s: '87', utm_source: 'share', utm_medium: 'friend_link', utm_campaign: 'animal' })
-  expect(new URL(shareUrl('face', 'wealth')).searchParams.has('s')).toBe(false)
+  expect(new URL(shareUrl('face', 'earth-mid')).searchParams.has('s')).toBe(false)
 })
 
 // 리뷰 Important: 객체 프로토타입 키(constructor 등)로 500이 나지 않는다

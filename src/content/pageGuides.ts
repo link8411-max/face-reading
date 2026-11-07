@@ -3,6 +3,8 @@
 
 import { animalTypeDB, animalTypeList } from '@/lib/animalTypeDB'
 import { samgukCharacters } from '@/lib/samgukDB'
+import { GUANSANG_TYPES } from '@/content/guansang'
+import { GUANSANG_TYPE_KEYS } from '@/lib/face/guansangKeys'
 
 export type GuideRoute = '/face2' | '/animal' | '/samguk' | '/samguk/duel' | '/fortune' | '/fortune/daily' | '/fortune/mbti'
 
@@ -80,15 +82,8 @@ export const pageGuides: Record<GuideRoute, PageGuideData> = {
     related: ['/animal', '/samguk', '/fortune'],
     sections: [
       {
-        heading: '관상 결과 유형 6가지',
-        items: [
-          { title: '재물상', body: '콧대가 길고 콧방울이 넉넉하며 턱선이 단단한 얼굴에서 자주 나와요. 실속 있고 든든한 인상이에요.' },
-          { title: '복덕상', body: '눈이 크고 입술이 도톰하며 턱이 둥근 계란형 얼굴에서 자주 나와요. 따뜻하고 편안해서 사람이 모이는 인상이에요.' },
-          { title: '리더상', body: '각진 얼굴형에 큰 입과 높은 이마가 더해진 얼굴에서 자주 나와요. 결단력 있고 앞에 나서는 인상이에요.' },
-          { title: '귀인상', body: '눈매가 차분하고 콧대가 길며 입술이 얇고 이마가 높은 얼굴에서 자주 나와요. 단정하고 믿음직한 인상이에요.' },
-          { title: '학자상', body: '이마가 높고 콧대가 가늘며 갸름하고 긴 얼굴형에서 자주 나와요. 차분하고 사색적인 인상이에요.' },
-          { title: '예술가상', body: '입술이 도톰하고 콧대가 가늘며 턱이 뾰족한 얼굴에서 자주 나와요. 섬세하고 감각적인 인상이에요.' },
-        ],
+        heading: '관상 결과 유형 15가지',
+        items: GUANSANG_TYPE_KEYS.map((k) => ({ title: GUANSANG_TYPES[k].nickname, body: GUANSANG_TYPES[k].oneLiner })),
       },
       {
         heading: '부위별로 보는 관상',

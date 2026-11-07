@@ -38,7 +38,7 @@ export async function shareMetadata(kind: ShareKind, params: P, searchParams: S)
 function summaryOf(r: SharedResult): string {
   if (r.kind === "animal") return animalTypeDB[r.key].description.split(/(?<=[.!?])\s/)[0];
   if (r.kind === "samguk") return samgukCharacters.find((c) => c.id === r.key)!.modernComment;
-  return `${TEST_NAME.face}에서 ${josa(r.name, "이", "가")} 나왔어요. 얼굴의 비율로 타고난 복과 연애운을 풀어 드려요.`;
+  return `${TEST_NAME.face}에서 ${josa(r.name, "이", "가")} 나왔어요. 얼굴형 5가지와 힘이 실린 자리 3곳으로 15가지 상을 나누고, 돈·일·사랑·사람·버팀 다섯 자리를 풀어 드려요.`;
 }
 
 export async function SharePage({ kind, params, searchParams }: { kind: ShareKind; params: P; searchParams: S }) {
