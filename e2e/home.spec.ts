@@ -67,3 +67,14 @@ test('홈 순서: 히어로 → 시즌 카드 → 띠 고르기 → 친구랑 �
   expect(together).toBeLessThan(banner)
   expect(banner).toBeLessThan(tabs)
 })
+
+test('밈 능력고사: 홈 카드와 푸터에서 /exam/meme으로 간다', async ({ page }) => {
+  await page.goto('/')
+  const card = page.getByRole('region', { name: '친구랑 같이 해봐요' }).locator('a[href="/exam/meme"]')
+  await expect(card).toHaveCount(1)
+  await expect(card).toContainText('밈 능력고사')
+  await expect(card).toContainText('매일 5문제, 내 등급은?')
+  await expect(page.locator('footer a[href="/exam/meme"]')).toHaveCount(1)
+  await card.click()
+  await expect(page).toHaveURL(/\/exam\/meme$/)
+})

@@ -7,6 +7,7 @@ export const PLAY_TOGETHER: { title: string; desc: string; href: string; icon: I
   { title: "얼굴 궁합", desc: "친구·연인·짝사랑 궁합", href: "/face-match", icon: "heart", bg: "#E6E8DF" },
   { title: "MBTI 궁합 계산기", desc: "연애·친구·직장 궁합 점수", href: "/mbti/match", icon: "rings", bg: "#ECE6F0" },
   { title: "나는 삼국지 속 누구?", desc: "닮은 장수와 회사생활 스탯", href: "/samguk", icon: "fan", bg: "#E8EEE6" },
+  { title: "밈 능력고사", desc: "매일 5문제, 내 등급은?", href: "/exam/meme", icon: "spark", bg: "#F1EBE2" },
 ];
 
 export default function PlayTogether() {

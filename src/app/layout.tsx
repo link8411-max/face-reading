@@ -5,7 +5,7 @@ import Script from "next/script";
 import { GA_ID, PROD_HOST_SOURCE } from "@/lib/analytics";
 import Link from "next/link";
 import BottomTabBar from "@/components/BottomTabBar";
-import { CATEGORIES } from "@/content/navigation";
+import { CATEGORIES, FOOTER_EXTRA } from "@/content/navigation";
 import "./globals.css";
 
 // 글꼴은 자체 호스팅(src/fonts, SIL OFL). Google Fonts를 빌드 때 내려받지 않으므로 Vercel 빌드가 네트워크에 기대지 않는다.
@@ -165,6 +165,14 @@ export default function RootLayout({
                     </ul>
                   </div>
                 ))}
+                <div className="space-y-3">
+                  <p className="text-accent font-bold text-sm">함께 해봐요</p>
+                  <ul className="text-sm space-y-2 text-muted">
+                    {FOOTER_EXTRA.map((i) => (
+                      <li key={i.href}><Link href={i.href} className="hover:text-accent">{i.title}</Link></li>
+                    ))}
+                  </ul>
+                </div>
                 <div className="space-y-3 col-span-2 border-t pt-6">
                   <p className="text-muted font-bold text-sm">정보</p>
                   <ul className="text-sm space-y-2 text-muted">

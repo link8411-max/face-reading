@@ -2,7 +2,7 @@
 // 개인정보 원칙: 사진·생년월일 원값·얼굴 수치는 절대 보내지 않는다. 결과는 유형 키(fox, caocao, 재물상, INFP_ENTJ 등)만.
 export const GA_ID = 'G-L99JPMPT9D'
 
-export type TestName = 'face' | 'animal' | 'samguk' | 'fortune' | 'daily' | 'mbti_match' | 'face_match' | 'team_samguk' | 'mbti_daily' | 'duel' | 'people' | 'cup' | 'zodiac' | 'mbti' | 'saju'
+export type TestName = 'face' | 'animal' | 'samguk' | 'fortune' | 'daily' | 'mbti_match' | 'face_match' | 'team_samguk' | 'mbti_daily' | 'duel' | 'people' | 'cup' | 'zodiac' | 'mbti' | 'saju' | 'exam'
 export type ShareMethod = 'save_image' | 'share' | 'link' | 'kakao'
 
 type Events = {
@@ -28,6 +28,9 @@ type Events = {
   // 장수 월드컵. cup_start는 판 키(warrior), cup_end는 `<판>_<우승 id>`(warrior_guanyu). 값은 24자 이하(테스트로 전 조합 확인)
   cup_start: { result_id: string }
   cup_end: { result_id: string }
+  // 밈 능력고사. exam_start의 result_id는 과목(meme), exam_end는 `<과목>_g<등급>`(meme_g3). 문제별 정오·태어난 해는 보내지 않는다
+  exam_start: { test_name: TestName; result_id: string }
+  exam_end: { test_name: TestName; result_id: string }
   // 쇼츠 영상. result_id는 `-`를 `_`로 바꾼 영상 id, slot은 people·result·videos·hub
   video_play: { slot: string; result_id: string }
   video_subscribe_click: { slot: string }

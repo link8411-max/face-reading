@@ -1,4 +1,4 @@
-import { TABS, CATEGORIES, tabForPath } from '@/content/navigation'
+import { TABS, CATEGORIES, FOOTER_EXTRA, tabForPath } from '@/content/navigation'
 import { SITEMAP_ROUTES } from '@/app/sitemap'
 
 test('탭 4개: 홈·관상·사주·운세·궁합 (주소는 그대로)', () => {
@@ -34,4 +34,14 @@ test('8단계 메뉴: 궁합 묶음에 얼굴 궁합, 얼굴 묶음에 우리 �
   const hrefs = (k: string) => CATEGORIES.find((c) => c.key === k)!.items.map((i) => i.href)
   expect(hrefs('mbti')).toContain('/face-match')
   expect(hrefs('face')).toContain('/samguk/team')
+})
+
+test('밈 능력고사는 푸터에만 항목이 있다: 묶음(홈 탭·허브)은 그대로, 하단 탭은 넷', () => {
+  expect(FOOTER_EXTRA.map((i) => [i.title, i.href])).toEqual([['밈 능력고사', '/exam/meme']])
+  expect(CATEGORIES.flatMap((c) => c.items.map((i) => i.href))).not.toContain('/exam/meme')
+  expect(TABS).toHaveLength(4)
+  expect((SITEMAP_ROUTES as readonly string[]).includes('/exam/meme')).toBe(true)
+  const { readFileSync } = require('node:fs')
+  const layout = readFileSync('src/app/layout.tsx', 'utf8')
+  expect(layout.match(/FOOTER_EXTRA\.map/g)).toHaveLength(1)
 })

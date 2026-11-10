@@ -76,6 +76,9 @@ export const CATEGORIES: Category[] = [
   },
 ]
 
+// 푸터에만 놓는 링크: 묶음(홈 탭·허브)과 하단 탭 순서는 건드리지 않는다. 홈에서는 '친구랑 같이 해봐요' 카드가 맡는다.
+export const FOOTER_EXTRA: { title: string; href: string }[] = [{ title: '밈 능력고사', href: '/exam/meme' }]
+
 // 결과 화면 아래 "이어서 보면 좋아요": 같은 줄기 1개 + 다른 줄기 1개 (설계 4절).
 // samePhoto: 같은 사진으로 이어지는 칸 — 사진 결과에서는 NextTests(사진 넘기기)가 이미 보여 주므로 NextSteps는 뺀다.
 export type NextFrom = 'saju' | 'fortune' | 'zodiac' | 'daily' | 'face' | 'animal' | 'samguk' | 'mbti'

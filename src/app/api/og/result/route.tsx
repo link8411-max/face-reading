@@ -12,6 +12,7 @@ import { cupName } from '@/lib/cup/share';
 import { parseCupShare } from '@/lib/cup/shareLanding';
 import { BOARDS } from '@/lib/cup/boards';
 import { mbtiProfiles } from '@/content/mbtiTypes';
+import { GRADE_NAME } from '@/lib/exam/score';
 
 export const runtime = 'edge';
 
@@ -75,6 +76,10 @@ export async function GET(request: NextRequest) {
     if (!c) return new Response('bad request', { status: 400 });
     big = c.name; score = cupName(BOARDS[c.board].title); phrase = c.phrase; label = '삼국지 장수 월드컵';
     await loadPortrait(c.image);
+  } else if (kind === 'exam') {
+    // ogQueryOk가 grade 1~9, correct 0~5 한 자리만 통과시킨다
+    const grade = Number(q.get('grade'));
+    big = `${grade}등급`; score = `5문제 중 ${q.get('correct')}개`; phrase = GRADE_NAME[grade]; label = '밈 능력고사';
   } else {
     return new Response('bad request', { status: 400 });
   }

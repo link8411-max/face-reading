@@ -38,3 +38,21 @@ test('쿠팡 배너가 빈 채로 남으면 일반 제휴 링크로 바꾸고 li
   await popup
   await expect.poll(() => events(page, 'coupang_click')).toContainEqual({ slot: 'home', keyword: 'home' })
 })
+
+test('밈 능력고사 성적표 아래에 쿠팡 배너가 있고 노출을 exam_meme 자리로 기록', async ({ page, context }) => {
+  await context.route('**/ads-partners.coupang.com/**', (r) => r.fulfill({
+    contentType: 'text/html',
+    body: `<p>상품</p><script>parent.postMessage(JSON.stringify({type:'adDisplayed',id:'1043563'}),'*')</script>`,
+  }))
+  await page.goto('/exam/meme')
+  await page.getByRole('button', { name: '시험 시작' }).click()
+  for (let i = 1; i <= 5; i++) {
+    await page.locator('section[aria-label="문제"] ul button').first().click()
+    await page.getByRole('button', { name: i === 5 ? '성적표 보기' : '다음 문제' }).click()
+  }
+  await page.getByRole('button', { name: '건너뛰기' }).click()
+  await expect(page.getByText('밈 능력고사 성적통지표')).toBeVisible()
+  const frame = page.locator('iframe[title="쿠팡 추천 상품"]')
+  await frame.scrollIntoViewIfNeeded()
+  await expect.poll(() => events(page, 'coupang_banner_view')).toEqual([{ slot: 'exam_meme', keyword: 'widget' }])
+})

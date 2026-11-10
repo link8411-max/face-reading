@@ -257,3 +257,47 @@
     opacity: 1;
   }
 }
+
+/* 밈 능력고사 모션. 전부 움직임 줄이기 설정이 아닐 때만 적용되므로, 설정이 켜져 있으면 바로 최종 상태가 보인다.
+   animation-fill-mode: backwards 라서 끝난 뒤의 모습이 곧 평소 스타일이다(.ex-settled는 캡처용으로 연출을 없앤다). */
+@media (prefers-reduced-motion: no-preference) {
+  .ex-rise { animation: ex-rise 0.2s ease-out backwards; animation-delay: var(--d, 0ms); }
+  .ex-rise-lg { animation: ex-rise-lg 0.3s ease-out backwards; animation-delay: var(--d, 0ms); }
+  .ex-pop { animation: ex-pop 0.2s ease-out backwards; animation-delay: var(--d, 0ms); }
+  .ex-flip { animation: ex-flip 0.25s ease-out backwards; }
+  .ex-emph { animation: ex-emph 0.4s ease-in-out 0.3s backwards; }
+  .ex-btn { transition: transform 90ms ease-out, opacity 200ms ease-out; }
+  .ex-btn:active:not(:disabled) { transform: scale(0.97); }
+  .ex-dim { transform: scale(0.96); }
+  .ex-correct { animation: ex-bounce 0.4s ease-out; }
+  .ex-wrong { animation: shake-x 0.35s ease-in-out; }
+  .ex-reveal { animation: ex-emph 0.35s ease-out 0.35s backwards; }
+  .ex-shake { animation: shake-x 0.35s ease-in-out; }
+  .ex-tick { animation: ex-tick 0.25s ease-out; }
+  .ex-dots span { animation: ex-blink 0.6s ease-in-out infinite; }
+  .ex-dots span:nth-child(2) { animation-delay: 0.15s; }
+  .ex-dots span:nth-child(3) { animation-delay: 0.3s; }
+  .ex-grade { animation: ex-grade 0.7s steps(var(--n, 1)) var(--d, 0ms) backwards; }
+  .ex-stamp { animation: ex-stamp 0.5s cubic-bezier(0.2, 0.8, 0.3, 1) var(--d, 0ms) backwards; }
+  /* 캡처·공유용: 연출이 끝난 모습으로 고정 */
+  .ex-settled, .ex-settled * { animation: none !important; transition: none !important; }
+}
+
+.ex-grade-strip { transform: translateY(calc(var(--n, 0) * -48px)); }
+.ex-stamp { transform: rotate(-6deg); }
+
+@keyframes ex-rise { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: none; } }
+@keyframes ex-rise-lg { from { opacity: 0; transform: translateY(18px); } to { opacity: 1; transform: none; } }
+@keyframes ex-pop { from { opacity: 0; transform: scale(0.9); } to { opacity: 1; transform: none; } }
+@keyframes ex-flip { from { opacity: 0.2; transform: rotateX(90deg); } to { opacity: 1; transform: none; } }
+@keyframes ex-emph { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.06); } }
+@keyframes ex-bounce { 0% { transform: scale(0.97); } 45% { transform: scale(1.07); } 75% { transform: scale(0.98); } 100% { transform: scale(1); } }
+@keyframes ex-tick { from { transform: scale(1.35); } to { transform: scale(1); } }
+@keyframes ex-blink { 0%, 100% { opacity: 0.25; } 50% { opacity: 1; } }
+@keyframes ex-grade { from { transform: translateY(0); } to { transform: translateY(calc(var(--n, 0) * -48px)); } }
+@keyframes ex-stamp {
+  0% { opacity: 0; transform: scale(2.2) rotate(-6deg); }
+  55% { opacity: 1; transform: scale(1) rotate(-6deg); }
+  75% { transform: scale(0.93) rotate(-6deg); }
+  100% { transform: scale(1) rotate(-6deg); }
+}

@@ -38,6 +38,7 @@ export const SITEMAP_ROUTES = [
     '/samguk/cup',
     '/samguk/cup/ranking',
     '/samguk/videos',
+    '/exam/meme',
 ]
 
 // 페이지 내용을 바꾸면 해당 라우트 날짜도 갱신할 것 (new Date()를 쓰면 매 요청마다 바뀌어 검색엔진이 무시함)
@@ -68,6 +69,7 @@ export const LAST_MODIFIED: Record<string, string> = {
     '/samguk/cup': '2026-11-04',
     '/samguk/cup/ranking': '2026-11-04',
     '/samguk/videos': '2026-11-05',
+    '/exam/meme': '2026-11-11',
     ...Object.fromEntries(MBTI_SLUGS.map((s) => [`/mbti/${s}`, '2026-11-07'])),
 }
 

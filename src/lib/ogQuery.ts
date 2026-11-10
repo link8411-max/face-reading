@@ -13,6 +13,7 @@ const PARAMS: Record<string, string[]> = {
   'mbti-daily': ['type'],
   duel: ['key'],
   cup: ['board', 'key'],
+  exam: ['grade', 'correct'],
 }
 
 export const OG_CACHE_CONTROL = 'public, max-age=86400, s-maxage=31536000, immutable'
@@ -23,6 +24,8 @@ export function ogQueryOk(q: URLSearchParams): boolean {
   const keys = [...q.keys()]
   if (new Set(keys).size !== keys.length) return false
   if (keys.some((k) => k !== 'kind' && !allowed.includes(k))) return false
+  // 밈 능력고사: 등급 1~9, 맞힌 수 0~5(앞자리 0 금지), 둘 다 있어야 한다
+  if (q.get('kind') === 'exam' && !(/^[1-9]$/.test(q.get('grade') ?? '') && /^[0-5]$/.test(q.get('correct') ?? ''))) return false
   const s = q.get('s')
   // 공유 링크가 만드는 점수는 50~99 두 자리 정수뿐
   return s === null || /^[5-9]\d$/.test(s)

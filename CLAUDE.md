@@ -198,6 +198,7 @@ public/
 | `/samguk/videos` | 삼국지 쇼츠 모음(격자·세로 피드) | - | YouTube API/RSS, ISR 1시간 |
 | `/fortune` | 신년운세 | - | DB 기반 |
 | `/fortune/daily` | 오늘의 운세 | - | 일진 엔진(`lib/dailyEngine`) |
+| `/exam/meme` | 밈 능력고사(매일 5문제·성적통지표·친구 대결) | 하루 한 번(기기 기준) | 얼린 회차(`src/content/exam`) + `lib/exam` |
 
 ---
 
@@ -452,3 +453,20 @@ public/
     - 제갈량: 백우선, 윤건(학자 모자).
 3.  **현대적 재해석**: 사용자의 실제 사진에서 추출된 '인상(분석 데이터)'을 캐릭터 포트레이트에 미세하게 투영하여 '나만의 장수' 느낌을 준다.
 4.  **기술 사양**: 16비트 레트로 게임 화풍, 낮은 팔레트(Muted colors), 유화적 터치를 도트로 표현.
+
+## 밈 능력고사 (/exam/meme, 1차 구현 2026-11-12)
+- 설계: `docs/superpowers/specs/2026-11-11-meme-exam-design.md`, 계획: `docs/superpowers/plans/2026-11-12-meme-exam.md`. 서버 저장·집계·또래 비교·낱말 모음은 다음 계획(지금 화면에 정답률·상위 %·응시자 수 같은 숫자는 없다).
+- 구조: 말 카드 `src/content/exam/meme-cards.json`(원본) → 얼린 회차 `src/content/exam/meme-rounds.json`(**뒤에 덧붙이기만**, 대결 링크가 옛 회차를 가리킨다) → 화면 `src/components/exam/ExamGame`(시작→문제→해설→채점→성적표 상태 기계). 순수 함수는 `src/lib/exam/`: `rounds.ts`(회차 만들기·뱃지·`EXAM_EPOCH`·오늘 회차 고르기), `score.ts`(점수·등급·별명), `link.ts`(대결 링크 `/exam/meme/r/<회차>-<OX 5글자>-<점수>-<등급>[h]`), `memory.ts`(기기 저장: 오늘 성적표·연속 응시, 저장소를 못 써도 던지지 않음).
+- 회차 늘리기: 새 말을 승인하면 카드 한 장을 쓰고 `npx tsx --tsconfig tsconfig.json scripts/exam/make-rounds.ts --add=14`(`--print`는 저장 없이 출력). 이미 있는 회차는 다시 만들지 않는다. 오늘 회차 번호가 얼린 회차 수를 넘으면 마지막 회차를 다시 연다(그때부터 날마다 같은 문제이므로 **출시 전·후로 회차를 넉넉히 미리 만들어 둔다**). `EXAM_EPOCH`(1회차 날짜, 지금 2026-11-16)는 실제 출시 날에 맞춰 한 번만 고친다.
+- 페이지: `/exam`(→ `/exam/meme` 리디렉션), `/exam/meme`, `/exam/meme/r/[code]`(공유 착지: noindex·canonical `/exam/meme`·사이트맵 제외, 잘못된 코드는 일반 시작 화면). 미리보기 `/api/og/result?kind=exam&grade=&correct=`. 홈 '친구랑 같이 해봐요' 카드와 푸터(`FOOTER_EXTRA`)에서 들어온다.
+- GA: `exam_start(result_id=meme)`, `exam_end(result_id=meme_g<등급>)`, 공유 `share_click(test_name=exam)`, 착지 `shared_landing`. 문제별 정오·태어난 해는 보내지 않는다.
+- 규칙: 해설은 카드의 `meaning`·`usage`·`origin`을 그대로 보여 준다(화면에서 문장을 짓지 않는다). 등급 표는 출시 뒤 바꾸지 않는다. 진행 중인 판은 시작한 회차로 끝난다(자정을 넘겨도). 문제당 10초, 힌트는 한 판에 한 번(오답 둘 흐림, 그 문제 가산점 0). 테스트 `npx vitest run tests/exam`, E2E `e2e/exam.spec.ts`.
+- (아래는 0단계 수집·카드 작성 기록)
+- 후보 수집: `node scripts/exam/collect.mjs`(찾기+확인, 5분쯤), `--no-find`(확인만), `--all`(전부 다시). Playwright로 네이버 블로그 검색과 "<말> 뜻" 검색을 읽는다(공식 검색 API는 개발자센터에서 빠져 키 없이 읽음). 화면이 바뀌어 요약이 비면 `parseVerify`를 고친다.
+- 설정 `scripts/exam/subjects/meme.json`: 검색어(`findQueries`), 씨앗(`seeds`, SNS에서 본 말을 손으로 넣는 곳), 금지어(`banned`), 뽑기 오탐 막는 말(`stopwords`).
+- 결과 `docs/exam/meme-candidates.json`이 원본이다(`docs/exam/meme-candidates.md`는 11/11 손 조사 기록). 스크립트는 `status`까지만 정하고, **승인·보류·반려는 Claude가 `decision`에 이유와 함께 적는다**(사용자 결정). 사용자에게 하나씩 묻지 않는다. `used`는 출제한 말.
+- 판정 기준: 서로 다른 출처 2곳 이상에서 뜻이 일치, 누구를 낮추지 않는 말(외모·집단·실존 인물 놀림, 욕설 원형은 반려), 대화 빈칸에 넣을 수 있는 말. 네이버 요약(AI 브리핑)은 틀릴 때가 있어 요약 하나만으로 승인하지 않는다.
+- 새 말은 블로그보다 SNS가 빠르다. 쓰레드는 Aside 브라우저(로그인됨)로 "신조어 뜻", "요즘 유행어", "무슨 뜻이야"를 검색해 본 말을 `seeds`에 넣고 스크립트로 확인한다.
+- 수집 틀은 과목별이다: `scripts/exam/subjects/<과목>.json` 하나(목록 사이트 `listSources`, 블로그 검색어, 씨앗, 금지어, 확인 검색어 꼬리 `verifySuffix`)를 만들고 `--subject=<과목>`으로 돌리면 `docs/exam/<과목>-candidates.json`이 생긴다. 밈 과목의 목록 사이트는 인스타공백닷컴 밈 사전(이름·시기만 가져오고 설명문은 옮기지 않는다). 이 사이트에서만 본 말은 네이버 요약이 같은 글을 인용했을 수 있어 독립 출처로 치지 않는다.
+- 문제는 손으로 쓰지 않고 말 카드에서 찍어 낸다: 카드 `src/content/exam/meme-cards.json`(말·갈래·난이도·한 줄 뜻 `gloss`·원형·해설 세 줄·출처·구조화된 대화 `skit`) → `scripts/exam/make-rounds.ts`(엔진은 `src/lib/exam/rounds.ts`)가 유형 여섯(뜻 고르기·말 고르기·줄임말 풀기·줄이기·O/X·대화)으로 회차를 만든다. 새 말을 승인하면 카드만 한 장 쓴다. 대화(상황극) 문제는 한 회차에 많아야 하나(사용자: "상황극에 너무 매달리지 마").
+- 레트로: 카드의 `when`(1990s·2000s·2010s·2020s·연도)이 문제 뱃지("90년대 레트로", "2026년". 신상·최신 같은 말은 안 붙임)가 된다. 1990s~2010s 카드는 레트로로 회차마다 셋째 자리에 한 문제(갈래 `code`는 삐삐 숫자). 사용자 뜻: 레트로는 어린 사람들이 푸는 재미라서 "옛날 말"이라 부르지 않는다. 뜻이 검색으로 확인 안 되는 옛날 말은 넣지 않는다(예: '캡', '0404'는 확인 못 해 뺌).

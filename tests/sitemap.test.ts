@@ -12,3 +12,10 @@ test('sitemap 항목은 new Date()가 아니라 LAST_MODIFIED 값을 쓴다', ()
     expect(e.lastModified).toBe(LAST_MODIFIED[route])
   }
 })
+
+test('밈 능력고사: /exam/meme은 사이트맵에 있고 공유 착지(/exam/meme/r/)는 없다', () => {
+  expect(SITEMAP_ROUTES).toContain('/exam/meme')
+  expect(LAST_MODIFIED['/exam/meme']).toBe('2026-11-11')
+  expect(SITEMAP_ROUTES.some((r) => r.startsWith('/exam/meme/r'))).toBe(false)
+  expect(sitemap().map((e) => e.url)).toContain('https://unse-ai.com/exam/meme')
+})
