@@ -460,7 +460,7 @@ public/
 - 회차 늘리기: 새 말을 승인하면 카드 한 장을 쓰고 `npx tsx --tsconfig tsconfig.json scripts/exam/make-rounds.ts --add=14`(`--print`는 저장 없이 출력). 이미 있는 회차는 다시 만들지 않는다. 오늘 회차 번호가 얼린 회차 수를 넘으면 마지막 회차를 다시 연다(그때부터 날마다 같은 문제이므로 **출시 전·후로 회차를 넉넉히 미리 만들어 둔다**). `EXAM_EPOCH`(1회차 날짜, 지금 2026-11-16)는 실제 출시 날에 맞춰 한 번만 고친다.
 - 페이지: `/exam`(→ `/exam/meme` 리디렉션), `/exam/meme`, `/exam/meme/r/[code]`(공유 착지: noindex·canonical `/exam/meme`·사이트맵 제외, 잘못된 코드는 일반 시작 화면). 미리보기 `/api/og/result?kind=exam&grade=&correct=`. 홈 '친구랑 같이 해봐요' 카드와 푸터(`FOOTER_EXTRA`)에서 들어온다.
 - GA: `exam_start(result_id=meme)`, `exam_end(result_id=meme_g<등급>)`, 공유 `share_click(test_name=exam)`, 착지 `shared_landing`. 문제별 정오·태어난 해는 보내지 않는다.
-- 규칙: 해설은 카드의 `meaning`·`usage`·`origin`을 그대로 보여 준다(화면에서 문장을 짓지 않는다). 등급 표는 출시 뒤 바꾸지 않는다. 진행 중인 판은 시작한 회차로 끝난다(자정을 넘겨도). 문제당 10초, 힌트는 한 판에 한 번(오답 둘 흐림, 그 문제 가산점 0). 테스트 `npx vitest run tests/exam`, E2E `e2e/exam.spec.ts`.
+- 규칙: 해설은 카드의 `meaning`·`usage`·`origin`을 그대로 보여 준다(화면에서 문장을 짓지 않는다). 등급 표는 출시 뒤 바꾸지 않는다. 진행 중인 판은 시작한 회차로 끝난다(자정을 넘겨도). 문제마다 제한 시간이 다르다(`timeLimitMs`: 5초 + 읽을 글자×0.11초, 10~25초), 힌트는 한 판에 한 번(오답 둘 흐림, 그 문제 가산점 0). 테스트 `npx vitest run tests/exam`, E2E `e2e/exam.spec.ts`.
 - (아래는 0단계 수집·카드 작성 기록)
 - 후보 수집: `node scripts/exam/collect.mjs`(찾기+확인, 5분쯤), `--no-find`(확인만), `--all`(전부 다시). Playwright로 네이버 블로그 검색과 "<말> 뜻" 검색을 읽는다(공식 검색 API는 개발자센터에서 빠져 키 없이 읽음). 화면이 바뀌어 요약이 비면 `parseVerify`를 고친다.
 - 설정 `scripts/exam/subjects/meme.json`: 검색어(`findQueries`), 씨앗(`seeds`, SNS에서 본 말을 손으로 넣는 곳), 금지어(`banned`), 뽑기 오탐 막는 말(`stopwords`).

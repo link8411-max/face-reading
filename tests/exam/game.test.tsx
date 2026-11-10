@@ -8,6 +8,7 @@ vi.mock('@/components/CoupangBanner', () => ({ default: () => null }))
 import ExamGame from '@/components/exam/ExamGame'
 import { track } from '@/lib/analytics'
 import { loadReport, saveReport, streak } from '@/lib/exam/memory'
+import { timeLimitMs } from '@/lib/exam/score'
 import { enterMs } from '@/components/exam/motion'
 import { rounds } from './fixture'
 import { breakStorageAccess, installStorage, restoreStorage } from './storageStub'
@@ -45,7 +46,7 @@ afterEach(() => {
 test('시작 화면: 오늘 회차와 안내, 시험 시작 버튼', () => {
   render(<ExamGame rounds={rounds} />)
   expect(screen.getByText(/3회차/)).toBeTruthy()
-  expect(screen.getByText('5문제, 1분이면 끝나요')).toBeTruthy()
+  expect(screen.getByText('5문제, 2분이면 끝나요')).toBeTruthy()
   expect(startBtn()).toBeTruthy()
 })
 
@@ -79,12 +80,12 @@ test('같은 문제에서 두 번 눌러도 답은 한 번', () => {
   expect(loadReport(3)?.marks).toBe('OOOOO')
 })
 
-test('10초가 지나면 오답 처리되고, 그 뒤에 누른 보기는 무시된다', () => {
+test('제한 시간이 지나면 오답 처리되고, 그 뒤에 누른 보기는 무시된다', () => {
   render(<ExamGame rounds={rounds} />)
   fireEvent.click(startBtn())
   const stale = screen.getByRole('button', { name: '정답A' })
   // 시간은 등장 연출이 끝난 뒤부터 센다
-  act(() => { vi.advanceTimersByTime(enterMs(rounds[2].questions[0]) + 10_000) })
+  act(() => { vi.advanceTimersByTime(enterMs(rounds[2].questions[0]) + timeLimitMs(rounds[2].questions[0])) })
   expect(screen.getByText('아쉬워요')).toBeTruthy()
   fireEvent.click(stale)
   expect(screen.getByText('아쉬워요')).toBeTruthy()
@@ -259,7 +260,7 @@ test('움직임 줄이기: 막대는 줄지 않고 남은 초만 보이며, 채�
     fireEvent.click(startBtn())
     const timer = screen.getByTestId('timer')
     expect(timer.querySelector('[style*="transition"]')).toBeNull()
-    expect(within(timer).getByText('10초')).toBeTruthy()
+    expect(within(timer).getByText('12초')).toBeTruthy()
     for (let i = 0; i < 5; i++) solveRight(i)
     expect(screen.queryByText('채점 중이에요')).toBeNull()
     expect(screen.getByText('밈 능력고사 성적통지표')).toBeTruthy()

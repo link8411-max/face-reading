@@ -6,7 +6,7 @@ import { kstDate, onDayMaybeChanged } from '@/lib/kst'
 import type { Shared } from '@/lib/exam/link'
 import { loadReport, saveReport, streak as loadStreak, type Report } from '@/lib/exam/memory'
 import { pickRound, roundDateLabel, roundNumberFor } from '@/lib/exam/rounds'
-import { grade as gradeOf, LIMIT_MS, total, type Answer } from '@/lib/exam/score'
+import { grade as gradeOf, timeLimitMs, total, type Answer } from '@/lib/exam/score'
 import type { Round } from '@/lib/exam/types'
 import Explain from './Explain'
 import { enterMs, useReducedMotion } from './motion'
@@ -68,8 +68,9 @@ export default function ExamGame({ rounds, challenge = null }: { rounds: Round[]
     answeredRef.current = true
     const q = play.round.questions[idx]
     // 등장 연출 중에 누르면 아직 시간이 안 흐른 것으로 친다
-    const msLeft = choice === null ? 0 : Math.min(LIMIT_MS, LIMIT_MS - (performance.now() - startRef.current))
-    setAnswers((a) => [...a, { correct: choice === q.answer, msLeft, hint: hintNow }])
+    const limitMs = timeLimitMs(q)
+    const msLeft = choice === null ? 0 : Math.min(limitMs, limitMs - (performance.now() - startRef.current))
+    setAnswers((a) => [...a, { correct: choice === q.answer, msLeft, hint: hintNow, limitMs }])
     setPicks((p) => [...p, choice])
     setPhase('explain')
   }, [play, idx, hintNow])
@@ -85,7 +86,7 @@ export default function ExamGame({ rounds, challenge = null }: { rounds: Round[]
     // 시간은 문제 등장 연출이 끝난 뒤부터 센다
     const delay = reducedRef.current || !playRef.current ? 0 : enterMs(playRef.current.round.questions[idx])
     startRef.current = performance.now() + delay
-    const t = setTimeout(() => recordRef.current(null), delay + LIMIT_MS)
+    const t = setTimeout(() => recordRef.current(null), delay + (playRef.current ? timeLimitMs(playRef.current.round.questions[idx]) : 10_000))
     return () => clearTimeout(t)
   }, [phase, idx])
 
@@ -113,7 +114,7 @@ export default function ExamGame({ rounds, challenge = null }: { rounds: Round[]
       correct: t.correct,
       grade: g,
       hint: answers.some((a) => a.hint),
-      ms: Math.round(answers.reduce((s, a) => s + (LIMIT_MS - Math.max(0, a.msLeft)), 0)),
+      ms: Math.round(answers.reduce((s, a) => s + (a.limitMs - Math.max(0, a.msLeft)), 0)),
     }
     // 도전장으로 푼 판은 오늘 회차와 같고 아직 안 풀었을 때만 오늘 성적표로 남긴다
     const saveIt = !challenge || (challenge.round === play.todayAtStart && !loadReport(report.round))
@@ -164,8 +165,8 @@ export default function ExamGame({ rounds, challenge = null }: { rounds: Round[]
       <section className="ex-rise-lg mt-6 rounded-[30px] bg-card px-6 pt-7 pb-6 text-center">
         <p className="text-sm font-medium text-accent">{viewRound.round}회차 · {roundDateLabel(viewRound.round)}</p>
         {challenge && <p className="ex-emph mt-3 font-serif text-[19px] font-bold break-keep">친구는 {challenge.grade}등급. 이길 수 있어요?</p>}
-        <h2 className="mt-3 font-serif text-[26px] font-bold leading-[1.35]">5문제, 1분이면 끝나요</h2>
-        <p className="mt-2 text-sm leading-relaxed text-muted break-keep">문제마다 10초 안에 골라요. 힌트는 한 판에 한 번 쓸 수 있어요.</p>
+        <h2 className="mt-3 font-serif text-[26px] font-bold leading-[1.35]">5문제, 2분이면 끝나요</h2>
+        <p className="mt-2 text-sm leading-relaxed text-muted break-keep">문제마다 시간이 정해져 있어요. 힌트는 한 판에 한 번 쓸 수 있어요.</p>
         <button type="button" onClick={begin} className="mt-6 flex h-[52px] w-full items-center justify-center rounded-full bg-ink text-base font-medium text-paper">
           시험 시작
         </button>
@@ -217,7 +218,7 @@ export default function ExamGame({ rounds, challenge = null }: { rounds: Round[]
         <p className="text-sm font-bold tabular-nums">{idx + 1} / {play.round.questions.length}</p>
         <span key={idx} className="ex-rise rounded-full bg-card px-3 py-1 text-xs text-muted">{q.badge}</span>
       </div>
-      {(!answered || timedOut) && <TimerBar key={`${play.round.round}-${idx}`} limitMs={LIMIT_MS} delayMs={reduced ? 0 : enterMs(q)} reduced={reduced} timedOut={timedOut} />}
+      {(!answered || timedOut) && <TimerBar key={`${play.round.round}-${idx}`} limitMs={timeLimitMs(q)} delayMs={reduced ? 0 : enterMs(q)} reduced={reduced} timedOut={timedOut} />}
       <div key={idx} className="mt-4">
         {q.type === 'skit' ? <SkitCard q={q} state={state} timedOut={timedOut} /> : <QuestionCard q={q} state={state} />}
       </div>

@@ -28,7 +28,7 @@ test('/exam은 /exam/meme으로 넘어간다', async ({ page }) => {
 test('한 판: 시작 → 5문제 → 성적표, 새로 고침하면 성적표가 바로 보인다', async ({ page }) => {
   const errors = trackErrors(page)
   await page.goto('/exam/meme')
-  await expect(page.getByText('5문제, 1분이면 끝나요')).toBeVisible()
+  await expect(page.getByText('5문제, 2분이면 끝나요')).toBeVisible()
   await playFirstOptions(page)
   await page.getByRole('button', { name: '건너뛰기' }).click()
   await expect(page.getByText('밈 능력고사 성적통지표')).toBeVisible()
@@ -53,9 +53,10 @@ test('채점 연출은 기다려도 성적표로 넘어간다', async ({ page })
 })
 
 test('시간이 지나면 오답 처리되고 해설이 나온다', async ({ page }) => {
+  test.setTimeout(60_000) // 문제별 제한 시간이 12~30초라 기본 30초로는 모자란다
   await page.goto('/exam/meme')
   await page.getByRole('button', { name: '시험 시작' }).click()
-  await expect(page.getByText('아쉬워요')).toBeVisible({ timeout: 13_000 })
+  await expect(page.getByText('아쉬워요')).toBeVisible({ timeout: 33_000 })
   await expect(page.getByText('시간이 지났어요')).toBeVisible()
 })
 

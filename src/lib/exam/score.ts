@@ -1,17 +1,30 @@
 // 점수와 등급. 등급은 공유 링크·미리보기·GA 값에 쓰이므로 출시 뒤에는 표를 바꾸지 않는다.
-export const LIMIT_MS = 10_000
+import type { Question } from './types'
+
+export const MIN_LIMIT_MS = 12_000
+export const MAX_LIMIT_MS = 30_000
+
+/** 문제마다 제한 시간: 생각 5초 + 읽을 글자(공백 제외)당 0.11초, 1초 단위 올림, 10~25초. */
+export function timeLimitMs(q: Question): number {
+  const len = (t: string) => t.replace(/\s/g, '').length
+  const read = q.skit ? q.skit.lines.reduce((n, l) => n + len(l.text), 0) : len(q.ask) + len(q.show ?? '')
+  const chars = read + q.options.reduce((n, o) => n + len(o), 0)
+  const ms = Math.ceil((6000 + chars * 160) / 1000) * 1000
+  return Math.min(MAX_LIMIT_MS, Math.max(MIN_LIMIT_MS, ms))
+}
 
 export interface Answer {
   correct: boolean
   msLeft: number
   hint: boolean
+  limitMs: number // 그 문제의 제한 시간
 }
 
 /** 오답 0. 정답 100 + 남은 시간 비례 가산(최대 20). 힌트를 썼으면 가산 0. */
 export function questionScore(a: Answer): number {
   if (!a.correct) return 0
   if (a.hint) return 100
-  const ratio = Math.min(Math.max(a.msLeft, 0), LIMIT_MS) / LIMIT_MS
+  const ratio = Math.min(Math.max(a.msLeft, 0), a.limitMs) / a.limitMs
   return 100 + Math.round(20 * ratio)
 }
 
