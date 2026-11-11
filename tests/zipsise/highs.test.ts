@@ -82,6 +82,20 @@ describe('fetchWeeklyHigh', () => {
     const [url, init] = f.mock.calls[0] as unknown as [string, { next?: { revalidate?: number } }]
     expect(url).toBe('https://example.test/v1/highs/recent.json')
     expect(init.next?.revalidate).toBe(3600)
+    // signal을 주면 Next의 데이터 캐시가 깨질 수 있어 넘기지 않는다
+    expect('signal' in init).toBe(false)
+  })
+  test('끝내 응답이 없는 fetch는 제한 시간(4초) 안에 null', async () => {
+    vi.useFakeTimers() // Date뿐 아니라 setTimeout도 가짜로
+    vi.setSystemTime(new Date('2026-11-11T03:00:00Z'))
+    globalThis.fetch = vi.fn(() => new Promise<Response>(() => {})) as unknown as typeof fetch
+    let out: unknown = 'pending'
+    const p = fetchWeeklyHigh().then((v) => { out = v })
+    await vi.advanceTimersByTimeAsync(3900)
+    expect(out).toBe('pending')
+    await vi.advanceTimersByTimeAsync(200)
+    await p
+    expect(out).toBeNull()
   })
   test('500이면 null', async () => {
     globalThis.fetch = vi.fn(async () => new Response('boom', { status: 500 })) as unknown as typeof fetch

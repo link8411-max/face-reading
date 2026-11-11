@@ -61,7 +61,8 @@ describe('url', () => {
   test('미리보기 주소에 이름이 없다', () => {
     const o = bujeokOgUrl(spec)
     expect(o).not.toMatch(/to=|from=/)
-    expect(o).toContain('/api/og/result?kind=bujeok&style=trad&wish=money&el=metal&finish=gold')
+    expect(o).toContain('/api/og/result?kind=bujeok&style=trad&wish=money&finish=gold')
+    expect(o).not.toContain('el=')
   })
   test('giftHeadline·mineHeadline', () => {
     expect(giftHeadline('민지')).toBe('민지님께 부적이 도착했어요')

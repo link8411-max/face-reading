@@ -1,6 +1,7 @@
 'use client'
 // 손으로 돌려 보는 입체 부적 카드 (설계 13절, 시안 docs/bujeok/card-spike.html).
-// 한 손가락으로 밀면 돌고(놓으면 관성으로 돌다 가까운 면에 멈춤), 두 손가락으로 벌리면 커지고, 휠도 된다.
+// 한 손가락으로 가로로 밀면 돌고(놓으면 관성으로 돌다 가까운 면에 멈춤), 세로로 밀면 페이지가 스크롤되고(touch-action: pan-y),
+// 두 손가락으로 벌리면 커진다. 마우스 휠은 페이지 스크롤이고, 트랙패드 핀치(ctrl+휠)만 확대·축소한다.
 // 움직임은 전부 requestAnimationFrame 하나가 spin.ts의 순수 함수로 계산해 CSS 변수에 쓴다(React 다시 그리기 없음).
 import { useEffect, useRef, useState, type CSSProperties, type PointerEvent as ReactPointerEvent } from 'react'
 import BujeokSvg from './BujeokSvg'
@@ -61,6 +62,8 @@ function CardInner({ spec, name, from, enter = false }: BujeokCardProps) {
   const cardRef = useRef<HTMLDivElement>(null)
   const dustRef = useRef<HTMLCanvasElement>(null)
   const reduceRef = useRef(false)
+  /** 프레임 루프를 다시 깨운다(움직임 줄이기에서 쉬던 루프를 입력이 올 때 되살림) */
+  const kick = useRef<() => void>(() => {})
   const mo = useRef<Motion | null>(null)
   if (mo.current === null) {
     const entering = enter && !prefersReduce()
@@ -87,7 +90,14 @@ function CardInner({ spec, name, from, enter = false }: BujeokCardProps) {
 
   const onDown = (e: ReactPointerEvent<HTMLDivElement>) => {
     const m = mo.current!
+    // 새로 눌린 primary 포인터가 있으면 up이 오지 않고 남은 옛 포인터는 지운다(두 손가락으로 오해하지 않게)
+    if (e.isPrimary) {
+      pts.current.clear()
+      m.dragging = false
+      m.pinching = false
+    }
     pts.current.set(e.pointerId, { x: e.clientX, y: e.clientY })
+    kick.current()
     try {
       stageRef.current?.setPointerCapture?.(e.pointerId)
     } catch {
@@ -167,6 +177,7 @@ function CardInner({ spec, name, from, enter = false }: BujeokCardProps) {
       setEntering(false)
     }
     m.touched = true
+    kick.current()
     m.vy = 11 // 놓으면 관성으로 한 면 돌고 가까운 면에 멈춘다
     setFace((f) => (f === 'front' ? 'back' : 'front'))
     m.face = m.face === 'front' ? 'back' : 'front'
@@ -176,17 +187,19 @@ function CardInner({ spec, name, from, enter = false }: BujeokCardProps) {
     const m = mo.current!
     if (e.key === 'ArrowLeft' || e.key === 'ArrowRight') {
       m.touched = true
+      kick.current()
       m.entering = false
       setEntering(false)
       m.vy = e.key === 'ArrowLeft' ? -9 : 9
     }
   }
 
-  // ---- 휠(마우스·트랙패드 핀치): 페이지가 같이 스크롤되지 않도록 passive 끔 ----
+  // ---- 트랙패드 핀치(ctrl+휠)만 확대·축소. 그냥 휠은 페이지 스크롤이므로 건드리지 않는다 ----
   useEffect(() => {
     const el = stageRef.current
     if (!el) return
     const onWheel = (e: WheelEvent) => {
+      if (!e.ctrlKey) return
       e.preventDefault()
       setZoom(zoomRef.current * Math.exp(-e.deltaY * 0.002))
     }
@@ -253,7 +266,11 @@ function CardInner({ spec, name, from, enter = false }: BujeokCardProps) {
       cx.globalAlpha = 1
     }
     fit()
-    window.addEventListener('resize', fit)
+    const onResize = () => {
+      fit()
+      kick.current() // 쉬는 중이어도 새 크기로 먼지를 다시 그린다
+    }
+    window.addEventListener('resize', onResize)
 
     const apply = () => {
       const tiltOn = !reduce
@@ -266,7 +283,8 @@ function CardInner({ spec, name, from, enter = false }: BujeokCardProps) {
       stage.style.setProperty('--sh', Math.max(0.15, Math.abs(Math.cos((m.ry * Math.PI) / 180))).toFixed(2))
     }
 
-    const update = (dt: number) => {
+    /** 이번 프레임에 카드가 움직였거나 움직일 예정인가(쉬는 중이면 false) */
+    const update = (dt: number): boolean => {
       if (m.entering) {
         m.entT += dt
         const k = Math.min(1, m.entT / ENTER_MS)
@@ -278,15 +296,16 @@ function CardInner({ spec, name, from, enter = false }: BujeokCardProps) {
           m.swayT = 0
           setEntering(false)
         }
-        return
+        return true
       }
       if (!m.touched && !reduce) {
         // 건드리기 전에는 혼자 천천히 좌우로 흔들린다
         m.swayT += dt
         m.ry = Math.sin(m.swayT / 1400) * SWAY_DEG
         m.rx = Math.sin(m.swayT / 2100) * 4
-        return
+        return true
       }
+      if (!m.touched) return false // 움직임 줄이기: 건드리기 전에는 가만히
       const s = stepSpin({ ry: m.ry, vy: m.vy, rx: m.rx }, m.dragging || m.pinching)
       m.ry = s.ry
       m.vy = s.vy
@@ -298,6 +317,14 @@ function CardInner({ spec, name, from, enter = false }: BujeokCardProps) {
           setFace(f)
         }
       }
+      if (m.dragging || m.pinching) return true
+      // 거의 멈췄으면 면에 딱 붙이고 쉰다
+      const target = Math.round(m.ry / 180) * 180
+      if (m.vy === 0 && Math.abs(m.ry - target) < 0.01 && m.rx === 0) {
+        m.ry = target
+        return false
+      }
+      return true
     }
 
     let raf = 0
@@ -306,9 +333,11 @@ function CardInner({ spec, name, from, enter = false }: BujeokCardProps) {
       raf = requestAnimationFrame(frame)
       const dt = last ? Math.min(now - last, 50) : 16
       last = now
-      update(dt)
+      const active = update(dt)
       apply()
       dust(now)
+      // 움직임 줄이기: 먼지는 한 번 그리고, 카드가 쉬면 루프를 멈춘다(입력이 오면 kick으로 되살림)
+      if (reduce && !active) stop()
     }
     const start = () => {
       if (!raf) {
@@ -322,6 +351,7 @@ function CardInner({ spec, name, from, enter = false }: BujeokCardProps) {
         raf = 0
       }
     }
+    kick.current = start
     // 탭이 가려지면 멈추고 다시 보이면 이어서 돈다
     const onVis = () => (document.hidden ? stop() : start())
     document.addEventListener('visibilitychange', onVis)
@@ -330,11 +360,12 @@ function CardInner({ spec, name, from, enter = false }: BujeokCardProps) {
     return () => {
       stop()
       document.removeEventListener('visibilitychange', onVis)
-      window.removeEventListener('resize', fit)
+      window.removeEventListener('resize', onResize)
+      kick.current = () => {}
     }
   }, [])
 
-  const stageStyle = { touchAction: 'none', '--ar': `${box.w}/${box.h}` } as CSSProperties
+  const stageStyle = { touchAction: 'pan-y', '--ar': `${box.w}/${box.h}` } as CSSProperties
   const cardStyle = { '--r': theme.radius, '--edge': theme.cardEdge, '--backbg': theme.backBg, '--backfg': theme.backFg, '--holo': spec.finish === 'holo' ? '.42' : '0' } as CSSProperties
   const zStyle = { '--zoom': zoom } as CSSProperties
   const pill = 'h-10 px-4 rounded-full bg-white text-ink border border-line text-sm font-medium disabled:opacity-40'
@@ -355,6 +386,7 @@ function CardInner({ spec, name, from, enter = false }: BujeokCardProps) {
         onPointerMove={onMove}
         onPointerUp={onUp}
         onPointerCancel={onUp}
+        onLostPointerCapture={onUp}
         onKeyDown={onKey}
       >
         <canvas ref={dustRef} className="bj-dust" aria-hidden="true" />

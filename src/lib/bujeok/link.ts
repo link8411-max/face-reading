@@ -60,7 +60,7 @@ export function parseNameHash(hash: string): { to: string | null; from: string |
 
 /** 미리보기 이미지 주소. 이름은 넣지 않는다 (CDN 캐시·개인정보) */
 export function bujeokOgUrl(spec: BujeokSpec): string {
-  return `${SITE}/api/og/result?kind=bujeok&style=${spec.style}&wish=${spec.wish}&el=${spec.el}&finish=${spec.finish}`
+  return `${SITE}/api/og/result?kind=bujeok&style=${spec.style}&wish=${spec.wish}&finish=${spec.finish}`
 }
 
 export function giftHeadline(to: string | null): string {

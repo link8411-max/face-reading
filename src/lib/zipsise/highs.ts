@@ -8,6 +8,7 @@ export { HOUSE_BANNER_URL }
 export type { WeeklyHigh }
 
 const DAYS = 7
+const TIMEOUT_MS = 4000
 const FILE = '/v1/highs/recent.json'
 const DATE_RE = /^\d{4}-\d{2}-\d{2}$/
 
@@ -61,11 +62,22 @@ export function pickWeeklyHigh(raw: unknown, today: string): WeeklyHigh | null {
 export async function fetchWeeklyHigh(): Promise<WeeklyHigh | null> {
   const base = (process.env.ZIPSISE_DATA_URL ?? '').trim().replace(/\/+$/, '')
   if (!base) return null
+  let timer: ReturnType<typeof setTimeout> | undefined
   try {
-    const res = await fetch(`${base}${FILE}`, { next: { revalidate: 3600 }, signal: AbortSignal.timeout(4000) })
-    if (!res.ok) return null
-    return pickWeeklyHigh(await res.json(), kstDate(new Date()))
+    // signal을 넘기면 Next의 데이터 캐시가 깨질 수 있어, 제한 시간은 Promise.race로 건다(시간이 지나면 null)
+    const timeout = new Promise<null>((resolve) => {
+      timer = setTimeout(() => resolve(null), TIMEOUT_MS)
+    })
+    const read = (async () => {
+      const res = await fetch(`${base}${FILE}`, { next: { revalidate: 3600 } })
+      if (!res.ok) return null
+      return pickWeeklyHigh(await res.json(), kstDate(new Date()))
+    })()
+    read.catch(() => {}) // 제한 시간이 먼저 끝난 뒤의 실패가 처리되지 않은 거부로 남지 않게
+    return await Promise.race([read, timeout])
   } catch {
     return null
+  } finally {
+    clearTimeout(timer)
   }
 }

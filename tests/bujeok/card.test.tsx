@@ -20,10 +20,11 @@ const card = () => screen.getByTestId('bujeok-card')
 const stage = () => screen.getByTestId('bujeok-stage')
 
 // jsdom에 PointerEvent가 없을 수 있어 직접 만든다
-function pointer(type: string, id: number, x: number, y: number) {
+function pointer(type: string, id: number, x: number, y: number, primary = id === 1) {
   const e = new MouseEvent(type, { bubbles: true, cancelable: true, clientX: x, clientY: y })
   Object.defineProperty(e, 'pointerId', { value: id })
   Object.defineProperty(e, 'pointerType', { value: 'touch' })
+  Object.defineProperty(e, 'isPrimary', { value: primary })
   act(() => {
     stage().dispatchEvent(e)
   })
@@ -106,17 +107,78 @@ test('두 손가락으로 벌리면 커지고, 그동안 돌아가지 않는다'
   pointer('pointerup', 1, 50, 100)
 })
 
-test('휠로 확대·축소', () => {
+test('휠: 그냥 휠은 페이지 스크롤(확대 없음, preventDefault 없음), ctrl+휠(트랙패드 핀치)만 확대·축소', () => {
   render(<BujeokCard spec={spec} name={null} />)
-  fireEvent.wheel(stage(), { deltaY: -200 })
+  const plain = new WheelEvent('wheel', { deltaY: -200, bubbles: true, cancelable: true })
+  act(() => { stage().dispatchEvent(plain) })
+  expect(plain.defaultPrevented).toBe(false)
+  expect(stage().getAttribute('data-zoom')).toBe('1')
+  const pinch = new WheelEvent('wheel', { deltaY: -200, ctrlKey: true, bubbles: true, cancelable: true })
+  act(() => { stage().dispatchEvent(pinch) })
+  expect(pinch.defaultPrevented).toBe(true)
   expect(Number(stage().getAttribute('data-zoom'))).toBeGreaterThan(1)
-  fireEvent.wheel(stage(), { deltaY: 5000 })
+  act(() => { stage().dispatchEvent(new WheelEvent('wheel', { deltaY: 5000, ctrlKey: true, bubbles: true, cancelable: true })) })
   expect(stage().getAttribute('data-zoom')).toBe('0.7')
 })
 
-test('무대는 touch-action none', () => {
+test('무대는 touch-action pan-y (세로로 밀면 페이지 스크롤, 가로는 돌리기, 두 손가락은 확대)', () => {
   render(<BujeokCard spec={spec} name={null} />)
-  expect(stage().style.touchAction).toBe('none')
+  expect(stage().style.touchAction).toBe('pan-y')
+})
+
+// requestAnimationFrame을 손으로 돌려 본다
+function fakeRaf() {
+  const q: FrameRequestCallback[] = []
+  vi.spyOn(window, 'requestAnimationFrame').mockImplementation((cb) => { q.push(cb); return q.length })
+  vi.spyOn(window, 'cancelAnimationFrame').mockImplementation(() => { q.length = 0 })
+  let t = 0
+  return {
+    pending: () => q.length,
+    tick: (n = 1) => { for (let i = 0; i < n; i++) { const cb = q.shift(); t += 16; if (cb) act(() => cb(t)) } },
+  }
+}
+
+test('lostpointercapture는 pointerup처럼 끝낸다', () => {
+  const raf = fakeRaf()
+  render(<BujeokCard spec={spec} name={null} />)
+  pointer('pointerdown', 1, 100, 100)
+  pointer('pointermove', 1, 140, 100)
+  pointer('lostpointercapture', 1, 140, 100)
+  pointer('pointermove', 1, 220, 100) // 끝난 뒤의 움직임은 무시(22도 + 관성 한 프레임 = 44도, 계속 끌었다면 66도)
+  raf.tick()
+  expect(Number(card().style.getPropertyValue('--ry').replace('deg', ''))).toBeLessThan(55)
+})
+
+test('primary 포인터가 새로 눌리면 남아 있던 포인터를 지운다(두 손가락 취급 안 함)', () => {
+  const raf = fakeRaf()
+  render(<BujeokCard spec={spec} name={null} />)
+  pointer('pointerdown', 1, 100, 100) // up이 안 온 채 남은 포인터
+  pointer('pointerdown', 5, 100, 100, true) // 새 primary
+  pointer('pointermove', 5, 180, 100)
+  raf.tick()
+  expect(stage().getAttribute('data-zoom')).toBe('1')
+  expect(Number(card().style.getPropertyValue('--ry').replace('deg', ''))).toBeGreaterThan(20)
+})
+
+test('움직임 줄이기: 먼지를 한 번 그리고 루프를 멈추고, 입력이 오면 다시 돌다가 쉬면 멈춘다', () => {
+  mockMotion(true)
+  const raf = fakeRaf()
+  render(<BujeokCard spec={spec} name={null} />)
+  expect(raf.pending()).toBe(1)
+  raf.tick()
+  expect(raf.pending()).toBe(0) // 가만히 있는 카드는 다음 프레임을 요청하지 않는다
+  fireEvent.click(screen.getByTestId('bujeok-flip')) // 관성으로 한 면 돈다
+  expect(raf.pending()).toBe(1)
+  for (let i = 0; i < 2000 && raf.pending(); i++) raf.tick()
+  expect(raf.pending()).toBe(0)
+  expect(card().getAttribute('data-face')).toBe('back')
+})
+
+test('움직임 줄이기를 안 켰으면 루프는 계속 돈다(먼지가 떠다님)', () => {
+  const raf = fakeRaf()
+  render(<BujeokCard spec={spec} name={null} />)
+  raf.tick(5)
+  expect(raf.pending()).toBe(1)
 })
 
 test('언마운트하면 rAF를 멈춘다', () => {

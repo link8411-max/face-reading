@@ -58,17 +58,17 @@ test('결과 이미지 캡처는 no-screenshot 요소(생년월일 등)와 ifram
   expect(fortune).toMatch(/className="[^"]*no-screenshot[^"]*">\s*\{birthDate\.year\}년/)
 })
 
-test('미리보기 이미지: 부적은 화풍·소원·기운이 허용 목록 안일 때만, 이름은 받지 않는다', () => {
+test('미리보기 이미지: 부적은 화풍·소원·마감이 허용 목록 안일 때만, 이름·기운(el)은 받지 않는다', () => {
   const q = (s: string) => ogQueryOk(new URLSearchParams(s))
-  expect(q('kind=bujeok&style=trad&wish=money&el=metal&finish=gold')).toBe(true)
-  expect(q('kind=bujeok&style=cute&wish=guard&el=water&finish=holo')).toBe(true)
-  expect(q('kind=bujeok&style=cute&wish=guard&el=water&finish=paper')).toBe(true)
-  expect(q('kind=bujeok&style=trad&wish=money&el=metal')).toBe(false)
-  expect(q('kind=bujeok&style=trad&wish=money&el=metal&finish=silver')).toBe(false)
-  expect(q('kind=bujeok&style=oil&wish=money&el=metal&finish=gold')).toBe(false)
-  expect(q('kind=bujeok&style=trad&wish=rich&el=metal&finish=gold')).toBe(false)
-  expect(q('kind=bujeok&style=trad&wish=money&el=gold&finish=gold')).toBe(false)
+  expect(q('kind=bujeok&style=trad&wish=money&finish=gold')).toBe(true)
+  expect(q('kind=bujeok&style=cute&wish=guard&finish=holo')).toBe(true)
+  expect(q('kind=bujeok&style=cute&wish=guard&finish=paper')).toBe(true)
+  // 기운은 그림에 쓰이지 않아 같은 이미지가 5벌 캐시되므로 받지 않는다
+  expect(q('kind=bujeok&style=trad&wish=money&el=metal&finish=gold')).toBe(false)
   expect(q('kind=bujeok&style=trad&wish=money')).toBe(false)
-  expect(q('kind=bujeok&style=trad&wish=money&el=metal&finish=gold&to=%EB%AF%BC%EC%A7%80')).toBe(false)
-  expect(q('kind=bujeok&style=trad&wish=money&el=metal&finish=gold&s=90')).toBe(false)
+  expect(q('kind=bujeok&style=trad&wish=money&finish=silver')).toBe(false)
+  expect(q('kind=bujeok&style=oil&wish=money&finish=gold')).toBe(false)
+  expect(q('kind=bujeok&style=trad&wish=rich&finish=gold')).toBe(false)
+  expect(q('kind=bujeok&style=trad&wish=money&finish=gold&to=%EB%AF%BC%EC%A7%80')).toBe(false)
+  expect(q('kind=bujeok&style=trad&wish=money&finish=gold&s=90')).toBe(false)
 })

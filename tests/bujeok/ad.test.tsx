@@ -89,7 +89,7 @@ test('배너 문구에 금지 표현이 없다', () => {
 })
 
 test('착지: 열기 전에는 광고가 없고, 연 뒤 카드 아래(버튼 위)에 있다', () => {
-  render(<GiftLanding spec={spec} to="민지" from={null} ad={<BujeokAd wish="money" high={high} />} />)
+  render(<GiftLanding spec={spec} ad={<BujeokAd wish="money" high={high} />} />)
   expect(screen.queryByText('이번 주 신고가')).toBeNull()
   fireEvent.click(screen.getByRole('button', { name: '열어 보기' }))
   const card = screen.getByTestId('bujeok-card')

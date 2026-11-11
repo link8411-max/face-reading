@@ -1,7 +1,7 @@
 import { readFileSync } from 'node:fs'
 import { pageGuides, faqJsonLd } from '@/content/pageGuides'
 import { metadata } from '@/app/bujeok/layout'
-import { BANNED_PHRASES } from '@/lib/bujeok/bannedPhrases'
+import { BANNED_PHRASES, EXEMPT_IN_HANJA_MEANING } from '@/lib/bujeok/bannedPhrases'
 import { WISH_TEXT } from '@/content/bujeok'
 import { WISHES } from '@/lib/bujeok/keys'
 
@@ -32,7 +32,9 @@ test('소원 다섯 가지의 한자 글귀와 한글 뜻이 본문에 있다', 
 })
 
 test('효험 단정 표현·오행 한자·이모지가 없다', () => {
-  for (const b of BANNED_PHRASES) expect(all).not.toContain(b)
+  // '들어온다'만 한자 뜻풀이(실제 문구의 번역) 안에서는 허용한다
+  const noMeaning = WISHES.reduce((t, w) => t.split(WISH_TEXT[w].hanjaMeaning.replace(/에요$/, '')).join(''), all)
+  for (const b of BANNED_PHRASES) expect(EXEMPT_IN_HANJA_MEANING.includes(b as never) ? noMeaning : all).not.toContain(b)
   // 소원 글귀(招財進寶 등)는 허용하고, 그걸 뺀 나머지에 오행 한자가 없어야 한다
   const rest = WISHES.reduce((t, w) => t.split(WISH_TEXT[w].hanja).join(''), all)
   expect(rest).not.toMatch(/[木火土金水]/)

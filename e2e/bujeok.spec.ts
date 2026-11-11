@@ -89,7 +89,7 @@ test('손으로 밀면 돌아가서 뒷면에 멈춘다', async ({ page }) => {
   await expect(card).toHaveAttribute('data-face', 'back', { timeout: 8_000 })
 })
 
-test('확대·축소 버튼과 휠, 두 번 두드리기', async ({ page }) => {
+test('확대·축소 버튼과 ctrl+휠, 두 번 두드리기', async ({ page }) => {
   await make(page, '건강', '전통')
   const stage = page.getByTestId('bujeok-stage')
   await page.getByTestId('bujeok-zoom-in').click()
@@ -99,12 +99,17 @@ test('확대·축소 버튼과 휠, 두 번 두드리기', async ({ page }) => {
   await expect(stage).toHaveAttribute('data-zoom', '0.75')
   const box = (await stage.boundingBox())!
   await page.mouse.move(box.x + box.width / 2, box.y + box.height / 2)
+  // 그냥 휠은 페이지 스크롤이라 확대되지 않는다. ctrl+휠(트랙패드 핀치)만 확대한다
   await page.mouse.wheel(0, -300)
-  expect(Number(await stage.getAttribute('data-zoom'))).toBeGreaterThan(0.75)
+  await expect(stage).toHaveAttribute('data-zoom', '0.75')
+  await page.keyboard.down('Control')
+  await page.mouse.wheel(0, -300)
+  await page.keyboard.up('Control')
+  await expect.poll(async () => Number(await stage.getAttribute('data-zoom'))).toBeGreaterThan(0.75)
   await page.mouse.dblclick(box.x + box.width / 2, box.y + box.height / 2)
   await expect(stage).toHaveAttribute('data-zoom', '1')
-  // 페이지 전체는 확대되지 않는다
-  expect(await stage.evaluate((el) => getComputedStyle(el).touchAction)).toBe('none')
+  // 세로로 밀면 페이지가 스크롤되고 가로로 밀면 카드가 돈다
+  expect(await stage.evaluate((el) => getComputedStyle(el).touchAction)).toBe('pan-y')
 })
 
 test('아이폰 사파리: 길게 눌러 저장 화면에 1170×2532 이미지가 뜬다', async ({ browser }) => {

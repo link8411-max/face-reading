@@ -130,7 +130,7 @@ public/
 - 하단 탭: 홈 / 관상(`/face-tests`) / 사주·운세(`/unse`) / 궁합(`/mbti`). URL은 그대로 두고 이름만 바꿨다.
 - 허브 순서: 관상·얼굴 테스트 = [관상·동물상] 내 관상 풀이 → 동물상, [삼국지로 보는 얼굴] 닮은꼴 → 우리 팀 → 월드컵 → 열전 → 영상 → 일기토. 사주·운세 = 내 사주 풀이 → 신년운세 → 띠별 → 오늘의 운세, [MBTI] 오늘의 MBTI 운세. 궁합·MBTI = 얼굴 궁합 → MBTI 궁합 계산기 → MBTI 유형별 풀이(오늘의 MBTI 운세는 사주·운세에만).
 - 푸터는 같은 데이터를 쓰되 `footer: false` 항목은 뺀다(삼국지는 닮은꼴·열전만 푸터에).
-- 결과 사이 연결: `NEXT_BY_TEST`(navigation.ts, 같은 줄기 1 + 다른 줄기 1) → `components/result/NextSteps`("이어서 보면 좋아요"). 사주·신년운세·띠별 글·오늘의 운세·관상·동물상·삼국지·MBTI 유형·MBTI 궁합 계산기에 붙어 있다. 사진 결과에서는 같은 사진 칸을 `NextTests`가 맡으므로 NextSteps는 다른 줄기만 보인다(`withPhoto`). GA `next_test_click(test_name=간 곳)`. 생년월일 넘기기는 아직 없다(링크만).
+- 결과 사이 연결: `NEXT_BY_TEST`(navigation.ts, 같은 줄기 1 + 다른 줄기 1) → `components/result/NextSteps`("이어서 보면 좋아요"). 사주·신년운세·띠별 글·오늘의 운세·관상·동물상·삼국지·MBTI 유형·MBTI 궁합 계산기에 붙어 있다. 사진 결과에서는 같은 사진 칸을 `NextTests`가 맡으므로 NextSteps는 다른 줄기만 보인다(`withPhoto`). GA `next_test_click(test_name=간 곳)`. 생년월일 넘기기는 사주·신년운세 결과의 부적 카드 하나뿐이다(`handOffBirth`, 메모리로만 전달; 나머지는 링크만). `NEXT_BY_TEST`의 saju·fortune은 이제 서로 대신 부적으로 이어진다.
 - 디자인 토큰·글꼴은 위 "디자인 시스템 (4b 뉴트럴)" 참고.
 - 참여자 수·인기 순위 같은 숫자는 실제 집계 전까지 넣지 않는다(테스트로 막음).
 
