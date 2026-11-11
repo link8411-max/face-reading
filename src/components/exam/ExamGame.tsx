@@ -1,5 +1,6 @@
 'use client'
 
+import Link from 'next/link'
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { track } from '@/lib/analytics'
 import { kstDate, onDayMaybeChanged } from '@/lib/kst'
@@ -162,6 +163,7 @@ export default function ExamGame({ rounds, challenge = null }: { rounds: Round[]
 
   if (phase === 'start') {
     return (
+      <>
       <section className="ex-rise-lg mt-6 rounded-[30px] bg-card px-6 pt-7 pb-6 text-center">
         <p className="text-sm font-medium text-accent">{viewRound.round}회차 · {roundDateLabel(viewRound.round)}</p>
         {challenge && <p className="ex-emph mt-3 font-serif text-[19px] font-bold break-keep">친구는 {challenge.grade}등급. 이길 수 있어요?</p>}
@@ -171,6 +173,8 @@ export default function ExamGame({ rounds, challenge = null }: { rounds: Round[]
           시험 시작
         </button>
       </section>
+      <Link href="/exam/meme/words" className="mt-4 flex h-11 items-center justify-center text-sm text-muted underline underline-offset-4">지난 문제에 나온 말 모아 보기</Link>
+      </>
     )
   }
 

@@ -9,7 +9,7 @@ export const EXAM_EPOCH = '2026-11-11'
 
 type Used = Map<string, { last: number; types: QType[] }>
 
-function rng(seed: number) {
+export function rng(seed: number) {
   let a = seed >>> 0
   return () => {
     a = (a + 0x6d2b79f5) >>> 0

@@ -5,7 +5,8 @@ test('모든 라우트가 고정된 lastModified를 가진다', () => {
 })
 
 test('sitemap 항목은 new Date()가 아니라 LAST_MODIFIED 값을 쓴다', () => {
-  const entries = sitemap()
+  // 공개된 낱말 페이지(/exam/meme/words/<말>)는 날짜에 따라 늘어나므로 따로 본다(tests/exam/words.test.tsx)
+  const entries = sitemap().filter((e) => !e.url.includes('/exam/meme/words/'))
   expect(entries).toHaveLength(SITEMAP_ROUTES.length)
   for (const e of entries) {
     const route = e.url.replace('https://unse-ai.com', '')
