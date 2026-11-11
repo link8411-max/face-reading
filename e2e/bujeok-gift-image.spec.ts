@@ -6,10 +6,9 @@ const TO = '민지'
 
 async function toGiftDone(page: Page) {
   await page.goto('/bujeok?mode=gift')
-  await page.getByRole('radio', { name: '합격' }).click()
-  await page.getByRole('radio', { name: '전통' }).click()
+  await page.getByRole('button', { name: '합격', exact: true }).click()
   await page.getByLabel('받는 사람 이름').fill(TO)
-  await page.getByRole('button', { name: '부적 만들기' }).click()
+  await page.getByRole('button', { name: '이 부적 선물하기' }).click()
   await page.getByRole('button', { name: '그냥 완성하기' }).click() // 전통 선물은 보내는 사람이 긋기만 한다
   await expect(page.getByTestId('bujeok-card')).toBeVisible()
   await expect(page.getByRole('button', { name: '링크로 보내기' })).toBeVisible()
@@ -55,11 +54,11 @@ const shareStub = async (page: Page) => {
   })
 }
 
-test('선물 완성 화면 버튼 순서: 카카오톡으로 보내기 → 링크로 보내기 → 그림 저장', async ({ page }) => {
+test('선물 완성 화면 버튼 순서: 큰 버튼 카카오톡으로 보내기 → 링크로 보내기, 작은 줄 그림 저장 · 다시 만들기 · 내 부적함', async ({ page }) => {
   await kakaoStub('ok')(page)
   await toGiftDone(page)
-  const names = await page.locator('.no-screenshot:has(button:text-is("카카오톡으로 보내기")) > button, .no-screenshot:has(button:text-is("카카오톡으로 보내기")) > a').allTextContents()
-  expect(names.map((t) => t.trim()).slice(0, 5)).toEqual(['카카오톡으로 보내기', '링크로 보내기', '그림 저장', '다시 만들기', '내 부적함'])
+  const names = await page.locator('.no-screenshot:has(button:text-is("카카오톡으로 보내기")) button, .no-screenshot:has(button:text-is("카카오톡으로 보내기")) a').allTextContents()
+  expect(names.map((t) => t.trim()).slice(0, 4)).toEqual(['카카오톡으로 보내기', '링크로 보내기', '그림 저장', '다시 만들기'])
   await expect(page.getByRole('button', { name: '선물 보내기' })).toHaveCount(0)
 })
 
