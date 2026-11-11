@@ -8,10 +8,17 @@ const SDK_INTEGRITY = 'sha384-DKYJZ8NLiK8MN4/C5P2dtSmLQ4KwPaoqAfyA/DfmEc1VDxu4yy
 // imageSize: imageUrl의 실제 크기(기본은 미리보기 이미지 1200×630). 올려 둔 선물 그림은 1080×1350
 export interface KakaoShareMeta { title: string; text: string; url: string; imageUrl: string; imageSize?: { width: number; height: number } }
 
+/** 카카오 피드 카드 템플릿(sendDefault에 그대로 넘긴다) */
+export interface KakaoFeed {
+  objectType: 'feed'
+  content: { title: string; description?: string; imageUrl: string; imageWidth: number; imageHeight: number; link: { mobileWebUrl: string; webUrl: string } }
+  buttons: { title: string; link: { mobileWebUrl: string; webUrl: string } }[]
+}
+
 type KakaoSDK = {
   isInitialized: () => boolean
   init: (key: string) => void
-  Share: { sendDefault: (template: ReturnType<typeof kakaoFeed>) => void; uploadImage?: (o: { file: File[] }) => Promise<unknown> }
+  Share: { sendDefault: (template: KakaoFeed) => void; uploadImage?: (o: { file: File[] }) => Promise<unknown> }
 }
 
 export function isKakaoInApp(userAgent: string): boolean {
@@ -62,10 +69,15 @@ function init(k: KakaoSDK): KakaoSDK | null {
 
 // 카카오톡 공유 화면을 연다. SDK를 못 불러오거나 실패하면 false (호출 쪽이 링크 공유·복사로 넘어간다)
 export async function shareKakao(m: KakaoShareMeta): Promise<boolean> {
+  return shareKakaoFeed(kakaoFeed(m))
+}
+
+// 만들어 둔 피드 템플릿을 보낸다(브라우저 종류와 상관없이 SDK가 카카오톡 앱·PC 카카오를 연다)
+export async function shareKakaoFeed(feed: KakaoFeed): Promise<boolean> {
   const k = await loadKakao()
   if (!k) return false
   try {
-    k.Share.sendDefault(kakaoFeed(m))
+    k.Share.sendDefault(feed)
     return true
   } catch {
     return false

@@ -172,8 +172,8 @@ async function makeGift(page: Page, opts: { to: string; from?: string; wish?: st
   await expect(page.getByRole('button', { name: '부적 만들기' })).toBeEnabled()
   await page.getByRole('button', { name: '부적 만들기' }).click()
   await expect(page.getByTestId('bujeok-card')).toBeVisible()
-  await expect(page.getByRole('button', { name: '선물 보내기' })).toBeVisible()
-  await page.getByRole('button', { name: '선물 보내기' }).click()
+  await expect(page.getByRole('button', { name: '링크로 보내기' })).toBeVisible()
+  await page.getByRole('button', { name: '링크로 보내기' }).click()
   await expect.poll(() => page.evaluate(() => (window as unknown as { __shared?: unknown }).__shared !== undefined)).toBe(true)
   return (await page.evaluate(() => (window as unknown as { __shared: { url: string } }).__shared.url)) as string
 }

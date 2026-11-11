@@ -1,9 +1,14 @@
 'use client'
-// 완성 화면 아래쪽: 문구 + 버튼. 내 부적: 잠금화면용 저장 · 공유하기 · 내 부적 링크 보내기 · 선물하기 · 다시 만들기 · 내 부적함 / 선물: 선물 보내기(주) · 잠금화면용 저장 · 다시 만들기 · 내 부적함
-import type { ReactNode } from 'react'
+// 완성 화면 아래쪽: 문구 + 버튼. 내 부적: 잠금화면용 저장 · 공유하기 · 내 부적 링크 보내기 · 선물하기 · 다시 만들기 · 내 부적함 / 선물: 카카오톡으로 보내기(주) · 링크로 보내기 · 그림 저장 · 다시 만들기 · 내 부적함
+import { useState, type ReactNode } from 'react'
 import Link from 'next/link'
 import { Icon } from '@/components/icons'
 import { useResultShare } from '@/hooks/useResultShare'
+import { shareResult, SHARE_NOTICE, type ShareOutcome } from '@/lib/share'
+import { shareKakaoFeed } from '@/lib/kakao'
+import { saveImage } from '@/lib/saveImage'
+import { track } from '@/lib/analytics'
+import { giftKakaoFeed, type KakaoImage } from '@/lib/bujeok/giftShare'
 import { useWallpaperSave } from './useWallpaperSave'
 import { useGiftImage } from './useGiftImage'
 import { addToBox } from '@/lib/bujeok/box'
@@ -24,22 +29,74 @@ export default function BujeokDone({ spec, getSvg, onRetry, gift, ad, mineName =
   const { saving, saveNotice, save } = useWallpaperSave(spec, getSvg)
   // 선물: 이름 도장이 찍힌 앞면 그림(1080×1350)을 완성 화면이 뜨면 미리 만들어 두고 공유에 같이 보낸다(카카오톡은 카드 이미지로 올린다)
   const giftImage = useGiftImage(spec, getSvg, !!gift)
-  // 내 부적: 공유 링크는 시작 화면(/bujeok)이다. 이름·생년월일·소원은 싣지 않는다.
-  // 선물: 받는 사람 이름이 든 선물 링크(bujeokGiftUrl) + 이름 도장이 찍힌 부적 그림. 카카오톡 카드 이미지는 올려 둔 그림, 실패하면 이름 없는 미리보기 이미지.
+  // 내 부적: 공유 링크는 시작 화면(/bujeok)이다. 이름·생년월일·소원은 싣지 않는다. (선물은 아래 sendKakao·sendLink가 따로 보낸다)
   const { busy, notice, share } = useResultShare(
-    gift
-      ? { testName: 'bujeok', title: SHARE_TITLE, text: giftHeadline(gift.to), url: bujeokGiftUrl(spec, { to: gift.to, from: gift.from ?? undefined }), imageUrl: bujeokOgUrl(spec), getFile: giftImage.getFile, getKakaoImage: giftImage.getKakaoImage }
-      : { testName: 'bujeok', title: SHARE_TITLE, text: SHARE_TEXT, url: `${SITE}/bujeok?${UTM('bujeok')}`, imageUrl: SHARE_IMAGE },
+    gift ? null : { testName: 'bujeok', title: SHARE_TITLE, text: SHARE_TEXT, url: `${SITE}/bujeok?${UTM('bujeok')}`, imageUrl: SHARE_IMAGE },
   )
 
   // 내 부적 링크: 카톡 "나와의 채팅" 등에 보관해 두고 언제든 같은 카드를 다시 연다. 이름은 # 뒤
   const mineLink = useResultShare(
     gift ? null : { testName: 'bujeok', title: SHARE_TITLE, text: MINE_LINK_TEXT, url: bujeokMineUrl(spec, mineName), imageUrl: bujeokOgUrl(spec) },
   )
-  // 선물은 공유가 실제로 끝났거나 링크가 복사됐을 때만 "보낸 부적"으로 남긴다(취소·실패는 남기지 않음)
-  const sendGift = async () => {
-    const out = await share()
-    if (gift && out && out !== 'cancelled' && out !== 'failed') addToBox({ code: bujeokCode(spec), to: gift.to, from: gift.from, kind: 'sent' })
+  // 선물: 받는 사람 이름이 든 선물 링크(bujeokGiftUrl)를 카카오 카드(주)·링크 공유·그림 저장으로 보낸다.
+  // 그림 파일은 공유창에 싣지 않는다(카카오톡 등이 그림만 남기고 글·링크를 버린다). 카드 이미지는 올려 둔 그림, 실패·3초 초과면 이름 없는 미리보기 이미지.
+  const giftUrl = gift ? bujeokGiftUrl(spec, { to: gift.to, from: gift.from ?? undefined }) : ''
+  const [giftBusy, setGiftBusy] = useState<'kakao' | 'link' | 'save' | null>(null)
+  const [giftNotice, setGiftNotice] = useState<string | null>(null)
+  // 선물은 공유가 실제로 끝났거나 카드가 열렸거나 링크가 복사됐을 때만 "보낸 부적"으로 남긴다(취소·실패는 남기지 않음)
+  const remember = () => gift && addToBox({ code: bujeokCode(spec), to: gift.to, from: gift.from, kind: 'sent' })
+  const shareLink = async (): Promise<ShareOutcome> => {
+    track('share_click', { test_name: 'bujeok', method: 'link' })
+    const out = await shareResult({ file: null, title: SHARE_TITLE, text: giftHeadline(gift!.to), url: giftUrl })
+    if (out === 'copied') setGiftNotice(SHARE_NOTICE.copied)
+    if (out === 'failed') setGiftNotice(SHARE_NOTICE.failed)
+    if (out !== 'cancelled' && out !== 'failed') remember()
+    return out
+  }
+  const sendLink = async () => {
+    if (giftBusy) return
+    setGiftBusy('link')
+    setGiftNotice(null)
+    try {
+      await shareLink()
+    } finally {
+      setGiftBusy(null)
+    }
+  }
+  const sendKakao = async () => {
+    if (giftBusy || !gift) return
+    setGiftBusy('kakao')
+    setGiftNotice(null)
+    try {
+      const og: KakaoImage = { url: bujeokOgUrl(spec), width: 1200, height: 630 }
+      const image = await giftImage.getKakaoImage(og)
+      if (await shareKakaoFeed(giftKakaoFeed({ to: gift.to, wishLabel: text.label, url: giftUrl, image }))) {
+        track('share_click', { test_name: 'bujeok', method: 'kakao' })
+        remember()
+        return
+      }
+      // 카카오 SDK를 못 쓰면 링크 공유로 이어서 보내고 짧게 알린다
+      const out = await shareLink()
+      setGiftNotice(out === 'copied' ? '카카오톡을 열지 못해 링크를 복사했어요. 원하는 곳에 붙여 넣어 주세요.' : out === 'failed' ? SHARE_NOTICE.failed : '카카오톡을 열지 못해 링크 공유창으로 보냈어요.')
+    } finally {
+      setGiftBusy(null)
+    }
+  }
+  const saveGift = async () => {
+    if (giftBusy) return
+    setGiftBusy('save')
+    setGiftNotice(null)
+    try {
+      const f = await giftImage.getFile()
+      if (!f) {
+        setGiftNotice('이미지를 만들다 문제가 생겼어요. 잠시 뒤에 다시 해 주세요.')
+        return
+      }
+      saveImage(f, f.name)
+      track('share_click', { test_name: 'bujeok', method: 'save_image' })
+    } finally {
+      setGiftBusy(null)
+    }
   }
 
   const pill = 'h-12 rounded-full bg-white text-ink border border-line text-sm font-medium flex items-center justify-center gap-1.5 disabled:opacity-50'
@@ -61,16 +118,20 @@ export default function BujeokDone({ spec, getSvg, onRetry, gift, ad, mineName =
       <div className="no-screenshot flex flex-col mt-5">
         {gift ? (
           <>
-            <button type="button" onClick={() => void sendGift()} disabled={busy} className="h-[52px] rounded-full flex items-center justify-center gap-2 bg-ink text-paper text-[15px] font-medium disabled:opacity-50">
+            <button type="button" onClick={() => void sendKakao()} disabled={!!giftBusy} className="h-[52px] rounded-full flex items-center justify-center gap-2 bg-ink text-paper text-[15px] font-medium disabled:opacity-50">
               <Icon name="heart" size={18} />
-              {busy ? '보낼 준비 중…' : '선물 보내기'}
+              카카오톡으로 보내기
             </button>
-            {notice && <p role="status" className="mt-2 text-xs text-center text-muted">{notice}</p>}
-            <button type="button" onClick={() => void save()} disabled={saving} className={`mt-2 ${pill} h-[52px] text-[15px]`}>
-              <Icon name="download" size={18} />
-              {saving ? '이미지 만드는 중…' : '잠금화면용 저장'}
+            <button type="button" onClick={() => void sendLink()} disabled={!!giftBusy} className={`mt-2 ${pill} h-[52px] text-[15px]`}>
+              <Icon name="share" size={18} />
+              링크로 보내기
             </button>
-            {saveNotice && <p role="status" className="mt-2 text-xs text-center text-muted">{saveNotice}</p>}
+            <button type="button" onClick={() => void saveGift()} disabled={!!giftBusy} className={`mt-2 ${pill}`}>
+              <Icon name="download" size={16} />
+              그림 저장
+            </button>
+            {giftBusy === 'kakao' && <p className="mt-2 text-xs text-center text-muted">카카오톡 보낼 준비 중…</p>}
+            {giftNotice && <p role="status" className="mt-2 text-xs text-center text-muted">{giftNotice}</p>}
             <button type="button" onClick={onRetry} className={`mt-2 ${pill}`}>
               <Icon name="refresh" size={16} />
               다시 만들기

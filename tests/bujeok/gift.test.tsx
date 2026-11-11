@@ -81,7 +81,7 @@ test('initial.finish가 마감을 미리 고른다', () => {
   expect(screen.getByRole('radio', { name: '홀로그램' }).getAttribute('aria-checked')).toBe('true')
 })
 
-test('선물 완성 화면: 카드(받는 사람 이름 뒷면)와 "선물 보내기"가 있고, 공유 링크는 bujeokGiftUrl과 같다', async () => {
+test('선물 완성 화면: 카드(받는 사람 이름 뒷면)와 "링크로 보내기"가 있고, 공유 링크는 bujeokGiftUrl과 같다', async () => {
   render(<BujeokClient initial={{ mode: 'gift' }} />)
   pick('연애')
   pick('귀여운')
@@ -91,12 +91,13 @@ test('선물 완성 화면: 카드(받는 사람 이름 뒷면)와 "선물 보�
   fireEvent.click(make())
   await screen.findByTestId('bujeok-card')
   expect(screen.queryByRole('button', { name: '공유하기' })).toBeNull()
-  fireEvent.click(screen.getByRole('button', { name: '선물 보내기' }))
+  fireEvent.click(screen.getByRole('button', { name: '링크로 보내기' }))
   await waitFor(() => expect(shareResult).toHaveBeenCalledTimes(1))
   const arg = shareResult.mock.calls[0][0] as { url: string; text: string }
   const code = new URL(arg.url).pathname.split('/').pop()!
   const got = parseBujeokCode(code)!
   expect(got).toMatchObject({ style: 'cute', wish: 'love', finish: 'paper' })
+  expect((arg as { file?: unknown }).file).toBeNull() // 링크 우선: 그림 파일을 같이 보내지 않는다
   expect(arg.url).toBe(bujeokGiftUrl(got, { to: '민지', from: '철수' }))
   expect(arg.url).not.toMatch(/birth|year|19\d\d/)
   expect(arg.url.split('#')[0]).not.toMatch(/민지|철수|%EB/)
@@ -135,6 +136,18 @@ test('착지: 이름이 없으면 "부적이 도착했어요", 보낸 사람 줄
   expect(screen.getByText('부적이 도착했어요')).toBeTruthy()
   fireEvent.click(screen.getByRole('button', { name: '열어 보기' }))
   expect(screen.queryByText(/님이 보냈어요/)).toBeNull()
+})
+
+test('착지: 카카오가 해시(#to=…)를 떼 가도 이름 없이 정상으로 열린다', () => {
+  for (const h of ['', '#', '#x=1']) {
+    setHash(h)
+    const { unmount } = render(<GiftLanding spec={spec} />)
+    expect(screen.getByRole('heading', { level: 1 }).textContent).toBe('부적이 도착했어요')
+    fireEvent.click(screen.getByRole('button', { name: '열어 보기' }))
+    expect(screen.getByTestId('bujeok-card')).toBeTruthy()
+    expect(screen.queryByText(/님이 보냈어요/)).toBeNull()
+    unmount()
+  }
 })
 
 test('착지: 9자·이모지·태그 해시는 이름 없이', () => {
@@ -208,7 +221,7 @@ test('선물 보내기: 공유가 끝났거나 링크를 복사했을 때만 sen
     type('보내는 사람 이름', '철수')
     fireEvent.click(make())
     await screen.findByTestId('bujeok-card')
-    fireEvent.click(screen.getByRole('button', { name: '선물 보내기' }))
+    fireEvent.click(screen.getByRole('button', { name: '링크로 보내기' }))
     await waitFor(() => expect(shareResult).toHaveBeenCalled())
     await act(async () => {})
     unmount()
