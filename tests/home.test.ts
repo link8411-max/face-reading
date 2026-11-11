@@ -62,3 +62,11 @@ test('친구랑 같이 해봐요: 동물상·얼굴 궁합·MBTI 궁합·삼국�
   expect(exam.title).toBe('밈 능력고사')
   expect(exam.desc).toBe('매일 5문제, 내 등급은?')
 })
+
+// 임시 띠(2026-11-11): 인스타 프로필 링크를 /exam/meme으로 바꾸면 띠와 함께 지운다.
+test('임시 띠: 홈 맨 위(관상 히어로 앞)에 밈 능력고사로 가는 링크가 있다', () => {
+  const src = readFileSync('src/app/page.tsx', 'utf8')
+  const strip = src.indexOf('href="/exam/meme"')
+  expect(strip).toBeGreaterThan(0)
+  expect(strip).toBeLessThan(src.indexOf('<FaceHero'))
+})
