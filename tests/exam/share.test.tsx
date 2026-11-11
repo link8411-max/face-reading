@@ -38,7 +38,7 @@ afterEach(() => {
 })
 
 test('잘못된 코드로 들어와도 시작 화면이 보인다', async () => {
-  for (const code of ['zzz', '999-OOOOO-9999-0', '3-OXOO-300-5', '15-OOOOO-600-1', '3-OXOOX-345-5x']) {
+  for (const code of ['zzz', '999-OOOOO-9999-0', '3-OXOO-300-5', '99-OOOOO-600-1', '3-OXOOX-345-5x']) {
     cleanup()
     render(await ExamSharePage(params(code)))
     expect(screen.getByRole('heading', { level: 1 }).textContent).toBe('밈 능력고사')

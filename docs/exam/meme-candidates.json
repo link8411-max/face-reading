@@ -1,6 +1,52 @@
 {
-  "updated": "2026-11-10",
+  "updated": "2026-11-11",
   "terms": {
+    "67": {
+      "term": "67",
+      "glosses": [],
+      "blogs": [],
+      "firstSeen": "2026-11-11",
+      "from": "seed",
+      "status": "checked",
+      "lastSeen": "2026-11-11",
+      "verify": {
+        "summary": "67은 미국 10대들 사이에서 유행하는 인터넷 밈으로, 특별히 정해진 의미가 없는 모호한 표현입니다.",
+        "sources": 0,
+        "examples": [],
+        "noResult": false,
+        "redirected": false,
+        "links": [
+          {
+            "title": "namu.wiki›67(인터넷 밈) 새 창 열림",
+            "href": "https://namu.wiki/w/67(%EC%9D%B8%ED%84%B0%EB%84%B7%20%EB%B0%88)"
+          },
+          {
+            "title": "“67이 대체 뭔데?” 미국 10대 사이에서 난리 난 밈 식스세븐뜻 새 창 열림",
+            "href": "https://blog.naver.com/dinnernin/224443621255"
+          },
+          {
+            "title": "식스세븐 밈 (67 뜻) 최신 슬랭 의미 공유해봐요!! 새 창 열림",
+            "href": "https://cafe.naver.com/ieltsdoksa/897045?art=ZXh0ZXJuYWwtc2VydmljZS1uYXZlci1zZWFyY2gtY2FmZS1wcg.eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJjYWZlVHlwZSI6IkNBRkVfVVJMIiwiY2FmZVVybCI6ImllbHRzZG9rc2EiLCJhcnRpY2xlSWQiOjg5NzA0NSwiaXNzdWVkQXQiOjE3OTQzNjQ2MDc5MDV9.WUoOKVgGvxRtcPNFyEjK_WNUniFsW1f1yZAr6FgYyjI"
+          },
+          {
+            "title": "#미국유행 #미국밈 #67밈 #67 새 창 열림",
+            "href": "https://m.naver.com/shorts?serviceType=MOMENT&mediaType=VOD&seedMediaId=0FBA7C921CD5EA07462064BAEDD96BED6A22&recType=CLIP_PC&recId=%7B%22targetProfileId%22%3A%22ap90hNJECH8GTLSC8xXd%22%2C%22open%22%3Atrue%7D"
+          },
+          {
+            "title": "그레이스인뉴저지 25.12.29 조회 671 새 창 열림",
+            "href": "https://clip.naver.com/@grace_nj"
+          }
+        ],
+        "titleHits": 22,
+        "checkedAt": "2026-11-11T02:36:49.950Z"
+      },
+      "decision": {
+        "status": "hold",
+        "by": "claude",
+        "reason": "트렌드어워드 2026 정답지에서 이름만 가져옴(독립 출처 1). 정해진 뜻이 없는 밈이라 뜻 고르기 문제가 성립하지 않음. 유래 문제로 낼지 나중에 판단",
+        "date": "2026-11-11"
+      }
+    },
     "막나귀": {
       "term": "막나귀",
       "glosses": [],
@@ -8,7 +54,7 @@
       "firstSeen": "2026-11-10",
       "from": "seed",
       "status": "checked",
-      "lastSeen": "2026-11-10",
+      "lastSeen": "2026-11-11",
       "verify": {
         "summary": "막나귀는 ‘막상 나가려니 귀찮다’를 줄인 신조어입니다.",
         "sources": 0,
@@ -59,7 +105,7 @@
       "firstSeen": "2026-11-10",
       "from": "seed",
       "status": "checked",
-      "lastSeen": "2026-11-10",
+      "lastSeen": "2026-11-11",
       "verify": {
         "summary": "검색어 '젬민이'는 문맥에 따라 두 가지 의미로 해석될 수 있습니다.",
         "sources": 0,
@@ -106,7 +152,7 @@
       "firstSeen": "2026-11-10",
       "from": "seed",
       "status": "checked",
-      "lastSeen": "2026-11-10",
+      "lastSeen": "2026-11-11",
       "verify": {
         "summary": "엠비스찬은 MBTI(성격유형검사)를 종교처럼 맹신하고 과도하게 몰입하는 사람을 뜻하는 신조어입니다.",
         "sources": 0,
@@ -153,7 +199,7 @@
       "firstSeen": "2026-11-10",
       "from": "seed",
       "status": "checked",
-      "lastSeen": "2026-11-10",
+      "lastSeen": "2026-11-11",
       "verify": {
         "summary": "난리자베스는 ‘난리가 났다’는 표현에 ‘엘리자베스’를 연상시키는 외국 이름 어감을 붙여 만든 합성 유행어입니다. 상황이 매우 어수선하거나, 반대로 어떤 대상이 기대 이상이라 크게 감탄할 때 쓰는 과장된 표현입니다.",
         "sources": 0,
@@ -201,7 +247,7 @@
       "firstSeen": "2026-11-10",
       "from": "seed",
       "status": "checked",
-      "lastSeen": "2026-11-10",
+      "lastSeen": "2026-11-11",
       "verify": {
         "summary": "테무인간은 겉모습이나 의욕은 그럴듯하지만 실제 결과물이나 내실은 기대에 못 미치는 사람을 뜻하는 신조어입니다.",
         "sources": 0,
@@ -248,7 +294,7 @@
       "firstSeen": "2026-11-10",
       "from": "seed",
       "status": "checked",
-      "lastSeen": "2026-11-10",
+      "lastSeen": "2026-11-11",
       "verify": {
         "summary": "동엽이는 한 가지 취향, 메뉴, 스타일, 분야 등을 꾸준히 고집하는 사람을 뜻하는 2026년식 SNS 밈 표현입니다.",
         "sources": 0,
@@ -298,7 +344,7 @@
       "firstSeen": "2026-11-10",
       "from": "seed",
       "status": "checked",
-      "lastSeen": "2026-11-10",
+      "lastSeen": "2026-11-11",
       "verify": {
         "summary": "야르는 기분이 좋거나 신날 때, 혹은 원하는 결과를 얻었을 때 사용하는 긍정적인 감탄사입니다. '앗싸', '나이스', '오예'와 비슷하게 기쁨이나 만족감을 표현하는 용도로 쓰입니다.",
         "sources": 0,
@@ -358,7 +404,7 @@
       "firstSeen": "2026-11-10",
       "from": "seed",
       "status": "checked",
-      "lastSeen": "2026-11-10",
+      "lastSeen": "2026-11-11",
       "verify": {
         "summary": "아자스는 일본어의 정중한 감사 표현인 ‘ありがとうございます(아리가토 고자이마스)’를 아주 가볍게 줄여 말한 비격식 표현에서 유래한 말입니다. 한국에서는 단순히 ‘고맙다’는 뜻을 넘어 장난스러운 말투나 밈(meme)처럼 사용되며, 상황에 따라 반어적인 비꼼의 의미로도 쓰입니다.",
         "sources": 0,
@@ -413,7 +459,7 @@
       "firstSeen": "2026-11-10",
       "from": "seed",
       "status": "checked",
-      "lastSeen": "2026-11-10",
+      "lastSeen": "2026-11-11",
       "verify": {
         "summary": "영크크는 보이그룹 코르티스(CORTIS)의 노래 〈YOUNGCREATORCREW〉(영 크리에이터 크루)의 제목을 줄여 부르며 시작된 유행어입니다. 원래 의미는 '젊은 창작자 무리'이지만, 현재는 트렌디한 감각을 가진 사람이나 젊은 분위기를 뜻하는 인터넷 밈으로 확장되어 사용됩니다.",
         "sources": 0,
@@ -470,7 +516,7 @@
       "firstSeen": "2026-11-10",
       "from": "seed",
       "status": "checked",
-      "lastSeen": "2026-11-10",
+      "lastSeen": "2026-11-11",
       "verify": {
         "summary": "늙크크는 최신 유행이나 밈, 신조어에 익숙하지 않은 상태를 장난스럽게 표현하는 신조어입니다.",
         "sources": 0,
@@ -526,7 +572,7 @@
       "firstSeen": "2026-11-10",
       "from": "seed",
       "status": "checked",
-      "lastSeen": "2026-11-10",
+      "lastSeen": "2026-11-11",
       "verify": {
         "summary": "L을 가져가 뜻은 영어 표현인 Take the L을 직역한 것으로, 패배를 인정하라는 의미입니다. 여기서 L은 패배(Loss)를 뜻하며, 상대에게 졌음을 인정하라고 하거나 스스로 패배를 받아들일 때 사용합니다.",
         "sources": 0,
@@ -585,7 +631,7 @@
       "firstSeen": "2026-11-10",
       "from": "seed",
       "status": "checked",
-      "lastSeen": "2026-11-10",
+      "lastSeen": "2026-11-11",
       "verify": {
         "summary": "",
         "sources": 0,
@@ -632,7 +678,7 @@
       "firstSeen": "2026-11-10",
       "from": "seed",
       "status": "checked",
-      "lastSeen": "2026-11-10",
+      "lastSeen": "2026-11-11",
       "verify": {
         "summary": "빼난지원금은 11월 11일 빼빼로데이에 빼빼로를 받지 못한 친구에게 선의로 빼빼로를 나눠주는 행동을 뜻하는 초등학생 신조어입니다.",
         "sources": 0,
@@ -678,7 +724,7 @@
       "firstSeen": "2026-11-10",
       "from": "seed",
       "status": "checked",
-      "lastSeen": "2026-11-10",
+      "lastSeen": "2026-11-11",
       "verify": {
         "summary": "언미새는 언니를 무척 좋아하고 잘 따르는 사람이 자신을 가리킬 때 쓰는 신조어입니다.",
         "sources": 0,
@@ -724,7 +770,7 @@
       "firstSeen": "2026-11-10",
       "from": "seed",
       "status": "checked",
-      "lastSeen": "2026-11-10",
+      "lastSeen": "2026-11-11",
       "verify": {
         "summary": "꺼드럭거리다는 거만하게 잘난 체하며 몸을 자꾸 흔들거나 으스대는 모양을 나타내는 말입니다. 이는 신조어가 아니라 국어사전에 등재된 표준어이며, 주로 상대방의 거만한 태도가 눈에 거슬릴 때 지적하는 부정적인 맥락으로 쓰입니다.",
         "sources": 0,
@@ -771,7 +817,7 @@
       "firstSeen": "2026-11-10",
       "from": "seed",
       "status": "checked",
-      "lastSeen": "2026-11-10",
+      "lastSeen": "2026-11-11",
       "verify": {
         "summary": "두쫀쿠는 ‘두바이 쫀득 쿠키’의 줄임말입니다.",
         "sources": 0,
@@ -818,7 +864,7 @@
       "firstSeen": "2026-11-10",
       "from": "seed",
       "status": "checked",
-      "lastSeen": "2026-11-10",
+      "lastSeen": "2026-11-11",
       "verify": {
         "summary": "'퇴사할게여'는 (여자)아이들 전소연이 2026년 9월 7일 발매한 첫 솔로 정규 앨범 '끝내주는 인생'의 타이틀곡 제목입니다. 이 곡은 실제 퇴사를 선언하는 노래라기보다, 일에 지친 순간 누구나 한 번쯤 떠올리는 '그만두고 싶다'는 감정과 그 너머의 삶을 낭만적으로 풀어낸 곡으로 해석됩니다.",
         "sources": 0,
@@ -864,7 +910,7 @@
       "firstSeen": "2026-11-10",
       "from": "seed",
       "status": "checked",
-      "lastSeen": "2026-11-10",
+      "lastSeen": "2026-11-11",
       "verify": {
         "summary": "샨션부(闪身步)는 ‘몸을 재빨리 비켜 움직이는 걸음’을 뜻하며, 중국 안후이 지역의 민속무용인 화고등(花鼓灯)의 기본 이동 스텝을 의미합니다. 최근에는 숏폼 영상에서 누군가나 상황을 재빨리 피하는 듯한 코믹한 동작으로 활용되며 밈(Meme)으로 유행하고 있습니다.",
         "sources": 0,
@@ -910,7 +956,7 @@
       "firstSeen": "2026-11-10",
       "from": "seed",
       "status": "checked",
-      "lastSeen": "2026-11-10",
+      "lastSeen": "2026-11-11",
       "verify": {
         "summary": "식스세븐(Six Seven)은 숫자 67을 영어식으로 읽은 표현으로, 특별히 정해진 사전적 의미가 없는 인터넷 밈입니다. 상황에 따라 '그저 그렇다'는 의미로 해석되기도 하지만, 대체로 맥락 없이 외치거나 친구들끼리 유대감을 확인하는 용도로 쓰입니다.",
         "sources": 0,
@@ -956,7 +1002,7 @@
       "firstSeen": "2026-11-10",
       "from": "seed",
       "status": "checked",
-      "lastSeen": "2026-11-10",
+      "lastSeen": "2026-11-11",
       "verify": {
         "summary": "",
         "sources": 0,
@@ -1002,7 +1048,7 @@
       "firstSeen": "2026-11-10",
       "from": "seed",
       "status": "checked",
-      "lastSeen": "2026-11-10",
+      "lastSeen": "2026-11-11",
       "verify": {
         "summary": "내가 그걸 모를까는 나도 당연히 알고 있지만 어찌할 수 없는 상황을 다른 사람이 지적했을 때 주로 사용하는 밈(meme)입니다. 버벌진트가 2021년 4월에 발매한 곡 “내가 그걸 모를까(Feat. JUSTHIS)”의 가사에서 유래했습니다.",
         "sources": 0,
@@ -1051,7 +1097,7 @@
       "firstSeen": "2026-11-10",
       "from": "seed",
       "status": "unverified",
-      "lastSeen": "2026-11-10",
+      "lastSeen": "2026-11-11",
       "verify": {
         "summary": "",
         "sources": 0,
@@ -1097,7 +1143,7 @@
       "firstSeen": "2026-11-10",
       "from": "seed",
       "status": "checked",
-      "lastSeen": "2026-11-10",
+      "lastSeen": "2026-11-11",
       "verify": {
         "summary": "치킨회동은 2025년 10월 30일 젠슨 황 엔비디아 CEO가 서울 강남의 깐부치킨 매장에서 이재용 삼성전자 회장, 정의선 현대차그룹 회장과 치맥을 함께한 비공식 만남을 일컫는 말입니다. 이 회동은 단순한 식사를 넘어 AI·반도체·모빌리티 분야의 전략적 협력을 상징하는 사건으로 평가받습니다.",
         "sources": 0,
@@ -1143,7 +1189,7 @@
       "firstSeen": "2026-11-10",
       "from": "seed",
       "status": "checked",
-      "lastSeen": "2026-11-10",
+      "lastSeen": "2026-11-11",
       "verify": {
         "summary": "",
         "sources": 0,
@@ -1189,7 +1235,7 @@
       "firstSeen": "2026-11-10",
       "from": "seed",
       "status": "checked",
-      "lastSeen": "2026-11-10",
+      "lastSeen": "2026-11-11",
       "verify": {
         "summary": "관식이병은 넷플릭스 시리즈 '폭싹 속았수다'의 남자 주인공 양관식(박보검/박해준 분)에게 열광하며, 그와 같은 일편단심 순애보나 헌신적인 모습을 현실의 남편·남자친구·아버지 등에게 대입하는 현상을 뜻합니다.",
         "sources": 0,
@@ -1236,7 +1282,7 @@
       "firstSeen": "2026-11-10",
       "from": "seed",
       "status": "checked",
-      "lastSeen": "2026-11-10",
+      "lastSeen": "2026-11-11",
       "verify": {
         "summary": "나니가스키(なにが好き)는 일본어로 \"무엇이 좋아?\", \"뭐 좋아해?\"라는 뜻의 질문 표현입니다.",
         "sources": 0,
@@ -1289,7 +1335,7 @@
       "firstSeen": "2026-11-10",
       "from": "seed",
       "status": "checked",
-      "lastSeen": "2026-11-10",
+      "lastSeen": "2026-11-11",
       "verify": {
         "summary": "샤갈은 주로 황당하거나 짜증 나는 상황에서 내뱉는 감탄사로 쓰이는 신조어입니다.",
         "sources": 0,
@@ -1335,7 +1381,7 @@
       "firstSeen": "2026-11-10",
       "from": "seed",
       "status": "checked",
-      "lastSeen": "2026-11-10",
+      "lastSeen": "2026-11-11",
       "verify": {
         "summary": "스하리는 메타(Meta)의 텍스트 기반 소셜 플랫폼인 스레드(Threads)에서 사용되는 용어로, 상대방의 계정을 팔로우하고 게시물에 하트(좋아요)를 누른 뒤 리포스트(공유)까지 마치는 3단계 행동을 의미합니다. 이는 이용자들 사이에서 만들어진 신조어로, 서로의 콘텐츠를 지지하고 네트워크를 형성하는 상호작용 문화로 통합니다.",
         "sources": 0,
@@ -1381,7 +1427,7 @@
       "firstSeen": "2026-11-10",
       "from": "seed",
       "status": "checked",
-      "lastSeen": "2026-11-10",
+      "lastSeen": "2026-11-11",
       "verify": {
         "summary": "반하리는 SNS 스레드(Threads) 이용자들 사이에서 쓰이는 용어로, 상대방이 나에게 해준 '스하리'를 그대로 돌려준다는 의미로 사용됩니다.",
         "sources": 0,
@@ -1427,7 +1473,7 @@
       "firstSeen": "2026-11-10",
       "from": "seed",
       "status": "unverified",
-      "lastSeen": "2026-11-10",
+      "lastSeen": "2026-11-11",
       "verify": {
         "summary": "스피킹(speaking)은 말하기, 연설 활동이나 그 기술, 또는 말하는 기능과 관련된 성질을 뜻합니다.",
         "sources": 0,
@@ -1473,7 +1519,7 @@
       "firstSeen": "2026-11-10",
       "from": "seed",
       "status": "checked",
-      "lastSeen": "2026-11-10",
+      "lastSeen": "2026-11-11",
       "verify": {
         "summary": "터져서 없어짐 수고하세요는 2026년부터 유행한 인터넷 밈으로, 자극적인 제목으로 클릭을 유도한 뒤 허무한 내용을 보여주는 낚시글 방식에서 유래했습니다. 2026년 7월 19일 인스타그램 계정 잇츠쿨띵이 고양이 밈을 활용한 사진을 올리며 본격적으로 인기를 끌기 시작했습니다.",
         "sources": 0,
@@ -1519,7 +1565,7 @@
       "firstSeen": "2026-11-10",
       "from": "seed",
       "status": "checked",
-      "lastSeen": "2026-11-10",
+      "lastSeen": "2026-11-11",
       "verify": {
         "summary": "‘감옥에서 누가 돌아왔게’는 한동안 보이지 않던 사람이나 콘텐츠가 강렬하게 다시 나타난 상황을 유쾌하고 극적으로 알리는 밈입니다. 실제 출소나 범죄를 뜻하기보다, “누가 다시 나타났다”는 장면을 과장해서 연출하는 템플릿으로 이해하면 됩니다.",
         "sources": 0,
@@ -1565,7 +1611,7 @@
       "firstSeen": "2026-11-10",
       "from": "seed",
       "status": "checked",
-      "lastSeen": "2026-11-10",
+      "lastSeen": "2026-11-11",
       "verify": {
         "summary": "운동 많이 된다는 힘든 상황을 성장의 기회로 받아들이는 긍정적인 태도를 담은 밈입니다.",
         "sources": 0,
@@ -1611,7 +1657,7 @@
       "firstSeen": "2026-11-10",
       "from": "seed",
       "status": "checked",
-      "lastSeen": "2026-11-10",
+      "lastSeen": "2026-11-11",
       "verify": {
         "summary": "거제 야호는 \"거제도 안녕~!\"이라는 뜻을 담은 친근한 인사 표현입니다. 산 정상에서 외치는 감탄사가 아니라, 일본 젊은 층(특히 갸루 문화권)에서 친구 사이에 가볍게 건네는 인사말 '얏호(やっほー, Yahho)'에서 비롯되었습니다.",
         "sources": 0,
@@ -1657,7 +1703,7 @@
       "firstSeen": "2026-11-10",
       "from": "seed",
       "status": "checked",
-      "lastSeen": "2026-11-10",
+      "lastSeen": "2026-11-11",
       "verify": {
         "summary": "'세상에서 제일 하찮은 프롬프트'는 첨부된 이미지를 2000년대 초 그림판에서 마우스로 그린 듯한, 최대한 서툴고 못 그린 낙서풍으로 변환하도록 지시하는 AI 이미지 생성 프롬프트입니다.",
         "sources": 0,
@@ -1703,7 +1749,7 @@
       "firstSeen": "2026-11-10",
       "from": "seed",
       "status": "checked",
-      "lastSeen": "2026-11-10",
+      "lastSeen": "2026-11-11",
       "verify": {
         "summary": "\"자려고 누웠는데 양의지\"는 아이오아이(I.O.I)의 신곡 '갑자기'의 후렴구 멜로디가 두산 베어스 포수 양의지 선수의 응원가와 유사하게 들리면서 탄생한 인터넷 밈입니다.",
         "sources": 0,
@@ -1749,7 +1795,7 @@
       "firstSeen": "2026-11-10",
       "from": "seed",
       "status": "checked",
-      "lastSeen": "2026-11-10",
+      "lastSeen": "2026-11-11",
       "verify": {
         "summary": "찌그러진 치즈볼은 ‘오늘 나는 찌그러진 치즈볼이 될 거야’라는 문구에서 유래한 밈으로, 음원에 맞춰 몸을 웅크리거나 쪼그라드는 동작을 하는 영상 챌린지를 의미합니다.",
         "sources": 0,
@@ -1795,7 +1841,7 @@
       "firstSeen": "2026-11-10",
       "from": "seed",
       "status": "checked",
-      "lastSeen": "2026-11-10",
+      "lastSeen": "2026-11-11",
       "verify": {
         "summary": "'설명할 시간이 없어, 빨리 타'는 주로 주식 시장의 급등 상황에서 투자자들에게 서둘러 투자에 참여하라는 의미를 유머러스하게 표현하는 밈입니다.",
         "sources": 0,
@@ -1841,7 +1887,7 @@
       "firstSeen": "2026-11-10",
       "from": "seed",
       "status": "checked",
-      "lastSeen": "2026-11-10",
+      "lastSeen": "2026-11-11",
       "verify": {
         "summary": "난오늘네가킹받으면좋겠어는 행복한피자빵이 2025년 11월 21일에 유튜브에 투고한 카사네 테토의 Synthesizer V 오리지널 곡 제목입니다.",
         "sources": 0,
@@ -1887,7 +1933,7 @@
       "firstSeen": "2026-11-10",
       "from": "seed",
       "status": "unverified",
-      "lastSeen": "2026-11-10",
+      "lastSeen": "2026-11-11",
       "verify": {
         "summary": "",
         "sources": 0,
@@ -1933,7 +1979,7 @@
       "firstSeen": "2026-11-10",
       "from": "seed",
       "status": "checked",
-      "lastSeen": "2026-11-10",
+      "lastSeen": "2026-11-11",
       "verify": {
         "summary": "",
         "sources": 0,
@@ -1979,7 +2025,7 @@
       "firstSeen": "2026-11-10",
       "from": "seed",
       "status": "checked",
-      "lastSeen": "2026-11-10",
+      "lastSeen": "2026-11-11",
       "verify": {
         "summary": "My Shayla는 틱톡(TikTok)에서 유행하는 밈(meme)으로, 주로 자신이 사랑하거나 아끼는 대상(반려동물, 연인, 친구 등)에 대한 애정이나 그리움을 표현할 때 사용됩니다.",
         "sources": 0,
@@ -2025,7 +2071,7 @@
       "firstSeen": "2026-11-10",
       "from": "seed",
       "status": "checked",
-      "lastSeen": "2026-11-10",
+      "lastSeen": "2026-11-11",
       "verify": {
         "summary": "스팔은 스레드 팔로우의 줄임말로, 누군가를 팔로우하거나 팔로우를 부탁할 때 사용하는 표현입니다.",
         "sources": 8,
@@ -2071,7 +2117,7 @@
       "firstSeen": "2026-11-10",
       "from": "seed",
       "status": "checked",
-      "lastSeen": "2026-11-10",
+      "lastSeen": "2026-11-11",
       "verify": {
         "summary": "검색 결과에서 '이자뿌쓰요'는 문맥에 따라 두 가지 의미로 확인됩니다.",
         "sources": 3,
@@ -2117,7 +2163,7 @@
       "firstSeen": "2026-11-10",
       "from": "seed",
       "status": "checked",
-      "lastSeen": "2026-11-10",
+      "lastSeen": "2026-11-11",
       "verify": {
         "summary": "고디바 모찌는 초콜릿 브랜드 고디바가 만든 디저트로, 얇고 쫀득한 찹쌀피 안에 초콜릿 가나슈와 과일, 프랄린 등을 넣은 형태를 의미합니다.",
         "sources": 0,
@@ -2163,7 +2209,7 @@
       "firstSeen": "2026-11-10",
       "from": "seed",
       "status": "checked",
-      "lastSeen": "2026-11-10",
+      "lastSeen": "2026-11-11",
       "verify": {
         "summary": "봄동비빔밥은 봄동 겉절이를 주재료로 하여 밥과 함께 비벼 먹는 음식입니다. 봄동은 겨울에 파종해 봄에 수확하는 배추의 한 품종으로, 일반 배추보다 단맛이 강하고 식감이 아삭한 것이 특징입니다.",
         "sources": 0,
@@ -2209,7 +2255,7 @@
       "firstSeen": "2026-11-10",
       "from": "seed",
       "status": "checked",
-      "lastSeen": "2026-11-10",
+      "lastSeen": "2026-11-11",
       "verify": {
         "summary": "칠가이(Chill Guy)는 어떤 상황에서도 당황하지 않고 느긋하며 여유로운 태도를 유지하는 사람을 뜻합니다. 이 용어는 2023년 10월 디지털 아티스트 필립 뱅크스가 공개한 갈색 강아지 캐릭터 밈에서 유래했습니다.",
         "sources": 0,
@@ -2255,7 +2301,7 @@
       "firstSeen": "2026-11-10",
       "from": "seed",
       "status": "checked",
-      "lastSeen": "2026-11-10",
+      "lastSeen": "2026-11-11",
       "verify": {
         "summary": "햄부기햄북은 '햄버거'를 '햄부기'로 부르는 말장난에서 시작되어, 발음이 비슷한 단어들을 나열한 '아무말 주문' 형태의 유행 밈입니다.",
         "sources": 0,
@@ -2301,7 +2347,7 @@
       "firstSeen": "2026-11-10",
       "from": "seed",
       "status": "checked",
-      "lastSeen": "2026-11-10",
+      "lastSeen": "2026-11-11",
       "verify": {
         "summary": "",
         "sources": 0,
@@ -2347,7 +2393,7 @@
       "firstSeen": "2026-11-10",
       "from": "seed",
       "status": "checked",
-      "lastSeen": "2026-11-10",
+      "lastSeen": "2026-11-11",
       "verify": {
         "summary": "딸깍은 기본적으로 작고 단단한 물건이 맞부딪치는 소리를 나타내는 의성어이자 부사입니다. 최근에는 인터넷에서 마우스 클릭 한 번으로 무언가를 쉽게 해낸다는 의미의 밈으로도 쓰입니다.",
         "sources": 0,
@@ -2393,7 +2439,7 @@
       "firstSeen": "2026-11-10",
       "from": "seed",
       "status": "checked",
-      "lastSeen": "2026-11-10",
+      "lastSeen": "2026-11-11",
       "verify": {
         "summary": "럭키비키는 행운을 뜻하는 럭키(Lucky)와 아이돌 그룹 아이브 장원영의 영어 이름인 비키(Vicky)를 합친 말입니다. 안 좋은 상황도 결국 운이 좋았다고 긍정적으로 받아들이는 태도를 뜻하며, 장원영의 초 긍정적인 사고방식인 원영적 사고에서 파생된 신조어입니다.",
         "sources": 0,
@@ -2449,7 +2495,7 @@
       "firstSeen": "2026-11-10",
       "from": "seed",
       "status": "checked",
-      "lastSeen": "2026-11-10",
+      "lastSeen": "2026-11-11",
       "verify": {
         "summary": "킹받다는 ‘열받다’에 ‘왕(King)’을 붙여 ‘매우 화가 난다’는 뜻을 강조한 신조어입니다.",
         "sources": 0,
@@ -2504,7 +2550,7 @@
       "firstSeen": "2026-11-10",
       "from": "seed",
       "status": "checked",
-      "lastSeen": "2026-11-10",
+      "lastSeen": "2026-11-11",
       "verify": {
         "summary": "스불재는 '스스로 불러온 재앙'의 줄임말로, 자신의 결정이나 선택으로 인해 곤란한 상황에 직면했을 때 자책하거나 후회하며 사용하는 신조어입니다.",
         "sources": 0,
@@ -2551,7 +2597,7 @@
       "firstSeen": "2026-11-10",
       "from": "seed",
       "status": "checked",
-      "lastSeen": "2026-11-10",
+      "lastSeen": "2026-11-11",
       "verify": {
         "summary": "오저치고는 오늘 저녁 치킨 고(Go)의 줄임말로, 오늘 저녁에 치킨을 먹으러 가자는 제안을 담은 신조어입니다.",
         "sources": 0,
@@ -2609,7 +2655,7 @@
       "firstSeen": "2026-11-10",
       "from": "seed",
       "status": "checked",
-      "lastSeen": "2026-11-10",
+      "lastSeen": "2026-11-11",
       "verify": {
         "summary": "",
         "sources": 0,
@@ -2668,7 +2714,7 @@
       "firstSeen": "2026-11-10",
       "from": "seed",
       "status": "checked",
-      "lastSeen": "2026-11-10",
+      "lastSeen": "2026-11-11",
       "verify": {
         "summary": "중꺾마는 ‘중요한 것은 꺾이지 않는 마음’의 줄임말로, 어떤 어려움에도 포기하지 않는 의지와 정신을 상징하는 표현입니다.",
         "sources": 0,
@@ -2731,7 +2777,7 @@
       "firstSeen": "2026-11-10",
       "from": "seed",
       "status": "checked",
-      "lastSeen": "2026-11-10",
+      "lastSeen": "2026-11-11",
       "verify": {
         "summary": "알잘딱깔센은 \"알아서, 잘, 딱, 깔끔하고, 센스 있게\"라는 문장의 앞 글자만 따서 만든 줄임말입니다. 누군가 일일이 지침을 주지 않아도 스스로 상황을 파악해 군더더기 없이 완벽하게 일을 해내는 태도나 감각을 의미합니다.",
         "sources": 0,
@@ -2795,7 +2841,7 @@
       "firstSeen": "2026-11-10",
       "from": "seed",
       "status": "checked",
-      "lastSeen": "2026-11-10",
+      "lastSeen": "2026-11-11",
       "verify": {
         "summary": "갓생은 신을 뜻하는 'God'과 인생을 뜻하는 '생(生)'이 합쳐진 신조어로, 하루하루를 계획적으로 부지런하고 알차게 살아가는 모범적인 삶을 의미합니다.",
         "sources": 0,
@@ -2842,7 +2888,7 @@
       "firstSeen": "2026-11-10",
       "from": "seed",
       "status": "checked",
-      "lastSeen": "2026-11-10",
+      "lastSeen": "2026-11-11",
       "verify": {
         "summary": "어쩔티비는 상대방의 말에 대해 \"어쩌라고 가서 TV나 봐\"라는 의미로 무시하거나 대답을 회피할 때 사용하는 신조어입니다. 주로 초등학생 등 어린이가 상대방의 말을 무시하거나 대화 자체를 차단하려는 의도로 사용하며, 논리적 반박보다는 유치한 말투로 대화의 힘을 빼는 밈(meme) 성격이 강합니다.",
         "sources": 0,
@@ -2976,7 +3022,7 @@
       "firstSeen": "2026-11-10",
       "from": "find",
       "status": "new",
-      "lastSeen": "2026-11-10",
+      "lastSeen": "2026-11-11",
       "site": {
         "name": "instablank",
         "url": "https://www.instablank.com/meme/287",
@@ -5388,7 +5434,7 @@
       "firstSeen": "2026-11-10",
       "from": "site",
       "status": "checked",
-      "lastSeen": "2026-11-10",
+      "lastSeen": "2026-11-11",
       "site": {
         "name": "instablank",
         "url": "https://www.instablank.com/meme/295",
@@ -5417,7 +5463,7 @@
       "firstSeen": "2026-11-10",
       "from": "site",
       "status": "checked",
-      "lastSeen": "2026-11-10",
+      "lastSeen": "2026-11-11",
       "site": {
         "name": "instablank",
         "url": "https://www.instablank.com/meme/294",
@@ -5441,7 +5487,7 @@
       "firstSeen": "2026-11-10",
       "from": "site",
       "status": "checked",
-      "lastSeen": "2026-11-10",
+      "lastSeen": "2026-11-11",
       "site": {
         "name": "instablank",
         "url": "https://www.instablank.com/meme/293",
@@ -5465,7 +5511,7 @@
       "firstSeen": "2026-11-10",
       "from": "site",
       "status": "checked",
-      "lastSeen": "2026-11-10",
+      "lastSeen": "2026-11-11",
       "site": {
         "name": "instablank",
         "url": "https://www.instablank.com/meme/292",
@@ -5489,7 +5535,7 @@
       "firstSeen": "2026-11-10",
       "from": "site",
       "status": "checked",
-      "lastSeen": "2026-11-10",
+      "lastSeen": "2026-11-11",
       "site": {
         "name": "instablank",
         "url": "https://www.instablank.com/meme/291",
@@ -5518,7 +5564,7 @@
       "firstSeen": "2026-11-10",
       "from": "site",
       "status": "checked",
-      "lastSeen": "2026-11-10",
+      "lastSeen": "2026-11-11",
       "site": {
         "name": "instablank",
         "url": "https://www.instablank.com/meme/290",
@@ -5557,7 +5603,7 @@
       "firstSeen": "2026-11-10",
       "from": "site",
       "status": "checked",
-      "lastSeen": "2026-11-10",
+      "lastSeen": "2026-11-11",
       "site": {
         "name": "instablank",
         "url": "https://www.instablank.com/meme/289",
@@ -5609,7 +5655,7 @@
       "firstSeen": "2026-11-10",
       "from": "site",
       "status": "checked",
-      "lastSeen": "2026-11-10",
+      "lastSeen": "2026-11-11",
       "site": {
         "name": "instablank",
         "url": "https://www.instablank.com/meme/288",
@@ -5661,7 +5707,7 @@
       "firstSeen": "2026-11-10",
       "from": "site",
       "status": "checked",
-      "lastSeen": "2026-11-10",
+      "lastSeen": "2026-11-11",
       "site": {
         "name": "instablank",
         "url": "https://www.instablank.com/meme/285",
@@ -5701,7 +5747,7 @@
       "firstSeen": "2026-11-10",
       "from": "site",
       "status": "checked",
-      "lastSeen": "2026-11-10",
+      "lastSeen": "2026-11-11",
       "site": {
         "name": "instablank",
         "url": "https://www.instablank.com/meme/284",
@@ -5753,7 +5799,7 @@
       "firstSeen": "2026-11-10",
       "from": "site",
       "status": "checked",
-      "lastSeen": "2026-11-10",
+      "lastSeen": "2026-11-11",
       "site": {
         "name": "instablank",
         "url": "https://www.instablank.com/meme/283",
@@ -5792,7 +5838,7 @@
       "firstSeen": "2026-11-10",
       "from": "site",
       "status": "checked",
-      "lastSeen": "2026-11-10",
+      "lastSeen": "2026-11-11",
       "site": {
         "name": "instablank",
         "url": "https://www.instablank.com/meme/282",
@@ -5831,7 +5877,7 @@
       "firstSeen": "2026-11-10",
       "from": "site",
       "status": "checked",
-      "lastSeen": "2026-11-10",
+      "lastSeen": "2026-11-11",
       "site": {
         "name": "instablank",
         "url": "https://www.instablank.com/meme/281",
@@ -5882,7 +5928,7 @@
       "firstSeen": "2026-11-10",
       "from": "site",
       "status": "checked",
-      "lastSeen": "2026-11-10",
+      "lastSeen": "2026-11-11",
       "site": {
         "name": "instablank",
         "url": "https://www.instablank.com/meme/280",
@@ -5933,7 +5979,7 @@
       "firstSeen": "2026-11-10",
       "from": "site",
       "status": "checked",
-      "lastSeen": "2026-11-10",
+      "lastSeen": "2026-11-11",
       "site": {
         "name": "instablank",
         "url": "https://www.instablank.com/meme/279",
@@ -5957,7 +6003,7 @@
       "firstSeen": "2026-11-10",
       "from": "site",
       "status": "checked",
-      "lastSeen": "2026-11-10",
+      "lastSeen": "2026-11-11",
       "site": {
         "name": "instablank",
         "url": "https://www.instablank.com/meme/278",
@@ -5981,7 +6027,7 @@
       "firstSeen": "2026-11-10",
       "from": "site",
       "status": "checked",
-      "lastSeen": "2026-11-10",
+      "lastSeen": "2026-11-11",
       "site": {
         "name": "instablank",
         "url": "https://www.instablank.com/meme/277",
@@ -6010,7 +6056,7 @@
       "firstSeen": "2026-11-10",
       "from": "site",
       "status": "checked",
-      "lastSeen": "2026-11-10",
+      "lastSeen": "2026-11-11",
       "site": {
         "name": "instablank",
         "url": "https://www.instablank.com/meme/276",
@@ -6034,7 +6080,7 @@
       "firstSeen": "2026-11-10",
       "from": "site",
       "status": "checked",
-      "lastSeen": "2026-11-10",
+      "lastSeen": "2026-11-11",
       "site": {
         "name": "instablank",
         "url": "https://www.instablank.com/meme/275",
@@ -6078,7 +6124,7 @@
       "firstSeen": "2026-11-10",
       "from": "site",
       "status": "unverified",
-      "lastSeen": "2026-11-10",
+      "lastSeen": "2026-11-11",
       "site": {
         "name": "instablank",
         "url": "https://www.instablank.com/meme/274",
@@ -6102,7 +6148,7 @@
       "firstSeen": "2026-11-10",
       "from": "site",
       "status": "checked",
-      "lastSeen": "2026-11-10",
+      "lastSeen": "2026-11-11",
       "site": {
         "name": "instablank",
         "url": "https://www.instablank.com/meme/273",
@@ -6153,7 +6199,7 @@
       "firstSeen": "2026-11-10",
       "from": "site",
       "status": "unverified",
-      "lastSeen": "2026-11-10",
+      "lastSeen": "2026-11-11",
       "site": {
         "name": "instablank",
         "url": "https://www.instablank.com/meme/272",
@@ -6177,7 +6223,7 @@
       "firstSeen": "2026-11-10",
       "from": "site",
       "status": "checked",
-      "lastSeen": "2026-11-10",
+      "lastSeen": "2026-11-11",
       "site": {
         "name": "instablank",
         "url": "https://www.instablank.com/meme/271",
@@ -6228,7 +6274,7 @@
       "firstSeen": "2026-11-10",
       "from": "site",
       "status": "checked",
-      "lastSeen": "2026-11-10",
+      "lastSeen": "2026-11-11",
       "site": {
         "name": "instablank",
         "url": "https://www.instablank.com/meme/270",
@@ -6272,7 +6318,7 @@
       "firstSeen": "2026-11-10",
       "from": "site",
       "status": "unverified",
-      "lastSeen": "2026-11-10",
+      "lastSeen": "2026-11-11",
       "site": {
         "name": "instablank",
         "url": "https://www.instablank.com/meme/269",
@@ -6296,7 +6342,7 @@
       "firstSeen": "2026-11-10",
       "from": "site",
       "status": "checked",
-      "lastSeen": "2026-11-10",
+      "lastSeen": "2026-11-11",
       "site": {
         "name": "instablank",
         "url": "https://www.instablank.com/meme/268",
@@ -6348,7 +6394,7 @@
       "firstSeen": "2026-11-10",
       "from": "site",
       "status": "rejected",
-      "lastSeen": "2026-11-10",
+      "lastSeen": "2026-11-11",
       "site": {
         "name": "instablank",
         "url": "https://www.instablank.com/meme/267",
@@ -6368,7 +6414,7 @@
       "firstSeen": "2026-11-10",
       "from": "site",
       "status": "unverified",
-      "lastSeen": "2026-11-10",
+      "lastSeen": "2026-11-11",
       "site": {
         "name": "instablank",
         "url": "https://www.instablank.com/meme/266",
@@ -6392,7 +6438,7 @@
       "firstSeen": "2026-11-10",
       "from": "site",
       "status": "checked",
-      "lastSeen": "2026-11-10",
+      "lastSeen": "2026-11-11",
       "site": {
         "name": "instablank",
         "url": "https://www.instablank.com/meme/265",
@@ -6443,7 +6489,7 @@
       "firstSeen": "2026-11-10",
       "from": "site",
       "status": "checked",
-      "lastSeen": "2026-11-10",
+      "lastSeen": "2026-11-11",
       "site": {
         "name": "instablank",
         "url": "https://www.instablank.com/meme/264",
@@ -6494,7 +6540,7 @@
       "firstSeen": "2026-11-10",
       "from": "site",
       "status": "checked",
-      "lastSeen": "2026-11-10",
+      "lastSeen": "2026-11-11",
       "site": {
         "name": "instablank",
         "url": "https://www.instablank.com/meme/263",
@@ -6518,7 +6564,7 @@
       "firstSeen": "2026-11-10",
       "from": "site",
       "status": "checked",
-      "lastSeen": "2026-11-10",
+      "lastSeen": "2026-11-11",
       "site": {
         "name": "instablank",
         "url": "https://www.instablank.com/meme/261",
@@ -6542,7 +6588,7 @@
       "firstSeen": "2026-11-10",
       "from": "site",
       "status": "checked",
-      "lastSeen": "2026-11-10",
+      "lastSeen": "2026-11-11",
       "site": {
         "name": "instablank",
         "url": "https://www.instablank.com/meme/260",
@@ -6566,7 +6612,7 @@
       "firstSeen": "2026-11-10",
       "from": "site",
       "status": "checked",
-      "lastSeen": "2026-11-10",
+      "lastSeen": "2026-11-11",
       "site": {
         "name": "instablank",
         "url": "https://www.instablank.com/meme/221",
@@ -6610,7 +6656,7 @@
       "firstSeen": "2026-11-10",
       "from": "site",
       "status": "checked",
-      "lastSeen": "2026-11-10",
+      "lastSeen": "2026-11-11",
       "site": {
         "name": "instablank",
         "url": "https://www.instablank.com/meme/258",
@@ -6634,7 +6680,7 @@
       "firstSeen": "2026-11-10",
       "from": "site",
       "status": "checked",
-      "lastSeen": "2026-11-10",
+      "lastSeen": "2026-11-11",
       "site": {
         "name": "instablank",
         "url": "https://www.instablank.com/meme/257",
@@ -6677,7 +6723,7 @@
       "firstSeen": "2026-11-10",
       "from": "site",
       "status": "rejected",
-      "lastSeen": "2026-11-10",
+      "lastSeen": "2026-11-11",
       "site": {
         "name": "instablank",
         "url": "https://www.instablank.com/meme/256",
@@ -6697,7 +6743,7 @@
       "firstSeen": "2026-11-10",
       "from": "site",
       "status": "checked",
-      "lastSeen": "2026-11-10",
+      "lastSeen": "2026-11-11",
       "site": {
         "name": "instablank",
         "url": "https://www.instablank.com/meme/255",
@@ -6721,7 +6767,7 @@
       "firstSeen": "2026-11-10",
       "from": "site",
       "status": "checked",
-      "lastSeen": "2026-11-10",
+      "lastSeen": "2026-11-11",
       "site": {
         "name": "instablank",
         "url": "https://www.instablank.com/meme/254",
@@ -6745,7 +6791,7 @@
       "firstSeen": "2026-11-10",
       "from": "site",
       "status": "checked",
-      "lastSeen": "2026-11-10",
+      "lastSeen": "2026-11-11",
       "site": {
         "name": "instablank",
         "url": "https://www.instablank.com/meme/253",
@@ -6769,7 +6815,7 @@
       "firstSeen": "2026-11-10",
       "from": "site",
       "status": "checked",
-      "lastSeen": "2026-11-10",
+      "lastSeen": "2026-11-11",
       "site": {
         "name": "instablank",
         "url": "https://www.instablank.com/meme/252",
@@ -6793,7 +6839,7 @@
       "firstSeen": "2026-11-10",
       "from": "site",
       "status": "checked",
-      "lastSeen": "2026-11-10",
+      "lastSeen": "2026-11-11",
       "site": {
         "name": "instablank",
         "url": "https://www.instablank.com/meme/251",
@@ -6817,7 +6863,7 @@
       "firstSeen": "2026-11-10",
       "from": "site",
       "status": "checked",
-      "lastSeen": "2026-11-10",
+      "lastSeen": "2026-11-11",
       "site": {
         "name": "instablank",
         "url": "https://www.instablank.com/meme/250",
@@ -6841,7 +6887,7 @@
       "firstSeen": "2026-11-10",
       "from": "site",
       "status": "checked",
-      "lastSeen": "2026-11-10",
+      "lastSeen": "2026-11-11",
       "site": {
         "name": "instablank",
         "url": "https://www.instablank.com/meme/249",
@@ -6865,7 +6911,7 @@
       "firstSeen": "2026-11-10",
       "from": "site",
       "status": "checked",
-      "lastSeen": "2026-11-10",
+      "lastSeen": "2026-11-11",
       "site": {
         "name": "instablank",
         "url": "https://www.instablank.com/meme/248",
@@ -6889,7 +6935,7 @@
       "firstSeen": "2026-11-10",
       "from": "site",
       "status": "checked",
-      "lastSeen": "2026-11-10",
+      "lastSeen": "2026-11-11",
       "site": {
         "name": "instablank",
         "url": "https://www.instablank.com/meme/247",
@@ -6936,7 +6982,7 @@
       "firstSeen": "2026-11-10",
       "from": "site",
       "status": "checked",
-      "lastSeen": "2026-11-10",
+      "lastSeen": "2026-11-11",
       "site": {
         "name": "instablank",
         "url": "https://www.instablank.com/meme/246",
@@ -6980,7 +7026,7 @@
       "firstSeen": "2026-11-10",
       "from": "site",
       "status": "checked",
-      "lastSeen": "2026-11-10",
+      "lastSeen": "2026-11-11",
       "site": {
         "name": "instablank",
         "url": "https://www.instablank.com/meme/245",
@@ -7004,7 +7050,7 @@
       "firstSeen": "2026-11-10",
       "from": "site",
       "status": "checked",
-      "lastSeen": "2026-11-10",
+      "lastSeen": "2026-11-11",
       "site": {
         "name": "instablank",
         "url": "https://www.instablank.com/meme/244",
@@ -7055,7 +7101,7 @@
       "firstSeen": "2026-11-10",
       "from": "site",
       "status": "checked",
-      "lastSeen": "2026-11-10",
+      "lastSeen": "2026-11-11",
       "site": {
         "name": "instablank",
         "url": "https://www.instablank.com/meme/243",
@@ -7078,8 +7124,8 @@
       "blogs": [],
       "firstSeen": "2026-11-10",
       "from": "site",
-      "status": "checked",
-      "lastSeen": "2026-11-10",
+      "status": "approved",
+      "lastSeen": "2026-11-11",
       "site": {
         "name": "instablank",
         "url": "https://www.instablank.com/meme/242",
@@ -7119,7 +7165,7 @@
       "decision": {
         "status": "approved",
         "by": "claude",
-        "reason": "독립 출처 2곳 이상, 누구를 낮추지 않음. 뜻은 문제 초안을 쓸 때 출처 글을 읽고 확정",
+        "reason": "트렌드어워드 2026 정답지에서 이름만 가져옴(독립 출처 1). 블로그 제목 19건, 뜻(책임 없는 쾌락) 일치, 줄임말 풀기 문제에 맞음",
         "date": "2026-11-11"
       }
     },
@@ -7130,7 +7176,7 @@
       "firstSeen": "2026-11-10",
       "from": "site",
       "status": "checked",
-      "lastSeen": "2026-11-10",
+      "lastSeen": "2026-11-11",
       "site": {
         "name": "instablank",
         "url": "https://www.instablank.com/meme/241",
@@ -7159,7 +7205,7 @@
       "firstSeen": "2026-11-10",
       "from": "site",
       "status": "checked",
-      "lastSeen": "2026-11-10",
+      "lastSeen": "2026-11-11",
       "site": {
         "name": "instablank",
         "url": "https://www.instablank.com/meme/240",
@@ -7183,7 +7229,7 @@
       "firstSeen": "2026-11-10",
       "from": "site",
       "status": "checked",
-      "lastSeen": "2026-11-10",
+      "lastSeen": "2026-11-11",
       "site": {
         "name": "instablank",
         "url": "https://www.instablank.com/meme/239",
@@ -7230,7 +7276,7 @@
       "firstSeen": "2026-11-10",
       "from": "site",
       "status": "checked",
-      "lastSeen": "2026-11-10",
+      "lastSeen": "2026-11-11",
       "site": {
         "name": "instablank",
         "url": "https://www.instablank.com/meme/238",
@@ -7274,7 +7320,7 @@
       "firstSeen": "2026-11-10",
       "from": "site",
       "status": "checked",
-      "lastSeen": "2026-11-10",
+      "lastSeen": "2026-11-11",
       "site": {
         "name": "instablank",
         "url": "https://www.instablank.com/meme/237",
@@ -7298,7 +7344,7 @@
       "firstSeen": "2026-11-10",
       "from": "site",
       "status": "checked",
-      "lastSeen": "2026-11-10",
+      "lastSeen": "2026-11-11",
       "site": {
         "name": "instablank",
         "url": "https://www.instablank.com/meme/236",
@@ -7337,7 +7383,7 @@
       "firstSeen": "2026-11-10",
       "from": "site",
       "status": "checked",
-      "lastSeen": "2026-11-10",
+      "lastSeen": "2026-11-11",
       "site": {
         "name": "instablank",
         "url": "https://www.instablank.com/meme/235",
@@ -7388,7 +7434,7 @@
       "firstSeen": "2026-11-10",
       "from": "site",
       "status": "checked",
-      "lastSeen": "2026-11-10",
+      "lastSeen": "2026-11-11",
       "site": {
         "name": "instablank",
         "url": "https://www.instablank.com/meme/234",
@@ -7412,7 +7458,7 @@
       "firstSeen": "2026-11-10",
       "from": "site",
       "status": "checked",
-      "lastSeen": "2026-11-10",
+      "lastSeen": "2026-11-11",
       "site": {
         "name": "instablank",
         "url": "https://www.instablank.com/meme/233",
@@ -7463,7 +7509,7 @@
       "firstSeen": "2026-11-10",
       "from": "site",
       "status": "checked",
-      "lastSeen": "2026-11-10",
+      "lastSeen": "2026-11-11",
       "site": {
         "name": "instablank",
         "url": "https://www.instablank.com/meme/232",
@@ -7487,7 +7533,7 @@
       "firstSeen": "2026-11-10",
       "from": "site",
       "status": "checked",
-      "lastSeen": "2026-11-10",
+      "lastSeen": "2026-11-11",
       "site": {
         "name": "instablank",
         "url": "https://www.instablank.com/meme/231",
@@ -7539,7 +7585,7 @@
       "firstSeen": "2026-11-10",
       "from": "site",
       "status": "checked",
-      "lastSeen": "2026-11-10",
+      "lastSeen": "2026-11-11",
       "site": {
         "name": "instablank",
         "url": "https://www.instablank.com/meme/230",
@@ -7590,7 +7636,7 @@
       "firstSeen": "2026-11-10",
       "from": "site",
       "status": "checked",
-      "lastSeen": "2026-11-10",
+      "lastSeen": "2026-11-11",
       "site": {
         "name": "instablank",
         "url": "https://www.instablank.com/meme/229",
@@ -7641,7 +7687,7 @@
       "firstSeen": "2026-11-10",
       "from": "site",
       "status": "checked",
-      "lastSeen": "2026-11-10",
+      "lastSeen": "2026-11-11",
       "site": {
         "name": "instablank",
         "url": "https://www.instablank.com/meme/228",
@@ -7665,7 +7711,7 @@
       "firstSeen": "2026-11-10",
       "from": "site",
       "status": "checked",
-      "lastSeen": "2026-11-10",
+      "lastSeen": "2026-11-11",
       "site": {
         "name": "instablank",
         "url": "https://www.instablank.com/meme/227",
@@ -7716,7 +7762,7 @@
       "firstSeen": "2026-11-10",
       "from": "site",
       "status": "checked",
-      "lastSeen": "2026-11-10",
+      "lastSeen": "2026-11-11",
       "site": {
         "name": "instablank",
         "url": "https://www.instablank.com/meme/226",
@@ -7740,7 +7786,7 @@
       "firstSeen": "2026-11-10",
       "from": "site",
       "status": "checked",
-      "lastSeen": "2026-11-10",
+      "lastSeen": "2026-11-11",
       "site": {
         "name": "instablank",
         "url": "https://www.instablank.com/meme/225",
@@ -7764,7 +7810,7 @@
       "firstSeen": "2026-11-10",
       "from": "site",
       "status": "unverified",
-      "lastSeen": "2026-11-10",
+      "lastSeen": "2026-11-11",
       "site": {
         "name": "instablank",
         "url": "https://www.instablank.com/meme/224",
@@ -7788,7 +7834,7 @@
       "firstSeen": "2026-11-10",
       "from": "site",
       "status": "checked",
-      "lastSeen": "2026-11-10",
+      "lastSeen": "2026-11-11",
       "site": {
         "name": "instablank",
         "url": "https://www.instablank.com/meme/222",
@@ -7812,7 +7858,7 @@
       "firstSeen": "2026-11-10",
       "from": "site",
       "status": "checked",
-      "lastSeen": "2026-11-10",
+      "lastSeen": "2026-11-11",
       "site": {
         "name": "instablank",
         "url": "https://www.instablank.com/meme/220",
@@ -7841,7 +7887,7 @@
       "firstSeen": "2026-11-10",
       "from": "site",
       "status": "checked",
-      "lastSeen": "2026-11-10",
+      "lastSeen": "2026-11-11",
       "site": {
         "name": "instablank",
         "url": "https://www.instablank.com/meme/219",
@@ -7892,7 +7938,7 @@
       "firstSeen": "2026-11-10",
       "from": "site",
       "status": "rejected",
-      "lastSeen": "2026-11-10",
+      "lastSeen": "2026-11-11",
       "site": {
         "name": "instablank",
         "url": "https://www.instablank.com/meme/218",
@@ -7912,7 +7958,7 @@
       "firstSeen": "2026-11-10",
       "from": "site",
       "status": "checked",
-      "lastSeen": "2026-11-10",
+      "lastSeen": "2026-11-11",
       "site": {
         "name": "instablank",
         "url": "https://www.instablank.com/meme/217",
@@ -7936,7 +7982,7 @@
       "firstSeen": "2026-11-10",
       "from": "site",
       "status": "checked",
-      "lastSeen": "2026-11-10",
+      "lastSeen": "2026-11-11",
       "site": {
         "name": "instablank",
         "url": "https://www.instablank.com/meme/216",
@@ -7987,7 +8033,7 @@
       "firstSeen": "2026-11-10",
       "from": "site",
       "status": "checked",
-      "lastSeen": "2026-11-10",
+      "lastSeen": "2026-11-11",
       "site": {
         "name": "instablank",
         "url": "https://www.instablank.com/meme/215",
@@ -8038,7 +8084,7 @@
       "firstSeen": "2026-11-10",
       "from": "site",
       "status": "checked",
-      "lastSeen": "2026-11-10",
+      "lastSeen": "2026-11-11",
       "site": {
         "name": "instablank",
         "url": "https://www.instablank.com/meme/214",
@@ -8062,7 +8108,7 @@
       "firstSeen": "2026-11-10",
       "from": "site",
       "status": "checked",
-      "lastSeen": "2026-11-10",
+      "lastSeen": "2026-11-11",
       "site": {
         "name": "instablank",
         "url": "https://www.instablank.com/meme/213",
@@ -8091,7 +8137,7 @@
       "firstSeen": "2026-11-10",
       "from": "site",
       "status": "checked",
-      "lastSeen": "2026-11-10",
+      "lastSeen": "2026-11-11",
       "site": {
         "name": "instablank",
         "url": "https://www.instablank.com/meme/212",
@@ -8115,7 +8161,7 @@
       "firstSeen": "2026-11-10",
       "from": "site",
       "status": "checked",
-      "lastSeen": "2026-11-10",
+      "lastSeen": "2026-11-11",
       "site": {
         "name": "instablank",
         "url": "https://www.instablank.com/meme/211",
@@ -8139,7 +8185,7 @@
       "firstSeen": "2026-11-10",
       "from": "site",
       "status": "checked",
-      "lastSeen": "2026-11-10",
+      "lastSeen": "2026-11-11",
       "site": {
         "name": "instablank",
         "url": "https://www.instablank.com/meme/210",
@@ -8190,7 +8236,7 @@
       "firstSeen": "2026-11-10",
       "from": "site",
       "status": "unverified",
-      "lastSeen": "2026-11-10",
+      "lastSeen": "2026-11-11",
       "site": {
         "name": "instablank",
         "url": "https://www.instablank.com/meme/209",
@@ -8214,7 +8260,7 @@
       "firstSeen": "2026-11-10",
       "from": "site",
       "status": "checked",
-      "lastSeen": "2026-11-10",
+      "lastSeen": "2026-11-11",
       "site": {
         "name": "instablank",
         "url": "https://www.instablank.com/meme/208",
@@ -8243,7 +8289,7 @@
       "firstSeen": "2026-11-10",
       "from": "site",
       "status": "checked",
-      "lastSeen": "2026-11-10",
+      "lastSeen": "2026-11-11",
       "site": {
         "name": "instablank",
         "url": "https://www.instablank.com/meme/207",
@@ -8267,7 +8313,7 @@
       "firstSeen": "2026-11-10",
       "from": "site",
       "status": "checked",
-      "lastSeen": "2026-11-10",
+      "lastSeen": "2026-11-11",
       "site": {
         "name": "instablank",
         "url": "https://www.instablank.com/meme/206",
@@ -8296,7 +8342,7 @@
       "firstSeen": "2026-11-10",
       "from": "site",
       "status": "checked",
-      "lastSeen": "2026-11-10",
+      "lastSeen": "2026-11-11",
       "site": {
         "name": "instablank",
         "url": "https://www.instablank.com/meme/205",
@@ -8335,7 +8381,7 @@
       "firstSeen": "2026-11-10",
       "from": "site",
       "status": "checked",
-      "lastSeen": "2026-11-10",
+      "lastSeen": "2026-11-11",
       "site": {
         "name": "instablank",
         "url": "https://www.instablank.com/meme/204",
@@ -8374,7 +8420,7 @@
       "firstSeen": "2026-11-10",
       "from": "site",
       "status": "checked",
-      "lastSeen": "2026-11-10",
+      "lastSeen": "2026-11-11",
       "site": {
         "name": "instablank",
         "url": "https://www.instablank.com/meme/203",
@@ -8398,7 +8444,7 @@
       "firstSeen": "2026-11-10",
       "from": "site",
       "status": "checked",
-      "lastSeen": "2026-11-10",
+      "lastSeen": "2026-11-11",
       "site": {
         "name": "instablank",
         "url": "https://www.instablank.com/meme/202",
@@ -8437,7 +8483,7 @@
       "firstSeen": "2026-11-10",
       "from": "site",
       "status": "checked",
-      "lastSeen": "2026-11-10",
+      "lastSeen": "2026-11-11",
       "site": {
         "name": "instablank",
         "url": "https://www.instablank.com/meme/201",
@@ -8461,7 +8507,7 @@
       "firstSeen": "2026-11-10",
       "from": "site",
       "status": "checked",
-      "lastSeen": "2026-11-10",
+      "lastSeen": "2026-11-11",
       "site": {
         "name": "instablank",
         "url": "https://www.instablank.com/meme/200",
@@ -8505,7 +8551,7 @@
       "firstSeen": "2026-11-10",
       "from": "site",
       "status": "checked",
-      "lastSeen": "2026-11-10",
+      "lastSeen": "2026-11-11",
       "site": {
         "name": "instablank",
         "url": "https://www.instablank.com/meme/199",
@@ -8529,7 +8575,7 @@
       "firstSeen": "2026-11-10",
       "from": "site",
       "status": "checked",
-      "lastSeen": "2026-11-10",
+      "lastSeen": "2026-11-11",
       "site": {
         "name": "instablank",
         "url": "https://www.instablank.com/meme/198",
@@ -8553,7 +8599,7 @@
       "firstSeen": "2026-11-10",
       "from": "site",
       "status": "checked",
-      "lastSeen": "2026-11-10",
+      "lastSeen": "2026-11-11",
       "site": {
         "name": "instablank",
         "url": "https://www.instablank.com/meme/197",
@@ -8577,7 +8623,7 @@
       "firstSeen": "2026-11-10",
       "from": "site",
       "status": "checked",
-      "lastSeen": "2026-11-10",
+      "lastSeen": "2026-11-11",
       "site": {
         "name": "instablank",
         "url": "https://www.instablank.com/meme/196",
@@ -8629,7 +8675,7 @@
       "firstSeen": "2026-11-10",
       "from": "site",
       "status": "checked",
-      "lastSeen": "2026-11-10",
+      "lastSeen": "2026-11-11",
       "site": {
         "name": "instablank",
         "url": "https://www.instablank.com/meme/195",
@@ -8680,7 +8726,7 @@
       "firstSeen": "2026-11-10",
       "from": "site",
       "status": "checked",
-      "lastSeen": "2026-11-10",
+      "lastSeen": "2026-11-11",
       "site": {
         "name": "instablank",
         "url": "https://www.instablank.com/meme/194",
@@ -8720,7 +8766,7 @@
       "firstSeen": "2026-11-10",
       "from": "site",
       "status": "checked",
-      "lastSeen": "2026-11-10",
+      "lastSeen": "2026-11-11",
       "site": {
         "name": "instablank",
         "url": "https://www.instablank.com/meme/193",
@@ -8749,7 +8795,7 @@
       "firstSeen": "2026-11-10",
       "from": "site",
       "status": "checked",
-      "lastSeen": "2026-11-10",
+      "lastSeen": "2026-11-11",
       "site": {
         "name": "instablank",
         "url": "https://www.instablank.com/meme/192",
@@ -8778,7 +8824,7 @@
       "firstSeen": "2026-11-10",
       "from": "site",
       "status": "checked",
-      "lastSeen": "2026-11-10",
+      "lastSeen": "2026-11-11",
       "site": {
         "name": "instablank",
         "url": "https://www.instablank.com/meme/191",
@@ -8802,7 +8848,7 @@
       "firstSeen": "2026-11-10",
       "from": "site",
       "status": "checked",
-      "lastSeen": "2026-11-10",
+      "lastSeen": "2026-11-11",
       "site": {
         "name": "instablank",
         "url": "https://www.instablank.com/meme/190",
@@ -8841,7 +8887,7 @@
       "firstSeen": "2026-11-10",
       "from": "site",
       "status": "checked",
-      "lastSeen": "2026-11-10",
+      "lastSeen": "2026-11-11",
       "site": {
         "name": "instablank",
         "url": "https://www.instablank.com/meme/189",
@@ -8865,7 +8911,7 @@
       "firstSeen": "2026-11-10",
       "from": "site",
       "status": "unverified",
-      "lastSeen": "2026-11-10",
+      "lastSeen": "2026-11-11",
       "site": {
         "name": "instablank",
         "url": "https://www.instablank.com/meme/188",
@@ -8889,7 +8935,7 @@
       "firstSeen": "2026-11-10",
       "from": "site",
       "status": "checked",
-      "lastSeen": "2026-11-10",
+      "lastSeen": "2026-11-11",
       "site": {
         "name": "instablank",
         "url": "https://www.instablank.com/meme/187",
@@ -8913,7 +8959,7 @@
       "firstSeen": "2026-11-10",
       "from": "site",
       "status": "checked",
-      "lastSeen": "2026-11-10",
+      "lastSeen": "2026-11-11",
       "site": {
         "name": "instablank",
         "url": "https://www.instablank.com/meme/186",
@@ -8937,7 +8983,7 @@
       "firstSeen": "2026-11-10",
       "from": "site",
       "status": "checked",
-      "lastSeen": "2026-11-10",
+      "lastSeen": "2026-11-11",
       "site": {
         "name": "instablank",
         "url": "https://www.instablank.com/meme/185",
@@ -8966,7 +9012,7 @@
       "firstSeen": "2026-11-10",
       "from": "site",
       "status": "checked",
-      "lastSeen": "2026-11-10",
+      "lastSeen": "2026-11-11",
       "site": {
         "name": "instablank",
         "url": "https://www.instablank.com/meme/184",
@@ -8995,7 +9041,7 @@
       "firstSeen": "2026-11-10",
       "from": "site",
       "status": "checked",
-      "lastSeen": "2026-11-10",
+      "lastSeen": "2026-11-11",
       "site": {
         "name": "instablank",
         "url": "https://www.instablank.com/meme/183",
@@ -9038,7 +9084,7 @@
       "firstSeen": "2026-11-10",
       "from": "site",
       "status": "checked",
-      "lastSeen": "2026-11-10",
+      "lastSeen": "2026-11-11",
       "site": {
         "name": "instablank",
         "url": "https://www.instablank.com/meme/182",
@@ -9067,7 +9113,7 @@
       "firstSeen": "2026-11-10",
       "from": "site",
       "status": "checked",
-      "lastSeen": "2026-11-10",
+      "lastSeen": "2026-11-11",
       "site": {
         "name": "instablank",
         "url": "https://www.instablank.com/meme/181",
@@ -9091,7 +9137,7 @@
       "firstSeen": "2026-11-10",
       "from": "site",
       "status": "checked",
-      "lastSeen": "2026-11-10",
+      "lastSeen": "2026-11-11",
       "site": {
         "name": "instablank",
         "url": "https://www.instablank.com/meme/180",
@@ -9115,7 +9161,7 @@
       "firstSeen": "2026-11-10",
       "from": "site",
       "status": "unverified",
-      "lastSeen": "2026-11-10",
+      "lastSeen": "2026-11-11",
       "site": {
         "name": "instablank",
         "url": "https://www.instablank.com/meme/179",
@@ -9139,7 +9185,7 @@
       "firstSeen": "2026-11-10",
       "from": "site",
       "status": "unverified",
-      "lastSeen": "2026-11-10",
+      "lastSeen": "2026-11-11",
       "site": {
         "name": "instablank",
         "url": "https://www.instablank.com/meme/178",
@@ -9163,7 +9209,7 @@
       "firstSeen": "2026-11-10",
       "from": "site",
       "status": "checked",
-      "lastSeen": "2026-11-10",
+      "lastSeen": "2026-11-11",
       "site": {
         "name": "instablank",
         "url": "https://www.instablank.com/meme/177",
@@ -9214,7 +9260,7 @@
       "firstSeen": "2026-11-10",
       "from": "site",
       "status": "checked",
-      "lastSeen": "2026-11-10",
+      "lastSeen": "2026-11-11",
       "site": {
         "name": "instablank",
         "url": "https://www.instablank.com/meme/176",
@@ -9265,7 +9311,7 @@
       "firstSeen": "2026-11-10",
       "from": "seed",
       "status": "checked",
-      "lastSeen": "2026-11-10",
+      "lastSeen": "2026-11-11",
       "verify": {
         "summary": "안습은 안구에 습기가 찬다는 말의 줄임말로, 안타깝거나 슬픈 상황을 희화화하여 표현할 때 쓰는 말입니다.",
         "sources": 0,
@@ -9305,7 +9351,7 @@
       "firstSeen": "2026-11-10",
       "from": "seed",
       "status": "checked",
-      "lastSeen": "2026-11-10",
+      "lastSeen": "2026-11-11",
       "verify": {
         "summary": "지못미는 ‘지켜 주지 못해 미안해’의 앞 글자를 딴 줄임말로, 누군가나 무언가가 안타깝거나 민망한 상황에 놓였을 때 미안함과 유감을 표현하는 인터넷 용어입니다.",
         "sources": 0,
@@ -9345,7 +9391,7 @@
       "firstSeen": "2026-11-10",
       "from": "seed",
       "status": "checked",
-      "lastSeen": "2026-11-10",
+      "lastSeen": "2026-11-11",
       "verify": {
         "summary": "완소는 크게 두 가지 의미로 쓰입니다.",
         "sources": 2,
@@ -9385,7 +9431,7 @@
       "firstSeen": "2026-11-10",
       "from": "seed",
       "status": "checked",
-      "lastSeen": "2026-11-10",
+      "lastSeen": "2026-11-11",
       "verify": {
         "summary": "솔까말은 \"솔직히 까놓고 말해서\"의 줄임말입니다.",
         "sources": 0,
@@ -9425,7 +9471,7 @@
       "firstSeen": "2026-11-10",
       "from": "seed",
       "status": "checked",
-      "lastSeen": "2026-11-10",
+      "lastSeen": "2026-11-11",
       "verify": {
         "summary": "냉무는 '내용 없음(無)'의 줄임말로, 게시글의 제목만으로 전달하려는 내용이 모두 표현되어 본문에는 추가적인 내용이 없음을 의미합니다.",
         "sources": 0,
@@ -9465,7 +9511,7 @@
       "firstSeen": "2026-11-10",
       "from": "seed",
       "status": "checked",
-      "lastSeen": "2026-11-10",
+      "lastSeen": "2026-11-11",
       "verify": {
         "summary": "엄친아는 '엄마 친구 아들'의 줄임말로, 주로 여러 가지 조건을 갖춘 완벽한 남자를 비유하는 용어입니다.",
         "sources": 0,
@@ -9505,7 +9551,7 @@
       "firstSeen": "2026-11-10",
       "from": "seed",
       "status": "checked",
-      "lastSeen": "2026-11-10",
+      "lastSeen": "2026-11-11",
       "verify": {
         "summary": "멘붕은 멘탈 붕괴의 줄임말로, 충격적이거나 황당한 일이 벌어졌을 때 정신을 차리기 힘들 만큼 혼란스럽고 패닉 상태가 된 것을 뜻합니다. 예상치 못한 사태나 압도적인 정보량 등으로 인해 이성적 판단과 감정 조절이 무너져 사고가 정지된 듯한 상태를 강조할 때 주로 쓰입니다.",
         "sources": 0,
@@ -9545,7 +9591,7 @@
       "firstSeen": "2026-11-10",
       "from": "seed",
       "status": "checked",
-      "lastSeen": "2026-11-10",
+      "lastSeen": "2026-11-11",
       "verify": {
         "summary": "넘사벽은 넘을 수 없는 사차원의 벽을 줄인 말로, 비교 대상이 너무 우월하여 따라잡을 수 없거나 대적할 상대가 없음을 뜻합니다.",
         "sources": 0,
@@ -9585,7 +9631,7 @@
       "firstSeen": "2026-11-10",
       "from": "seed",
       "status": "checked",
-      "lastSeen": "2026-11-10",
+      "lastSeen": "2026-11-11",
       "verify": {
         "summary": "깜놀은 ‘깜짝 놀라다’의 줄임말로, 예상치 못한 일에 화들짝 놀랐을 때 사용하는 말입니다.",
         "sources": 0,
@@ -9625,7 +9671,7 @@
       "firstSeen": "2026-11-10",
       "from": "seed",
       "status": "checked",
-      "lastSeen": "2026-11-10",
+      "lastSeen": "2026-11-11",
       "verify": {
         "summary": "열공은 열심히 공부하자는 말의 줄임말입니다.",
         "sources": 4,
@@ -9665,7 +9711,7 @@
       "firstSeen": "2026-11-10",
       "from": "seed",
       "status": "checked",
-      "lastSeen": "2026-11-10",
+      "lastSeen": "2026-11-11",
       "verify": {
         "summary": "강추는 강력 추천을 줄여 이르는 말로, 무언가를 강력하게 추천한다는 뜻입니다.",
         "sources": 0,
@@ -9705,7 +9751,7 @@
       "firstSeen": "2026-11-10",
       "from": "seed",
       "status": "checked",
-      "lastSeen": "2026-11-10",
+      "lastSeen": "2026-11-11",
       "verify": {
         "summary": "즐감은 즐겁게 감상한다는 뜻의 줄임말입니다.",
         "sources": 3,
@@ -9745,7 +9791,7 @@
       "firstSeen": "2026-11-10",
       "from": "seed",
       "status": "checked",
-      "lastSeen": "2026-11-10",
+      "lastSeen": "2026-11-11",
       "verify": {
         "summary": "득템은 얻는다는 뜻의 한자 '득(得)'과 영어 '아이템(item)'이 결합한 말로, 좋은 물건을 얻는다는 의미입니다.",
         "sources": 0,
@@ -9785,7 +9831,7 @@
       "firstSeen": "2026-11-10",
       "from": "seed",
       "status": "checked",
-      "lastSeen": "2026-11-10",
+      "lastSeen": "2026-11-11",
       "verify": {
         "summary": "볼매는 볼수록 매력 있다는 뜻의 줄임말입니다.",
         "sources": 6,
@@ -9825,7 +9871,7 @@
       "firstSeen": "2026-11-10",
       "from": "seed",
       "status": "checked",
-      "lastSeen": "2026-11-10",
+      "lastSeen": "2026-11-11",
       "verify": {
         "summary": "불금은 불타는 금요일의 줄임말로, 주말을 앞두고 신나게 즐기는 금요일 밤을 뜻합니다. 주말이 시작되는 금요일 특유의 들뜬 분위기나 기분을 가리키는 표현으로도 쓰입니다.",
         "sources": 0,
@@ -9865,7 +9911,7 @@
       "firstSeen": "2026-11-10",
       "from": "seed",
       "status": "checked",
-      "lastSeen": "2026-11-10",
+      "lastSeen": "2026-11-11",
       "verify": {
         "summary": "썩소는 썩은 미소의 줄임말로, 한쪽 입꼬리만 올려 씁쓸하게 짓거나 음흉하게 짓는 미소를 의미합니다.",
         "sources": 0,
@@ -9905,7 +9951,7 @@
       "firstSeen": "2026-11-10",
       "from": "seed",
       "status": "checked",
-      "lastSeen": "2026-11-10",
+      "lastSeen": "2026-11-11",
       "verify": {
         "summary": "따봉은 포르투갈어 'Tá bom(타 봉)'에서 유래한 말로, \"좋다\" 또는 \"알겠다\"라는 뜻을 가진 단어입니다. 한국에서는 1980년대 말 델몬트 오렌지 주스 광고를 통해 널리 알려졌으며, 현재는 \"최고다\", \"엄지 척\"과 같은 긍정적인 의미의 유행어로 쓰입니다.",
         "sources": 0,
@@ -9945,7 +9991,7 @@
       "firstSeen": "2026-11-10",
       "from": "seed",
       "status": "checked",
-      "lastSeen": "2026-11-10",
+      "lastSeen": "2026-11-11",
       "verify": {
         "summary": "당근이지는 '당연하지'를 변형하여 사용하는 유행어로, 상황에 따라 두 가지 의미로 해석될 수 있습니다.",
         "sources": 0,
@@ -9985,7 +10031,7 @@
       "firstSeen": "2026-11-10",
       "from": "seed",
       "status": "checked",
-      "lastSeen": "2026-11-10",
+      "lastSeen": "2026-11-11",
       "verify": {
         "summary": "방가방가는 1990년대 후반에서 2000년대 초반 사이 PC통신과 인터넷 채팅에서 유행한 인사말로, ‘반갑다’는 뜻을 담고 있습니다.",
         "sources": 0,
@@ -10025,7 +10071,7 @@
       "firstSeen": "2026-11-10",
       "from": "seed",
       "status": "checked",
-      "lastSeen": "2026-11-10",
+      "lastSeen": "2026-11-11",
       "verify": {
         "summary": "하이루는 문맥에 따라 크게 세 가지 의미로 쓰입니다.",
         "sources": 0,
@@ -10065,7 +10111,7 @@
       "firstSeen": "2026-11-10",
       "from": "seed",
       "status": "checked",
-      "lastSeen": "2026-11-10",
+      "lastSeen": "2026-11-11",
       "verify": {
         "summary": "캡(cap)은 문맥에 따라 모자, 뚜껑, 한도, 또는 거짓말을 뜻하는 슬랭 등 다양한 의미로 쓰입니다.",
         "sources": 0,
@@ -10105,7 +10151,7 @@
       "firstSeen": "2026-11-10",
       "from": "seed",
       "status": "checked",
-      "lastSeen": "2026-11-10",
+      "lastSeen": "2026-11-11",
       "verify": {
         "summary": "킹왕짱은 영어 '킹(King)', 한자 '왕(王)', 한국어 '짱'을 합성하여 최상급을 세 번 강조한 신조어입니다. '매우 최고', '최고 중의 최고'라는 의미로 쓰이며, 2000년대 중반부터 유행하여 대중적으로 널리 퍼졌습니다.",
         "sources": 0,
@@ -10145,7 +10191,7 @@
       "firstSeen": "2026-11-10",
       "from": "seed",
       "status": "checked",
-      "lastSeen": "2026-11-10",
+      "lastSeen": "2026-11-11",
       "verify": {
         "summary": "오나전은 ‘완전’을 빠르게 입력하다가 발생하는 오타에서 유래한 인터넷 표현으로, ‘정말’, ‘아주’, ‘완전히’와 같이 의미를 강조할 때 사용합니다.",
         "sources": 0,
@@ -10185,7 +10231,7 @@
       "firstSeen": "2026-11-10",
       "from": "seed",
       "status": "checked",
-      "lastSeen": "2026-11-10",
+      "lastSeen": "2026-11-11",
       "verify": {
         "summary": "대략난감은 상황이 대체로 난감하거나 당황스럽다는 뜻을 가진 신조어입니다.",
         "sources": 3,
@@ -10225,7 +10271,7 @@
       "firstSeen": "2026-11-10",
       "from": "seed",
       "status": "checked",
-      "lastSeen": "2026-11-10",
+      "lastSeen": "2026-11-11",
       "verify": {
         "summary": "도토리는 떡갈나무, 갈참나무, 상수리나무와 같은 참나무 종류의 열매를 통칭하는 말입니다.",
         "sources": 0,
@@ -10265,7 +10311,7 @@
       "firstSeen": "2026-11-10",
       "from": "seed",
       "status": "checked",
-      "lastSeen": "2026-11-10",
+      "lastSeen": "2026-11-11",
       "verify": {
         "summary": "일촌은 문맥에 따라 한 마을 전체를 뜻하거나, SNS 싸이월드의 친구 관계를 의미합니다.",
         "sources": 0,
@@ -10305,7 +10351,7 @@
       "firstSeen": "2026-11-10",
       "from": "seed",
       "status": "checked",
-      "lastSeen": "2026-11-10",
+      "lastSeen": "2026-11-11",
       "verify": {
         "summary": "OTL은 사람이 좌절하여 땅에 손을 짚고 무릎을 꿇은 채 엎드린 모습을 형상화한 이모티콘입니다.",
         "sources": 0,
@@ -10345,7 +10391,7 @@
       "firstSeen": "2026-11-10",
       "from": "seed",
       "status": "checked",
-      "lastSeen": "2026-11-10",
+      "lastSeen": "2026-11-11",
       "verify": {
         "summary": "삐삐 번호 8282는 ‘빨리빨리’라는 뜻입니다.",
         "sources": 0,
@@ -10364,7 +10410,7 @@
       "firstSeen": "2026-11-10",
       "from": "seed",
       "status": "checked",
-      "lastSeen": "2026-11-10",
+      "lastSeen": "2026-11-11",
       "verify": {
         "summary": "삐삐 번호 486은 1990년대 무선호출기(삐삐) 시절에 사용되던 숫자 암호로, '사랑해'라는 뜻을 담고 있습니다.",
         "sources": 0,
@@ -10383,7 +10429,7 @@
       "firstSeen": "2026-11-10",
       "from": "seed",
       "status": "checked",
-      "lastSeen": "2026-11-10",
+      "lastSeen": "2026-11-11",
       "verify": {
         "summary": "삐삐 번호 1010235는 '열렬히 사모해'라는 뜻을 담은 숫자 암호입니다.",
         "sources": 7,
@@ -10393,6 +10439,564 @@
         "links": [],
         "titleHits": 0,
         "checkedAt": "2026-11-10T18:31:38.411Z"
+      }
+    },
+    "엔믹스하다": {
+      "term": "엔믹스하다",
+      "glosses": [],
+      "blogs": [],
+      "firstSeen": "2026-11-11",
+      "from": "seed",
+      "status": "rejected",
+      "lastSeen": "2026-11-11",
+      "verify": {
+        "summary": "엔믹스하다는 대화나 분위기가 예상치 못한 방향으로 갑자기 바뀌는 상황을 가리키는 2026년 유행 밈입니다.",
+        "sources": 0,
+        "examples": [],
+        "noResult": false,
+        "redirected": false,
+        "links": [
+          {
+            "title": "엔믹스하다 밈 총정리 새 창 열림",
+            "href": "https://www.instablank.com/meme/144"
+          },
+          {
+            "title": "www.yugacrew.com›육아위키›엔믹스하다 새 창 열림",
+            "href": "https://www.yugacrew.com/yugawiki/%EC%97%94%EB%AF%B9%EC%8A%A4%ED%95%98%EB%8B%A4"
+          },
+          {
+            "title": "엔믹스하다 (엔믹스~ 체인지 업) 새 창 열림",
+            "href": "https://jjalnews.com/archives/19784"
+          },
+          {
+            "title": "엔믹스하다 (엔믹스~ 체인지 업) 새 창 열림",
+            "href": "https://www.jjalbang.today/jjalstoryview/122"
+          }
+        ],
+        "titleHits": 4,
+        "checkedAt": "2026-11-11T02:36:53.050Z"
+      },
+      "decision": {
+        "status": "rejected",
+        "by": "claude",
+        "reason": "트렌드어워드 2026 정답지에서 이름만 가져옴(독립 출처 1). 실존 아이돌 그룹 이름에서 온 말이라 실존 인물 소재 제외 규칙에 걸림",
+        "date": "2026-11-11"
+      }
+    },
+    "라을라": {
+      "term": "라을라",
+      "glosses": [],
+      "blogs": [],
+      "firstSeen": "2026-11-11",
+      "from": "seed",
+      "status": "approved",
+      "lastSeen": "2026-11-11",
+      "verify": {
+        "summary": "라을라는 하품을 하다가 성대가 열리며 성악가처럼 ‘라을라’ 소리가 났다는 직장인의 일화에서 시작된 인터넷 밈입니다. 하품 소리를 흉내 내는 의성어에서 시작해, 현재는 당황스러운 상황을 유머로 넘기거나 피곤함·즐거움 등 여러 상태를 장난스럽게 표현하는 용도로 쓰입니다.",
+        "sources": 0,
+        "examples": [],
+        "noResult": false,
+        "redirected": false,
+        "links": [
+          {
+            "title": "라을라 뜻, 하품 밈으로 유명한 MZ신조어 새 창 열림",
+            "href": "https://blog.naver.com/cltube/224369016682"
+          },
+          {
+            "title": "라을라 뜻, 하품이 왜 요즘 유행하는 밈이 됐을까 새 창 열림",
+            "href": "https://blog.naver.com/jssmsh3/224387472305"
+          },
+          {
+            "title": "www.yugacrew.com›육아위키›라을라 새 창 열림",
+            "href": "https://www.yugacrew.com/yugawiki/%EB%9D%BC%EC%9D%84%EB%9D%BC"
+          },
+          {
+            "title": "라을라가 무슨 뜻이야?? 새 창 열림",
+            "href": "https://www.instiz.net/name_enter/100165310"
+          },
+          {
+            "title": "11월 9일 요즘 10대·20대 신조어 — 동결건조, 라을라, 왁뿌볼, 스트롱 스트롱, 윤정아 확인된 5개만 .... 새 창 열림",
+            "href": "https://blog.naver.com/feelfreefun/224470407906"
+          }
+        ],
+        "titleHits": 19,
+        "checkedAt": "2026-11-11T02:36:56.021Z"
+      },
+      "decision": {
+        "status": "approved",
+        "by": "claude",
+        "reason": "트렌드어워드 2026 정답지에서 이름만 가져옴(독립 출처 1). 블로그 제목 19건, 하품 소리 의성어에서 시작한 밈으로 일치. 뜻이 넓어 해설에 유래를 꼭 넣을 것",
+        "date": "2026-11-11"
+      }
+    },
+    "피아노방": {
+      "term": "피아노 방",
+      "glosses": [],
+      "blogs": [],
+      "firstSeen": "2026-11-11",
+      "from": "seed",
+      "status": "checked",
+      "lastSeen": "2026-11-11",
+      "verify": {
+        "summary": "",
+        "sources": 8,
+        "examples": [],
+        "noResult": false,
+        "redirected": false,
+        "links": [
+          {
+            "title": "피아노 소리 민원, 음악이 갈등이 되는 시대[조율사 김진수의 피아노 방음 이야기①] 더리포트 새 창 열림",
+            "href": "https://www.thereport.co.kr/news/articleView.html?idxno=89429"
+          }
+        ],
+        "titleHits": 1,
+        "checkedAt": "2026-11-11T02:36:59.129Z"
+      },
+      "decision": {
+        "status": "hold",
+        "by": "claude",
+        "reason": "트렌드어워드 2026 정답지에서 이름만 가져옴(독립 출처 1). 요약이 비고 블로그 제목 1건뿐",
+        "date": "2026-11-11"
+      }
+    },
+    "왁뿌볼": {
+      "term": "왁뿌볼",
+      "glosses": [],
+      "blogs": [],
+      "firstSeen": "2026-11-11",
+      "from": "seed",
+      "status": "approved",
+      "lastSeen": "2026-11-11",
+      "verify": {
+        "summary": "왁뿌볼은 '왁스 뿌시기 볼'의 줄임말로, 말랑한 점토나 스퀴시 같은 내용물 겉면을 왁스로 코팅한 촉감 완구를 뜻합니다. 손으로 누르면 겉면의 왁스가 바삭하게 깨지면서 독특한 소리와 촉감을 제공하는 것이 특징입니다.",
+        "sources": 0,
+        "examples": [],
+        "noResult": false,
+        "redirected": false,
+        "links": [
+          {
+            "title": "왁뿌볼 슬라임 장난감 유아 초등학생 인기 이유와 뜻 발암물질 재사용 방법 새 창 열림",
+            "href": "https://blog.naver.com/jini4998/224385561844"
+          },
+          {
+            "title": "www.yugacrew.com›육아위키›왁뿌볼 뜻 새 창 열림",
+            "href": "https://www.yugacrew.com/yugawiki/%EC%99%81%EB%BF%8C%EB%B3%BC_%EB%9C%BB"
+          },
+          {
+            "title": "왁뿌볼 뜻 사이트 웹게임 추천 시간가는줄 몰라 새 창 열림",
+            "href": "https://blog.naver.com/kdj111111111/224356438758"
+          },
+          {
+            "title": "namu.wiki›왁뿌볼 새 창 열림",
+            "href": "https://namu.wiki/w/%EC%99%81%EB%BF%8C%EB%B3%BC"
+          },
+          {
+            "title": "왁뿌볼 구하기 넘 어려워서... #왁뿌볼 #청사과왁뿌볼 #왁뿌볼파는곳... 새 창 열림",
+            "href": "https://m.naver.com/shorts?serviceType=MOMENT&mediaType=VOD&seedMediaId=81A0200A4610FF7053E5C6C8BCBD22996D1D&recType=CLIP_PC&recId=%7B%22targetProfileId%22%3A%22bw_6ejULb6Syr2r19WxD%22%2C%22open%22%3Atrue%7D"
+          }
+        ],
+        "titleHits": 21,
+        "checkedAt": "2026-11-11T02:37:02.185Z"
+      },
+      "decision": {
+        "status": "approved",
+        "by": "claude",
+        "reason": "트렌드어워드 2026 정답지에서 이름만 가져옴(독립 출처 1). 블로그 제목 21건, 왁스 뿌시기 볼(촉감 완구)로 일치. 말이라기보다 유행 물건 이름이라 줄임말 풀기로만 낸다",
+        "date": "2026-11-11"
+      }
+    },
+    "냐냐냥": {
+      "term": "냐냐냥",
+      "glosses": [],
+      "blogs": [],
+      "firstSeen": "2026-11-11",
+      "from": "seed",
+      "status": "approved",
+      "lastSeen": "2026-11-11",
+      "verify": {
+        "summary": "냐냐냥은 2023년 카카오톡 대화 캡처에서 유래하여 2026년 봄 SNS에서 재유행한 참여형 밈으로, 다음 내용이 궁금하면 ‘냐냐냥’이라고 답하라는 식의 호기심 유발용 추임새입니다.",
+        "sources": 9,
+        "examples": [],
+        "noResult": false,
+        "redirected": false,
+        "links": [
+          {
+            "title": "냐냐냥이 뭐지 - 인스티즈 새 창 열림",
+            "href": "https://www.instiz.net/name_enter/98947782"
+          },
+          {
+            "title": "냐냐냥 뜻 - 별다줄사전 새 창 열림",
+            "href": "https://www.jjalbang.today/memedictview/758"
+          },
+          {
+            "title": "slangkorea.com›냐냐냥 새 창 열림",
+            "href": "https://slangkorea.com/word/%EB%83%90%EB%83%90%EB%83%A5"
+          },
+          {
+            "title": "“궁금하다면 냐냐냥” 밈, 댓글에 고양이 소리가 달리는 이유 새 창 열림",
+            "href": "https://blog.naver.com/dbblog-/224402628241"
+          },
+          {
+            "title": "냐냐냥 그릭요거트 합정본점",
+            "href": "https://map.naver.com/p/entry/place/1625723797?lng=126.916362&lat=37.5507778&placePath=%2Fhome&searchType=place"
+          }
+        ],
+        "titleHits": 15,
+        "checkedAt": "2026-11-11T02:37:05.627Z"
+      },
+      "decision": {
+        "status": "approved",
+        "by": "claude",
+        "reason": "트렌드어워드 2026 정답지에서 이름만 가져옴(독립 출처 1). 네이버 확인 출처 9곳·블로그 제목 15건, 뜻(다음 내용이 궁금하면 답하는 추임새) 일치, 누구도 낮추지 않음",
+        "date": "2026-11-11"
+      }
+    },
+    "백룸코어": {
+      "term": "백룸 코어",
+      "glosses": [],
+      "blogs": [],
+      "firstSeen": "2026-11-11",
+      "from": "seed",
+      "status": "approved",
+      "lastSeen": "2026-11-11",
+      "verify": {
+        "summary": "백룸 코어는 사람이 없는 텅 빈 실내 공간이 주는 기이한 분위기를 나타내는 미감 표현입니다. 이는 현실 뒤에 숨겨진 끝없는 공간을 뜻하는 백룸 괴담에서 유래했으며, 영화 <백룸>이 개봉하며 널리 알려졌습니다.",
+        "sources": 0,
+        "examples": [],
+        "noResult": false,
+        "redirected": false,
+        "links": [
+          {
+            "title": "www.yugacrew.com›육아위키›백룸코어 새 창 열림",
+            "href": "https://www.yugacrew.com/yugawiki/%EB%B0%B1%EB%A3%B8%EC%BD%94%EC%96%B4"
+          },
+          {
+            "title": "7번 문제는 ‘백룸 코어’를 찾는 문제였는데요, 정답은 3번입니다! ‘현실 뒤에 숨겨진 끝없는 공간’을 의미하는 ‘백룸’! 지난 5월에 영화 ‘",
+            "href": "https://maily.so/trendaword/posts/1gz2w6q4z3q"
+          },
+          {
+            "title": "서울에서 ‘백룸코어’를 경험하고 싶다면 여기로 새 창 열림",
+            "href": "https://heypop.kr/n/140841/"
+          },
+          {
+            "title": "백며들게 되… 백룸 덕후라면 한번쯤은 들어본 백룸코어 브금들을 모아보았습니다🪑 : 데패뉴 | .... 새 창 열림",
+            "href": "https://dafanew.com/Entertainment/?bmode=view&idx=171694331"
+          }
+        ],
+        "titleHits": 4,
+        "checkedAt": "2026-11-11T02:37:08.641Z"
+      },
+      "decision": {
+        "status": "approved",
+        "by": "claude",
+        "reason": "트렌드어워드 2026 정답지에서 이름만 가져옴(독립 출처 1). 블로그 제목 4건, 텅 빈 실내의 기이한 분위기를 뜻하는 미감 말로 일치",
+        "date": "2026-11-11"
+      }
+    },
+    "롱멘": {
+      "term": "롱멘",
+      "glosses": [],
+      "blogs": [],
+      "firstSeen": "2026-11-11",
+      "from": "seed",
+      "status": "rejected",
+      "lastSeen": "2026-11-11",
+      "verify": {
+        "summary": "롱멘은 주식 시장에서 가격 상승을 기대하는 방향을 뜻하는 롱(Long)과 종교적 표현인 아멘(Amen)을 결합한 인터넷 유행어입니다. “주가가 오르기를 바라며 기도한다”는 의미를 담아 투자자들이 재미있게 사용하는 밈입니다.",
+        "sources": 0,
+        "examples": [],
+        "noResult": false,
+        "redirected": false,
+        "links": [
+          {
+            "title": "[MZ신조어]롱멘 뜻｜주식하는 사람들이 아멘 대신 “롱멘~”이라고 하는 이유 새 창 열림",
+            "href": "https://blog.naver.com/dudvlf4948/224395276796"
+          },
+          {
+            "title": "newwordzip.com›장투교-뜻-롱멘-무슨-의미일까 새 창 열림",
+            "href": "https://newwordzip.com/%EC%9E%A5%ED%88%AC%EA%B5%90-%EB%9C%BB-%EB%A1%B1%EB%A9%98-%EB%AC%B4%EC%8A%A8-%EC%9D%98%EB%AF%B8%EC%9D%BC%EA%B9%8C/"
+          },
+          {
+            "title": "롱멘(long 아멘)은 장기투자를 종교처럼 설파하는 '최병욱 전도사' 부캐의 마무리 인사이다. 손실 중인 종목을 계속 보유하거나 존버(버티기)를",
+            "href": "https://www.instablank.com/meme/197"
+          },
+          {
+            "title": "장투교 (롱멘~ · 장기투자 전도사) 새 창 열림",
+            "href": "https://jjalnews.com/archives/42785"
+          },
+          {
+            "title": "장투교 뜻｜최병욱 전도사 정체와 롱멘·심야예배 밈 유래 새 창 열림",
+            "href": "https://luckyvicky.moamoang.co.kr/trends/jangtoo-cho/"
+          }
+        ],
+        "titleHits": 12,
+        "checkedAt": "2026-11-11T02:37:11.639Z"
+      },
+      "decision": {
+        "status": "rejected",
+        "by": "claude",
+        "reason": "출처 확인 결과 개그맨이 만든 부캐(최병욱 전도사)의 마무리 인사에서 시작된 말. 실존 인물 소재 제외 규칙",
+        "date": "2026-11-11"
+      }
+    },
+    "꺽캡": {
+      "term": "꺽캡",
+      "glosses": [],
+      "blogs": [],
+      "firstSeen": "2026-11-11",
+      "from": "seed",
+      "status": "approved",
+      "lastSeen": "2026-11-11",
+      "verify": {
+        "summary": "꺽캡은 꺾는 키캡의 줄임말로, 손가락으로 꺾을 때 나는 뽀각 소리와 감촉을 즐기는 작은 촉감 장난감을 뜻합니다. 꺾다와 캡을 합쳐 부르며 뽀각 클리커라는 별명도 있습니다.",
+        "sources": 0,
+        "examples": [],
+        "noResult": false,
+        "redirected": false,
+        "links": [
+          {
+            "title": "꺽캡 (뽀각 클리커) 오늘의짤방 새 창 열림",
+            "href": "https://www.jjalbang.today/jjalstoryview/154"
+          },
+          {
+            "title": "꺽캡 뜻 - 신조어 사전 새 창 열림",
+            "href": "https://www.instablank.com/slang/770"
+          },
+          {
+            "title": "www.yugacrew.com›육아위키›꺽캡 새 창 열림",
+            "href": "https://www.yugacrew.com/yugawiki/%EA%BA%BD%EC%BA%A1"
+          },
+          {
+            "title": "10월 28일 요즘 10대·20대 신조어 9개 — 이혼앤비혼부터 꺽캡까지 새 창 열림",
+            "href": "https://blog.naver.com/feelfreefun/224456717582"
+          },
+          {
+            "title": "클릭커, 꺽캡도 있다 특히 할인제품을 잘 찾아보면 지시봉처럼 1000원 미만의 득템 찬스도 있음! 무지개링, 만득이 등 추억을 자극하는 제품들도",
+            "href": "https://blog.naver.com/7488h2/224397931212"
+          }
+        ],
+        "titleHits": 9,
+        "checkedAt": "2026-11-11T02:37:14.611Z"
+      },
+      "decision": {
+        "status": "approved",
+        "by": "claude",
+        "reason": "트렌드어워드 2026 정답지에서 이름만 가져옴(독립 출처 1). 블로그 제목 9건, 꺾는 키캡(촉감 완구)으로 일치. 왁뿌볼과 같은 회차에 넣지 않는다",
+        "date": "2026-11-11"
+      }
+    },
+    "그로구": {
+      "term": "그로구",
+      "glosses": [],
+      "blogs": [],
+      "firstSeen": "2026-11-11",
+      "from": "seed",
+      "status": "rejected",
+      "lastSeen": "2026-11-11",
+      "verify": {
+        "summary": "그로구(Grogu)는 스타워즈 프랜차이즈의 캐릭터로, 디즈니+ 오리지널 시리즈 '만달로리안'에서 처음 소개되었습니다. 요다와 같은 신비로운 종족에 속하는 포스 감응 외계인입니다.",
+        "sources": 0,
+        "examples": [],
+        "noResult": false,
+        "redirected": false,
+        "links": [
+          {
+            "title": "namu.wiki›그로구 새 창 열림",
+            "href": "https://namu.wiki/w/%EA%B7%B8%EB%A1%9C%EA%B5%AC"
+          },
+          {
+            "title": "ko.wikipedia.org›만달로리안과_그로구 새 창 열림",
+            "href": "https://ko.wikipedia.org/wiki/%EB%A7%8C%EB%8B%AC%EB%A1%9C%EB%A6%AC%EC%95%88%EA%B3%BC_%EA%B7%B8%EB%A1%9C%EA%B5%AC"
+          },
+          {
+            "title": "www.yugacrew.com›육아위키›만달로리안과 그로구 새 창 열림",
+            "href": "https://www.yugacrew.com/yugawiki/%EB%A7%8C%EB%8B%AC%EB%A1%9C%EB%A6%AC%EC%95%88%EA%B3%BC_%EA%B7%B8%EB%A1%9C%EA%B5%AC"
+          },
+          {
+            "title": "스타워즈 신작 「만달로리안과 그로구」가 개봉하면서 다시 궁금해진 이름이 있다. 만달로리안과 그로구 영화 포스터. 출처: https://namu.",
+            "href": "https://blog.naver.com/bear_base/224295279363"
+          },
+          {
+            "title": "영화 스타워즈 만달로리안과 그로구 새 창 열림",
+            "href": "https://blog.naver.com/kschung/224298073448"
+          }
+        ],
+        "titleHits": 19,
+        "checkedAt": "2026-11-11T02:37:17.689Z"
+      },
+      "decision": {
+        "status": "rejected",
+        "by": "claude",
+        "reason": "트렌드어워드 2026 정답지에서 이름만 가져옴(독립 출처 1). 유행어가 아니라 스타워즈 캐릭터 이름. 네이버 요약도 캐릭터 설명뿐",
+        "date": "2026-11-11"
+      }
+    },
+    "동결건조": {
+      "term": "동결건조",
+      "glosses": [],
+      "blogs": [],
+      "firstSeen": "2026-11-11",
+      "from": "seed",
+      "status": "checked",
+      "lastSeen": "2026-11-11",
+      "verify": {
+        "summary": "동결건조는 물체를 얼린 뒤 기압을 낮춰 고체 상태의 물이 액체를 거치지 않고 바로 기체로 변하는 승화 현상을 이용해 수분을 제거하는 공법입니다.",
+        "sources": 0,
+        "examples": [],
+        "noResult": false,
+        "redirected": false,
+        "links": [
+          {
+            "title": "namu.wiki›동결건조 새 창 열림",
+            "href": "https://namu.wiki/w/%EB%8F%99%EA%B2%B0%EA%B1%B4%EC%A1%B0"
+          },
+          {
+            "title": "동결 건조 - 위키백과 한국어 새 창 열림",
+            "href": "https://ko.wikipedia.org/wiki/%EB%8F%99%EA%B2%B0_%EA%B1%B4%EC%A1%B0"
+          },
+          {
+            "title": "kslangs.com›슬랭›사전›동결건조 새 창 열림",
+            "href": "https://kslangs.com/word/32295c73-0108-467e-9eda-c3412f9f7c61"
+          },
+          {
+            "title": "동결건조 - 그랑 라루스 요리백과 새 창 열림",
+            "href": "https://terms.naver.com/%EC%84%B8%EA%B3%84-%EC%9D%8C%EC%8B%9D/%EB%8F%99%EA%B2%B0%EA%B1%B4%EC%A1%B0-2N3Oq5SJTsNVV8jY1otAL4"
+          },
+          {
+            "title": "아기 귤칩 먹방 보고가세요 ㅋㅋ 동결건조 과일칩 먹는 9개월 아기... 새 창 열림",
+            "href": "https://m.naver.com/shorts?serviceType=MOMENT&mediaType=VOD&seedMediaId=5A76D6A26B51A5BA6362687188CB34A2B4A5&recType=CLIP_PC&recId=%7B%22targetProfileId%22%3A%2284mvYd3Sgvt0EmKLYBpC%22%2C%22open%22%3Atrue%7D"
+          }
+        ],
+        "titleHits": 22,
+        "checkedAt": "2026-11-11T02:37:20.763Z"
+      },
+      "decision": {
+        "status": "hold",
+        "by": "claude",
+        "reason": "트렌드어워드 2026 정답지에서 이름만 가져옴(독립 출처 1). 네이버 요약이 공법 설명뿐이라 밈으로서의 뜻을 확인 못 함",
+        "date": "2026-11-11"
+      }
+    },
+    "아기원숭이펀치": {
+      "term": "아기 원숭이 펀치",
+      "glosses": [],
+      "blogs": [],
+      "firstSeen": "2026-11-11",
+      "from": "seed",
+      "status": "approved",
+      "lastSeen": "2026-11-11",
+      "verify": {
+        "summary": "아기 원숭이 펀치(Punch)는 일본 이치카와시 동식물원에서 태어난 일본원숭이 새끼의 이름이며, 어미에게 버림받고 사육사의 손에서 자라며 오랑우탄 봉제인형에 강한 애착을 보이는 모습이 SNS를 통해 큰 화제가 되면서 유명해진 동물 밈입니다.",
+        "sources": 0,
+        "examples": [],
+        "noResult": false,
+        "redirected": false,
+        "links": [
+          {
+            "title": "www.yugacrew.com›육아위키›아기원숭이펀치 새 창 열림",
+            "href": "https://www.yugacrew.com/yugawiki/%EC%95%84%EA%B8%B0%EC%9B%90%EC%88%AD%EC%9D%B4%ED%8E%80%EC%B9%98"
+          },
+          {
+            "title": "푸바오를 잇는 SNS 금쪽이 스타 | 아기 원숭이 펀치 이야기 [마이풀] 새 창 열림",
+            "href": "https://blog.naver.com/mypool_official/224195267119"
+          },
+          {
+            "title": "아기 원숭이 펀치 뜻 — 요즘사전 새 창 열림",
+            "href": "https://trendict.yigolab.com/trend/%EC%95%84%EA%B8%B0-%EC%9B%90%EC%88%AD%EC%9D%B4-%ED%8E%80%EC%B9%98.html"
+          },
+          {
+            "title": "아기원숭이 펀치로 일본어공부10 새 창 열림",
+            "href": "https://blog.naver.com/drpic10/224251578311"
+          },
+          {
+            "title": "아기 원숭이 펀치 (일본 동물원 새끼원숭이) 새 창 열림",
+            "href": "https://www.jjalbang.today/jjalstoryview/63"
+          }
+        ],
+        "titleHits": 11,
+        "checkedAt": "2026-11-11T02:37:23.857Z"
+      },
+      "decision": {
+        "status": "approved",
+        "by": "claude",
+        "reason": "트렌드어워드 2026 정답지에서 이름만 가져옴(독립 출처 1). 블로그 제목 11건, 일본 동물원의 새끼 원숭이 화제로 일치. 사람이 아닌 동물 밈",
+        "date": "2026-11-11"
+      }
+    },
+    "마제타라마제타라닌자하이야": {
+      "term": "마제타라 마제타라 닌자 하이야",
+      "glosses": [],
+      "blogs": [],
+      "firstSeen": "2026-11-11",
+      "from": "seed",
+      "status": "checked",
+      "lastSeen": "2026-11-11",
+      "verify": {
+        "summary": "",
+        "sources": 0,
+        "examples": [],
+        "noResult": false,
+        "redirected": false,
+        "links": [
+          {
+            "title": "●마제타라 마제타라 닌자하이야! ●오늘 기말고사 이지까까브로~ 나 : 마제타라 마제타라 마법 주문 같은 걸로 기억함. 해설 : 마제타라 마제타라",
+            "href": "https://blog.naver.com/dltaha111/224388670942"
+          }
+        ],
+        "titleHits": 1,
+        "checkedAt": "2026-11-11T02:37:26.923Z"
+      },
+      "decision": {
+        "status": "hold",
+        "by": "claude",
+        "reason": "트렌드어워드 2026 정답지에서 이름만 가져옴(독립 출처 1). 요약이 비고 블로그 제목 1건뿐",
+        "date": "2026-11-11"
+      }
+    },
+    "스머프할배": {
+      "term": "스머프 할배",
+      "glosses": [],
+      "blogs": [],
+      "firstSeen": "2026-11-11",
+      "from": "seed",
+      "status": "checked",
+      "lastSeen": "2026-11-11",
+      "verify": {
+        "summary": "",
+        "sources": 0,
+        "examples": [],
+        "noResult": false,
+        "redirected": false,
+        "links": [
+          {
+            "title": "스머프할배의 만화방 새 창 열림",
+            "href": "https://blog.naver.com/adcsk"
+          },
+          {
+            "title": "도서소개 ; 노년의 일상을 시니컬하면서도 유쾌한 문장으로 풀어내며 MZ세대의 마음을 사로잡은 18년 차 네이버 블로거 ‘스머프할배’ 정성기의 에",
+            "href": "https://www.kobic.net/book/bookInfo/view.do?isbn=9791175911512"
+          },
+          {
+            "title": "스머프할배 (추구미 할아버지) 새 창 열림",
+            "href": "https://jjalnews.com/archives/19790"
+          },
+          {
+            "title": "스머프할배 뜻과 블로그 유행 이유 2026년 급부상한 일상 감성 밈 완벽 정리 새 창 열림",
+            "href": "https://blog.naver.com/yeaiee/224383356871"
+          },
+          {
+            "title": "스머프할배 뜻? 2026년 밈으로 급부상한 이유와 감성 활용법! 새 창 열림",
+            "href": "https://blog.naver.com/funnyhm1/224383193431"
+          }
+        ],
+        "titleHits": 16,
+        "checkedAt": "2026-11-11T02:37:29.895Z"
+      },
+      "decision": {
+        "status": "hold",
+        "by": "claude",
+        "reason": "트렌드어워드 2026 정답지에서 이름만 가져옴(독립 출처 1). 요약이 비어 뜻을 확인 못 함. 실존 인물을 가리키는지도 확인 필요",
+        "date": "2026-11-11"
       }
     }
   }

@@ -21,10 +21,10 @@ afterEach(() => vi.useRealTimers())
 
 test('출시 날짜가 테스트 가정과 같다', () => expect(EXAM_EPOCH).toBe('2026-11-11'))
 
-test('slug 66개 유일하고 왕복한다', () => {
+test('slug는 카드 수만큼 유일하고 왕복한다', () => {
   const slugs = cards.map((c) => wordSlug(c.term))
-  expect(slugs).toHaveLength(66)
-  expect(new Set(slugs).size).toBe(66)
+  expect(slugs).toHaveLength(cards.length)
+  expect(new Set(slugs).size).toBe(cards.length)
   for (const c of cards) {
     const s = wordSlug(c.term)
     expect(s, c.term).toBeTruthy()
@@ -33,7 +33,7 @@ test('slug 66개 유일하고 왕복한다', () => {
     expect(cardBySlug(encodeURIComponent(s))?.term).toBe(c.term) // 주소에서 인코딩돼 들어와도
   }
   expect(cardBySlug('없는-말')).toBeNull()
-  expect(generateStaticParams()).toHaveLength(66)
+  expect(generateStaticParams()).toHaveLength(cards.length)
   expect(wordSlug('AI 한 단어 챌린지')).toBe('AI-한-단어-챌린지')
 })
 
@@ -106,7 +106,7 @@ test('이 말로 한 문제의 오답에 숨긴 말이 없다', () => {
   }
 })
 
-test('낱말 페이지 본문은 공백 제외 300자 이상(카드 66장 모두, 관련 말 포함)', () => {
+test('낱말 페이지 본문은 공백 제외 300자 이상(모든 카드, 관련 말 포함)', () => {
   // 본문이 300자에 못 미치는 카드(삐삐 숫자 5장: 뜻·쓰임·유래 문장이 짧다). 카드 문장을 지어내 늘리지 않고 보고만 한다
   const KNOWN_SHORT = ['1004', '1010235', '486', '7942', '8282']
   const short: string[] = []
