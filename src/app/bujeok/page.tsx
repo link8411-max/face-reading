@@ -1,5 +1,6 @@
 import { fetchWeeklyHigh } from '@/lib/zipsise/highs'
 import PageGuide from '@/components/PageGuide'
+import ExampleGallery from '@/components/bujeok/ExampleGallery'
 import BujeokClient, { type Initial } from '@/components/bujeok/BujeokClient'
 import { FINISHES, STYLES, WISHES, type BujeokStyle, type Finish, type Wish } from '@/lib/bujeok/keys'
 
@@ -49,6 +50,7 @@ export default async function BujeokPage({ searchParams }: { searchParams: Promi
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }} />
       <BujeokClient key={JSON.stringify(initial)} initial={initial} high={high} />
+      <ExampleGallery />
       <PageGuide route="/bujeok" />
     </div>
   )
