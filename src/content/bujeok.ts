@@ -1,6 +1,6 @@
 // 부적 문구. 응원의 말로 쓰고 효험을 단정하지 않는다. 화면 글에 오행 한자·십신 같은 말을 쓰지 않는다.
 // hanja는 실제로 쓰이는 길상 문구만(소원 11개, 설계 16절) (전통 화풍 그림 속 글귀).
-import type { ElKey, Wish } from '@/lib/bujeok/keys'
+import type { ElKey, Finish, Wish } from '@/lib/bujeok/keys'
 
 export const WISH_TEXT: Record<Wish, { label: string; hanja: string; hanjaMeaning: string; cutePhrase: string; sub: string }> = {
   money: { label: '재물', hanja: '招財進寶', hanjaMeaning: '재물을 부르고 보배가 들어온다는 뜻이에요', cutePhrase: '돈 모여라', sub: '모으는 재미가 붙는 한 해가 되기를 바라요' },
@@ -23,3 +23,16 @@ export const EL_TEXT: Record<ElKey, { name: string; line: string }> = {
   metal: { name: '쇠의 기운', line: '쇠의 기운을 채워 주는 부적이에요' },
   water: { name: '물의 기운', line: '물의 기운을 채워 주는 부적이에요' },
 }
+
+/** 소원별 검색어 로마자(예시 그림 파일 이름·scripts/bujeok-examples.mjs와 공용) */
+export const WISH_SLUG: Record<Wish, string> = {
+  money: 'jaemul', pass: 'hapgyeok', health: 'geongang', love: 'yeonae', guard: 'aengmagi', allgood: 'mansahyeongtong',
+  career: 'chwieop-seungjin', business: 'saeop-gaeeop', family: 'gajok-pyeongan', samjae: 'samjae-magi', wish: 'sowon-seongchwi',
+}
+
+/** 예시 그림(공개 폴더, scripts/bujeok-examples.mjs가 만든다). 홀로그램은 정지 그림이 금박과 거의 같아 뽑지 않는다 */
+export const EXAMPLE_W = 480
+export const EXAMPLE_H = 1016
+export const exampleSrc = (wish: Wish, finish: Exclude<Finish, 'holo'>) => `/bujeok/examples/${WISH_SLUG[wish]}-bujeok-${finish}.webp`
+export const exampleAlt = (wish: Wish, finish: Exclude<Finish, 'holo'>) =>
+  `${WISH_TEXT[wish].label} 부적 ${WISH_TEXT[wish].hanja} ${finish === 'gold' ? '금박' : '종이'} 잠금화면`
