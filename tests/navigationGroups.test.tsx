@@ -4,19 +4,20 @@ import CategoryList from '@/components/CategoryList'
 
 const cat = (k: string) => CATEGORIES.find((c) => c.key === k)!
 
-test('운세 묶음은 두 갈래: 생년월일로 보는 운세 4개 → MBTI로 보는 운세', () => {
+test('운세 묶음은 세 갈래: 생년월일로 보는 운세 4개 → MBTI로 보는 운세 → 소원을 담은 부적', () => {
   expect(cat('unse').items.map((i) => [i.group, i.href])).toEqual([
     ['생년월일로 보는 운세', '/saju'],
     ['생년월일로 보는 운세', '/fortune'],
     ['생년월일로 보는 운세', '/fortune/2027'],
     ['생년월일로 보는 운세', '/fortune/daily'],
     ['MBTI로 보는 운세', '/fortune/mbti'],
+    ['소원을 담은 부적', '/bujeok'],
   ])
   const html = renderToStaticMarkup(<CategoryList items={cat('unse').items} />)
   const a = html.indexOf('생년월일로 보는 운세'), b = html.indexOf('MBTI로 보는 운세')
   expect(a).toBeGreaterThanOrEqual(0)
   expect(b).toBeGreaterThan(a)
-  expect(html.match(/<h3/g)).toHaveLength(2)
+  expect(html.match(/<h3/g)).toHaveLength(3)
 })
 
 test('관상 묶음은 두 갈래: 관상·동물상 → 삼국지로 보는 얼굴(영상 포함, 일기토 맨 끝)', () => {

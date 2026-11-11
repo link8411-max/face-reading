@@ -4,7 +4,7 @@ import { NEXT_BY_TEST, CATEGORIES } from '@/content/navigation'
 import NextSteps from '@/components/result/NextSteps'
 
 const STEM: Record<string, 'birth' | 'photo' | 'pair'> = {
-  '/saju': 'birth', '/fortune': 'birth', '/fortune/2027': 'birth', '/fortune/daily': 'birth', '/fortune/mbti': 'pair',
+  '/saju': 'birth', '/bujeok': 'birth', '/fortune': 'birth', '/fortune/2027': 'birth', '/fortune/daily': 'birth', '/fortune/mbti': 'pair',
   '/face2': 'photo', '/animal': 'photo', '/samguk': 'photo', '/face-match': 'pair', '/mbti': 'pair', '/mbti/match': 'pair',
 }
 const FROM_HREF = { saju: '/saju', fortune: '/fortune', zodiac: '/fortune/2027', daily: '/fortune/daily', face: '/face2', animal: '/animal', samguk: '/samguk', mbti: '/mbti' } as const
@@ -29,7 +29,7 @@ test('사진 결과에서는 같은 사진 칸을 빼고(NextTests가 맡음) �
   const html = renderToStaticMarkup(<NextSteps from="face" withPhoto />)
   expect(html).toContain('href="/saju"')
   expect(html).not.toContain('href="/animal"')
-  expect(renderToStaticMarkup(<NextSteps from="saju" />)).toContain('href="/fortune"')
+  expect(renderToStaticMarkup(<NextSteps from="saju" />)).toContain('href="/bujeok"')
 })
 
 test.each([
@@ -37,4 +37,16 @@ test.each([
   'src/app/face2/page.tsx', 'src/app/animal/page.tsx', 'src/app/samguk/(match)/page.tsx', 'src/components/mbti/MbtiArticle.tsx', 'src/app/mbti/match/page.tsx',
 ])('%s 결과에 NextSteps가 붙어 있다', (f) => {
   expect(readFileSync(f, 'utf8')).toContain('<NextSteps')
+})
+
+test('사주·신년운세 결과는 부적으로 잇는다', () => {
+  expect(NEXT_BY_TEST.saju.map((s) => s.href)).toContain('/bujeok')
+  expect(NEXT_BY_TEST.fortune.map((s) => s.href)).toContain('/bujeok')
+  const step = NEXT_BY_TEST.saju.find((s) => s.href === '/bujeok')!
+  expect(step.title).toBe('내 사주로 부적 만들기')
+  expect(step.test).toBe('bujeok')
+})
+
+test.each(['src/app/saju/SajuClient.tsx', 'src/app/fortune/FortuneClient.tsx'])('%s는 NextSteps에 입력한 생년월일(birth)을 넘긴다', (f) => {
+  expect(readFileSync(f, 'utf8')).toMatch(/<NextSteps from="(saju|fortune)" birth=\{/)
 })

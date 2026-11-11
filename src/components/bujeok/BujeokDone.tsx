@@ -11,8 +11,8 @@ import type { BujeokSpec } from '@/lib/bujeok/keys'
 import { EL_TEXT, WISH_TEXT } from '@/content/bujeok'
 
 const SHARE_TITLE = '운명을 읽다 · 나만의 부적'
-const SHARE_TEXT = '소원 하나 골라서 붓으로 그린 부적을 받아 봤어요. 잠금화면으로 저장해 뒀어요.'
-const SHARE_IMAGE = `${SITE}/api/og?title=${encodeURIComponent('나만의 부적')}&subtitle=${encodeURIComponent('소원을 붓으로 그려 드려요')}`
+const SHARE_TEXT = '소원 하나 골라서 손으로 돌려 보는 부적 카드를 받아 봤어요. 잠금화면으로 저장해 뒀어요.'
+const SHARE_IMAGE = `${SITE}/api/og?title=${encodeURIComponent('나만의 부적')}&subtitle=${encodeURIComponent('손으로 돌려 보는 부적 카드')}`
 
 export interface GiftInfo { to: string; from: string | null }
 

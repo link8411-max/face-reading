@@ -25,3 +25,10 @@ test('/fortune 가이드는 하위 라우트(/fortune/daily)에 중첩되지 않
   expect(readFileSync('src/app/fortune/layout.tsx', 'utf8')).not.toContain('PageGuide')
   expect(readFileSync('src/app/fortune/page.tsx', 'utf8')).toContain('<PageGuide route="/fortune" />')
 })
+
+test('/bujeok 가이드·구조화 데이터는 선물 착지(/bujeok/r)에 중첩되지 않게 layout이 아닌 page에서 렌더한다', () => {
+  const layout = readFileSync('src/app/bujeok/layout.tsx', 'utf8')
+  expect(layout).not.toContain('PageGuide')
+  expect(layout).not.toContain('application/ld+json')
+  expect(readFileSync('src/app/bujeok/page.tsx', 'utf8')).toContain('<PageGuide route="/bujeok" />')
+})

@@ -14,7 +14,7 @@ test('메뉴 데이터에 이모지가 없다 (선 아이콘으로 대체)', () 
 test.each([
   ['/', 'home'], ['/about', 'home'], ['/privacy', 'home'],
   ['/face2', 'face'], ['/animal', 'face'], ['/samguk', 'face'], ['/face-tests', 'face'],
-  ['/fortune', 'unse'], ['/fortune/daily', 'unse'], ['/fortune/2027', 'unse'], ['/fortune/2027/sheep', 'unse'], ['/unse', 'unse'],
+  ['/fortune', 'unse'], ['/bujeok', 'unse'], ['/bujeok/r/trad-money-metal-0-gold', 'unse'], ['/fortune/daily', 'unse'], ['/fortune/2027', 'unse'], ['/fortune/2027/sheep', 'unse'], ['/unse', 'unse'],
   ['/mbti', 'mbti'], ['/face-match', 'mbti'], ['/face-match/r/cat-fox', 'mbti'], ['/samguk/team', 'face'],
 ])('tabForPath(%s) = %s', (path, key) => {
   expect(tabForPath(path)).toBe(key)
@@ -44,4 +44,10 @@ test('밈 능력고사는 푸터에만 항목이 있다: 묶음(홈 탭·허브)
   const { readFileSync } = require('node:fs')
   const layout = readFileSync('src/app/layout.tsx', 'utf8')
   expect(layout.match(/FOOTER_EXTRA\.map/g)).toHaveLength(1)
+})
+
+test('부적(/bujeok)은 사주·운세 묶음에 있다', () => {
+  const unse = CATEGORIES.find((c) => c.key === 'unse')!
+  expect(unse.items.map((i) => i.href)).toContain('/bujeok')
+  expect(SITEMAP_ROUTES as readonly string[]).toContain('/bujeok')
 })

@@ -7,7 +7,7 @@ import { FINISHES, FINISH_LABEL, STYLES, WISHES, WISH_DEFAULT_EL, type BujeokSty
 import { WISH_TEXT } from '@/content/bujeok'
 
 export const STYLE_LABEL: Record<BujeokStyle, string> = { trad: '전통', cute: '귀여운' }
-const STYLE_HINT: Record<BujeokStyle, string> = { trad: '붓글씨 한자 부적', cute: '말랑한 캐릭터' }
+const STYLE_HINT: Record<BujeokStyle, string> = { trad: '한자 글귀 부적', cute: '말랑한 캐릭터' }
 const FINISH_HINT: Record<Finish, string> = { paper: '노란 종이에 붉은 선', gold: '먹색 바탕에 금색 선', holo: '금박에 무지갯빛이 비쳐요' }
 
 export interface FormValues {

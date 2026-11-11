@@ -60,6 +60,7 @@ export const CATEGORIES: Category[] = [
       { group: '생년월일로 보는 운세', title: '2027 띠별 운세', desc: '쥐띠부터 돼지띠까지 12띠', href: '/fortune/2027', thumb: { icon: 'spark', bg: '#F3EBDD' }, chip: '12띠' },
       { group: '생년월일로 보는 운세', title: '오늘의 운세', desc: '띠별 운세와 행운의 시간·색', href: '/fortune/daily', thumb: { icon: 'sun', bg: '#E8EEE6' }, chip: '매일' },
       { group: 'MBTI로 보는 운세', title: '오늘의 MBTI 운세', desc: 'MBTI만 고르면 오늘의 한마디와 행운', href: '/fortune/mbti', thumb: { icon: 'spark', bg: '#ECE6F0' }, chip: '생년월일 없이' },
+      { group: '소원을 담은 부적', title: '나만의 부적', desc: '손으로 돌려 보는 부적 카드, 잠금화면에 저장', href: '/bujeok', thumb: { icon: 'spark', bg: '#EFE6CF' }, chip: '친구에게 선물' },
     ],
   },
   {
@@ -82,7 +83,7 @@ export const FOOTER_EXTRA: { title: string; href: string }[] = [{ title: '밈 �
 // 결과 화면 아래 "이어서 보면 좋아요": 같은 줄기 1개 + 다른 줄기 1개 (설계 4절).
 // samePhoto: 같은 사진으로 이어지는 칸 — 사진 결과에서는 NextTests(사진 넘기기)가 이미 보여 주므로 NextSteps는 뺀다.
 export type NextFrom = 'saju' | 'fortune' | 'zodiac' | 'daily' | 'face' | 'animal' | 'samguk' | 'mbti'
-export type NextTestName = 'saju' | 'fortune' | 'face' | 'animal' | 'face_match' | 'mbti_daily'
+export type NextTestName = 'saju' | 'fortune' | 'face' | 'animal' | 'face_match' | 'mbti_daily' | 'bujeok'
 export interface NextStep { href: string; title: string; desc: string; test: NextTestName; icon: IconName; samePhoto?: true }
 
 const STEP = {
@@ -92,12 +93,13 @@ const STEP = {
   animal: { href: '/animal', title: '동물상 테스트', desc: '같은 사진으로 보는 8가지 동물상', test: 'animal', icon: 'cat', samePhoto: true },
   faceSame: { href: '/face2', title: '내 관상 풀이', desc: '같은 사진으로 읽는 15가지 관상', test: 'face', icon: 'face', samePhoto: true },
   faceMatch: { href: '/face-match', title: '얼굴 궁합', desc: '친구·연인과 두 얼굴로 보는 궁합', test: 'face_match', icon: 'heart' },
+  bujeok: { href: '/bujeok', title: '내 사주로 부적 만들기', desc: '부족한 기운을 채워 주는 부적, 잠금화면에 쏙', test: 'bujeok', icon: 'spark' },
   mbtiDaily: { href: '/fortune/mbti', title: '오늘의 MBTI 운세', desc: 'MBTI만 고르면 오늘의 한마디', test: 'mbti_daily', icon: 'spark' },
 } as const satisfies Record<string, NextStep>
 
 export const NEXT_BY_TEST: Record<NextFrom, [NextStep, NextStep]> = {
-  saju: [STEP.fortune, STEP.face],
-  fortune: [STEP.saju, STEP.face],
+  saju: [STEP.bujeok, STEP.face],
+  fortune: [STEP.bujeok, STEP.face],
   zodiac: [STEP.fortune, STEP.saju],
   daily: [STEP.saju, STEP.face],
   face: [STEP.animal, STEP.saju],
@@ -108,7 +110,7 @@ export const NEXT_BY_TEST: Record<NextFrom, [NextStep, NextStep]> = {
 
 export function tabForPath(pathname: string): TabKey {
   if (pathname === '/face-tests' || ['/face2', '/animal', '/samguk'].some((p) => pathname.startsWith(p))) return 'face'
-  if (pathname === '/unse' || pathname.startsWith('/fortune') || pathname.startsWith('/saju')) return 'unse'
+  if (pathname === '/unse' || pathname.startsWith('/fortune') || pathname.startsWith('/saju') || pathname.startsWith('/bujeok')) return 'unse'
   if (pathname.startsWith('/mbti') || pathname.startsWith('/face-match')) return 'mbti'
   return 'home'
 }

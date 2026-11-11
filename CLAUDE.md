@@ -366,6 +366,35 @@ public/
 
 ## 부적 (/bujeok)
 
+소원·그림체·마감을 고르면 **손으로 돌려 보는 입체 카드**를 만들어 주고, 잠금화면 이미지로 저장하거나 이름을 넣어 링크로 선물한다. 설계 `docs/superpowers/specs/2026-11-11-bujeok-design.md`(13절이 5절 움직임·6절 영상 파일을 대신한다), 계획 `docs/superpowers/plans/2026-11-11-bujeok.md`. 서버 비용 0: 그리기·저장은 전부 브라우저에서 한다.
+
+**구조**
+| 위치 | 내용 |
+|------|------|
+| `src/lib/bujeok/` | 순수 함수. `keys.ts`(화풍 2·소원 5·기운 5·변형 4·마감 3, `BujeokSpec`)·`compose.ts`(기운 고르기, 생년월일 → 기운)·`link.ts`(링크 코드 `<화풍>-<소원>-<기운>-<변형>-<마감>` 다섯 조각, `cleanName`, `bujeokGiftUrl`, `bujeokOgUrl`, `giftHeadline`)·`spin.ts`(회전 관성·확대 범위)·`palette.ts`(`themeFor` 마감별 색)·`wallpaper.ts`(잠금화면 1170×2532)·`birthHandoff.ts`(사주→부적 생년월일, 메모리만)·`bannedNames.ts`·`bannedPhrases.ts` |
+| `src/content/bujeok.ts` | 소원·기운 문구(`WISH_TEXT`, `EL_TEXT`). 한자 글귀는 실제 쓰이는 길상 문구 다섯 개뿐 |
+| `src/components/bujeok/` | `BujeokClient`(form → done, 내 부적/선물 모드)·`BujeokForm`·`BujeokDone`·`BujeokCard`(입체 카드: 앞면 `BujeokSvg`, 뒷면 이름·뜻·응원 한 줄, 확대·축소, 뒤집기 버튼)·`GiftLanding`(선물 착지)·`BujeokAd`·`HouseBanner`·`useWallpaperSave`·`parts/{trad,cute}`(SVG 부품, 전부 코드로 그림) |
+| 라우트 | `/bujeok`(`?mode=gift&style=&wish=&finish=`를 허용 목록으로만 받음, 서버 페이지가 집시세 신고가를 읽어 내려 줌, 구조화 데이터·`PageGuide`는 layout이 아니라 page에서 렌더), `/bujeok/r/[code]`(선물 착지: noindex·canonical `/bujeok`·사이트맵 제외, 잘못된 코드는 `/bujeok`으로 redirect), `/dev/bujeok-lab`(개발 전용, 부품 격자) |
+| OG | `/api/og/result?kind=bujeok&style=&wish=&el=&finish=`(1200×630, 이름은 받지 않는다. 종이는 노란 종이, 금박·홀로그램은 먹색 바탕. 붉은 바탕 없음) |
+| 메뉴 | 사주·운세 묶음 "소원을 담은 부적". 사주·신년운세 결과의 "이어서 보면 좋아요"에서 `NextSteps birth={…}`로 생년월일을 메모리로만 넘긴다 |
+
+**규칙 (테스트로 고정)**
+- **빨간 바탕 금지**: 금박·홀로그램 바탕은 먹색 `#17140F`, 무대도 붉은 기운 없는 어두운 중성색.
+- **효험 단정 금지**: `반드시`·`100%`·`보장`·`틀림없이`·`들어옵니다`·`합격합니다`가 부적 문구·광고·본문에 나오면 실패(`bannedPhrases.ts`). 부적은 재미와 응원이다. 화면 글에 오행 한자(木火土金水)·십신을 쓰지 않는다(길상 글귀 한자는 예외, 한글 뜻을 붙인다).
+- **이름은 GA·미리보기 이미지·통계에 넣지 않는다.** 이름은 선물 링크(`to`·`from`)와 화면에만. `cleanName`: 앞뒤 공백 제거 후 1~8자, 한글·영문·숫자·공백, 금지어 없음. 통과 못 한 이름은 떼고 부적은 연다. 생년월일은 링크·GA·저장 이미지·브라우저 저장소에 넣지 않는다.
+- 광고는 카드 **아래**에만(위 "광고" 항목). 가짜 숫자("○명이 받았어요") 금지. 이모지는 제목·버튼에 쓰지 않는다. 글꼴 굵기 900·Google Fonts 금지.
+- 화면 문구는 지금의 카드를 설명한다: 손으로 돌려 보는 카드, 마감 세 가지(종이·금박·홀로그램), 확대·축소, 뒷면에 이름. "붓으로 그려지는" 연출은 없다(`tests/bujeok/guide.test.ts`가 막는다).
+- 잠금화면 저장은 고른 마감의 앞면 정지 이미지다(`lib/saveImage.ts` 경로, 아이폰·인앱은 길게 눌러 저장).
+- 링크 코드가 변조되면(조각 수·값 범위) `parseBujeokCode`가 null → 착지는 `/bujeok`으로 보낸다. 옛 4조각 코드는 호환하지 않는다(배포 전 형식).
+
+**테스트**
+```bash
+npx vitest run tests/bujeok tests/zipsise      # 부적 단위 테스트 전부
+npx playwright test e2e/bujeok.spec.ts         # 부적 E2E (먼저 npm run build 필요)
+BUJEOK_SHOT_DIR=/경로 npx playwright test e2e/bujeok.spec.ts   # 저장된 잠금화면 PNG를 폴더에 복사해 눈으로 볼 수 있다
+```
+GA: `test_name=bujeok`, `result_view`·`shared_landing`의 `result_id`는 `<화풍>_<소원>`(이름·생년월일 없음).
+
 - **광고(2026-11-11)**: 부적 **아래**에만 둔다(카드 위·앞 금지). 완성 화면과 선물 착지(연 뒤)에 `components/bujeok/BujeokAd`가 놓인다. 소원이 재물이고 집시세의 이번 주 신고가가 있으면 `HouseBanner`, 그 밖에는 쿠팡 배너(subId `bujeok-<소원>`). 집시세 배너는 실제 데이터만 쓰고 없으면 쿠팡으로 바꾼다.
 - **집시세 데이터** `lib/zipsise/highs.ts`(서버 전용, 클라이언트에서 가져오면 `tests/bujeok/ad.test.tsx`가 실패): `<ZIPSISE_DATA_URL>/v1/highs/recent.json`을 서버에서 `revalidate: 3600`으로 읽어 최근 7일(오늘 포함) 중 `jump`(이전 최고가 대비 오른 금액)가 가장 큰 한 건. 금액 단위는 **만원**(159500 = 15억 9,500만). 정정 의심(`held`)·공유 불가(`shareable: false`) 거래는 뺀다. 못 읽거나 0건이면 `null` → 쿠팡 배너. 실제 파일 3건이 `tests/zipsise/fixtures/highs.json`.
 - **환경변수 `ZIPSISE_DATA_URL`**(Vercel): 현재 값 `https://pub-d64c5ee85ced4675b2e8b07dc9185d74.r2.dev`(r2.dev 공개 주소라 요청 제한이 있고 나중에 바뀔 수 있어 코드에 박지 않았다). 없으면 집시세 배너 없이 쿠팡 배너만 나온다. 넣거나 바꾼 뒤 재배포.

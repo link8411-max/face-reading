@@ -190,7 +190,7 @@ export default function SajuClient() {
             after={
               <>
                 <div className="mt-2"><CoupangBanner subId="saju" /></div>
-                <NextSteps from="saju" />
+                <NextSteps from="saju" birth={{ year: parseInt(birthDate.year), month: parseInt(birthDate.month), day: parseInt(birthDate.day), isLunar, isLeapMonth: isLunar && isLeapMonth }} />
               </>
             }
           />

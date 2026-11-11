@@ -376,7 +376,7 @@ export default function FortuneClient() {
 
             <CoupangBanner subId="fortune" />
 
-            <NextSteps from="fortune" className="mb-4" />
+            <NextSteps from="fortune" birth={{ year: parseInt(birthDate.year), month: parseInt(birthDate.month), day: parseInt(birthDate.day), isLunar, isLeapMonth: isLunar && isLeapMonth }} className="mb-4" />
 
             {/* 버튼 */}
             <Link
