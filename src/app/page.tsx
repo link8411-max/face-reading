@@ -30,17 +30,7 @@ export default function Home() {
         <Icon name="moon" className="text-ink mt-0.5" />
       </header>
 
-      {/* 임시 띠(11월 11일 추가): 인스타 프로필 링크가 아직 첫 화면이라, 릴스를 보고 온 사람이 밈 능력고사를 바로 찾게 한다.
-          인스타 프로필 링크를 /exam/meme으로 바꾸면 이 띠를 지운다(tests/home.test.ts의 임시 띠 테스트도 함께). */}
-      <Link
-        href="/exam/meme"
-        className="!mt-[14px] flex min-h-[48px] items-center justify-between gap-3 rounded-full border border-line bg-card px-5 py-2.5 text-sm"
-      >
-        <span><b className="font-bold text-accent">밈 능력고사</b><span className="text-ink"> · 매일 5문제, 내 등급은?</span></span>
-        <span aria-hidden="true" className="font-bold text-accent">풀기</span>
-      </Link>
-
-      <div className="!mt-[14px]">
+      <div className="!mt-[18px]">
         <FaceHero />
       </div>
       {/* 시즌 카드는 히어로 바로 아래(평소 내 사주 풀이, 12~1월 신년운세 — src/content/season.ts) */}
