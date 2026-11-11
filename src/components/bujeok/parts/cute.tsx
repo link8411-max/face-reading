@@ -162,7 +162,7 @@ const MASCOT: Record<Wish, { faceY: number; draw: (fill: string) => ReactNode }>
 // 네잎클로버: 지름 76 원 넷의 합집합을 한 줄 경로로
 const CLOVER = 'M150 216.3 A38 38 0 1 1 203.7 270 A38 38 0 1 1 150 323.7 A38 38 0 1 1 96.3 270 A38 38 0 1 1 150 216.3 Z'
 
-export default function CuteBujeok({ spec, name }: KitProps) {
+export default function CuteBujeok({ spec, name, hideSeal }: KitProps) {
   const { border, head } = partsFor(spec)
   const t = themeFor('cute', spec.finish)
   const w = WISH_TEXT[spec.wish]
@@ -210,12 +210,12 @@ export default function CuteBujeok({ spec, name }: KitProps) {
         {w.label} 부적 · {EL_TEXT[spec.el].name}
       </text>
 
-      <g data-a="stamp" data-part="stamp">
+      {!hideSeal && <g data-a="stamp" data-part="stamp">
         <rect x={150 - tagW / 2} y="424" width={tagW} height="46" rx="23" fill={PAL.cuteTag} />
         <text x="150" y={447 + tagSize * 0.36} textAnchor="middle" fontSize={tagSize} fontWeight="700" fill="#fff" style={ROUND}>
           {tag}
         </text>
-      </g>
+      </g>}
     </>
   )
 }

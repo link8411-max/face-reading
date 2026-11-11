@@ -36,6 +36,14 @@ const silkscreen = localFont({
   preload: false,
 });
 
+// 전통 부적 그림 속 한자(霞鹜文楷 TC 46자, scripts/font-subset-brush.mjs). 부적을 열 때만 받는다
+const bujeokBrush = localFont({
+  variable: "--font-bujeok-brush",
+  src: [{ path: "../fonts/LXGWWenKaiTC-Bujeok.woff2", weight: "500", style: "normal" }],
+  display: "swap",
+  preload: false,
+});
+
 // 검색 결과 제목·설명 (클릭률 위주, 길이 상한은 tests/seo-snippets.test.tsx). og·트위터도 같은 문구
 const TITLE = "무료 AI 관상·동물상 테스트와 사주 풀이 – 운명을 읽다";
 const DESCRIPTION = "사진 한 장으로 보는 무료 AI 관상·동물상 테스트와 생년월일로 보는 내 사주 풀이. 가입 없이, 사진은 저장하지 않아요. 2027 신년운세와 오늘의 운세도 무료예요.";
@@ -144,7 +152,7 @@ export default function RootLayout({
         />
       </head>
       <body
-        className={`${notoSans.variable} ${gowunBatang.variable} ${silkscreen.variable} font-sans antialiased bg-paper text-ink`}
+        className={`${notoSans.variable} ${gowunBatang.variable} ${silkscreen.variable} ${bujeokBrush.variable} font-sans antialiased bg-paper text-ink`}
       >
         {/* 하단 탭바(h-16)에 내용이 가리지 않도록 아래 여백. 탭바를 숨기는 일기토 화면은 duel.css가 app-shell 여백을 줄인다 */}
         <div className="app-shell flex flex-col min-h-screen pb-[calc(4rem+env(safe-area-inset-bottom))]">

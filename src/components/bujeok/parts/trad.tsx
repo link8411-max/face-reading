@@ -1,162 +1,223 @@
-// 전통 화풍: 노란 종이에 붉은 붓선. 몸통 문양은 기운, 가운데 상징은 소원, 테두리·머리 문양은 변형 번호가 정한다.
+// 전통 화풍(진지한 부적): 괴황지(노란 종이)에 주사로 쓴 부적. 시안 docs/bujeok/serious/art.js를 옮겼다.
+// 위는 모든 소원 공통(雨 갓·三台), 가운데는 기운, 아래 상징은 소원, 몸통은 사용자가 긋는 마지막 한 획이다.
+// 좌표는 시안의 240×508 종이 좌표이고 전체를 translate(30 6)으로 옮겨 CARD_BOX.trad(30,6,240,508)에 맞춘다.
+import type { ReactNode } from 'react'
+import { box, brush, rng, type Pt } from '@/lib/bujeok/brush'
 import { partsFor } from '@/lib/bujeok/compose'
-import type { ElKey, Wish } from '@/lib/bujeok/keys'
-import { EL_COLOR, themeFor } from '@/lib/bujeok/palette'
-import { EL_TEXT, WISH_TEXT } from '@/content/bujeok'
-import GoldDefs from './GoldDefs'
-import { ring, stampChars, type KitProps } from './types'
+import { FOIL, PAL, goldId, themeFor } from '@/lib/bujeok/palette'
+import { DEFAULT_SPINE, SPINE_BRUSH, SPINE_W, decodeStroke } from '@/lib/bujeok/stroke'
+import { bottomStrokes, elementStrokes, symbolStrokes, topStrokes, type TStroke } from '@/lib/bujeok/talisman'
+import { WISH_TEXT } from '@/content/bujeok'
+import { stampChars, type KitProps } from './types'
 
+const BRUSH_FONT = { fontFamily: 'var(--font-bujeok-brush), "Kaiti TC", serif' }
 const SERIF = { fontFamily: 'var(--font-gowun-batang), "Noto Serif KR", serif' }
 
-const BODY: Record<ElKey, string[]> = {
-  wood: ['M150 152 L110 128', 'M150 152 L190 128', 'M150 204 L102 174', 'M150 204 L198 174', 'M150 256 L110 230', 'M150 256 L190 230'],
-  fire: ['M106 288 L124 238 L112 202 L136 150 L150 192 L164 150 L188 202 L176 238 L194 288'],
-  earth: ['M98 140 H202 V176 H98 V212 H202 V248 H98 V284'],
-  metal: ['M150 124 L198 206 L150 288 L102 206 Z', 'M150 160 L176 206 L150 252 L124 206 Z'],
-  water: ['M100 150 Q125 126 150 150 T200 150', 'M100 204 Q125 180 150 204 T200 204', 'M100 258 Q125 234 150 258 T200 258'],
+/** 글귀 줄 배치(왼쪽 세로줄): 4자는 간격 38·글자 28, 5자는 간격 34·글자 26. 첫 글자 y=190 */
+export function phraseLayout(n: number): { x: number; y0: number; step: number; size: number } {
+  return n > 4 ? { x: 42, y0: 190, step: 34, size: 26 } : { x: 42, y0: 190, step: 38, size: 28 }
 }
 
-const SYMBOL: Record<Wish, string[]> = {
-  money: ['M132 327 H168 V363 H132 Z'],
-  pass: ['M150 372 V318', 'M130 340 L150 318 L170 340'],
-  health: [ring(150, 331, 9), ring(150, 357, 15)],
-  love: [ring(139, 345, 14), ring(161, 345, 14)],
-  guard: ['M130 368 V326 H170 V368', 'M130 346 H170'],
-  // 네잎클로버: 작은 고리 넷
-  allgood: [ring(141, 336, 8), ring(159, 336, 8), ring(141, 354, 8), ring(159, 354, 8)],
-  // 오르는 계단
-  career: ['M126 364 H139 V350 H152 V336 H165 V322', 'M154 322 H168 V336'],
-  // 동전 더미
-  business: ['M130 330 a20 8 0 1 0 40 0 a20 8 0 1 0 -40 0', 'M130 330 V347 a20 8 0 0 0 40 0 V330', 'M130 347 V362 a20 8 0 0 0 40 0 V347'],
-  // 지붕 아래 두 사람
-  family: ['M124 342 L150 316 L176 342', ring(140, 358, 4), ring(160, 358, 4)],
-  // 방패
-  samjae: ['M150 320 L172 328 V344 Q172 360 150 370 Q128 360 128 344 V328 Z', 'M150 334 V356'],
-  // 연등
-  wish: ['M138 326 H162', 'M138 326 Q122 346 138 366 H162 Q178 346 162 326', 'M150 314 V326', 'M150 366 V373', 'M126 346 H174'],
-}
-
-/** 글귀 줄 배치: 4자는 간격 34·글자 26, 5자는 간격 27·글자 22. 도장(가장 넓을 때 x=192부터)보다 왼쪽에서 끝난다 */
-export function phraseLayout(n: number): { x0: number; step: number; size: number } {
-  return n > 4 ? { x0: 70, step: 27, size: 22 } : { x0: 72, step: 34, size: 26 }
-}
-
-export default function TradBujeok({ spec, name, lite }: KitProps) {
+export default function TradBujeok({ spec, name, lite, hideSpine, hideSeal, spine }: KitProps) {
   const { border, head } = partsFor(spec)
   const t = themeFor('trad', spec.finish)
-  const J = t.line
-  const w = WISH_TEXT[spec.wish]
-  const chars = stampChars(name)
+  const f = spec.finish
+  const gold = t.foil
+  const id = (k: string) => `bujeok-${k}-${f}`
+  const foil = `url(#${goldId(f)})`
+  const ink = gold ? foil : PAL.tradInk
+  const wish = WISH_TEXT[spec.wish]
+  const vs = spec.variant * 31
+  const filt = (k: string) => (lite ? undefined : `url(#${id(k)})`)
+
+  const parts: TStroke[][] = [topStrokes(), elementStrokes(spec.el), symbolStrokes(spec.wish), bottomStrokes()]
+  let n = 0
+  const strokePaths = (list: TStroke[]) => list.map((s) => <path key={n} d={brush(s.pts, s.w, { seed: ++n + vs, start: s.start, end: s.end })} />)
+  const [top, mid, sym, bot] = [strokePaths(parts[0]), strokePaths(parts[1]), strokePaths(parts[2]), strokePaths(parts[3])]
+
+  const spinePts: Pt[] = spine ?? (spec.stroke ? decodeStroke(spec.stroke) : null) ?? DEFAULT_SPINE
+  const spineD = spinePts.length >= 2 ? brush(spinePts, SPINE_W, SPINE_BRUSH) : null
+
+  const frame = (m: number, w: number, seed: number) =>
+    ([
+      [[m, m + 2], [240 - m, m]],
+      [[240 - m, m], [240 - m + 1, 508 - m]],
+      [[240 - m + 1, 508 - m], [m, 508 - m - 1]],
+      [[m, 508 - m - 1], [m, m + 2]],
+    ] as Pt[][]).map((p, i) => <path key={`${m}-${i}`} d={brush(p, w, { seed: seed + i + vs, start: 0.9, end: 0.6 })} />)
+
+  // 섬유(고정 시드): 종이는 160, 금박은 60, 작은 격자(lite)는 없음
+  const fibers: ReactNode[] = []
+  if (!lite) {
+    const r = rng(42)
+    for (let i = 0; i < (gold ? 60 : 160); i++) {
+      const x = r() * 240, y = r() * 508, a = r() * Math.PI, l = 6 + r() * 22
+      const cx = x + Math.cos(a) * l / 2 + (r() - 0.5) * 6, cy = y + Math.sin(a) * l / 2 + (r() - 0.5) * 6
+      const light = r() < 0.35
+      fibers.push(
+        <path
+          key={i}
+          d={`M${x.toFixed(1)} ${y.toFixed(1)} Q${cx.toFixed(1)} ${cy.toFixed(1)} ${(x + Math.cos(a) * l).toFixed(1)} ${(y + Math.sin(a) * l).toFixed(1)}`}
+          fill="none"
+          stroke={gold ? (light ? '#4A3E2A' : '#000') : light ? '#FFF2C2' : '#A87A26'}
+          strokeWidth={(0.3 + r() * 0.5).toFixed(2)}
+          opacity={(0.12 + r() * 0.22).toFixed(2)}
+        />,
+      )
+    }
+  }
+
+  const T = (c: string, x: number, y: number, size: number, extra: Record<string, string | number> = {}) => (
+    <text key={`${c}${x}${y}`} x={x} y={y} fontSize={size} textAnchor="middle" fill={ink} style={BRUSH_FONT} {...extra}>
+      {c}
+    </text>
+  )
+
+  const pl = phraseLayout([...wish.hanja].length)
+  const chars = name ? stampChars(name) : []
   const cols = chars.length > 3 ? 2 : 1
   const rows = Math.ceil(chars.length / cols)
   const sw = cols * 20 + 14
   const sh = rows * 20 + 14
-  const sx = 246 - sw
+  const sx = 214 - sw
   const sy = 490 - sh
-  const pl = phraseLayout([...w.hanja].length)
-  const brush = lite ? undefined : 'url(#bujeok-brush)'
-  const line = { fill: 'none', stroke: J, strokeLinecap: 'round', strokeLinejoin: 'round' } as const
+  const sealFill = gold ? foil : PAL.tradSeal
+
   return (
     <>
-      {(!lite || t.foil) && (
+      {(!lite || gold) && (
         <defs>
-          {t.foil && <GoldDefs finish={spec.finish} />}
+          {gold && (
+            <linearGradient id={goldId(f)} x1="0" y1="0" x2="1" y2="1">
+              {FOIL.tradStops.map((c, i) => (
+                <stop key={i} offset={FOIL.tradAt[i]} stopColor={c} />
+              ))}
+            </linearGradient>
+          )}
           {!lite && (
             <>
-          <filter id="bujeok-brush" x="-5%" y="-5%" width="110%" height="110%">
-            <feTurbulence type="fractalNoise" baseFrequency=".05" numOctaves="2" seed="4" />
-            <feDisplacementMap in="SourceGraphic" scale="3.2" />
-          </filter>
-          <filter id={t.ids.grain}>
-            <feTurbulence type="fractalNoise" baseFrequency=".9" numOctaves="2" seed="7" />
-            <feColorMatrix values={t.grain} />
-            <feComposite in2="SourceGraphic" operator="in" />
-          </filter>
-          <linearGradient id={t.ids.edge} x1="0" x2="1">
-            <stop offset="0" stopColor={t.edge} stopOpacity=".55" />
-            <stop offset=".12" stopColor={t.edge} stopOpacity="0" />
-            <stop offset=".88" stopColor={t.edge} stopOpacity="0" />
-            <stop offset="1" stopColor={t.edge} stopOpacity=".55" />
-          </linearGradient>
+              <filter id={id('ink')} x="-10%" y="-10%" width="120%" height="120%">
+                <feTurbulence type="fractalNoise" baseFrequency="0.045" numOctaves="3" seed="7" result="n" />
+                <feDisplacementMap in="SourceGraphic" in2="n" scale={gold ? 2 : 3.2} result="d" />
+                <feTurbulence type="fractalNoise" baseFrequency="1.1" numOctaves="2" seed="3" result="g" />
+                <feColorMatrix in="g" type="matrix" values="0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  -3.2 0 0 0 2.75" result="ga" />
+                <feComposite in="d" in2="ga" operator="in" />
+              </filter>
+              <filter id={id('edge')} x="-3%" y="-3%" width="106%" height="106%">
+                <feTurbulence type="fractalNoise" baseFrequency="0.06" numOctaves="2" seed="11" result="n" />
+                <feDisplacementMap in="SourceGraphic" in2="n" scale="5" />
+              </filter>
+              <filter id={id('mottle')}>
+                <feTurbulence type="fractalNoise" baseFrequency="0.02 0.05" numOctaves="3" seed="5" />
+                <feColorMatrix
+                  type="matrix"
+                  values={`0 0 0 0 ${gold ? 0.6 : 0.55}  0 0 0 0 ${gold ? 0.5 : 0.33}  0 0 0 0 ${gold ? 0.3 : 0.08}  ${gold ? '0 0 0 -1.4 0.95' : '0 0 0 -1.1 0.62'}`}
+                />
+              </filter>
+              <radialGradient id={id('burn')} cx="50%" cy="48%" r="70%">
+                <stop offset="62%" stopColor={gold ? '#000' : PAL.tradBurn} stopOpacity="0" />
+                <stop offset="100%" stopColor={gold ? '#000' : PAL.tradBurn} stopOpacity={gold ? 0.55 : 0.42} />
+              </radialGradient>
+              <linearGradient id={id('paper')} x1="0" y1="0" x2="0.3" y2="1">
+                {(gold ? FOIL.tradPaperStops : PAL.tradPaperStops).map((c, i, a) => (
+                  <stop key={i} offset={a.length === 2 ? i : [0, 0.55, 1][i]} stopColor={c} />
+                ))}
+              </linearGradient>
+              <clipPath id={id('clip')}>
+                <rect x="4" y="4" width="232" height="500" rx="5" />
+              </clipPath>
             </>
           )}
         </defs>
       )}
-      <rect x="30" y="6" width="240" height="508" fill={t.paper} />
-      {!lite && <rect x="30" y="6" width="240" height="508" fill={`url(#${t.ids.edge})`} />}
-      {!lite && <rect x="30" y="6" width="240" height="508" filter={`url(#${t.ids.grain})`} />}
-
-      <g {...line} filter={brush}>
-        {border === 0 ? (
-          <>
-            <rect data-a="draw" data-part="border" data-d="700" x="42" y="18" width="216" height="484" strokeWidth="3" />
-            <rect data-a="draw" data-d="600" x="49" y="25" width="202" height="470" strokeWidth="1.2" />
-          </>
-        ) : (
-          <>
-            <rect data-a="draw" data-part="border" data-d="700" x="44" y="20" width="212" height="480" strokeWidth="4" />
-            <path data-a="draw" d="M52 28 h14 v14 h-14 z M234 28 h14 v14 h-14 z M52 478 h14 v14 h-14 z M234 478 h14 v14 h-14 z" strokeWidth="2" />
-          </>
+      <g transform="translate(30 6)">
+        {/* 종이: 바닥은 한 색, 그 위에 거친 가장자리의 괴황지(또는 먹색 종이)·얼룩·섬유·그을림 */}
+        <rect x="0" y="0" width="240" height="508" fill={t.paper} />
+        {!lite && (
+          <g clipPath={`url(#${id('clip')})`}>
+            <rect x="4" y="4" width="232" height="500" rx="5" fill={`url(#${id('paper')})`} filter={filt('edge')} />
+            <rect x="0" y="0" width="240" height="508" filter={filt('mottle')} style={{ mixBlendMode: 'multiply' }} />
+            {fibers}
+            <rect x="0" y="0" width="240" height="508" fill={`url(#${id('burn')})`} />
+          </g>
         )}
 
-        {head === 0 ? (
-          <>
-            <path data-a="draw" data-part="head" d="M118 64 Q150 32 182 64" strokeWidth="4" />
-            <circle data-a="pop" cx="118" cy="64" r="6" fill={J} stroke="none" />
-            <circle data-a="pop" cx="150" cy="48" r="6" fill={J} stroke="none" />
-            <circle data-a="pop" cx="182" cy="64" r="6" fill={J} stroke="none" />
-          </>
-        ) : (
-          <>
-            <path data-a="draw" data-part="head" d={ring(122, 56, 11)} strokeWidth="4" />
-            <path data-a="draw" d="M135 56 H162" strokeWidth="3" />
-            <path data-a="draw" d="M186 45 a12 12 0 1 0 0 22 a9 9 0 1 1 0 -22" strokeWidth="4" />
-          </>
+        {/* 먹(주사) 층 */}
+        <g filter={filt('ink')} fill={ink} style={gold || lite ? undefined : { mixBlendMode: 'multiply' }} opacity={gold ? 1 : 0.93}>
+          <g data-part="border">
+            {border === 0 ? (
+              <>
+                {frame(13, 3.2, 100)}
+                {frame(19, 1.4, 200)}
+              </>
+            ) : (
+              <>
+                {frame(14, 5.2, 100)}
+                {[[24, 24], [204, 24], [24, 472], [204, 472]].map(([x, y], i) => (
+                  <path key={i} d={brush(box(x, y, 12), 2.6, { seed: 300 + i + vs, start: 0.8, end: 0.5 })} />
+                ))}
+              </>
+            )}
+          </g>
+          <g data-part="head">
+            {head === 0 ? (
+              <>
+                {T('日', 40, 62, 17)}
+                {T('月', 200, 62, 17)}
+              </>
+            ) : (
+              <>
+                {/* 해: 동그라미 한 바퀴와 가운데 점 / 달: 왼쪽으로 볼록한 초승달 */}
+                <path d={brush(Array.from({ length: 21 }, (_, i) => { const a = -Math.PI / 2 + (Math.PI * 1.7 * i) / 20; return [40 + 10 * Math.cos(a), 58 + 10 * Math.sin(a)] as Pt }), 3.4, { seed: 400 + vs, start: 0.7, end: 0.2 })} />
+                <path d={brush([[40, 56], [40.5, 60]], 4.2, { seed: 401 + vs, start: 0.9, end: 0.7 })} />
+                <path d={brush(Array.from({ length: 17 }, (_, i) => { const a = Math.PI * 0.32 + (Math.PI * 1.36 * i) / 16; return [203 + 11 * Math.cos(a), 58 + 12 * Math.sin(a)] as Pt }), 5.2, { seed: 402 + vs, start: 0.5, end: 0.1 })} />
+              </>
+            )}
+          </g>
+          <g data-part="body">
+            {top}
+            {mid}
+            {!hideSpine && spineD && <path data-part="spine" d={spineD} />}
+            {bot}
+          </g>
+          <g data-part="symbol">{sym}</g>
+          <g data-part="title">{T('勅令', 120, 84, 54, { letterSpacing: -4, stroke: ink as string, strokeWidth: 1.4 })}</g>
+          <g data-part="phrase" aria-label={wish.hanja}>
+            {[...wish.hanja].map((c, i) => T(c, pl.x, pl.y0 + i * pl.step, pl.size))}
+          </g>
+          <g data-part="charm">{[...'急急如律令'].map((c, i) => T(c, 199, 180 + i * 31, 21))}</g>
+        </g>
+
+        {/* 吉 백문 도장 */}
+        {!hideSeal && (
+          <g data-part="seal" transform="rotate(-4 120 474)">
+            <rect x="97" y="451" width="46" height="46" rx="3" fill={sealFill} filter={filt('ink')} opacity={gold ? 1 : 0.88} />
+            <rect x="101" y="455" width="38" height="38" fill="none" stroke={gold ? FOIL.lacquer : '#E8C463'} strokeWidth="1.2" opacity="0.8" filter={filt('edge')} />
+            <text x="120" y="488" fontSize="34" textAnchor="middle" fill={gold ? FOIL.lacquer : PAL.tradSealInk} stroke={gold ? FOIL.lacquer : PAL.tradSealInk} strokeWidth="0.9" filter={filt('edge')} style={BRUSH_FONT}>
+              吉
+            </text>
+          </g>
         )}
-
-        <path data-a="draw" data-part="body" d="M92 98 Q150 78 208 98" strokeWidth="7" />
-        <path data-a="draw" d="M112 106 v10 M150 102 v14 M188 106 v10" strokeWidth="5" />
-        {BODY[spec.el].map((d) => (
-          <path key={d} data-a="draw" d={d} strokeWidth="6.5" />
-        ))}
-        <path data-a="draw" d="M150 112 V300" strokeWidth="9" />
-
-        <path data-a="draw" data-part="symbol" d={ring(150, 345, 38)} strokeWidth="7" />
-        {SYMBOL[spec.wish].map((d) => (
-          <path key={d} data-a="draw" d={d} strokeWidth="6" />
-        ))}
-        <path data-a="draw" d="M78 345 Q58 345 64 320 M222 345 Q242 345 236 320" strokeWidth="5" />
-        <path data-a="draw" d="M150 383 V396 Q150 412 136 412 Q124 412 124 402 Q124 394 134 395" strokeWidth="5" />
-      </g>
-
-      <g data-part="phrase" aria-label={w.hanja}>
-        {[...w.hanja].map((c, i) => (
-          <text key={i} data-a="fade" x={pl.x0 + i * pl.step} y="452" textAnchor="middle" fontSize={pl.size} fontWeight="700" fill={J} style={SERIF}>
-            {c}
-          </text>
-        ))}
-      </g>
-      <circle data-a="pop" cx="62" cy="479" r="6" fill={EL_COLOR[spec.el]} />
-      <text data-a="fade" x="74" y="483" fontSize="11" fill={J} style={SERIF}>
-        {EL_TEXT[spec.el].name}
-      </text>
-
-      <g data-a="stamp" data-part="stamp">
-        <rect x={sx} y={sy} width={sw} height={sh} rx="3" fill={t.stampFill} filter={brush} />
-        {chars.map((c, i) => (
-          <text
-            key={i}
-            x={sx + 7 + (cols - 1 - Math.floor(i / rows)) * 20 + 10}
-            y={sy + 7 + (i % rows) * 20 + 16}
-            textAnchor="middle"
-            fontSize="17"
-            fontWeight="700"
-            fill={t.stampInk}
-            style={SERIF}
-          >
-            {c}
-          </text>
-        ))}
+        {/* 받는 사람 이름 도장(이름이 있을 때만) */}
+        {!hideSeal && name && (
+          <g data-part="stamp">
+            <rect x={sx} y={sy} width={sw} height={sh} rx="3" fill={sealFill} filter={filt('edge')} opacity={gold ? 1 : 0.9} />
+            {chars.map((c, i) => (
+              <text
+                key={i}
+                x={sx + 7 + (cols - 1 - Math.floor(i / rows)) * 20 + 10}
+                y={sy + 7 + (i % rows) * 20 + 16}
+                textAnchor="middle"
+                fontSize="17"
+                fontWeight="700"
+                fill={gold ? FOIL.lacquer : PAL.tradSealInk}
+                style={SERIF}
+              >
+                {c}
+              </text>
+            ))}
+          </g>
+        )}
       </g>
     </>
   )

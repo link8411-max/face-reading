@@ -15,6 +15,12 @@ export const PAL = {
   cutePill: '#FFE3E8',
   cuteSub: '#B48A7C',
   tradBack: '#8F1D17',
+  /** 진지한 전통 부적(시안 art.js): 주사 먹, 도장 바탕·글자, 괴황지 그라데이션, 그을림 */
+  tradInk: '#B92B1B',
+  tradSeal: '#B3231A',
+  tradSealInk: '#EBC867',
+  tradPaperStops: ['#EDCB6C', '#E5BC55', '#D9AA42'],
+  tradBurn: '#7A4A10',
 } as const
 
 /** 금박·홀로그램 전용 색. 바탕에 붉은 기운이 없다(설계 13절) */
@@ -25,6 +31,10 @@ export const FOIL = {
   gold: '#E9C46A',
   goldDeep: '#B8862B',
   stops: ['#FFF3C4', '#E9C46A', '#B8862B', '#F6DD95', '#C9982F'],
+  /** 진지한 전통 부적의 금박(시안 foil)과 먹색 종이 */
+  tradStops: ['#F7E4A2', '#C9963A', '#F3D88C', '#A9792B', '#EBCB79'],
+  tradAt: [0, 0.3, 0.5, 0.72, 1],
+  tradPaperStops: ['#1D1913', '#12100C'],
 } as const
 
 export const EL_COLOR: Record<ElKey, string> = {

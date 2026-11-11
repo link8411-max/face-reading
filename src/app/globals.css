@@ -15,6 +15,8 @@
   /* 부적 전용 (src/lib/bujeok/palette.ts와 같은 값) */
   --color-bujeok-paper: #E6C35C;
   --color-bujeok-jusa: #B3261E;
+  --color-bujeok-ink: #B92B1B;
+  --color-bujeok-seal: #B3231A;
   --color-bujeok-cute-paper: #FFFAF2;
   --color-bujeok-cute-ink: #5B4037;
   --color-bujeok-el-wood: #3E7B55;
