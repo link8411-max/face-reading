@@ -224,6 +224,7 @@ export default function SamgukPage() {
               </section>
 
               <ResultActions
+                from="samguk"
                 onShare={shareCard}
                 lead={duelCta(result.character.id)}
                 companion={{ label: "우리 팀 삼국지 만들기", href: "/samguk/team" }}

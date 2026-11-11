@@ -1,5 +1,6 @@
 "use client";
 
+import GiftNudge from "@/components/bujeok/GiftNudge";
 import SeasonPicks from "@/components/SeasonPicks";
 import { track } from "@/lib/analytics";
 import { useState } from "react";
@@ -270,6 +271,7 @@ export default function FortuneClient() {
                 {isCapturing ? "이미지 만드는 중…" : `${FORTUNE_YEAR.year} 운세 공유하기`}
               </button>
               {shareNotice && <p role="status" className="mt-2 text-xs text-center text-muted">{shareNotice}</p>}
+              <GiftNudge from="fortune" />
               <div className="grid grid-cols-2 gap-2 mt-2">
                 <button onClick={() => { track("share_click", { test_name: "fortune", method: "save_image" }); download(getShareOptions()); }} disabled={isCapturing} className="h-12 rounded-full bg-white border border-line text-sm font-medium flex items-center justify-center gap-1.5 disabled:opacity-50">
                   <Icon name="download" size={16} />

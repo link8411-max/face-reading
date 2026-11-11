@@ -118,7 +118,7 @@ export default function Zodiac2027Article({ slug }: { slug: ZodiacSlug }) {
           <p className="leading-relaxed">{z.조언}</p>
         </section>
 
-        <ArticleShare testName="zodiac" title={`${FORTUNE_YEAR.year} ${z.띠}띠 운세 – 운명을 읽다`} text={`${FORTUNE_YEAR.year}년 ${z.띠}띠 운세예요. 너도 확인해 봐`} url={url} imageUrl={`https://unse-ai.com${zodiacOgPath(slug)}`} />
+        <ArticleShare giftNudge testName="zodiac" title={`${FORTUNE_YEAR.year} ${z.띠}띠 운세 – 운명을 읽다`} text={`${FORTUNE_YEAR.year}년 ${z.띠}띠 운세예요. 너도 확인해 봐`} url={url} imageUrl={`https://unse-ai.com${zodiacOgPath(slug)}`} />
 
         <SeasonPicks slot={`zodiac_${slug}`} />
 

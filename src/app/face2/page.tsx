@@ -140,6 +140,7 @@ export default function Face2Page() {
               captureRef={resultRef}
               actions={
                 <ResultActions
+                  from="face"
                   onShare={shareCard}
                   onSave={() => {
                     track("share_click", { test_name: "face", method: "save_image" });

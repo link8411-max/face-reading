@@ -1,5 +1,6 @@
 "use client";
 
+import GiftNudge from "@/components/bujeok/GiftNudge";
 import { track } from "@/lib/analytics";
 import { useResultShare } from "@/hooks/useResultShare";
 import { mbtiShared, ogImageUrl } from "@/lib/shareLinks";
@@ -85,6 +86,7 @@ export default function MatchCalculator({ initial }: { initial?: { a: MbtiType; 
           <button type="button" onClick={share} disabled={busy} className="py-3 rounded-full bg-ink text-paper font-bold">공유하기</button>
         </div>
         {notice && <p role="status" className="text-xs text-center text-muted">{notice}</p>}
+        <GiftNudge from="mbti_match" />
         <div className="grid grid-cols-2 gap-2 text-sm">
           <Link href={`/mbti/${a.toLowerCase()}`} className="text-center py-2.5 rounded-xl bg-card-2 font-bold">{a}: {mbtiProfiles[a].nickname}</Link>
           <Link href={`/mbti/${b.toLowerCase()}`} className="text-center py-2.5 rounded-xl bg-card-2 font-bold">{b}: {mbtiProfiles[b].nickname}</Link>

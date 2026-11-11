@@ -102,7 +102,7 @@ export default function FaceMatchClient({ invite }: { invite?: { key: AnimalKey;
     return (
       <div className="pb-6 animate-fade-in">
         <FaceMatchCard captureRef={cardRef} a={me.animal} b={other.animal} rel={rel} result={result} />
-        <ResultActions onShare={resultShare.share} onSave={() => { track("share_click", { test_name: "face_match", method: "save_image" }); download({ fileName: `얼굴궁합_${REL_NAME[rel]}` }); }} onRetry={retry} busy={resultShare.busy || isCapturing} notice={resultShare.notice} />
+        <ResultActions from="face_match" onShare={resultShare.share} onSave={() => { track("share_click", { test_name: "face_match", method: "save_image" }); download({ fileName: `얼굴궁합_${REL_NAME[rel]}` }); }} onRetry={retry} busy={resultShare.busy || isCapturing} notice={resultShare.notice} />
         <div className="mt-2"><CoupangBanner subId="face-match" /></div>
         <Link href="/animal" className="mt-3 flex items-center gap-3 bg-card-2 rounded-[22px] p-4">
           <span className="w-11 h-11 rounded-full bg-paper grid place-items-center"><Icon name="cat" size={24} /></span>

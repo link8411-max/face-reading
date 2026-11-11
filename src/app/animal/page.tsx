@@ -143,6 +143,7 @@ export default function AnimalTypePage() {
           <div className="pb-6 animate-fade-in">
             <ResultCard captureRef={resultRef} {...cardProps(result)} />
             <ResultActions
+              from="animal"
               onShare={shareCard}
               companion={{ label: "친구 얼굴이랑 궁합", href: `/face-match?me=${result.type}` }}
               onSave={() => { track("share_click", { test_name: "animal", method: "save_image" }); download(getShareOptions()); }}

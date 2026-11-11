@@ -1,5 +1,6 @@
 'use client'
 
+import GiftNudge from '@/components/bujeok/GiftNudge'
 import Link from 'next/link'
 import { useEffect, useState } from 'react'
 import CoupangBanner from '@/components/CoupangBanner'
@@ -114,6 +115,7 @@ export default function ReportCard({ round, report, streak, challenge = null }: 
           </button>
         )}
         {notice && <p role="status" className="text-center text-xs text-muted">{notice}</p>}
+        <GiftNudge from="exam" />
         <button type="button" onClick={save} className="flex h-12 items-center justify-center gap-1.5 rounded-full border border-line bg-white text-sm font-medium">
           <Icon name="download" size={16} />
           이미지 저장

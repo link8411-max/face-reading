@@ -72,7 +72,7 @@ export default function TeamClient() {
     return (
       <div className="pb-6 animate-fade-in">
         <TeamCard team={team} captureRef={cardRef} />
-        <ResultActions onShare={share.share} onSave={() => { track("share_click", { test_name: "team_samguk", method: "save_image" }); download({ fileName: "우리팀_삼국지" }); }} onRetry={() => { setDone(false); setSlots([empty(), empty()]); }} busy={share.busy || isCapturing} notice={share.notice} />
+        <ResultActions from="team_samguk" onShare={share.share} onSave={() => { track("share_click", { test_name: "team_samguk", method: "save_image" }); download({ fileName: "우리팀_삼국지" }); }} onRetry={() => { setDone(false); setSlots([empty(), empty()]); }} busy={share.busy || isCapturing} notice={share.notice} />
         <div className="mt-2"><CoupangBanner subId="samguk-team" /></div>
         <Link href="/samguk" className="mt-3 flex items-center gap-3 bg-card-2 rounded-[22px] p-4">
           <span className="w-11 h-11 rounded-full bg-paper grid place-items-center"><Icon name="fan" size={24} /></span>

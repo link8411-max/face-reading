@@ -71,6 +71,7 @@ export default function MbtiDailyClient() {
         <div className="pb-6">
           <MbtiDailyCard type={type} date={date} daily={daily} captureRef={ref} />
           <ResultActions
+            from="mbti_daily"
             onShare={share.share}
             onSave={() => { track("share_click", { test_name: "mbti_daily", method: "save_image" }); download({ fileName: `오늘의MBTI운세_${type}` }); }}
             onRetry={reset}

@@ -2,10 +2,13 @@
 
 import Link from "next/link";
 import { Icon } from "@/components/icons";
+import GiftNudge from "@/components/bujeok/GiftNudge";
+import type { TestName } from "@/lib/analytics";
 
-// 결과 버튼: 1순위 공유하기(휴대폰 기본 공유창), 2순위 이미지 저장·다시하기.
+// 결과 버튼: 1순위 공유하기(바로 아래 부적 선물 줄)(휴대폰 기본 공유창), 2순위 이미지 저장·다시하기.
 // lead: 공유하기보다 앞에 두는 링크(삼국지 → 우리 팀 삼국지), companion: 이미지 저장 옆 짝 기능(동물상 → 얼굴 궁합)
-export default function ResultActions({ onShare, onSave, onRetry, busy, notice, lead, companion, retryLabel = "다시하기" }: {
+export default function ResultActions({ from, onShare, onSave, onRetry, busy, notice, lead, companion, retryLabel = "다시하기" }: {
+  from: TestName; // 부적 선물 줄(GiftNudge)의 출발 화면
   retryLabel?: string;
   lead?: { label: string; href: string };
   companion?: { label: string; href: string };
@@ -28,6 +31,7 @@ export default function ResultActions({ onShare, onSave, onRetry, busy, notice, 
         {busy ? "공유 준비 중…" : "공유하기"}
       </button>
       {notice && <p role="status" className="mt-2 text-xs text-center text-muted">{notice}</p>}
+      <GiftNudge from={from} />
       <div className="grid grid-cols-2 gap-2 mt-2">
         {companion && (
           <Link href={companion.href} className="h-12 rounded-full bg-white text-ink border border-line text-sm font-medium flex items-center justify-center gap-1.5">

@@ -54,6 +54,7 @@ npm run test:e2e     # E2E (next build 후 3200 포트): 전 페이지 로딩·�
 - 결과 캡처는 `no-screenshot` 요소와 iframe을 뺀다(`lib/capture.ts`). 운세의 생년월일 줄은 화면에만. 운세 공유 이미지는 결과가 나오면 미리 만들어 두고(`useScreenshot(result)`), 공유하기는 누르자마자 공유창을 연다.
 - 얼굴 궁합·우리 팀은 분석 중에 입력(관계·성별·사진·별칭·인원)을 잠근다.
 - 이미지 저장: `lib/saveImage.ts`. iOS와 인앱 브라우저(카카오톡·인스타·네이버 등)는 다운로드 대신 길게 눌러 저장 화면(data 이미지), 카카오톡이면 "다른 브라우저로 열기"(`kakaotalk://web/openExternal`)
+- **부적 선물 줄** `components/bujeok/GiftNudge`(`from: TestName`): 결과 화면의 공유 버튼 **바로 아래**에 작은 둘째 줄 "친구에게 부적 선물하기" → `/bujeok?mode=gift`(`no-screenshot`, 버튼을 밀어 내리지 않고 아래에 붙는다). `ResultActions`가 `from`(필수)을 받아 한 번 그리고(삼국지·관상·동물상·얼굴 궁합·우리 팀·오늘의 MBTI 운세·내 사주 풀이), 그 밖의 결과 화면은 직접 넣었다(신년운세·오늘의 운세·MBTI 궁합 계산기·밈 능력고사 성적표, 띠 글은 `ArticleShare giftNudge`). 사진 테스트 시작 화면·부적 화면·월드컵·일기토·열전 투표에는 없다. GA `next_test_click(test_name=bujeok, result_id=gift_<from>)`(`result_id`는 이 줄에서만 붙는 선택 값). 새 결과 화면을 만들면 `tests/bujeok/giftNudge.test.tsx`의 `VIEWS`에 추가한다(화면마다 정확히 하나).
 - 같은 사진으로 다음 테스트: 삼국지·동물상·관상 결과 아래 `components/result/NextTests`(나머지 두 사진 테스트 카드). 사진은 `lib/photoHandoff.ts` 메모리로만 넘기고(브라우저 저장소 금지, 테스트로 막음) 받는 쪽은 `useHandedPhoto`로 바로 분석한다. 새로고침하면 사라진다. GA `next_test_click(test_name=간 곳)`.
 - 삼국지: `components/samguk/SamgukGameCard`(회사생활 STATUS), `lib/samguk/guardian.ts`(나를 지켜줄 장수: 같은 세력에서 funStats 빈틈을 가장 많이 메우는 장수, 80~98점)
 - 8단계 전까지 없는 기능(친구 얼굴 궁합, 우리 팀 삼국지) 버튼은 넣지 않는다.

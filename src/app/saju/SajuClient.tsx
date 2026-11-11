@@ -177,6 +177,7 @@ export default function SajuClient() {
             birthLine={birthLine}
             actions={
               <ResultActions
+                from="saju"
                 onShare={share}
                 onSave={() => {
                   track("share_click", { test_name: "saju", method: "save_image" });

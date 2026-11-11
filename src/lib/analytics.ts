@@ -16,7 +16,8 @@ type Events = {
   shared_landing: { test_name: TestName; result_id?: string }
   coupang_click: { slot: string; keyword: string }
   coupang_banner_view: { slot: string; keyword: 'widget' | 'links' }
-  next_test_click: { test_name: TestName }
+  // result_id는 부적 선물 줄(GiftNudge)에서만: `gift_<출발 화면 test_name>`
+  next_test_click: { test_name: TestName; result_id?: string }
   // 집시세 배너(쿠팡 집계와 섞지 않는다). slot은 놓인 곳(bujeok)
   house_banner_view: { slot: string }
   house_banner_click: { slot: string }
