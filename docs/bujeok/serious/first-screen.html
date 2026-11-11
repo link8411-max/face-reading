@@ -1,0 +1,92 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>부적 첫 화면 시안</title>
+<style>
+  @font-face { font-family: Gowun; src: url(../../../src/fonts/GowunBatang-Regular.woff2); }
+  @font-face { font-family: Gowun; font-weight: 700; src: url(../../../src/fonts/GowunBatang-Bold.woff2); }
+  @font-face { font-family: Noto; src: url(../../../src/fonts/NotoSansKR-Regular.woff2); }
+  @font-face { font-family: Noto; font-weight: 700; src: url(../../../src/fonts/NotoSansKR-Bold.woff2); }
+  @font-face { font-family: BujeokBrush; src: url(../../../src/fonts/LXGWWenKaiTC-Bujeok.woff2); }
+  * { box-sizing: border-box; }
+  body { margin: 0; font-family: Noto, sans-serif; }
+  main { max-width: 420px; margin: 0 auto; padding: 18px 16px 32px; }
+  .top { display: flex; justify-content: space-between; align-items: center; font-size: 14px; }
+  .seg { display: inline-flex; border-radius: 999px; padding: 3px; font-size: 13px; }
+  .seg span { padding: 6px 12px; border-radius: 999px; }
+  .hero { position: relative; margin: 14px auto 0; width: 64%; perspective: 900px; }
+  .hero svg { width: 100%; display: block; animation: sway 6s ease-in-out infinite; transform-origin: 50% 50%; }
+  @keyframes sway { 0%,100% { transform: rotateY(-14deg) } 50% { transform: rotateY(14deg) } }
+  .glow { position: absolute; inset: 8% -18% -6%; border-radius: 50%; filter: blur(28px); z-index: -1; }
+  h1 { font-family: Gowun; font-weight: 700; font-size: 25px; line-height: 1.35; text-align: center; margin: 18px 0 4px; }
+  .mean { text-align: center; font-size: 14px; margin: 0; }
+  .cta { display: block; width: 100%; height: 54px; margin-top: 16px; border: 0; border-radius: 999px; font: 700 16px Noto, sans-serif; }
+  .note { text-align: center; font-size: 12px; margin: 8px 0 0; }
+  h2 { font-size: 14px; font-weight: 700; margin: 26px 0 10px; }
+  .tiles { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px 8px; }
+  .tile { text-align: center; font-size: 12px; border-radius: 12px; padding: 7px 4px 6px; }
+  .tile svg { width: 100%; display: block; border-radius: 4px; }
+  .tile b { display: block; margin-top: 5px; font-weight: 400; }
+  .fold { display: flex; justify-content: space-between; align-items: center; height: 50px; padding: 0 16px; border-radius: 14px; margin-top: 10px; font-size: 14px; }
+
+  /* A: 먹빛 가게 — 화면 전체가 먹색, 금빛 글씨 */
+  .A { background: radial-gradient(120% 60% at 50% 18%, #2A2219 0%, #15110D 55%, #0E0B09 100%); color: #EADFC8; min-height: 100vh; }
+  .A .seg { background: #241D16; border: 1px solid #3A2F22; } .A .seg .on { background: #E9C46A; color: #17140F; }
+  .A .glow { background: radial-gradient(#E9C46A55, transparent 70%); }
+  .A h1 { color: #F3D88C; } .A .mean, .A .note { color: #B9AC94; }
+  .A .cta { background: linear-gradient(90deg, #C9963A, #F3D88C 50%, #C9963A); color: #17140F; }
+  .A h2 { color: #D9C9A8; }
+  .A .tile { background: #1C1712; border: 1px solid #2E261C; color: #CDBF9F; }
+  .A .tile.on { border-color: #E9C46A; color: #F3D88C; box-shadow: 0 0 0 1px #E9C46A inset; }
+  .A .fold { background: #1C1712; border: 1px solid #2E261C; color: #D9C9A8; }
+
+  /* B: 한지 진열 — 사이트 바탕은 그대로, 부적만 어두운 진열대 위에 */
+  .B { background: #FBF6F1; color: #2E2A27; min-height: 100vh; }
+  .B .seg { background: #fff; border: 1px solid #E6DED2; } .B .seg .on { background: #2E2A27; color: #FBF6F1; }
+  .B .stand { margin-top: 12px; border-radius: 26px; padding: 22px 0 18px; background: radial-gradient(90% 70% at 50% 35%, #2B231A, #120F0C); }
+  .B .hero { margin-top: 0; }
+  .B .glow { background: radial-gradient(#E9C46A44, transparent 70%); }
+  .B .mean, .B .note { color: #6B6259; }
+  .B .cta { background: #2E2A27; color: #FBF6F1; }
+  .B .tiles { display: flex; gap: 8px; overflow-x: auto; padding-bottom: 4px; }
+  .B .tile { flex: 0 0 74px; background: #fff; border: 1px solid #E6DED2; }
+  .B .tile.on { border-color: #2E2A27; box-shadow: 0 0 0 1px #2E2A27 inset; }
+  .B .fold { background: #fff; border: 1px solid #E6DED2; }
+</style>
+</head>
+<body>
+<main id="m">
+  <div class="top"><span class="seg"><span class="on">내 부적</span><span>선물하기</span></span><span style="opacity:.75">내 부적 2장</span></div>
+  <div class="stand-wrap"></div>
+  <h1>합격 부적</h1>
+  <p class="mean"><span style="font-family:BujeokBrush;font-size:16px;letter-spacing:.08em">金榜題名</span> · 합격자 명단에 이름이 오른다는 뜻</p>
+  <button class="cta">이 부적 받기</button>
+  <p class="note">마지막 한 획은 직접 그어 완성해요</p>
+  <h2>다른 소원</h2>
+  <div class="tiles" id="tiles"></div>
+  <div class="fold"><span>그림 바꾸기 <span style="opacity:.6">· 전통 · 금박</span></span><span>＋</span></div>
+  <div class="fold"><span>내 사주로 맞추기 · 이름 새기기</span><span>＋</span></div>
+</main>
+<script src="art-mock.js"></script>
+<script>
+const v = (location.hash.slice(1) || 'A').toUpperCase()
+document.body.className = v
+const heroHtml = '<div class="hero"><div class="glow"></div><svg id="hero" viewBox="0 0 240 508"></svg></div>'
+document.querySelector('.stand-wrap').outerHTML = v === 'B' ? `<div class="stand">${heroHtml}</div>` : heroHtml
+const W = [['합격','金榜題名'],['재물','招財進寶'],['만사형통','萬事亨通'],['건강','無病長壽'],['연애','天生緣分'],['취업·승진','立身揚名'],['사업·개업','事業繁昌'],['가족 평안','家和萬事成'],['소원성취','所願成就'],['삼재 막이','三災消滅'],['액막이','消災吉祥']]
+document.fonts.load('20px BujeokBrush', '勅').then(() => {
+  draw(document.getElementById('hero'), 'gold')
+  const box = document.getElementById('tiles')
+  W.forEach(([label, h], i) => {
+    const t = document.createElement('div'); t.className = 'tile' + (i === 0 ? ' on' : '')
+    t.innerHTML = `<svg viewBox="0 0 240 508"></svg><b>${label}</b>`
+    box.appendChild(t)
+    draw(t.querySelector('svg'), v === 'B' ? 'paper' : 'gold', { hanja: h })
+  })
+  document.title = 'ok'
+})
+</script>
+</body>
+</html>
