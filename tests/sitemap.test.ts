@@ -23,7 +23,7 @@ test('밈 능력고사: /exam/meme은 사이트맵에 있고 공유 착지(/exam
 
 test('부적: /bujeok은 사이트맵에 있고 선물 착지(/bujeok/r/)는 없다', () => {
   expect(SITEMAP_ROUTES).toContain('/bujeok')
-  expect(LAST_MODIFIED['/bujeok']).toBe('2026-11-11')
+  expect(LAST_MODIFIED['/bujeok']).toBe('2026-11-12')
   expect(SITEMAP_ROUTES.some((r) => r.startsWith('/bujeok/r'))).toBe(false)
   expect(sitemap().map((e) => e.url)).toContain('https://unse-ai.com/bujeok')
 })
