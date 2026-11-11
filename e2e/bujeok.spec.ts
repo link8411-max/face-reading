@@ -260,3 +260,33 @@ test('잘못된 코드는 /bujeok 으로 가고, 사이트맵에 /bujeok/r/ 은 
   const xml = await (await request.get('/sitemap.xml')).text()
   expect(xml).not.toContain('/bujeok/r/')
 })
+
+// --- 광고: 부적 아래에만 ---
+// (e2e 서버에는 ZIPSISE_DATA_URL이 없어 집시세 데이터가 없다 → 쿠팡 배너가 대신 뜬다. 집시세 배너는 단위 테스트와 별도 수동 확인으로 본다)
+test('완성 화면: 광고는 카드 아래에 있고 카드 위·앞에는 없다', async ({ page }) => {
+  await make(page, '재물', '전통')
+  const frame = page.locator('iframe[title="쿠팡 추천 상품"]')
+  await expect(frame).toHaveCount(1)
+  const card = (await page.getByTestId('bujeok-card').boundingBox())!
+  await frame.scrollIntoViewIfNeeded()
+  const ad = (await frame.boundingBox())!
+  const cardAfter = (await page.getByTestId('bujeok-card').boundingBox())!
+  expect(ad.y).toBeGreaterThan(cardAfter.y + cardAfter.height - 1)
+  expect(card.height).toBeGreaterThan(100)
+  // 카드 안에는 광고가 없다
+  expect(await page.getByTestId('bujeok-card').locator('iframe').count()).toBe(0)
+})
+
+test('착지: 열기 전에는 광고가 없고 연 뒤 카드 아래에 있다', async ({ page }) => {
+  await page.goto('/bujeok/r/cute-pass-wood-1-paper?to=%EB%AF%BC%EC%A7%80')
+  await expect(page.locator('iframe[title="쿠팡 추천 상품"]')).toHaveCount(0)
+  await page.getByRole('button', { name: '열어 보기' }).click()
+  const frame = page.locator('iframe[title="쿠팡 추천 상품"]')
+  await expect(frame).toHaveCount(1)
+  await expect(frame).toHaveAttribute('src', /subId=bujeok-pass/)
+  const card = (await page.getByTestId('bujeok-card').boundingBox())!
+  await frame.scrollIntoViewIfNeeded()
+  const cardAfter = (await page.getByTestId('bujeok-card').boundingBox())!
+  expect((await frame.boundingBox())!.y).toBeGreaterThan(cardAfter.y + cardAfter.height - 1)
+  expect(card.height).toBeGreaterThan(100)
+})

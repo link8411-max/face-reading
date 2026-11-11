@@ -1,8 +1,10 @@
 import type { Metadata } from 'next'
 import { redirect } from 'next/navigation'
+import BujeokAd from '@/components/bujeok/BujeokAd'
 import GiftLanding from '@/components/bujeok/GiftLanding'
 import { bujeokOgUrl, cleanName, giftHeadline, parseBujeokCode } from '@/lib/bujeok/link'
 import { SITE } from '@/lib/shareBase'
+import { fetchWeeklyHigh } from '@/lib/zipsise/highs'
 
 type Q = Record<string, string | string[] | undefined>
 type Props = { params: Promise<{ code: string }>; searchParams: Promise<Q> }
@@ -36,5 +38,6 @@ export default async function BujeokGiftPage({ params, searchParams }: Props) {
   const spec = parseBujeokCode(code)
   if (!spec) redirect('/bujeok')
   const q = await searchParams
-  return <GiftLanding spec={spec} to={cleanName(one(q.to))} from={cleanName(one(q.from))} />
+  const high = await fetchWeeklyHigh()
+  return <GiftLanding spec={spec} to={cleanName(one(q.to))} from={cleanName(one(q.from))} ad={<BujeokAd wish={spec.wish} high={high} />} />
 }

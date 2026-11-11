@@ -17,6 +17,9 @@ type Events = {
   coupang_click: { slot: string; keyword: string }
   coupang_banner_view: { slot: string; keyword: 'widget' | 'links' }
   next_test_click: { test_name: TestName }
+  // 집시세 배너(쿠팡 집계와 섞지 않는다). slot은 놓인 곳(bujeok)
+  house_banner_view: { slot: string }
+  house_banner_click: { slot: string }
   // 일기토 퍼널. 값은 result_id에 인코딩한다(허용 키를 늘리지 않는다): duel_wave는 'w06', duel_end는 'guanyu_l_w18'
   duel_wave: { test_name: TestName; result_id: string }
   duel_end: { test_name: TestName; result_id: string }

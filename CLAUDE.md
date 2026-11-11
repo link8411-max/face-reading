@@ -364,6 +364,14 @@ public/
 
 ---
 
+## 부적 (/bujeok)
+
+- **광고(2026-11-11)**: 부적 **아래**에만 둔다(카드 위·앞 금지). 완성 화면과 선물 착지(연 뒤)에 `components/bujeok/BujeokAd`가 놓인다. 소원이 재물이고 집시세의 이번 주 신고가가 있으면 `HouseBanner`, 그 밖에는 쿠팡 배너(subId `bujeok-<소원>`). 집시세 배너는 실제 데이터만 쓰고 없으면 쿠팡으로 바꾼다.
+- **집시세 데이터** `lib/zipsise/highs.ts`(서버 전용, 클라이언트에서 가져오면 `tests/bujeok/ad.test.tsx`가 실패): `<ZIPSISE_DATA_URL>/v1/highs/recent.json`을 서버에서 `revalidate: 3600`으로 읽어 최근 7일(오늘 포함) 중 `jump`(이전 최고가 대비 오른 금액)가 가장 큰 한 건. 금액 단위는 **만원**(159500 = 15억 9,500만). 정정 의심(`held`)·공유 불가(`shareable: false`) 거래는 뺀다. 못 읽거나 0건이면 `null` → 쿠팡 배너. 실제 파일 3건이 `tests/zipsise/fixtures/highs.json`.
+- **환경변수 `ZIPSISE_DATA_URL`**(Vercel): 현재 값 `https://pub-d64c5ee85ced4675b2e8b07dc9185d74.r2.dev`(r2.dev 공개 주소라 요청 제한이 있고 나중에 바뀔 수 있어 코드에 박지 않았다). 없으면 집시세 배너 없이 쿠팡 배너만 나온다. 넣거나 바꾼 뒤 재배포.
+- GA: `house_banner_view {slot: bujeok}`(절반 이상 보이면 한 번), `house_banner_click {slot: bujeok}`. 쿠팡 집계와 섞지 않는다. 단지명·금액은 보내지 않는다.
+- 집시세 링크 `https://zipsise.com/highs?utm_source=unse&utm_medium=banner&utm_campaign=bujeok`는 새 창·`rel="nofollow noopener"`. 2026-11-04의 "두 사이트는 서로 링크하지 않는다"를 이 자리에 한해 사용자가 2026-11-11에 바꿨다.
+
 ## 자주 수정하는 파일
 
 | 작업 | 파일 |

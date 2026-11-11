@@ -6,6 +6,8 @@ import TestHeader from '@/components/test/TestHeader'
 import BujeokForm, { type FormValues } from './BujeokForm'
 import BujeokCard from './BujeokCard'
 import BujeokDone from './BujeokDone'
+import BujeokAd from './BujeokAd'
+import type { WeeklyHigh } from '@/lib/zipsise/banner'
 import { track } from '@/lib/analytics'
 import { validateBirthDate } from '@/lib/birthDate'
 import { elementFromBirth, randomVariant } from '@/lib/bujeok/compose'
@@ -35,7 +37,7 @@ function initialValues(initial?: Initial): FormValues {
   }
 }
 
-export default function BujeokClient({ initial }: { initial?: Initial }) {
+export default function BujeokClient({ initial, high = null }: { initial?: Initial; high?: WeeklyHigh | null }) {
   const goBack = useBackOrHome()
   const [values, setValues] = useState<FormValues>(() => initialValues(initial))
   const [phase, setPhase] = useState<Phase>('form')
@@ -119,7 +121,7 @@ export default function BujeokClient({ initial }: { initial?: Initial }) {
             <div ref={panel} className="mx-auto max-w-[420px]">
               <BujeokCard spec={spec} name={madeName} from={madeFrom} enter playKey={playKey} />
             </div>
-            <BujeokDone spec={spec} getSvg={() => panel.current?.querySelector('[data-bujeok-art] svg') ?? null} onRetry={retry} gift={gift && madeName ? { to: madeName, from: madeFrom } : undefined} />
+            <BujeokDone spec={spec} getSvg={() => panel.current?.querySelector('[data-bujeok-art] svg') ?? null} onRetry={retry} gift={gift && madeName ? { to: madeName, from: madeFrom } : undefined} ad={<BujeokAd wish={spec.wish} high={high} />} />
           </div>
         ) : (
           <>

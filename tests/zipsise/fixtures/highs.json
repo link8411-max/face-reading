@@ -1,0 +1,81 @@
+{
+  "generated_at": "2026-11-10T17:49:40.524652+00:00",
+  "since": "2026-10-12",
+  "items": [
+    {
+      "tx_id": 11446251,
+      "apt_id": 30394,
+      "apt_name": "인덕원 센트럴 자이 2단지",
+      "region_name": "경기 의왕",
+      "city": "경기",
+      "lawd_cd": "41430",
+      "dong": "내손동",
+      "area": 137.826,
+      "area_group": 137,
+      "floor": 21,
+      "amount": 159500,
+      "prev_max": 149000,
+      "jump": 10500,
+      "jump_pct": 7.0,
+      "deal_date": "2026-11-09",
+      "supply": {
+        "min": 52,
+        "max": 52,
+        "approx": false
+      },
+      "direct": false,
+      "shareable": true,
+      "held": false
+    },
+    {
+      "tx_id": 11446206,
+      "apt_id": 2283433,
+      "apt_name": "오산세교한신더휴",
+      "region_name": "경기 오산",
+      "city": "경기",
+      "lawd_cd": "41370",
+      "dong": "탑동",
+      "area": 84.9317,
+      "area_group": 84,
+      "floor": 23,
+      "amount": 58000,
+      "prev_max": 50000,
+      "jump": 8000,
+      "jump_pct": 16.0,
+      "deal_date": "2026-11-09",
+      "supply": {
+        "min": 33,
+        "max": 33,
+        "approx": false
+      },
+      "direct": false,
+      "shareable": true,
+      "held": false
+    },
+    {
+      "tx_id": 11445871,
+      "apt_id": 3803,
+      "apt_name": "마곡엠밸리2단지",
+      "region_name": "서울 강서구",
+      "city": "서울",
+      "lawd_cd": "11500",
+      "dong": "마곡동",
+      "area": 84.88,
+      "area_group": 84,
+      "floor": 4,
+      "amount": 157500,
+      "prev_max": 152000,
+      "jump": 5500,
+      "jump_pct": 3.6,
+      "deal_date": "2026-11-09",
+      "supply": {
+        "min": 34,
+        "max": 34,
+        "approx": false
+      },
+      "direct": true,
+      "shareable": true,
+      "held": false
+    }
+  ]
+}
