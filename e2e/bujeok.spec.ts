@@ -243,7 +243,7 @@ test('해시의 이름이 잘못된 링크(9자·이모지·태그)는 이름 �
   await expect(page.getByRole('heading', { level: 1 })).toHaveText('부적이 도착했어요')
 })
 
-test('착지 메타: 이름 없음(쿼리를 줘도), noindex, canonical /bujeok, 이미지는 실제로 받아진다', async ({ page, request }) => {
+test('착지 메타: 이름 없음(쿼리를 줘도), noindex, canonical /bujeok, 이미지는 실제로 받아진다', async ({ request }) => {
   const html = await (await request.get('/bujeok/r/trad-money-metal-0-gold?to=%EB%AF%BC%EC%A7%80&from=%EC%B2%A0%EC%88%98')).text()
   expect(html).toMatch(/<meta name="robots" content="noindex/)
   expect(html).toContain('<link rel="canonical" href="https://unse-ai.com/bujeok"')
@@ -300,4 +300,87 @@ test('착지: 열기 전에는 광고가 없고 연 뒤 카드 아래에 있다'
   const cardAfter = (await page.getByTestId('bujeok-card').boundingBox())!
   expect((await frame.boundingBox())!.y).toBeGreaterThan(cardAfter.y + cardAfter.height - 1)
   expect(card.height).toBeGreaterThan(100)
+})
+
+// --- 내 부적 링크와 부적함 ---
+// 서버가 그린 SVG와 브라우저가 그린 SVG는 직렬화가 달라(공백·주석 노드) 글자와 도형 경로로 비교한다
+const artOf = (page: Page) =>
+  page.locator('[data-bujeok-art] svg').first().evaluate((svg) => JSON.stringify({ text: svg.textContent, d: [...svg.querySelectorAll('[d]')].map((e) => e.getAttribute('d')), fills: [...svg.querySelectorAll('[fill]')].map((e) => e.getAttribute('fill')).filter((f) => !f!.startsWith('url')) }))
+
+test('내 부적을 만들면 주소가 내 부적 링크로 바뀌고, 새로고침해도 같은 카드가 바로 열린다. 부적함에도 있다', async ({ page }) => {
+  const errors = trackErrors(page)
+  await page.goto('/bujeok')
+  await page.getByRole('radio', { name: '재물' }).click()
+  await page.getByRole('radio', { name: '귀여운' }).click()
+  await page.getByLabel('이름').fill('민지')
+  await page.getByRole('button', { name: '부적 만들기' }).click()
+  await expect(page.getByTestId('bujeok-card')).toBeVisible()
+  await expect(page.getByRole('button', { name: '내 부적 링크 보내기' })).toBeVisible()
+  await expect(page).toHaveURL(/\/bujeok\/r\/cute-money-[a-z]+-\d-gold\?me=1#to=%EB%AF%BC%EC%A7%80$/)
+  const url = page.url()
+  const before = await artOf(page)
+  // GA로 가는 값에는 이름이 없다
+  expect(JSON.stringify(await events(page))).not.toMatch(/민지|%EB%AF%BC/)
+
+  await page.reload()
+  await expect(page.getByRole('heading', { level: 1 })).toHaveText('민지님의 부적')
+  await expect(page.getByRole('button', { name: '열어 보기' })).toHaveCount(0)
+  await expect(page.getByTestId('bujeok-card')).toBeVisible()
+  expect(page.url()).toBe(url)
+  expect(await artOf(page)).toBe(before)
+  for (const n of ['잠금화면용 저장']) await expect(page.getByRole('button', { name: n })).toBeVisible()
+  await expect(page.getByRole('link', { name: '내 부적함' })).toBeVisible()
+  await expect(page.getByRole('link', { name: '선물 보내기' })).toBeVisible()
+  expect(await page.title()).not.toMatch(/민지/)
+
+  await page.getByRole('link', { name: '내 부적함' }).click()
+  await expect(page).toHaveURL(/\/bujeok\/box$/)
+  await expect(page.getByRole('heading', { level: 1 })).toHaveText('내 부적함')
+  await expect(page.getByRole('heading', { level: 2, name: '내 부적' })).toBeVisible()
+  await page.getByRole('link', { name: /민지님의 부적/ }).click()
+  await expect(page.getByRole('heading', { level: 1 })).toHaveText('민지님의 부적')
+  expect(errors).toEqual([])
+})
+
+test('선물 링크를 열면 부적함 받은 부적에 들어가고, 누르면 다시 열리고, 지우면 사라진다', async ({ page }) => {
+  const errors = trackErrors(page)
+  await page.goto('/bujeok/r/cute-pass-wood-1-paper#to=%EB%AF%BC%EC%A7%80&from=%EC%B2%A0%EC%88%98')
+  await expect(page.getByRole('heading', { level: 1 })).toHaveText('민지님께 부적이 도착했어요')
+  await page.getByRole('button', { name: '열어 보기' }).click()
+  await page.getByRole('link', { name: '내 부적함' }).click()
+  await expect(page).toHaveURL(/\/bujeok\/box$/)
+  await expect(page.getByRole('heading', { level: 2, name: '받은 부적' })).toBeVisible()
+  const item = page.getByRole('link', { name: /민지님께 부적이 도착했어요/ })
+  await expect(item).toBeVisible()
+  await expect(item).toContainText('철수님이 보냈어요')
+  await expect(page.getByText(/이 폰에만 저장돼요/)).toBeVisible()
+  await expect(page.getByText(/홈 화면에 추가/)).toBeVisible()
+  // 눌러서 다시 열기 (이름은 해시로 따라온다)
+  await item.click()
+  await expect(page).toHaveURL(/\/bujeok\/r\/cute-pass-wood-1-paper#to=%EB%AF%BC%EC%A7%80&from=%EC%B2%A0%EC%88%98$/)
+  await expect(page.getByRole('heading', { level: 1 })).toHaveText('민지님께 부적이 도착했어요')
+  // 지우기: 앱 안 확인
+  await page.goto('/bujeok/box')
+  await page.getByRole('button', { name: '지우기' }).click()
+  await expect(page.getByText('이 부적을 지울까요?')).toBeVisible()
+  await page.getByRole('button', { name: '네, 지울게요' }).click()
+  await expect(page.getByText('아직 모은 부적이 없어요')).toBeVisible()
+  await page.reload()
+  await expect(page.getByText('아직 모은 부적이 없어요')).toBeVisible()
+  expect(errors).toEqual([])
+})
+
+test('부적함에 하나라도 있으면 /bujeok 시작 화면에 "내 부적함 (N)" 링크가 보인다', async ({ page }) => {
+  await page.goto('/bujeok')
+  await expect(page.getByRole('link', { name: /내 부적함/ })).toHaveCount(0)
+  await page.goto('/bujeok/r/cute-pass-wood-1-paper')
+  await page.goto('/bujeok')
+  await expect(page.getByRole('link', { name: '내 부적함 (1)' })).toBeVisible()
+})
+
+test('/bujeok/box: noindex이고 사이트맵에 없다', async ({ request }) => {
+  const html = await (await request.get('/bujeok/box')).text()
+  expect(html).toMatch(/<meta name="robots" content="noindex/)
+  expect(html).toContain('<link rel="canonical" href="https://unse-ai.com/bujeok"')
+  expect(await (await request.get('/sitemap.xml')).text()).not.toContain('/bujeok/box')
 })

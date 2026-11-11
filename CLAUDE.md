@@ -371,17 +371,18 @@ public/
 **구조**
 | 위치 | 내용 |
 |------|------|
-| `src/lib/bujeok/` | 순수 함수. `keys.ts`(화풍 2·소원 5·기운 5·변형 4·마감 3, `BujeokSpec`)·`compose.ts`(기운 고르기, 생년월일 → 기운)·`link.ts`(링크 코드 `<화풍>-<소원>-<기운>-<변형>-<마감>` 다섯 조각, `cleanName`, `bujeokGiftUrl`, `bujeokOgUrl`, `giftHeadline`)·`spin.ts`(회전 관성·확대 범위)·`palette.ts`(`themeFor` 마감별 색)·`wallpaper.ts`(잠금화면 1170×2532)·`birthHandoff.ts`(사주→부적 생년월일, 메모리만)·`bannedNames.ts`·`bannedPhrases.ts` |
+| `src/lib/bujeok/` | 순수 함수. `keys.ts`(화풍 2·소원 5·기운 5·변형 4·마감 3, `BujeokSpec`)·`compose.ts`(기운 고르기, 생년월일 → 기운)·`link.ts`(링크 코드 `<화풍>-<소원>-<기운>-<변형>-<마감>` 다섯 조각, `cleanName`, `bujeokGiftUrl`, `bujeokMineUrl`, `parseNameHash`, `bujeokOgUrl`, `giftHeadline`, `mineHeadline`)·`spin.ts`(회전 관성·확대 범위)·`palette.ts`(`themeFor` 마감별 색)·`wallpaper.ts`(잠금화면 1170×2532)·`birthHandoff.ts`(사주→부적 생년월일, 메모리만)·`box.ts`(부적함, localStorage `bujeok-box-v1`)·`bannedNames.ts`·`bannedPhrases.ts` |
 | `src/content/bujeok.ts` | 소원·기운 문구(`WISH_TEXT`, `EL_TEXT`). 한자 글귀는 실제 쓰이는 길상 문구 다섯 개뿐 |
-| `src/components/bujeok/` | `BujeokClient`(form → done, 내 부적/선물 모드)·`BujeokForm`·`BujeokDone`·`BujeokCard`(입체 카드: 앞면 `BujeokSvg`, 뒷면 이름·뜻·응원 한 줄, 확대·축소, 뒤집기 버튼)·`GiftLanding`(선물 착지)·`BujeokAd`·`HouseBanner`·`useWallpaperSave`·`parts/{trad,cute}`(SVG 부품, 전부 코드로 그림) |
-| 라우트 | `/bujeok`(`?mode=gift&style=&wish=&finish=`를 허용 목록으로만 받음, 서버 페이지가 집시세 신고가를 읽어 내려 줌, 구조화 데이터·`PageGuide`는 layout이 아니라 page에서 렌더), `/bujeok/r/[code]`(선물 착지: noindex·canonical `/bujeok`·사이트맵 제외, 잘못된 코드는 `/bujeok`으로 redirect), `/dev/bujeok-lab`(개발 전용, 부품 격자) |
-| OG | `/api/og/result?kind=bujeok&style=&wish=&el=&finish=`(1200×630, 이름은 받지 않는다. 종이는 노란 종이, 금박·홀로그램은 먹색 바탕. 붉은 바탕 없음) |
+| `src/components/bujeok/` | `BujeokClient`(form → done, 내 부적/선물 모드)·`BujeokForm`·`BujeokDone`·`BujeokCard`(입체 카드: 앞면 `BujeokSvg`, 뒷면 이름·뜻·응원 한 줄, 확대·축소, 뒤집기 버튼)·`GiftLanding`(선물·내 부적 착지)·`BujeokBox`(부적함 화면)·`useNameHash`·`useBox`·`BujeokAd`·`HouseBanner`·`useWallpaperSave`·`parts/{trad,cute}`(SVG 부품, 전부 코드로 그림) |
+| 라우트 | `/bujeok`(`?mode=gift&style=&wish=&finish=`를 허용 목록으로만 받음, 서버 페이지가 집시세 신고가를 읽어 내려 줌, 구조화 데이터·`PageGuide`는 layout이 아니라 page에서 렌더), `/bujeok/r/[code]`(착지: noindex·canonical `/bujeok`·사이트맵 제외, 잘못된 코드는 `/bujeok`으로 redirect. 이름은 **해시**: `/bujeok/r/<code>?utm…#to=<이름>&from=<이름>`이 선물, `?me=1#to=<이름>`이 내 부적 — `me=1`이면 "열어 보기" 없이 바로 카드가 나오고 머리말이 "○○님의 부적"/"나의 부적"), `/bujeok/box`(내 부적함: 클라이언트 페이지, noindex·canonical `/bujeok`·사이트맵 제외), `/dev/bujeok-lab`(개발 전용, 부품 격자) |
+| OG | `/api/og/result?kind=bujeok&style=&wish=&finish=`(1200×630, 이름·기운(el)은 받지 않는다. 종이는 노란 종이, 금박·홀로그램은 먹색 바탕. 붉은 바탕 없음) |
 | 메뉴 | 사주·운세 묶음 "소원을 담은 부적". 사주·신년운세 결과의 "이어서 보면 좋아요"에서 `NextSteps birth={…}`로 생년월일을 메모리로만 넘긴다 |
 
 **규칙 (테스트로 고정)**
 - **빨간 바탕 금지**: 금박·홀로그램 바탕은 먹색 `#17140F`, 무대도 붉은 기운 없는 어두운 중성색.
-- **효험 단정 금지**: `반드시`·`100%`·`보장`·`틀림없이`·`들어옵니다`·`합격합니다`가 부적 문구·광고·본문에 나오면 실패(`bannedPhrases.ts`). 부적은 재미와 응원이다. 화면 글에 오행 한자(木火土金水)·십신을 쓰지 않는다(길상 글귀 한자는 예외, 한글 뜻을 붙인다).
-- **이름은 GA·미리보기 이미지·통계에 넣지 않는다.** 이름은 선물 링크(`to`·`from`)와 화면에만. `cleanName`: 앞뒤 공백 제거 후 1~8자, 한글·영문·숫자·공백, 금지어 없음. 통과 못 한 이름은 떼고 부적은 연다. 생년월일은 링크·GA·저장 이미지·브라우저 저장소에 넣지 않는다.
+- **효험 단정 금지**: `반드시`·`100%`·`보장`·`틀림없이`·`들어옵니다`·`합격합니다`·`들어온다`(한자 뜻풀이 `hanjaMeaning`만 예외)가 부적 문구·광고·본문에 나오면 실패(`bannedPhrases.ts`). 부적은 재미와 응원이다. 화면 글에 오행 한자(木火土金水)·십신을 쓰지 않는다(길상 글귀 한자는 예외, 한글 뜻을 붙인다).
+- **이름은 GA·미리보기 글·미리보기 이미지·서버 로그·통계에 넣지 않는다.** 이름은 링크의 `#` 뒤(해시)와 화면에만 둔다(쿼리에 두면 GA 페이지 조회와 접근 로그에 실명이 남는다). 서버 착지 페이지는 `to`·`from` 쿼리를 읽지 않고 `<title>`·openGraph에 이름이 없다("부적이 도착했어요"/"나의 부적"). 클라이언트(`useNameHash`)가 마운트 뒤 `location.hash`를 읽어 머리말을 채운다. 카카오톡 공유 카드의 제목만 보내는 쪽 화면에서 "○○님께 부적이 도착했어요"로 만들고(`kakaoFeed`의 title), 카드 링크는 해시 주소다. `cleanName`: 앞뒤 공백 제거 후 1~8자, 한글·영문·숫자·공백, 금지어 없음. 통과 못 한 이름은 떼고 부적은 연다. 옛 쿼리 형식(`?to=`)은 지원하지 않는다. 생년월일은 링크·GA·저장 이미지·브라우저 저장소에 넣지 않는다.
+- **내 부적 링크와 부적함(설계 14절)**: 내 부적이 완성되면 `history.replaceState`로 주소를 `/bujeok/r/<code>?me=1#to=…`로 바꾸고(새로고침·"다른 브라우저로 열기"로도 같은 카드), 시작 화면으로 돌아가면 원래 주소로 되돌린다. 완성 화면의 "내 부적 링크 보내기"는 그 주소를 공유한다. 부적함(`lib/bujeok/box.ts`, localStorage `bujeok-box-v1`, 최대 60개, 같은 코드·이름·종류는 한 번만)에는 코드·받는 이름·보낸 이름·종류(`mine`·`sent`·`received`)·저장 시각만 넣는다(생년월일 없음). 저장 시점: 내 부적 완성(mine, 다시 만들기는 이전 항목을 바꿈), 선물 공유가 끝났거나 링크를 복사했을 때(sent), 선물 착지를 열었을 때(received, `me=1`은 저장 안 함). 저장소를 못 쓰면 `loadBox()`가 null이고 화면은 "이 브라우저에서는 부적함을 쓸 수 없어요". GA 이벤트는 새로 만들지 않는다. (브라우저 저장소 금지 테스트는 `photoHandoff.ts` 하나에만 걸려 있다.)
 - 광고는 카드 **아래**에만(위 "광고" 항목). 가짜 숫자("○명이 받았어요") 금지. 이모지는 제목·버튼에 쓰지 않는다. 글꼴 굵기 900·Google Fonts 금지.
 - 화면 문구는 지금의 카드를 설명한다: 손으로 돌려 보는 카드, 마감 세 가지(종이·금박·홀로그램), 확대·축소, 뒷면에 이름. "붓으로 그려지는" 연출은 없다(`tests/bujeok/guide.test.ts`가 막는다).
 - 잠금화면 저장은 고른 마감의 앞면 정지 이미지다(`lib/saveImage.ts` 경로, 아이폰·인앱은 길게 눌러 저장).

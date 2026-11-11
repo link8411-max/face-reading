@@ -1,7 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useState } from "react";
-import { shareResult, SHARE_NOTICE } from "@/lib/share";
+import { shareResult, SHARE_NOTICE, type ShareOutcome } from "@/lib/share";
 import { isKakaoInApp, loadKakao, shareKakao } from "@/lib/kakao";
 import { track, type TestName } from "@/lib/analytics";
 
@@ -20,19 +20,21 @@ export function useResultShare(meta: ShareMeta | null) {
     if (key && isKakaoInApp(navigator.userAgent)) void loadKakao();
   }, [key]);
 
-  const share = useCallback(async () => {
-    if (!meta) return;
+  // 끝난 방식을 돌려준다(부적함이 "실제로 보냈을 때"만 저장하려고). 카카오톡은 공유 화면이 열리면 'kakao'
+  const share = useCallback(async (): Promise<ShareOutcome | "kakao" | null> => {
+    if (!meta) return null;
     setBusy(true);
     setNotice(null);
     try {
       if (isKakaoInApp(navigator.userAgent) && (await shareKakao(meta))) {
         track("share_click", { test_name: meta.testName, method: "kakao" });
-        return;
+        return "kakao";
       }
       track("share_click", { test_name: meta.testName, method: "link" });
       const out = await shareResult({ file: null, title: meta.title, text: meta.text, url: meta.url });
       if (out === "copied") setNotice(SHARE_NOTICE.copied);
       if (out === "failed") setNotice(SHARE_NOTICE.failed);
+      return out;
     } finally {
       setBusy(false);
     }

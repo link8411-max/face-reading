@@ -8,7 +8,8 @@ import BujeokCard from './BujeokCard'
 import { useWallpaperSave } from './useWallpaperSave'
 import { useNameHash } from './useNameHash'
 import { track } from '@/lib/analytics'
-import { giftHeadline, mineHeadline } from '@/lib/bujeok/link'
+import { addToBox } from '@/lib/bujeok/box'
+import { bujeokCode, giftHeadline, mineHeadline, parseNameHash } from '@/lib/bujeok/link'
 import type { BujeokSpec } from '@/lib/bujeok/keys'
 import { WISH_TEXT } from '@/content/bujeok'
 
@@ -25,6 +26,13 @@ export default function GiftLanding({ spec, mine = false, ad }: { spec: BujeokSp
   useEffect(() => {
     track('shared_landing', { test_name: 'bujeok', result_id: `${spec.style}_${spec.wish}` })
   }, [spec.style, spec.wish])
+
+  // 받은 선물은 부적함에 남긴다(이름은 이 기기 안에만). 내 부적 링크(me=1)는 남의 것일 수 있어 저장하지 않는다
+  useEffect(() => {
+    if (mine) return
+    const n = parseNameHash(window.location.hash)
+    addToBox({ code: bujeokCode(spec), to: n.to, from: n.from, kind: 'received' })
+  }, [mine, spec])
 
   return (
     <main className="mx-auto px-[22px] max-w-lg pt-8 pb-10 min-h-screen bg-paper text-ink">
@@ -51,23 +59,33 @@ export default function GiftLanding({ spec, mine = false, ad }: { spec: BujeokSp
               {saving ? '이미지 만드는 중…' : '잠금화면용 저장'}
             </button>
             {saveNotice && <p role="status" className="mt-2 text-xs text-center text-muted">{saveNotice}</p>}
-            {mine ? (
-              <div className="grid grid-cols-1 gap-2 mt-2">
-                <Link href={`/bujeok?mode=gift&style=${spec.style}&finish=${spec.finish}`} className={pill}>
-                  <Icon name="heart" size={16} />
-                  선물 보내기
-                </Link>
-              </div>
-            ) : (
             <div className="grid grid-cols-2 gap-2 mt-2">
-              <Link href={`/bujeok?mode=gift&style=${spec.style}&finish=${spec.finish}`} className={pill}>
-                <Icon name="heart" size={16} />
-                나도 보내기
-              </Link>
-              <Link href={`/bujeok?wish=${spec.wish}&style=${spec.style}&finish=${spec.finish}`} className={pill}>
-                내 부적 만들기
-              </Link>
+              {mine ? (
+                <>
+                  <Link href="/bujeok/box" className={pill}>
+                    내 부적함
+                  </Link>
+                  <Link href={`/bujeok?mode=gift&style=${spec.style}&finish=${spec.finish}`} className={pill}>
+                    <Icon name="heart" size={16} />
+                    선물 보내기
+                  </Link>
+                </>
+              ) : (
+                <>
+                  <Link href={`/bujeok?mode=gift&style=${spec.style}&finish=${spec.finish}`} className={pill}>
+                    <Icon name="heart" size={16} />
+                    나도 보내기
+                  </Link>
+                  <Link href={`/bujeok?wish=${spec.wish}&style=${spec.style}&finish=${spec.finish}`} className={pill}>
+                    내 부적 만들기
+                  </Link>
+                </>
+              )}
             </div>
+            {!mine && (
+              <Link href="/bujeok/box" className={`mt-2 ${pill}`}>
+                내 부적함
+              </Link>
             )}
           </div>
         </div>

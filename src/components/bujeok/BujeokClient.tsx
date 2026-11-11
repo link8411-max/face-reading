@@ -1,18 +1,21 @@
 'use client'
 // /bujeok 화면: form → done. 완성 화면에서 카드가 돌며 나타난다(손으로 돌려 볼 수 있다). 서버 호출 없이 브라우저에서 만들고 저장한다.
 import { useEffect, useRef, useState } from 'react'
+import Link from 'next/link'
 import { useBackOrHome } from '@/hooks/useBackOrHome'
 import TestHeader from '@/components/test/TestHeader'
 import BujeokForm, { type FormValues } from './BujeokForm'
 import BujeokCard from './BujeokCard'
 import BujeokDone from './BujeokDone'
 import BujeokAd from './BujeokAd'
+import { useBox } from './useBox'
 import type { WeeklyHigh } from '@/lib/zipsise/banner'
 import { track } from '@/lib/analytics'
 import { validateBirthDate } from '@/lib/birthDate'
 import { elementFromBirth, randomVariant } from '@/lib/bujeok/compose'
 import { takeHandedBirth } from '@/lib/bujeok/birthHandoff'
-import { cleanName } from '@/lib/bujeok/link'
+import { addToBox, removeFromBox } from '@/lib/bujeok/box'
+import { bujeokCode, bujeokMineUrl, cleanName } from '@/lib/bujeok/link'
 import { FINISH_DEFAULT, VARIANTS, WISH_DEFAULT_EL, type BujeokSpec, type BujeokStyle, type Finish, type Wish } from '@/lib/bujeok/keys'
 
 export type Mode = 'mine' | 'gift'
@@ -48,6 +51,9 @@ export default function BujeokClient({ initial, high = null }: { initial?: Initi
   const [playKey, setPlayKey] = useState(0)
   const [failText, setFailText] = useState<string | null>(null)
   const panel = useRef<HTMLDivElement>(null)
+  const boxCount = useBox()?.length ?? 0
+  const savedMine = useRef<{ code: string; to: string | null } | null>(null)
+  const origUrl = useRef<string | null>(null)
 
   const { wish, style, finish, birth, isLunar, isLeap } = values
   const anyBirth = !!(birth.year || birth.month || birth.day)
@@ -107,6 +113,29 @@ export default function BujeokClient({ initial, high = null }: { initial?: Initi
   }
 
   const inRun = phase === 'done' && spec
+  const mineRun = inRun && !gift
+
+  // 내 부적이 완성되면: 부적함(mine)에 남기고, 주소를 내 부적 링크로 바꿔(새로고침·"다른 브라우저로 열기"로도 같은 카드가 열리게) 한다.
+  // 다시 만들기로 카드가 바뀌면 이번 화면에서 남긴 이전 항목을 새 항목으로 바꾼다(연타해도 부적함이 불어나지 않게).
+  // 생년월일은 주소·저장소에 넣지 않는다(코드에는 기운만 있다). 이름은 # 뒤.
+  useEffect(() => {
+    if (!mineRun || !spec) return
+    const code = bujeokCode(spec)
+    const prev = savedMine.current
+    if (prev && prev.code !== code) removeFromBox({ code: prev.code, to: prev.to, from: null, kind: 'mine' })
+    addToBox({ code, to: madeName, from: null, kind: 'mine' })
+    savedMine.current = { code, to: madeName }
+    if (origUrl.current === null) origUrl.current = window.location.pathname + window.location.search
+    const u = new URL(bujeokMineUrl(spec, madeName))
+    window.history.replaceState(window.history.state, '', u.pathname + u.search + u.hash)
+  }, [mineRun, spec, madeName])
+  // 시작 화면으로 돌아가면 주소도 처음으로 되돌린다
+  useEffect(() => {
+    if (mineRun || origUrl.current === null) return
+    window.history.replaceState(window.history.state, '', origUrl.current)
+    origUrl.current = null
+    savedMine.current = null
+  }, [mineRun])
   // 폼 아래쪽에서 눌러도 카드가 화면에 들어오게 한다(다시 만들기도 같다)
   useEffect(() => {
     if (inRun) panel.current?.scrollIntoView?.({ block: 'nearest' })
@@ -121,10 +150,17 @@ export default function BujeokClient({ initial, high = null }: { initial?: Initi
             <div ref={panel} className="mx-auto max-w-[420px]">
               <BujeokCard spec={spec} name={madeName} from={madeFrom} enter playKey={playKey} />
             </div>
-            <BujeokDone spec={spec} getSvg={() => panel.current?.querySelector('[data-bujeok-art] svg') ?? null} onRetry={retry} gift={gift && madeName ? { to: madeName, from: madeFrom } : undefined} ad={<BujeokAd wish={spec.wish} high={high} />} />
+            <BujeokDone spec={spec} getSvg={() => panel.current?.querySelector('[data-bujeok-art] svg') ?? null} onRetry={retry} gift={gift && madeName ? { to: madeName, from: madeFrom } : undefined} mineName={madeName} ad={<BujeokAd wish={spec.wish} high={high} />} />
           </div>
         ) : (
           <>
+            {boxCount > 0 && (
+              <div className="text-right">
+                <Link href="/bujeok/box" className="text-sm text-muted underline underline-offset-2">
+                  내 부적함 ({boxCount})
+                </Link>
+              </div>
+            )}
             <BujeokForm values={values} onChange={onValues} mode={mode} onModeChange={setMode} birthError={birthError} nameError={nameError} fromError={fromError} canSubmit={canSubmit} onSubmit={start} />
             {failText && <p role="alert" className="mt-3 text-sm text-center text-accent">{failText}</p>}
           </>

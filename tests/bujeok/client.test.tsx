@@ -6,15 +6,27 @@ vi.mock('next/navigation', () => ({ useRouter: () => ({ push: vi.fn() }) }))
 const track = vi.fn()
 vi.mock('@/lib/analytics', () => ({ track: (...a: unknown[]) => track(...a) }))
 
+import { installStorage, restoreStorage } from '../exam/storageStub'
+import { addToBox, loadBox } from '@/lib/bujeok/box'
+import { bujeokCode, parseBujeokCode } from '@/lib/bujeok/link'
 import BujeokClient from '@/components/bujeok/BujeokClient'
 import { handOffBirth } from '@/lib/bujeok/birthHandoff'
 import { EL_TEXT } from '@/content/bujeok'
 
+const shareResult = vi.fn<(...a: unknown[]) => Promise<string>>(async () => 'shared_link')
+vi.mock('@/lib/share', () => ({ shareResult: (...a: unknown[]) => shareResult(...a), SHARE_NOTICE: { copied: '복사했어요', failed: '실패' } }))
+
 beforeEach(() => {
+  installStorage()
+  shareResult.mockClear()
+  window.history.replaceState(null, '', '/')
   track.mockClear()
   window.matchMedia = ((q: string) => ({ matches: q.includes('reduce'), media: q, addEventListener() {}, removeEventListener() {}, addListener() {}, removeListener() {}, onchange: null, dispatchEvent: () => false })) as unknown as typeof window.matchMedia
 })
-afterEach(cleanup)
+afterEach(() => {
+  cleanup()
+  restoreStorage()
+})
 
 const make = () => screen.getByRole('button', { name: '부적 만들기' })
 const pick = (name: string) => fireEvent.click(screen.getByRole('radio', { name }))
@@ -137,4 +149,93 @@ test('initial의 소원·화풍이 미리 골라져 있다', () => {
   render(<BujeokClient initial={{ wish: 'love', style: 'cute' }} />)
   expect(screen.getByRole('radio', { name: '연애' }).getAttribute('aria-checked')).toBe('true')
   expect(screen.getByRole('radio', { name: '귀여운' }).getAttribute('aria-checked')).toBe('true')
+})
+
+// --- 내 부적 링크와 부적함 ---
+const makeMine = async (name?: string) => {
+  render(<BujeokClient />)
+  pick('재물')
+  pick('전통')
+  if (name) type('이름', name)
+  fireEvent.click(make())
+  await screen.findByRole('button', { name: '다시 만들기' })
+}
+
+test('내 부적을 만들면 부적함(mine)에 저장하고 주소를 /bujeok/r/<코드>?me=1#to=…로 바꾼다', async () => {
+  await makeMine('민지')
+  const items = loadBox()!
+  expect(items).toMatchObject([{ to: '민지', from: null, kind: 'mine' }])
+  expect(window.location.pathname).toBe(`/bujeok/r/${items[0].code}`)
+  expect(window.location.search).toBe('?me=1')
+  expect(window.location.hash).toBe('#to=%EB%AF%BC%EC%A7%80')
+  expect(parseBujeokCode(items[0].code)).toMatchObject({ style: 'trad', wish: 'money' })
+  expect(JSON.stringify(items)).not.toMatch(/birth|year/)
+})
+
+test('이름이 없으면 해시도 없다. 생년월일은 주소·저장소 어디에도 없다', async () => {
+  render(<BujeokClient />)
+  pick('재물')
+  pick('전통')
+  type('년도', '1990')
+  type('월', '5')
+  type('일', '15')
+  fireEvent.click(make())
+  await screen.findByRole('button', { name: '다시 만들기' })
+  expect(window.location.hash).toBe('')
+  expect(window.location.href).not.toMatch(/1990/)
+  expect(JSON.stringify(loadBox())).not.toMatch(/1990/)
+})
+
+test('다시 만들기는 바뀐 카드 주소로 갱신하고, 부적함의 이전 항목을 새 항목으로 바꾼다', async () => {
+  await makeMine()
+  const before = loadBox()![0].code
+  fireEvent.click(screen.getByRole('button', { name: '다시 만들기' }))
+  await screen.findByRole('button', { name: '다시 만들기' })
+  const after = loadBox()!
+  expect(after.length).toBe(1)
+  expect(after[0].code).not.toBe(before)
+  expect(window.location.pathname).toBe(`/bujeok/r/${after[0].code}`)
+})
+
+test('완성 화면에 "내 부적 링크 보내기"(내 부적 주소 공유)와 "내 부적함" 링크가 있다', async () => {
+  await makeMine('민지')
+  expect(screen.getByRole('link', { name: '내 부적함' }).getAttribute('href')).toBe('/bujeok/box')
+  fireEvent.click(screen.getByRole('button', { name: '내 부적 링크 보내기' }))
+  await waitFor(() => expect(shareResult).toHaveBeenCalledTimes(1))
+  const arg = shareResult.mock.calls[0][0] as { url: string; text: string }
+  const code = loadBox()![0].code
+  expect(arg.url).toBe(`https://unse-ai.com/bujeok/r/${code}?me=1#to=%EB%AF%BC%EC%A7%80`)
+  expect(arg.text).toBe('언제든 다시 열어 볼 수 있어요')
+  expect(bujeokCode(parseBujeokCode(code)!)).toBe(code)
+})
+
+test('다시하기(돌아가기)로 폼에 돌아가면 주소를 시작 화면으로 되돌린다', async () => {
+  await makeMine('민지')
+  fireEvent.click(screen.getByRole('button', { name: '다시하기' }))
+  expect(window.location.pathname).toBe('/')
+  expect(window.location.search).toBe('')
+  expect(window.location.hash).toBe('')
+})
+
+test('선물 모드 완성 화면은 주소를 바꾸지 않고 부적함(mine)에도 넣지 않는다', async () => {
+  render(<BujeokClient initial={{ mode: 'gift' }} />)
+  pick('연애')
+  pick('귀여운')
+  type('받는 사람 이름', '민지')
+  fireEvent.click(make())
+  await screen.findByTestId('bujeok-card')
+  expect(window.location.pathname).toBe('/')
+  expect(loadBox()).toEqual([])
+  expect(screen.getByRole('link', { name: '내 부적함' }).getAttribute('href')).toBe('/bujeok/box')
+})
+
+test('시작 화면의 "내 부적함 (N)"은 부적함에 하나라도 있을 때만 보인다', async () => {
+  const { unmount } = render(<BujeokClient />)
+  expect(screen.queryByRole('link', { name: /내 부적함/ })).toBeNull()
+  unmount()
+  addToBox({ code: 'trad-money-metal-1-gold', to: null, from: null, kind: 'mine' })
+  addToBox({ code: 'cute-love-fire-2-holo', to: '철수', from: null, kind: 'received' })
+  render(<BujeokClient />)
+  const link = await screen.findByRole('link', { name: '내 부적함 (2)' })
+  expect(link.getAttribute('href')).toBe('/bujeok/box')
 })

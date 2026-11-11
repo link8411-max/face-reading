@@ -17,6 +17,8 @@ import BujeokClient from '@/components/bujeok/BujeokClient'
 import GiftLanding from '@/components/bujeok/GiftLanding'
 import BujeokPage from '@/app/bujeok/page'
 import GiftPage, { generateMetadata } from '@/app/bujeok/r/[code]/page'
+import { breakStorageAccess, installStorage, restoreStorage } from '../exam/storageStub'
+import { loadBox } from '@/lib/bujeok/box'
 import { kakaoFeed } from '@/lib/kakao'
 import { bujeokCode, bujeokGiftUrl, parseBujeokCode } from '@/lib/bujeok/link'
 import type { BujeokSpec } from '@/lib/bujeok/keys'
@@ -24,12 +26,16 @@ import type { BujeokSpec } from '@/lib/bujeok/keys'
 const spec: BujeokSpec = { style: 'trad', wish: 'money', el: 'metal', variant: 1, finish: 'gold' }
 
 beforeEach(() => {
+  installStorage()
   track.mockClear()
   shareResult.mockClear()
   window.location.hash = ''
   window.matchMedia = ((q: string) => ({ matches: q.includes('reduce'), media: q, addEventListener() {}, removeEventListener() {}, addListener() {}, removeListener() {}, onchange: null, dispatchEvent: () => false })) as unknown as typeof window.matchMedia
 })
-afterEach(cleanup)
+afterEach(() => {
+  cleanup()
+  restoreStorage()
+})
 
 const make = () => screen.getByRole('button', { name: '부적 만들기' }) as HTMLButtonElement
 const pick = (name: string) => fireEvent.click(screen.getByRole('radio', { name }))
@@ -146,6 +152,76 @@ test('착지: shared_landing 이벤트는 result_id `<화풍>_<소원>`이고 �
   render(<GiftLanding spec={spec} />)
   expect(track).toHaveBeenCalledWith('shared_landing', { test_name: 'bujeok', result_id: 'trad_money' })
   expect(JSON.stringify(track.mock.calls)).not.toMatch(/민지|철수/)
+})
+
+// --- 부적함 저장 / 내 부적 착지 ---
+test('받은 선물 착지를 열면 부적함에 received로 한 번만 저장된다 (이름은 해시에서)', () => {
+  setHash(H('민지', '철수'))
+  const { unmount } = render(<GiftLanding spec={spec} />)
+  expect(loadBox()).toMatchObject([{ code: bujeokCode(spec), to: '민지', from: '철수', kind: 'received' }])
+  unmount()
+  render(<GiftLanding spec={spec} />)
+  expect(loadBox()!.length).toBe(1) // 같은 링크를 다시 열어도 한 번만
+})
+
+test('이름이 잘못된 선물도 이름 없이 저장하고, 저장소를 못 써도 착지는 정상', () => {
+  setHash(H('민지😀'))
+  render(<GiftLanding spec={spec} />)
+  expect(loadBox()).toMatchObject([{ to: null, from: null, kind: 'received' }])
+  cleanup()
+  breakStorageAccess()
+  render(<GiftLanding spec={spec} />)
+  expect(screen.getByRole('button', { name: '열어 보기' })).toBeTruthy()
+})
+
+test('내 부적 착지(me=1): 열어 보기 없이 바로 카드, "○○님의 부적", 버튼은 저장 · 내 부적함 · 선물 보내기, 부적함에는 저장하지 않는다', () => {
+  setHash(H('민지'))
+  render(<GiftLanding spec={spec} mine />)
+  expect(screen.getByRole('heading', { level: 1 }).textContent).toBe('민지님의 부적')
+  expect(screen.queryByRole('button', { name: '열어 보기' })).toBeNull()
+  expect(screen.getByTestId('bujeok-card')).toBeTruthy()
+  expect(screen.getByRole('button', { name: '잠금화면용 저장' })).toBeTruthy()
+  expect(screen.getByRole('link', { name: '내 부적함' }).getAttribute('href')).toBe('/bujeok/box')
+  expect(screen.getByRole('link', { name: '선물 보내기' }).getAttribute('href')).toBe('/bujeok?mode=gift&style=trad&finish=gold')
+  expect(screen.queryByRole('link', { name: '나도 보내기' })).toBeNull()
+  expect(loadBox()).toEqual([])
+})
+
+test('내 부적 착지: 이름이 없으면 "나의 부적"', () => {
+  render(<GiftLanding spec={spec} mine />)
+  expect(screen.getByRole('heading', { level: 1 }).textContent).toBe('나의 부적')
+})
+
+test('선물 착지에도 내 부적함 버튼이 있다', () => {
+  render(<GiftLanding spec={spec} />)
+  fireEvent.click(screen.getByRole('button', { name: '열어 보기' }))
+  expect(screen.getByRole('link', { name: '내 부적함' }).getAttribute('href')).toBe('/bujeok/box')
+})
+
+test('선물 보내기: 공유가 끝났거나 링크를 복사했을 때만 sent로 저장, 취소·실패는 저장 안 함', async () => {
+  const go = async (outcome: string) => {
+    shareResult.mockResolvedValueOnce(outcome)
+    const { unmount } = render(<BujeokClient initial={{ mode: 'gift' }} />)
+    pick('연애')
+    pick('귀여운')
+    type('받는 사람 이름', '민지')
+    type('보내는 사람 이름', '철수')
+    fireEvent.click(make())
+    await screen.findByTestId('bujeok-card')
+    fireEvent.click(screen.getByRole('button', { name: '선물 보내기' }))
+    await waitFor(() => expect(shareResult).toHaveBeenCalled())
+    await act(async () => {})
+    unmount()
+  }
+  await go('cancelled')
+  await go('failed')
+  expect(loadBox()).toEqual([])
+  await go('shared_link')
+  expect(loadBox()).toMatchObject([{ to: '민지', from: '철수', kind: 'sent' }])
+  expect(JSON.stringify(track.mock.calls)).not.toMatch(/민지|철수/)
+  localStorage.clear()
+  await go('copied')
+  expect(loadBox()).toMatchObject([{ to: '민지', kind: 'sent' }])
 })
 
 // --- 서버 페이지 ---
