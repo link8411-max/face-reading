@@ -41,8 +41,18 @@ const skipRite = () => {
   const b = screen.queryByRole('button', { name: '그냥 완성하기' })
   if (b) fireEvent.click(b)
 }
-const make = () => screen.getByRole('button', { name: '부적 만들기' }) as HTMLButtonElement
-const pick = (name: string) => fireEvent.click(screen.getByRole('radio', { name }))
+const make = () => screen.getByRole('button', { name: /이 부적 (받기|선물하기)/ }) as HTMLButtonElement
+const open = (name: RegExp) => {
+  const b = screen.getByRole('button', { name })
+  if (b.getAttribute('aria-expanded') !== 'true') fireEvent.click(b)
+}
+const STYLE_FINISH = ['전통', '귀여운', '종이', '금박', '홀로그램']
+const pick = (name: string) => {
+  if (STYLE_FINISH.includes(name)) {
+    open(/그림 바꾸기/)
+    fireEvent.click(screen.getByRole('radio', { name }))
+  } else fireEvent.click(screen.getByRole('button', { name }))
+}
 const type = (label: string, value: string) => fireEvent.change(screen.getByLabelText(label), { target: { value } })
 
 // --- 선물 모드 폼 ---
@@ -74,14 +84,16 @@ test('선물 모드: 보내는 사람 이름은 선택이지만 틀린 이름이
 
 test('내 부적 모드와 선물 모드를 폼에서 바꿀 수 있다', () => {
   render(<BujeokClient />)
+  open(/내 사주로 맞추기/)
   expect(screen.getByLabelText('년도')).toBeTruthy()
-  fireEvent.click(screen.getByRole('radio', { name: '선물 보내기' }))
+  fireEvent.click(screen.getByRole('radio', { name: '선물하기' }))
   expect(screen.queryByLabelText('년도')).toBeNull()
   expect(screen.getByLabelText('받는 사람 이름')).toBeTruthy()
 })
 
 test('initial.finish가 마감을 미리 고른다', () => {
   render(<BujeokClient initial={{ finish: 'holo' }} />)
+  open(/그림 바꾸기/)
   expect(screen.getByRole('radio', { name: '홀로그램' }).getAttribute('aria-checked')).toBe('true')
 })
 
@@ -248,14 +260,16 @@ const q = (o: Record<string, string>) => Promise.resolve(o)
 const props = (code: string, o: Record<string, string> = {}) => ({ params: Promise.resolve({ code }), searchParams: q(o) })
 type El = { props: { spec: BujeokSpec; mine?: boolean; to?: unknown; from?: unknown } }
 
+const unwrap = (el: unknown) => (el as { props: { children: El } }).props.children
+
 test('착지 페이지: 쿼리의 to·from은 무시하고, me=1이면 mine', async () => {
   const code = bujeokCode(spec)
-  const r = (await GiftPage(props(code, { to: '민지', from: '철수' }))) as unknown as El
+  const r = unwrap(await GiftPage(props(code, { to: '민지', from: '철수' })))
   expect(r.props.spec).toEqual(spec)
   expect(r.props.to).toBeUndefined()
   expect(r.props.from).toBeUndefined()
   expect(r.props.mine).toBeFalsy()
-  const mine = (await GiftPage(props(code, { me: '1' }))) as unknown as El
+  const mine = unwrap(await GiftPage(props(code, { me: '1' })))
   expect(mine.props.mine).toBe(true)
 })
 
@@ -266,10 +280,10 @@ test('착지 페이지: 잘못된 코드는 /bujeok 으로 redirect', async () =
 })
 
 test('착지 페이지: 옛 5칸 코드는 그대로 열리고 6칸(획) 코드는 획을 달고 열린다', async () => {
-  const old = (await GiftPage(props('trad-pass-wood-0-gold', {}))) as unknown as El
+  const old = unwrap(await GiftPage(props('trad-pass-wood-0-gold', {})))
   expect(old.props.spec.stroke).toBeUndefined()
   const s6 = 's' + '5a'.repeat(12)
-  const r = (await GiftPage(props(`trad-pass-wood-0-gold-${s6}`, {}))) as unknown as El
+  const r = unwrap(await GiftPage(props(`trad-pass-wood-0-gold-${s6}`, {})))
   expect(r.props.spec.stroke).toBe(s6)
 })
 

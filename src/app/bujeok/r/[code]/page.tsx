@@ -41,5 +41,9 @@ export default async function BujeokGiftPage({ params, searchParams }: Props) {
   if (!spec) redirect('/bujeok')
   const q = await searchParams
   const high = await fetchWeeklyHigh()
-  return <GiftLanding spec={spec} mine={one(q.me) === '1'} ad={<BujeokAd wish={spec.wish} high={high} />} />
+  return (
+    <div className="bj-dark">
+      <GiftLanding spec={spec} mine={one(q.me) === '1'} ad={<BujeokAd wish={spec.wish} high={high} />} />
+    </div>
+  )
 }

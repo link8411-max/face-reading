@@ -45,11 +45,11 @@ export default async function BujeokPage({ searchParams }: { searchParams: Promi
   // 쿼리가 바뀌어 같은 페이지로 이동하면(선물하기 등) 입력 상태를 새로 시작한다
   const high = await fetchWeeklyHigh() // 1시간 캐시, 실패하면 null(쿠팡 배너로 대신)
   return (
-    <>
+    <div className="bj-dark">
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }} />
       <BujeokClient key={JSON.stringify(initial)} initial={initial} high={high} />
       <PageGuide route="/bujeok" />
-    </>
+    </div>
   )
 }

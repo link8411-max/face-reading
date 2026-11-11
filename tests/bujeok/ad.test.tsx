@@ -102,9 +102,8 @@ test('착지: 열기 전에는 광고가 없고, 연 뒤 카드 아래(버튼 �
 test('완성 화면: 광고는 카드 아래에 있다. 폼 단계에는 없다', async () => {
   render(<BujeokClient high={high} />)
   expect(screen.queryByText('이번 주 신고가')).toBeNull()
-  fireEvent.click(screen.getByRole('radio', { name: '재물' }))
-  fireEvent.click(screen.getByRole('radio', { name: '전통' }))
-  fireEvent.click(screen.getByRole('button', { name: '부적 만들기' }))
+  fireEvent.click(screen.getByRole('button', { name: '재물' }))
+  fireEvent.click(screen.getByRole('button', { name: '이 부적 받기' }))
   fireEvent.click(screen.getByRole('button', { name: '그냥 완성하기' }))
   const card = await screen.findByTestId('bujeok-card')
   const ad = screen.getByText('이번 주 신고가')
@@ -114,9 +113,8 @@ test('완성 화면: 광고는 카드 아래에 있다. 폼 단계에는 없다'
 
 test('완성 화면: 소원이 합격이면 high가 있어도 쿠팡 배너', async () => {
   render(<BujeokClient high={high} />)
-  fireEvent.click(screen.getByRole('radio', { name: '합격' }))
-  fireEvent.click(screen.getByRole('radio', { name: '전통' }))
-  fireEvent.click(screen.getByRole('button', { name: '부적 만들기' }))
+  fireEvent.click(screen.getByRole('button', { name: '합격' }))
+  fireEvent.click(screen.getByRole('button', { name: '이 부적 받기' }))
   fireEvent.click(screen.getByRole('button', { name: '그냥 완성하기' }))
   await screen.findByTestId('bujeok-card')
   expect(screen.queryByText('이번 주 신고가')).toBeNull()

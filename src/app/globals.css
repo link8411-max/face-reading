@@ -323,6 +323,44 @@
 @keyframes bujeok-tw { 0%, 100% { opacity: .55; } 50% { opacity: 1; } }
 
 /* 부적 입체 카드 (BujeokCard): 어두운 중성색 무대, 붉은 기운 없음 */
+/* 부적 먹빛 바탕(시안 A "먹빛 가게"): /bujeok 만들기·완성·선물 착지. 토큰을 어두운 값으로 바꿔 아래 모든 글씨·테두리·상자가 따라온다. 부적함은 쓰지 않는다 */
+.bj-dark {
+  --color-paper: #15110D;
+  --color-ink: #EADFC8;
+  --color-muted: #B9AC94;
+  --color-line: #3A2F22;
+  --color-card: #1C1712;
+  --color-card-2: #241D16;
+  --color-accent: #F2B08A;
+  min-height: 100vh;
+  color: #EADFC8;
+  background: radial-gradient(120% 60% at 50% 18%, #2A2219 0%, #15110D 55%, #0E0B09 100%) top / 100% 100vh no-repeat, #0E0B09;
+}
+.bj-dark .bg-white { background-color: #1C1712; }
+.bj-dark .bg-ink.text-paper { background-color: #E9C46A; color: #17140F; }
+.bj-dark input { color-scheme: dark; }
+.bj-top { display: flex; justify-content: space-between; align-items: center; margin-top: 2px; font-size: 14px; }
+.bj-seg { display: inline-flex; border-radius: 999px; padding: 3px; font-size: 13px; background: #241D16; border: 1px solid #3A2F22; }
+.bj-seg button { min-height: 36px; padding: 0 14px; border-radius: 999px; color: #EADFC8; }
+.bj-seg button[aria-checked='true'] { background: #E9C46A; color: #17140F; font-weight: 700; }
+.bj-hero { position: relative; isolation: isolate; margin: 14px auto 0; width: 64%; max-width: 300px; perspective: 900px; }
+.bj-hero svg { width: 100%; height: auto; display: block; transform-origin: 50% 50%; }
+.bj-hero-glow { position: absolute; inset: 8% -18% -6%; border-radius: 50%; filter: blur(28px); z-index: -1; background: radial-gradient(#E9C46A55, transparent 70%); }
+@media (prefers-reduced-motion: no-preference) { .bj-hero svg { animation: bj-sway 6s ease-in-out infinite; } }
+@keyframes bj-sway { 0%, 100% { transform: rotateY(-14deg); } 50% { transform: rotateY(14deg); } }
+.bj-cta { display: block; width: 100%; height: 54px; margin-top: 16px; border: 0; border-radius: 999px; font-weight: 700; font-size: 16px; background: linear-gradient(90deg, #C9963A, #F3D88C 50%, #C9963A); color: #17140F; }
+.bj-cta:disabled { opacity: .45; }
+.bj-cta:focus-visible, .bj-tile:focus-visible, .bj-fold:focus-visible, .bj-seg button:focus-visible { outline: 2px solid #F3D88C; outline-offset: 2px; }
+.bj-tiles { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px 8px; }
+.bj-tile { text-align: center; font-size: 12px; border-radius: 12px; padding: 7px 4px 6px; background: #1C1712; border: 1px solid #2E261C; color: #CDBF9F; }
+.bj-tile[aria-pressed='true'] { border-color: #E9C46A; color: #F3D88C; box-shadow: 0 0 0 1px #E9C46A inset; }
+.bj-tile svg { width: 100%; height: auto; display: block; border-radius: 4px; }
+.bj-tile b { display: block; margin-top: 5px; font-weight: 400; }
+.bj-fold { display: flex; width: 100%; justify-content: space-between; align-items: center; min-height: 50px; padding: 0 16px; border-radius: 14px; margin-top: 10px; font-size: 14px; background: #1C1712; border: 1px solid #2E261C; color: #D9C9A8; text-align: left; }
+.bj-fold-body { margin-top: 6px; padding: 16px; border-radius: 14px; background: #1C1712; border: 1px solid #2E261C; }
+.bj-linkrow { margin-top: 16px; text-align: center; font-size: 13px; color: #B9AC94; }
+.bj-linkrow a, .bj-linkrow button { display: inline-flex; align-items: center; min-height: 44px; padding: 0 8px; color: #D9C9A8; text-decoration: underline; text-underline-offset: 3px; }
+.bj-linkrow a:focus-visible, .bj-linkrow button:focus-visible { outline: 2px solid #F3D88C; outline-offset: 2px; border-radius: 6px; }
 .bj-stage { position: relative; width: 100%; height: clamp(400px, 62vh, 560px); display: grid; place-items: center; overflow: hidden; border-radius: 28px; cursor: grab; user-select: none; -webkit-user-select: none; background: radial-gradient(90% 60% at 50% 38%, #2b2620 0%, #0f0b0a 70%), #0f0b0a; }
 .bj-stage:active { cursor: grabbing; }
 .bj-stage:focus-visible { outline: 2px solid #e9c46a; outline-offset: 2px; }
@@ -358,7 +396,7 @@
 .bj-rite-seal:focus-visible { outline: 2px solid #e9c46a; outline-offset: 2px; }
 .bj-rite-say { min-height: 52px; margin: 14px 14px 0; color: #ede3cf; font-size: 16px; line-height: 1.5; }
 .bj-rite-say small { display: block; color: #b9ae97; font-size: 13px; }
-.bj-rite-skip { margin: 12px auto 0; display: flex; align-items: center; justify-content: center; height: 48px; padding: 0 24px; border-radius: 999px; border: 1px solid #d8cfc2; background: transparent; color: #6b6259; font-size: 14px; cursor: pointer; }
+.bj-rite-skip { margin: 12px auto 0; display: flex; align-items: center; justify-content: center; height: 48px; padding: 0 24px; border-radius: 999px; border: 1px solid #5a4b37; background: transparent; color: #d9c9a8; font-size: 14px; cursor: pointer; }
 .bj-rite-glow { position: absolute; inset: -20%; pointer-events: none; background: radial-gradient(circle at 50% 88%, rgba(255, 214, 120, .75), rgba(255, 190, 80, .18) 35%, transparent 65%); opacity: 0; }
 @media (prefers-reduced-motion: no-preference) {
   .bj-rite-dot { animation: bj-rite-pulse 1.2s ease-in-out infinite; transform-box: fill-box; transform-origin: center; }

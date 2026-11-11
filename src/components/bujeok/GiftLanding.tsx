@@ -36,7 +36,7 @@ export default function GiftLanding({ spec, mine = false, ad }: { spec: BujeokSp
   }, [mine, spec])
 
   return (
-    <main className="mx-auto px-[22px] max-w-lg pt-8 pb-10 min-h-screen bg-paper text-ink">
+    <main className="mx-auto px-[22px] max-w-lg pt-8 pb-10 min-h-screen text-ink">
       {opened ? (
         <div>
           <h1 className="font-serif font-bold text-[24px] leading-[1.4] text-center break-keep">{headline}</h1>

@@ -1,7 +1,6 @@
 'use client'
 // /bujeok 화면: form → rite(마지막 한 획·도장) → done. 완성 화면에서 카드가 돌며 나타난다(손으로 돌려 볼 수 있다). 서버 호출 없이 브라우저에서 만들고 저장한다.
-import { useEffect, useRef, useState } from 'react'
-import Link from 'next/link'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import { useBackOrHome } from '@/hooks/useBackOrHome'
 import TestHeader from '@/components/test/TestHeader'
 import BujeokForm, { type FormValues } from './BujeokForm'
@@ -16,6 +15,7 @@ import { validateBirthDate } from '@/lib/birthDate'
 import { elementFromBirth, randomVariant } from '@/lib/bujeok/compose'
 import { takeHandedBirth } from '@/lib/bujeok/birthHandoff'
 import { addToBox, removeFromBox } from '@/lib/bujeok/box'
+import { seasonDefaultWish } from '@/lib/bujeok/season'
 import { bujeokCode, bujeokMineUrl, cleanName } from '@/lib/bujeok/link'
 import { FINISH_DEFAULT, VARIANTS, WISH_DEFAULT_EL, type BujeokSpec, type BujeokStyle, type Finish, type Wish } from '@/lib/bujeok/keys'
 
@@ -30,8 +30,8 @@ type Phase = 'form' | 'rite' | 'done'
 function initialValues(initial?: Initial): FormValues {
   const b = takeHandedBirth()
   return {
-    wish: initial?.wish ?? null,
-    style: initial?.style ?? null,
+    wish: initial?.wish ?? seasonDefaultWish(new Date()),
+    style: initial?.style ?? 'trad',
     finish: initial?.finish ?? FINISH_DEFAULT,
     birth: b ? { year: String(b.year), month: String(b.month), day: String(b.day) } : { year: '', month: '', day: '' },
     isLunar: b?.isLunar ?? false,
@@ -52,7 +52,9 @@ export default function BujeokClient({ initial, high = null }: { initial?: Initi
   const [playKey, setPlayKey] = useState(0)
   const [failText, setFailText] = useState<string | null>(null)
   const panel = useRef<HTMLDivElement>(null)
-  const boxCount = useBox()?.length ?? 0
+  const boxItems = useBox()
+  // 내 부적 N장 = 만든 것 + 받은 것(보낸 것은 따로 센다). 이 기기 저장 개수 그대로
+  const boxCount = (boxItems ?? []).filter((i) => i.kind !== 'sent').length
   const savedMine = useRef<{ code: string; to: string | null } | null>(null)
   const origUrl = useRef<string | null>(null)
 
@@ -69,9 +71,15 @@ export default function BujeokClient({ initial, high = null }: { initial?: Initi
   const rawFrom = values.from.trim()
   const fromOk = rawFrom === '' || cleanName(rawFrom) !== null
   const fromError = fromOk ? null : NAME_FAIL
-  const canSubmit = !!wish && !!style && !birthBlocked && nameOk && fromOk
+  const canSubmit = !birthBlocked && nameOk && fromOk
   // 선물 모드에서는 생년월일 칸이 없으므로 넘겨받은 값이 있어도 쓰지 않는다
   const useBirth = anyBirth && !gift
+  // 미리보기 기운: 생년월일이 맞게 들어 있으면 그 기운, 아니면(비었거나 계산 실패) 소원의 기본 기운. 만들 때 실패하면 아래 start()가 안내한다
+  const birthEl = useMemo(
+    () => (!useBirth || !dateCheck.ok ? null : elementFromBirth({ year: Number(birth.year), month: Number(birth.month), day: Number(birth.day), isLunar, isLeapMonth: isLunar && isLeap }, wish)),
+    [useBirth, dateCheck.ok, birth.year, birth.month, birth.day, isLunar, isLeap, wish],
+  )
+  const previewEl = birthEl ?? WISH_DEFAULT_EL[wish]
 
   const onValues = (next: FormValues) => {
     setFailText(null)
@@ -79,13 +87,10 @@ export default function BujeokClient({ initial, high = null }: { initial?: Initi
   }
 
   const start = () => {
-    if (!wish || !style || !canSubmit) return
+    if (!canSubmit) return
     let el = WISH_DEFAULT_EL[wish]
     if (useBirth) {
-      const r = elementFromBirth(
-        { year: Number(birth.year), month: Number(birth.month), day: Number(birth.day), isLunar, isLeapMonth: isLunar && isLeap },
-        wish,
-      )
+      const r = birthEl
       if (!r) {
         // 틀린 생년월일로 조용히 다른 부적을 주지 않는다
         setFailText(BIRTH_FAIL)
@@ -151,7 +156,7 @@ export default function BujeokClient({ initial, high = null }: { initial?: Initi
     if (inRun || phase === 'rite') panel.current?.scrollIntoView?.({ block: 'nearest' })
   }, [inRun, phase, playKey])
   return (
-    <div className="min-h-screen bg-paper text-ink">
+    <div className="text-ink">
       <main className="mx-auto px-[22px] max-w-lg pb-6">
         <TestHeader title="나만의 부적" onBack={() => (phase !== 'form' ? setPhase('form') : goBack())} backLabel={phase !== 'form' ? '다시하기' : '돌아가기'} />
 
@@ -169,14 +174,7 @@ export default function BujeokClient({ initial, high = null }: { initial?: Initi
           </div>
         ) : (
           <>
-            {boxCount > 0 && (
-              <div className="text-right">
-                <Link href="/bujeok/box" className="text-sm text-muted underline underline-offset-2">
-                  내 부적함 ({boxCount})
-                </Link>
-              </div>
-            )}
-            <BujeokForm values={values} onChange={onValues} mode={mode} onModeChange={setMode} birthError={birthError} nameError={nameError} fromError={fromError} canSubmit={canSubmit} onSubmit={start} />
+            <BujeokForm values={values} onChange={onValues} mode={mode} onModeChange={setMode} boxCount={boxCount} previewEl={previewEl} birthError={birthError} nameError={nameError} fromError={fromError} canSubmit={canSubmit} onSubmit={start} />
             {failText && <p role="alert" className="mt-3 text-sm text-center text-accent">{failText}</p>}
           </>
         )}

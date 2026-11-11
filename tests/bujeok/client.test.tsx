@@ -32,17 +32,74 @@ const skipRite = () => {
   const b = screen.queryByRole('button', { name: '그냥 완성하기' })
   if (b) fireEvent.click(b)
 }
-const make = () => screen.getByRole('button', { name: '부적 만들기' })
-const pick = (name: string) => fireEvent.click(screen.getByRole('radio', { name }))
-const type = (label: string, value: string) => fireEvent.change(screen.getByLabelText(label), { target: { value } })
+const make = () => screen.getByRole('button', { name: /이 부적 (받기|선물하기)/ })
+// 접힌 칸은 열어야 안의 칸이 보인다
+const open = (name: RegExp) => {
+  const b = screen.getByRole('button', { name })
+  if (b.getAttribute('aria-expanded') !== 'true') fireEvent.click(b)
+}
+const STYLE_FINISH = ['전통', '귀여운', '종이', '금박', '홀로그램']
+const pick = (name: string) => {
+  if (STYLE_FINISH.includes(name)) {
+    open(/그림 바꾸기/)
+    fireEvent.click(screen.getByRole('radio', { name }))
+  } else fireEvent.click(screen.getByRole('button', { name }))
+}
+const type = (label: string, value: string) => {
+  if (!['받는 사람 이름', '보내는 사람 이름'].includes(label)) open(/내 사주로 맞추기/)
+  fireEvent.change(screen.getByLabelText(label), { target: { value } })
+}
 
-test('소원·화풍을 고르기 전에는 만들기 버튼이 비활성', () => {
+test('처음부터 한 장이 완성돼 있다: 소원·화풍·마감이 이미 정해져 있고 큰 버튼이 켜져 있다', () => {
   render(<BujeokClient />)
-  expect((make() as HTMLButtonElement).disabled).toBe(true)
-  pick('재물')
-  expect((make() as HTMLButtonElement).disabled).toBe(true)
-  pick('전통')
   expect((make() as HTMLButtonElement).disabled).toBe(false)
+  expect(screen.getByTestId('bujeok-hero').querySelector('svg')).toBeTruthy()
+  // 지금 날짜가 수능 철이면 합격, 아니면 재물(seasonDefaultWish)
+  const title = screen.getByTestId('bujeok-wish-title').textContent
+  expect(['합격 부적', '재물 부적']).toContain(title)
+  expect(screen.getAllByRole('button', { pressed: true }).filter((b) => b.className.includes('bj-tile'))).toHaveLength(1)
+})
+
+test('소원 타일을 누르면 위의 큰 그림과 제목이 바뀐다', () => {
+  render(<BujeokClient />)
+  const before = screen.getByTestId('bujeok-hero').innerHTML
+  pick('건강')
+  expect(screen.getByTestId('bujeok-wish-title').textContent).toBe('건강 부적')
+  expect(screen.getByRole('button', { name: '건강' }).getAttribute('aria-pressed')).toBe('true')
+  expect(screen.getByTestId('bujeok-hero').innerHTML).not.toBe(before)
+})
+
+test('접힌 칸 둘은 처음에 닫혀 있고 누르면 열린다. 그림 바꾸기 칸에 지금 값이 보인다', () => {
+  render(<BujeokClient />)
+  const fold = screen.getByRole('button', { name: /그림 바꾸기/ })
+  expect(fold.getAttribute('aria-expanded')).toBe('false')
+  expect(fold.textContent).toContain('전통')
+  expect(fold.textContent).toContain('금박')
+  expect(screen.queryByLabelText('이름')).toBeNull()
+  expect(screen.getByRole('button', { name: /내 사주로 맞추기/ }).getAttribute('aria-expanded')).toBe('false')
+  fireEvent.click(screen.getByRole('button', { name: /내 사주로 맞추기/ }))
+  expect(screen.getByLabelText('이름')).toBeTruthy()
+})
+
+test('선물 모드는 받는 사람 이름 칸이 접히지 않고 보이며, 이름이 있어야 큰 버튼이 켜진다', () => {
+  render(<BujeokClient initial={{ mode: 'gift' }} />)
+  expect(screen.getByLabelText('받는 사람 이름')).toBeTruthy()
+  expect(screen.queryByRole('button', { name: /내 사주로 맞추기/ })).toBeNull()
+  expect(screen.getByRole('button', { name: '이 부적 선물하기' })).toBeTruthy()
+  expect((make() as HTMLButtonElement).disabled).toBe(true)
+  type('받는 사람 이름', '민지')
+  expect((make() as HTMLButtonElement).disabled).toBe(false)
+})
+
+test('생년월일로 맞춘 기운이 큰 그림 미리보기에 바로 반영된다(틀린 날짜면 기본 기운)', () => {
+  render(<BujeokClient initial={{ wish: 'money' }} />)
+  const base = screen.getByTestId('bujeok-hero').innerHTML
+  type('년도', '1990')
+  type('월', '5')
+  type('일', '15')
+  expect(screen.getByTestId('bujeok-hero').innerHTML).not.toBe('')
+  type('일', '45')
+  expect(screen.getByTestId('bujeok-hero').innerHTML).toBe(base)
 })
 
 test('생년월일 없이도 만들 수 있고 이때 기운은 WISH_DEFAULT_EL', async () => {
@@ -85,6 +142,7 @@ test('이름 칸은 선택이고, 넣은 이름이 cleanName을 통과하지 못
 
 test('마감은 필수 선택이고 기본은 금박이다', async () => {
   render(<BujeokClient />)
+  open(/그림 바꾸기/)
   expect(screen.getByRole('radio', { name: '금박' }).getAttribute('aria-checked')).toBe('true')
   expect(screen.getAllByRole('radio', { name: /종이|금박|홀로그램/ })).toHaveLength(3)
   pick('홀로그램')
@@ -158,7 +216,8 @@ test('result_view는 result_id가 `<화풍>_<소원>`이고 이름·생년이 �
 
 test('initial의 소원·화풍이 미리 골라져 있다', () => {
   render(<BujeokClient initial={{ wish: 'love', style: 'cute' }} />)
-  expect(screen.getByRole('radio', { name: '연애' }).getAttribute('aria-checked')).toBe('true')
+  expect(screen.getByRole('button', { name: '연애' }).getAttribute('aria-pressed')).toBe('true')
+  open(/그림 바꾸기/)
   expect(screen.getByRole('radio', { name: '귀여운' }).getAttribute('aria-checked')).toBe('true')
 })
 
@@ -243,31 +302,32 @@ test('선물 모드 완성 화면은 주소를 바꾸지 않고 부적함(mine)�
   expect(screen.getByRole('link', { name: '내 부적함' }).getAttribute('href')).toBe('/bujeok/box')
 })
 
-test('시작 화면의 "내 부적함 (N)"은 부적함에 하나라도 있을 때만 보인다', async () => {
+test('시작 화면의 "내 부적 N장"은 부적함에 만든 것·받은 것이 있을 때만 보이고 개수는 실제 저장 개수다(보낸 것은 세지 않음)', async () => {
   const { unmount } = render(<BujeokClient />)
-  expect(screen.queryByRole('link', { name: /내 부적함/ })).toBeNull()
+  expect(screen.queryByRole('link', { name: /내 부적/ })).toBeNull()
   unmount()
   addToBox({ code: 'trad-money-metal-1-gold', to: null, from: null, kind: 'mine' })
   addToBox({ code: 'cute-love-fire-2-holo', to: '철수', from: null, kind: 'received' })
   render(<BujeokClient />)
-  const link = await screen.findByRole('link', { name: '내 부적함 (2)' })
+  addToBox({ code: 'cute-love-fire-2-holo', to: '영희', from: null, kind: 'sent' })
+  const link = await screen.findByRole('link', { name: '내 부적 2장' })
   expect(link.getAttribute('href')).toBe('/bujeok/box')
 })
 
 test('?mode=gift&wish=pass: 선물 모드와 합격 소원이 미리 골라져 있다', () => {
   render(<BujeokClient initial={{ mode: 'gift', wish: 'pass' }} />)
-  expect(screen.getByRole('radio', { name: '선물 보내기' }).getAttribute('aria-checked')).toBe('true')
+  expect(screen.getByRole('radio', { name: '선물하기' }).getAttribute('aria-checked')).toBe('true')
   expect(screen.getByRole('radio', { name: '내 부적' }).getAttribute('aria-checked')).toBe('false')
-  expect(screen.getByRole('radio', { name: '합격' }).getAttribute('aria-checked')).toBe('true')
+  expect(screen.getByRole('button', { name: '합격' }).getAttribute('aria-pressed')).toBe('true')
 })
 
-test('소원 고르기: 열한 개가 WISH_ORDER 순서로 3열 격자에 보이고, 새 소원으로도 부적이 만들어진다', async () => {
+test('소원 고르기: 열한 개 타일이 WISH_ORDER 순서로 4열 격자에 보이고, 새 소원으로도 부적이 만들어진다', async () => {
   const { WISH_ORDER } = await import('@/lib/bujeok/keys')
   const { WISH_TEXT } = await import('@/content/bujeok')
   render(<BujeokClient />)
-  const group = screen.getByRole('radiogroup', { name: '어떤 소원을 담을까요?' })
-  expect(group.className).toContain('grid-cols-3')
-  const labels = [...group.querySelectorAll('[role=radio]')].map((e) => e.textContent)
+  const group = screen.getByRole('group', { name: '다른 소원' })
+  expect(group.className).toContain('bj-tiles')
+  const labels = [...group.querySelectorAll('button')].map((e) => e.getAttribute('aria-label'))
   expect(labels).toEqual(WISH_ORDER.map((w) => WISH_TEXT[w].label))
   expect(labels).toHaveLength(11)
   pick('삼재 막이')
@@ -280,7 +340,7 @@ test('소원 고르기: 열한 개가 WISH_ORDER 순서로 3열 격자에 보이
 
 test('?wish=samjae로 열면 삼재 막이가 미리 골라져 있다', () => {
   render(<BujeokClient initial={{ wish: 'samjae' }} />)
-  expect(screen.getByRole('radio', { name: '삼재 막이' }).getAttribute('aria-checked')).toBe('true')
+  expect(screen.getByRole('button', { name: '삼재 막이' }).getAttribute('aria-pressed')).toBe('true')
 })
 
 // --- 점안(마지막 한 획·도장) ---
