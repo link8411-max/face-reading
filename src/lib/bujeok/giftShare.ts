@@ -1,10 +1,12 @@
 import type { KakaoFeed } from '@/lib/kakao'
-// 선물 그림 공유의 갈림길(순수 함수). 카카오톡: 올라간 그림 주소, 실패·3초 초과면 기존 미리보기 이미지.
+// 선물 그림 공유의 갈림길(순수 함수). 카카오톡: 올라간 그림 주소, 실패·아직 안 올라갔으면 기존 미리보기 이미지.
+// 누른 뒤 오래 기다리면 폰 브라우저가 카카오톡 열기를 막을 수 있어(사용자 동작이 끊김) 아주 짧게만 기다린다.
+// 그림은 완성 화면이 뜨자마자 올리기 시작하므로 보통은 누르기 전에 끝나 있다.
 export interface KakaoImage { url: string; width: number; height: number }
 
-export const KAKAO_UPLOAD_TIMEOUT_MS = 3000
+export const KAKAO_UPLOAD_TIMEOUT_MS = 300
 
-/** 업로드가 3초 안에 끝나면 그 그림, 실패·시간 초과·없음이면 fallback(기존 OG 이미지) */
+/** 업로드가 KAKAO_UPLOAD_TIMEOUT_MS 안에 끝나면 그 그림, 실패·시간 초과·없음이면 fallback(기존 OG 이미지) */
 export function pickKakaoImage(upload: Promise<KakaoImage | null> | null, fallback: KakaoImage, timeoutMs = KAKAO_UPLOAD_TIMEOUT_MS): Promise<KakaoImage> {
   if (!upload) return Promise.resolve(fallback)
   return new Promise((resolve) => {

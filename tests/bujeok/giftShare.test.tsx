@@ -119,16 +119,16 @@ test('카카오: 업로드가 실패하면 기존 미리보기 이미지(1200×6
   expect(c.imageHeight).toBe(630)
 })
 
-test('카카오: 업로드가 3초 넘게 걸리면 기다리지 않고 기존 미리보기 이미지', async () => {
+test('카카오: 업로드가 아직이면 0.3초만 기다리고 기존 미리보기 이미지', async () => {
   const upload = vi.fn(() => new Promise(() => {}))
   const sendDefault = kakaoStub(upload)
   mount()
   await waitFor(() => expect(upload).toHaveBeenCalled(), { timeout: 3000 })
   vi.useFakeTimers()
   fireEvent.click(kakaoBtn())
-  await vi.advanceTimersByTimeAsync(2900)
+  await vi.advanceTimersByTimeAsync(250)
   expect(sendDefault).not.toHaveBeenCalled()
-  await vi.advanceTimersByTimeAsync(200)
+  await vi.advanceTimersByTimeAsync(100)
   expect(sendDefault).toHaveBeenCalledTimes(1)
   expect(feedOf(sendDefault).content.imageUrl).toBe(bujeokOgUrl(spec))
 })

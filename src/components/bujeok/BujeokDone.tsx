@@ -113,8 +113,6 @@ export default function BujeokDone({ spec, getSvg, onRetry, gift, ad, mineName =
         <p className="mt-1.5 text-sm text-muted break-keep">{text.sub}</p>
       </div>
 
-      {ad}
-
       <div className="no-screenshot flex flex-col mt-5">
         {gift ? (
           <>
@@ -174,6 +172,9 @@ export default function BujeokDone({ spec, getSvg, onRetry, gift, ad, mineName =
           </>
         )}
       </div>
+
+      {/* 광고는 버튼 아래: 보내기·저장이 광고에 밀려 내려가지 않게 */}
+      {ad}
     </div>
   )
 }

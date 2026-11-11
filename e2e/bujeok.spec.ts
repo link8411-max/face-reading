@@ -284,6 +284,9 @@ test('완성 화면: 광고는 카드 아래에 있고 카드 위·앞에는 없
   const cardAfter = (await page.getByTestId('bujeok-card').boundingBox())!
   expect(ad.y).toBeGreaterThan(cardAfter.y + cardAfter.height - 1)
   expect(card.height).toBeGreaterThan(100)
+  // 버튼(저장·다시 만들기·부적함)이 광고보다 위에 있다 — 주 버튼이 광고에 밀리지 않게
+  const lastBtn = (await page.getByRole('link', { name: '내 부적함' }).last().boundingBox())!
+  expect(ad.y).toBeGreaterThan(lastBtn.y + lastBtn.height - 1)
   // 카드 안에는 광고가 없다
   expect(await page.getByTestId('bujeok-card').locator('iframe').count()).toBe(0)
 })

@@ -31,12 +31,12 @@ test('카카오 이미지 고르기: 업로드가 실패하면 기존 미리보�
   expect(await pickKakaoImage(null, OG)).toEqual(OG)
 })
 
-test('카카오 이미지 고르기: 3초 안에 안 끝나면 기존 미리보기 이미지', async () => {
+test('카카오 이미지 고르기: 0.3초 안에 안 끝나면 기존 미리보기 이미지(누른 뒤 오래 기다리지 않는다)', async () => {
   vi.useFakeTimers()
-  expect(KAKAO_UPLOAD_TIMEOUT_MS).toBe(3000)
+  expect(KAKAO_UPLOAD_TIMEOUT_MS).toBe(300)
   const never = new Promise<KakaoImage>(() => {})
   const p = pickKakaoImage(never, OG)
-  await vi.advanceTimersByTimeAsync(2999)
+  await vi.advanceTimersByTimeAsync(299)
   let done = false
   void p.then(() => { done = true })
   await vi.advanceTimersByTimeAsync(0)
