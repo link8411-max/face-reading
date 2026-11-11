@@ -8,6 +8,7 @@ import type { Shared } from '@/lib/exam/link'
 import { loadReport, saveReport, streak as loadStreak, type Report } from '@/lib/exam/memory'
 import { pickRound, roundDateLabel, roundNumberFor } from '@/lib/exam/rounds'
 import { grade as gradeOf, timeLimitMs, total, type Answer } from '@/lib/exam/score'
+import { rateText, type QuestionStat } from '@/lib/exam/stats'
 import type { Round } from '@/lib/exam/types'
 import Explain from './Explain'
 import { enterMs, useReducedMotion } from './motion'
@@ -15,6 +16,26 @@ import QuestionCard, { type OptionState } from './QuestionCard'
 import ReportCard from './ReportCard'
 import SkitCard from './SkitCard'
 import TimerBar from './TimerBar'
+
+// 서버 집계(문제별 정답률) 읽기·저장. 실패해도 놀이는 멈추지 않는다(숫자 칸만 숨는다).
+async function fetchRates(round: number): Promise<QuestionStat[] | null> {
+  try {
+    const res = await fetch(`/api/exam/rates?round=${round}`)
+    if (!res.ok) return null
+    const data: unknown = await res.json()
+    const rates = (data as { rates?: unknown }).rates
+    return Array.isArray(rates) && rates.length === 5 ? (rates as QuestionStat[]) : null
+  } catch {
+    return null
+  }
+}
+function sendPlay(body: { round: number; marks: string; score: number; grade: number }) {
+  try {
+    void fetch('/api/exam/play', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body), keepalive: true }).catch(() => {})
+  } catch {
+    // 저장 실패는 무시한다
+  }
+}
 
 type Phase = 'boot' | 'start' | 'question' | 'explain' | 'grading' | 'report'
 
@@ -35,6 +56,7 @@ export default function ExamGame({ rounds, challenge = null }: { rounds: Round[]
   const [hintUsed, setHintUsed] = useState(false)
   const [hintNow, setHintNow] = useState(false)
   const [revealed, setRevealed] = useState(0)
+  const [rates, setRates] = useState<QuestionStat[] | null>(null)
   const [result, setResult] = useState<{ report: Report; round: Round; streak: number } | null>(null)
 
   const answeredRef = useRef(false)
@@ -101,7 +123,10 @@ export default function ExamGame({ rounds, challenge = null }: { rounds: Round[]
     setPicks([])
     setHintUsed(false)
     setHintNow(false)
+    setRates(null)
     setPhase('question')
+    // 이번 판이 저장되기 전 집계라 내 답은 들어 있지 않다
+    void fetchRates(round.round).then(setRates)
   }
 
   const finish = () => {
@@ -120,6 +145,7 @@ export default function ExamGame({ rounds, challenge = null }: { rounds: Round[]
     // 도전장으로 푼 판은 오늘 회차와 같고 아직 안 풀었을 때만 오늘 성적표로 남긴다
     const saveIt = !challenge || (challenge.round === play.todayAtStart && !loadReport(report.round))
     if (saveIt) saveReport(report)
+    sendPlay({ round: report.round, marks: report.marks, score: report.score, grade: report.grade })
     setResult({ report, round: play.round, streak: loadStreak() })
     setRevealed(0)
     setPhase(reduced ? 'report' : 'grading')
@@ -231,7 +257,7 @@ export default function ExamGame({ rounds, challenge = null }: { rounds: Round[]
           힌트 쓰기
         </button>
       )}
-      {answered && <Explain q={q} correct={correct} timedOut={timedOut} isLast={idx + 1 >= play.round.questions.length} onNext={next} />}
+      {answered && <Explain q={q} correct={correct} timedOut={timedOut} rate={rateText(rates?.[idx])} isLast={idx + 1 >= play.round.questions.length} onNext={next} />}
     </section>
   )
 }

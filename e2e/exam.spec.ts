@@ -4,6 +4,9 @@ import { trackErrors } from './helpers'
 const events = (page: Page) =>
   page.evaluate(() => ((window as unknown as { dataLayer?: unknown[][] }).dataLayer ?? []).filter((a) => a[0] === 'event').map((a) => [a[1], a[2]] as [string, Record<string, string>]))
 
+// E2E 서버에는 Supabase 환경 변수가 없다 -> /api/exam/* 은 503, 화면은 정답률 칸을 숨기고 놀이는 그대로.
+const realErrors = (errors: string[]) => errors.filter((e) => !e.includes('/api/exam/'))
+
 // 문제 화면의 보기 버튼(해설이 나오면 사라진다)
 const options = (page: Page) => page.locator('section[aria-label="문제"] ul button')
 
@@ -39,10 +42,11 @@ test('한 판: 시작 → 5문제 → 성적표, 새로 고침하면 성적표�
   const ends = ev.filter((e) => e[0] === 'exam_end')
   expect(ends).toHaveLength(1)
   expect(ends[0][1].result_id).toMatch(/^meme_g[1-9]$/)
+  await expect(page.getByText(/푼 사람의/)).toHaveCount(0)
   await page.reload()
   await expect(page.getByText('밈 능력고사 성적통지표')).toBeVisible()
   await expect(page.getByRole('button', { name: '시험 시작' })).toHaveCount(0)
-  expect(errors).toEqual([])
+  expect(realErrors(errors)).toEqual([])
 })
 
 test('채점 연출은 기다려도 성적표로 넘어간다', async ({ page }) => {
@@ -87,7 +91,7 @@ test('도전장 링크: 친구 등급이 보이고, 다 풀면 친구·나 두 �
   await expect(page.getByRole('button', { name: '나도 도전장 보내기' })).toBeVisible()
   const ev = await events(page)
   expect(ev).toContainEqual(['shared_landing', { test_name: 'exam', result_id: 'meme' }])
-  expect(errors).toEqual([])
+  expect(realErrors(errors)).toEqual([])
 })
 
 test('손으로 고친 도전장 링크는 일반 시작 화면이 된다', async ({ page }) => {
@@ -99,7 +103,7 @@ test('손으로 고친 도전장 링크는 일반 시작 화면이 된다', asyn
     await expect(page.getByRole('button', { name: '시험 시작' })).toBeVisible()
     await expect(page.getByText(/친구는/)).toHaveCount(0)
   }
-  expect(errors).toEqual([])
+  expect(realErrors(errors)).toEqual([])
 })
 
 test('미리보기 이미지: 등급·맞힌 수만 받는다', async ({ request }) => {
@@ -135,7 +139,7 @@ test('말 모음 → 낱말 → 한 문제 → 오늘의 5문제 풀기(공개�
     await page.getByRole('link', { name: '오늘의 5문제 풀기' }).click()
     await expect(page).toHaveURL(/\/exam\/meme$/)
   }
-  expect(errors).toEqual([])
+  expect(realErrors(errors)).toEqual([])
 })
 
 test('없는 말 주소는 404', async ({ page }) => {
