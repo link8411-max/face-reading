@@ -29,15 +29,25 @@ const HOLO_FIXED = 'repeating-linear-gradient(115deg,#ff5f6d 0%,#ffc371 12%,#f9f
 
 export const WATERMARK = '운명을 읽다 · unse-ai.com'
 
-function buildStage(svg: SVGSVGElement, style: BujeokStyle, finish: Finish): { host: HTMLElement; stage: HTMLElement } {
-  const L = wallpaperLayout()
+/** 그림을 놓는 틀: 전체 크기(이미지 픽셀)·카드 자리·워터마크 위치·글자 크기. 잠금화면과 선물 이미지가 같은 코드로 찍는다 */
+export interface StillFrame {
+  size: { w: number; h: number }
+  layout: { x: number; y: number; w: number; h: number }
+  markTop: number
+  markSize: number
+}
+const WALLPAPER_FRAME: StillFrame = { size: WALLPAPER, layout: wallpaperLayout(), markTop: WALLPAPER.h - 150, markSize: 34 }
+
+function buildStage(svg: SVGSVGElement, style: BujeokStyle, finish: Finish, frame: StillFrame): { host: HTMLElement; stage: HTMLElement } {
+  const L = frame.layout
+  const W = frame.size
   const px = (n: number) => `${n / SCALE}px`
   const host = document.createElement('div')
   host.setAttribute('aria-hidden', 'true')
   // 캡처 대상(stage)이 위치를 직접 갖지 않도록 한 겹 감싸 화면 밖으로 보낸다
   host.style.cssText = 'position:fixed;left:-10000px;top:0;pointer-events:none;'
   const stage = document.createElement('div')
-  stage.style.cssText = `position:relative;width:${px(WALLPAPER.w)};height:${px(WALLPAPER.h)};overflow:hidden;background:${bgFor(style, finish).bg};`
+  stage.style.cssText = `position:relative;width:${px(W.w)};height:${px(W.h)};overflow:hidden;background:${bgFor(style, finish).bg};`
   const clone = svg.cloneNode(true) as SVGSVGElement
   // 화면에서 흔들리는 중이던 동작이 캡처에 섞이지 않게 한다
   clone.querySelectorAll('.bujeok-bob,.bujeok-tw').forEach((el) => el.classList.remove('bujeok-bob', 'bujeok-tw'))
@@ -49,7 +59,7 @@ function buildStage(svg: SVGSVGElement, style: BujeokStyle, finish: Finish): { h
   clone.style.cssText = `position:absolute;left:${px(L.x)};top:${px(L.y)};width:${px(L.w)};height:${px(L.h)};display:block;`
   const mark = document.createElement('div')
   mark.textContent = WATERMARK
-  mark.style.cssText = `position:absolute;left:0;right:0;top:${px(WALLPAPER.h - 150)};text-align:center;font-family:var(--font-noto-sans-kr),sans-serif;font-size:${px(34)};letter-spacing:.04em;color:${bgFor(style, finish).mark};opacity:.8;`
+  mark.style.cssText = `position:absolute;left:0;right:0;top:${px(frame.markTop)};text-align:center;font-family:var(--font-noto-sans-kr),sans-serif;font-size:${px(frame.markSize)};letter-spacing:.04em;color:${bgFor(style, finish).mark};opacity:.8;`
   stage.append(clone)
   if (finish === 'holo') {
     const b = CARD_BOX[style]
@@ -64,31 +74,34 @@ function buildStage(svg: SVGSVGElement, style: BujeokStyle, finish: Finish): { h
   return { host, stage }
 }
 
-async function ensureSize(blob: Blob): Promise<Blob> {
+async function ensureSize(blob: Blob, W: { w: number; h: number }): Promise<Blob> {
   const bmp = await createImageBitmap(blob)
-  const ok = bmp.width === WALLPAPER.w && bmp.height === WALLPAPER.h
+  const ok = bmp.width === W.w && bmp.height === W.h
   if (ok) {
     bmp.close()
     return blob
   }
   const c = document.createElement('canvas')
-  c.width = WALLPAPER.w
-  c.height = WALLPAPER.h
-  c.getContext('2d')!.drawImage(bmp, 0, 0, WALLPAPER.w, WALLPAPER.h)
+  c.width = W.w
+  c.height = W.h
+  c.getContext('2d')!.drawImage(bmp, 0, 0, W.w, W.h)
   bmp.close()
   return await new Promise<Blob>((res, rej) => c.toBlob((b) => (b ? res(b) : rej(new Error('이미지를 만들지 못했어요'))), 'image/png'))
 }
 
-/** 화면에 있는 부적 SVG를 잠금화면 PNG로 만든다. 이름·생년월일은 SVG에 있는 것(도장 이름)만 담긴다 */
-export async function renderWallpaper(svg: SVGSVGElement, style: BujeokStyle, finish: Finish = 'paper'): Promise<Blob> {
+/** 화면에 있는 부적 SVG를 주어진 틀의 PNG로 만든다. 이름·생년월일은 SVG에 있는 것(도장 이름)만 담긴다 */
+export async function renderStill(svg: SVGSVGElement, style: BujeokStyle, finish: Finish, frame: StillFrame): Promise<Blob> {
   const { domToBlob } = await import('modern-screenshot')
-  const { host, stage } = buildStage(svg, style, finish)
+  const { host, stage } = buildStage(svg, style, finish, frame)
   document.body.appendChild(host)
   try {
     await document.fonts?.ready
-    const blob = await domToBlob(stage, { scale: SCALE, width: WALLPAPER.w / SCALE, height: WALLPAPER.h / SCALE, type: 'image/png' })
-    return await ensureSize(blob)
+    const blob = await domToBlob(stage, { scale: SCALE, width: frame.size.w / SCALE, height: frame.size.h / SCALE, type: 'image/png' })
+    return await ensureSize(blob, frame.size)
   } finally {
     host.remove()
   }
 }
+
+/** 잠금화면 PNG(1170×2532) */
+export const renderWallpaper = (svg: SVGSVGElement, style: BujeokStyle, finish: Finish = 'paper') => renderStill(svg, style, finish, WALLPAPER_FRAME)

@@ -5,6 +5,7 @@ import Link from 'next/link'
 import { Icon } from '@/components/icons'
 import { useResultShare } from '@/hooks/useResultShare'
 import { useWallpaperSave } from './useWallpaperSave'
+import { useGiftImage } from './useGiftImage'
 import { addToBox } from '@/lib/bujeok/box'
 import { bujeokCode, bujeokGiftUrl, bujeokMineUrl, bujeokOgUrl, giftHeadline } from '@/lib/bujeok/link'
 import { SITE, UTM } from '@/lib/shareBase'
@@ -21,11 +22,13 @@ export interface GiftInfo { to: string; from: string | null }
 export default function BujeokDone({ spec, getSvg, onRetry, gift, ad, mineName = null }: { spec: BujeokSpec; getSvg: () => SVGSVGElement | null; onRetry: () => void; gift?: GiftInfo; ad?: ReactNode; mineName?: string | null }) {
   const text = WISH_TEXT[spec.wish]
   const { saving, saveNotice, save } = useWallpaperSave(spec, getSvg)
+  // 선물: 이름 도장이 찍힌 앞면 그림(1080×1350)을 완성 화면이 뜨면 미리 만들어 두고 공유에 같이 보낸다(카카오톡은 카드 이미지로 올린다)
+  const giftImage = useGiftImage(spec, getSvg, !!gift)
   // 내 부적: 공유 링크는 시작 화면(/bujeok)이다. 이름·생년월일·소원은 싣지 않는다.
-  // 선물: 받는 사람 이름이 든 선물 링크(bujeokGiftUrl). 카카오톡 카드 이미지는 이름 없는 미리보기 이미지.
+  // 선물: 받는 사람 이름이 든 선물 링크(bujeokGiftUrl) + 이름 도장이 찍힌 부적 그림. 카카오톡 카드 이미지는 올려 둔 그림, 실패하면 이름 없는 미리보기 이미지.
   const { busy, notice, share } = useResultShare(
     gift
-      ? { testName: 'bujeok', title: SHARE_TITLE, text: giftHeadline(gift.to), url: bujeokGiftUrl(spec, { to: gift.to, from: gift.from ?? undefined }), imageUrl: bujeokOgUrl(spec) }
+      ? { testName: 'bujeok', title: SHARE_TITLE, text: giftHeadline(gift.to), url: bujeokGiftUrl(spec, { to: gift.to, from: gift.from ?? undefined }), imageUrl: bujeokOgUrl(spec), getFile: giftImage.getFile, getKakaoImage: giftImage.getKakaoImage }
       : { testName: 'bujeok', title: SHARE_TITLE, text: SHARE_TEXT, url: `${SITE}/bujeok?${UTM('bujeok')}`, imageUrl: SHARE_IMAGE },
   )
 

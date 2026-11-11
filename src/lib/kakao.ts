@@ -5,12 +5,13 @@ export const KAKAO_JS_KEY = 'fb47565faa13bd3ae4861d909b1c830c'
 const SDK_URL = 'https://t1.kakaocdn.net/kakao_js_sdk/2.7.4/kakao.min.js'
 const SDK_INTEGRITY = 'sha384-DKYJZ8NLiK8MN4/C5P2dtSmLQ4KwPaoqAfyA/DfmEc1VDxu4yyC7wy6K1Hs90nka'
 
-export interface KakaoShareMeta { title: string; text: string; url: string; imageUrl: string }
+// imageSize: imageUrl의 실제 크기(기본은 미리보기 이미지 1200×630). 올려 둔 선물 그림은 1080×1350
+export interface KakaoShareMeta { title: string; text: string; url: string; imageUrl: string; imageSize?: { width: number; height: number } }
 
 type KakaoSDK = {
   isInitialized: () => boolean
   init: (key: string) => void
-  Share: { sendDefault: (template: ReturnType<typeof kakaoFeed>) => void }
+  Share: { sendDefault: (template: ReturnType<typeof kakaoFeed>) => void; uploadImage?: (o: { file: File[] }) => Promise<unknown> }
 }
 
 export function isKakaoInApp(userAgent: string): boolean {
@@ -22,7 +23,7 @@ export function kakaoFeed(m: KakaoShareMeta) {
   const link = { mobileWebUrl: m.url, webUrl: m.url }
   return {
     objectType: 'feed' as const,
-    content: { title: m.text, description: m.title, imageUrl: m.imageUrl, imageWidth: 1200, imageHeight: 630, link },
+    content: { title: m.text, description: m.title, imageUrl: m.imageUrl, imageWidth: m.imageSize?.width ?? 1200, imageHeight: m.imageSize?.height ?? 630, link },
     buttons: [{ title: '나도 해보기', link }],
   }
 }
@@ -68,5 +69,20 @@ export async function shareKakao(m: KakaoShareMeta): Promise<boolean> {
     return true
   } catch {
     return false
+  }
+}
+
+// 카카오 서버에 그림 한 장을 올려 카드 이미지 주소를 얻는다(SDK 2.x Kakao.Share.uploadImage, 응답 infos.original.url).
+// 실패·이상한 응답·https가 아닌 주소는 null (호출 쪽이 기존 미리보기 이미지로 보낸다)
+export async function uploadKakaoImage(file: File, size = { width: 1080, height: 1350 }): Promise<{ url: string; width: number; height: number } | null> {
+  const k = await loadKakao()
+  if (!k?.Share.uploadImage) return null
+  try {
+    const res = (await k.Share.uploadImage({ file: [file] })) as { infos?: { original?: { url?: unknown; width?: unknown; height?: unknown } } } | null
+    const o = res?.infos?.original
+    if (!o || typeof o.url !== 'string' || !o.url.startsWith('https://')) return null
+    return { url: o.url, width: typeof o.width === 'number' ? o.width : size.width, height: typeof o.height === 'number' ? o.height : size.height }
+  } catch {
+    return null
   }
 }
