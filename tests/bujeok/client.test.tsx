@@ -28,6 +28,10 @@ afterEach(() => {
   restoreStorage()
 })
 
+const skipRite = () => {
+  const b = screen.queryByRole('button', { name: '그냥 완성하기' })
+  if (b) fireEvent.click(b)
+}
 const make = () => screen.getByRole('button', { name: '부적 만들기' })
 const pick = (name: string) => fireEvent.click(screen.getByRole('radio', { name }))
 const type = (label: string, value: string) => fireEvent.change(screen.getByLabelText(label), { target: { value } })
@@ -46,6 +50,7 @@ test('생년월일 없이도 만들 수 있고 이때 기운은 WISH_DEFAULT_EL'
   pick('재물')
   pick('전통')
   fireEvent.click(make())
+  skipRite()
   // 재물의 기본 기운은 metal
   expect(await screen.findByText(EL_TEXT.metal.line)).toBeTruthy()
 })
@@ -60,6 +65,7 @@ test('2월 30일을 넣으면 안내 문구가 보이고 drawing으로 넘어가
   expect(screen.getByRole('alert').textContent).toContain('2월은 28일까지 있어요')
   expect((make() as HTMLButtonElement).disabled).toBe(true)
   fireEvent.click(make())
+  skipRite()
   expect(screen.queryByTestId('bujeok-card')).toBeNull()
   expect(make()).toBeTruthy()
 })
@@ -86,6 +92,7 @@ test('마감은 필수 선택이고 기본은 금박이다', async () => {
   pick('재물')
   pick('전통')
   fireEvent.click(make())
+  skipRite()
   await screen.findByTestId('bujeok-card')
   expect(document.querySelector('[data-bujeok-art] svg')!.innerHTML).toContain('bujeok-gold-holo')
 })
@@ -95,6 +102,7 @@ test('만들면 바로 완성 화면(카드)이 뜬다. 중간 단계는 없다'
   pick('합격')
   pick('귀여운')
   fireEvent.click(make())
+  skipRite()
   expect(await screen.findByTestId('bujeok-card')).toBeTruthy()
   expect(screen.getByRole('button', { name: '잠금화면용 저장' })).toBeTruthy()
 })
@@ -104,6 +112,7 @@ test('다시 만들기는 form으로 돌아가지 않고 변형 번호만 새로
   pick('건강')
   pick('전통')
   fireEvent.click(make())
+  skipRite()
   await screen.findByRole('button', { name: '다시 만들기' })
   const before = document.querySelector('[data-bujeok-art] svg')!.innerHTML
   fireEvent.click(screen.getByRole('button', { name: '다시 만들기' }))
@@ -117,6 +126,7 @@ test('완성 화면에 네 버튼이 있고 선물하기는 /bujeok?mode=gift&st
   pick('연애')
   pick('귀여운')
   fireEvent.click(make())
+  skipRite()
   await screen.findByRole('button', { name: '다시 만들기' })
   expect(screen.getByRole('button', { name: '잠금화면용 저장' })).toBeTruthy()
   expect(screen.getByRole('button', { name: '공유하기' })).toBeTruthy()
@@ -140,6 +150,7 @@ test('result_view는 result_id가 `<화풍>_<소원>`이고 이름·생년이 �
   type('월', '5')
   type('일', '15')
   fireEvent.click(make())
+  skipRite()
   await waitFor(() => expect(track).toHaveBeenCalledWith('result_view', { test_name: 'bujeok', result_id: 'trad_money' }))
   expect(JSON.stringify(track.mock.calls)).not.toMatch(/민지|1990/)
   await act(async () => {})
@@ -158,6 +169,7 @@ const makeMine = async (name?: string) => {
   pick('전통')
   if (name) type('이름', name)
   fireEvent.click(make())
+  skipRite()
   await screen.findByRole('button', { name: '다시 만들기' })
 }
 
@@ -180,6 +192,7 @@ test('이름이 없으면 해시도 없다. 생년월일은 주소·저장소 �
   type('월', '5')
   type('일', '15')
   fireEvent.click(make())
+  skipRite()
   await screen.findByRole('button', { name: '다시 만들기' })
   expect(window.location.hash).toBe('')
   expect(window.location.href).not.toMatch(/1990/)
@@ -223,6 +236,7 @@ test('선물 모드 완성 화면은 주소를 바꾸지 않고 부적함(mine)�
   pick('귀여운')
   type('받는 사람 이름', '민지')
   fireEvent.click(make())
+  skipRite()
   await screen.findByTestId('bujeok-card')
   expect(window.location.pathname).toBe('/')
   expect(loadBox()).toEqual([])
@@ -259,6 +273,7 @@ test('소원 고르기: 열한 개가 WISH_ORDER 순서로 3열 격자에 보이
   pick('삼재 막이')
   pick('전통')
   fireEvent.click(make())
+  skipRite()
   // 삼재 막이의 기본 기운은 water
   expect(await screen.findByText(EL_TEXT.water.line)).toBeTruthy()
 })
@@ -266,4 +281,85 @@ test('소원 고르기: 열한 개가 WISH_ORDER 순서로 3열 격자에 보이
 test('?wish=samjae로 열면 삼재 막이가 미리 골라져 있다', () => {
   render(<BujeokClient initial={{ wish: 'samjae' }} />)
   expect(screen.getByRole('radio', { name: '삼재 막이' }).getAttribute('aria-checked')).toBe('true')
+})
+
+// --- 점안(마지막 한 획·도장) ---
+test('전통 내 부적: 만들면 점안 화면이 먼저 뜨고, 그냥 완성하기로 지나가면 5칸 코드(기본 획)로 완성된다', () => {
+  render(<BujeokClient />)
+  pick('재물')
+  pick('전통')
+  fireEvent.click(make())
+  expect(screen.getByTestId('bujeok-rite')).toBeTruthy()
+  expect(screen.queryByTestId('bujeok-card')).toBeNull()
+  expect(screen.getByText('마지막 한 획을 그어 부적을 완성해요')).toBeTruthy()
+  skipRite()
+  expect(screen.getByTestId('bujeok-card')).toBeTruthy()
+  expect(window.location.pathname.split('/').at(-1)!.split('-')).toHaveLength(5)
+  expect(parseBujeokCode(loadBox()![0].code)!.stroke).toBeUndefined()
+})
+
+test('전통 내 부적: 그은 획과 도장을 거치면 주소가 6칸 코드로 바뀌고 부적함에도 6칸이 남는다', () => {
+  vi.useFakeTimers()
+  render(<BujeokClient />)
+  pick('합격')
+  pick('전통')
+  fireEvent.click(make())
+  const pad = screen.getByTestId('bujeok-rite-pad')
+  pad.getBoundingClientRect = () => ({ left: 0, top: 0, width: 240, height: 508, right: 240, bottom: 508, x: 0, y: 0, toJSON() {} }) as DOMRect
+  const ev = (x: number, y: number) => ({ clientX: x, clientY: y, pointerId: 1, isPrimary: true })
+  const pts: [number, number][] = [[120, 254], [121, 290], [119, 330], [121, 370], [118, 410], [119, 440]]
+  fireEvent.pointerDown(pad, ev(...pts[0]))
+  for (const p of pts.slice(1)) fireEvent.pointerMove(pad, ev(...p))
+  fireEvent.pointerUp(pad, ev(...pts[5]))
+  fireEvent.keyDown(screen.getByRole('button', { name: '도장 찍기' }), { key: 'Enter' })
+  act(() => void vi.advanceTimersByTime(800))
+  vi.useRealTimers()
+  expect(screen.getByTestId('bujeok-card')).toBeTruthy()
+  const code = window.location.pathname.split('/').at(-1)!
+  expect(code.split('-')).toHaveLength(6)
+  const spec = parseBujeokCode(code)!
+  expect(spec.stroke).toMatch(/^s[0-9a-z]{24}$/)
+  expect(loadBox()![0].code).toBe(code)
+})
+
+test('귀여운 내 부적은 도장만(긋기 없음), 선물 귀여운은 점안 없이 바로 완성', () => {
+  render(<BujeokClient />)
+  pick('재물')
+  pick('귀여운')
+  fireEvent.click(make())
+  expect(screen.getByRole('button', { name: '도장 찍기' })).toBeTruthy()
+  expect(screen.getByTestId('bujeok-rite').getAttribute('data-step')).toBe('seal')
+  cleanup()
+  render(<BujeokClient initial={{ mode: 'gift' }} />)
+  pick('재물')
+  pick('귀여운')
+  type('받는 사람 이름', '민지')
+  fireEvent.click(make())
+  expect(screen.queryByTestId('bujeok-rite')).toBeNull()
+  expect(screen.getByTestId('bujeok-card')).toBeTruthy()
+})
+
+test('선물(전통): 보내는 사람은 긋기만 하고, 완성 카드에는 도장이 없고 "도장은 받는 사람이 찍어요"가 있다', () => {
+  render(<BujeokClient initial={{ mode: 'gift' }} />)
+  pick('재물')
+  pick('전통')
+  type('받는 사람 이름', '민지')
+  fireEvent.click(make())
+  expect(screen.getByTestId('bujeok-rite').getAttribute('data-step')).toBe('draw')
+  expect(screen.queryByRole('button', { name: '도장 찍기' })).toBeNull()
+  skipRite()
+  expect(screen.getByText('도장은 받는 사람이 찍어요')).toBeTruthy()
+  const art = document.querySelector('[data-bujeok-art] svg')!
+  expect(art.querySelector('[data-part=seal]')).toBeNull()
+  expect(art.querySelector('[data-part=stamp]')).toBeNull()
+})
+
+test('점안 중 "다시하기"는 폼으로 돌아간다', () => {
+  render(<BujeokClient />)
+  pick('재물')
+  pick('전통')
+  fireEvent.click(make())
+  fireEvent.click(screen.getByRole('button', { name: /다시하기/ }))
+  expect(screen.queryByTestId('bujeok-rite')).toBeNull()
+  expect(make()).toBeTruthy()
 })

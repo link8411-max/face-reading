@@ -21,6 +21,8 @@ export interface BujeokCardProps {
   enter?: boolean
   /** 값이 바뀌면 카드를 새로 세워 등장 회전을 다시 한다 */
   playKey?: number
+  /** 도장(전통은 吉·이름 도장)을 그리지 않는다: 선물을 보내는 사람의 카드(도장은 받는 사람이 찍는다) */
+  hideSeal?: boolean
 }
 
 const ENTER_MS = 1500
@@ -63,7 +65,7 @@ export default function BujeokCard(props: BujeokCardProps) {
   return <CardInner key={props.playKey ?? 0} {...props} />
 }
 
-function CardInner({ spec, name, from, enter = false }: BujeokCardProps) {
+function CardInner({ spec, name, from, enter = false, hideSeal }: BujeokCardProps) {
   const theme = themeFor(spec.style, spec.finish)
   const box = CARD_BOX[spec.style]
   const text = WISH_TEXT[spec.wish]
@@ -427,7 +429,7 @@ function CardInner({ spec, name, from, enter = false }: BujeokCardProps) {
               ))}
               <div className="bj-face bj-front">
                 <div data-bujeok-art="" style={{ position: 'absolute', inset: 0 }}>
-                  <BujeokSvg spec={spec} name={name} crop />
+                  <BujeokSvg spec={spec} name={name} crop hideSeal={hideSeal} />
                 </div>
                 <div className="bj-holo" />
                 {sheen}
@@ -450,8 +452,12 @@ function CardInner({ spec, name, from, enter = false }: BujeokCardProps) {
           </div>
         </div>
         <div className="bj-shadow" aria-hidden="true" />
+      </div>
+
+      {/* 안내는 카드 위에 겹치지 않고 무대 아래 흐름 안에 둔다(자리를 비워 두어 사라져도 화면이 튀지 않는다) */}
+      <div className="bj-hint-slot no-screenshot">
         {hintOn && (
-          <div className="bj-hint no-screenshot" data-testid="bujeok-hint">
+          <div className="bj-hint" data-testid="bujeok-hint">
             <svg width="22" height="16" viewBox="0 0 22 16" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
               <path d="M2 8h18M6 4 2 8l4 4M16 4l4 4-4 4" />
             </svg>

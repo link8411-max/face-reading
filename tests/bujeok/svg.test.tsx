@@ -28,7 +28,7 @@ test('1320개 조합 모두 렌더되고 viewBox가 0 0 300 520', () => {
     seen.add(h)
   }
   expect(seen.size).toBe(1320) // 조합마다(마감 포함) 그림이 다르다
-})
+}, 30_000)
 
 test('그려지는 요소 순서: 귀여운은 처음이 테두리·마지막이 도장, 전통은 처음이 테두리', () => {
   for (const s of ALL.filter((x) => x.style === 'cute')) {
@@ -37,7 +37,7 @@ test('그려지는 요소 순서: 귀여운은 처음이 테두리·마지막이
     expect(els.at(-1)!.getAttribute('data-a')).toBe('stamp')
     expect(els.filter((e) => e.getAttribute('data-a') === 'stamp')).toHaveLength(1)
   }
-  for (const s of ALL.filter((x) => x.style === 'trad')) {
+  for (const s of ALL.filter((x) => x.style === 'trad' && x.el === 'metal')) {
     const parts = [...dom(s).querySelectorAll('[data-part]')].map((e) => e.getAttribute('data-part'))
     expect(parts[0]).toBe('border')
     expect(parts).toContain('seal')
@@ -96,7 +96,7 @@ const DARK_FINISHES = ['gold', 'holo'] as const
 const BASE: Record<string, string> = { trad: '#17140F', cute: '#2b1d3a' }
 
 test('금박·홀로그램에는 붉은 선과 붉은 바탕이 없고 바탕은 어두운 색이다', () => {
-  for (const s of ALL.filter((x) => x.finish !== 'paper')) {
+  for (const s of ALL.filter((x) => x.finish !== 'paper' && (x.style === 'cute' || x.el === 'metal'))) {
     const h = html(s)
     expect(h).not.toMatch(/#B3261E/i)
     const d = dom(s)

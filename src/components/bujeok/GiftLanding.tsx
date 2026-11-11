@@ -1,10 +1,11 @@
 'use client'
-// 선물 착지 화면: 닫힌 상태("○○님께 부적이 도착했어요") → "열어 보기"를 누르면 카드가 돌며 나타난다.
+// 선물 착지 화면: 닫힌 상태("○○님께 부적이 도착했어요") + 도장 찍기(BujeokRite) → 찍으면 카드가 돌며 나타난다.
 // 이름은 링크 해시(#to=…)에서 마운트 뒤에 읽는다(서버·GA로 가지 않는다). me=1(mine)이면 "열어 보기" 없이 바로 카드가 나온다.
 import { useEffect, useRef, useState, type ReactNode } from 'react'
 import Link from 'next/link'
 import { Icon } from '@/components/icons'
 import BujeokCard from './BujeokCard'
+import BujeokRite from './BujeokRite'
 import { useWallpaperSave } from './useWallpaperSave'
 import { useNameHash } from './useNameHash'
 import { track } from '@/lib/analytics'
@@ -90,14 +91,14 @@ export default function GiftLanding({ spec, mine = false, ad }: { spec: BujeokSp
           </div>
         </div>
       ) : (
-        <div className="text-center pt-16">
+        <div className="text-center pt-4">
           <p className="text-sm text-muted">운명을 읽다</p>
           <h1 className="mt-3 font-serif font-bold text-[27px] leading-[1.4] break-keep">{headline}</h1>
           {from && <p className="mt-2 text-sm text-muted">{from}님이 보냈어요</p>}
-          <p className="mt-3 text-sm text-muted break-keep">열어서 손으로 돌려 보세요. 잠금화면에 저장해 둘 수도 있어요.</p>
-          <button type="button" onClick={() => setOpened(true)} className="mt-8 w-full h-[56px] rounded-full bg-ink text-paper text-base font-medium">
-            열어 보기
-          </button>
+          <p className="mt-3 mb-5 text-sm text-muted break-keep">도장을 찍으면 열려요. 열면 손으로 돌려 볼 수 있고, 잠금화면에 저장해 둘 수도 있어요.</p>
+          <div className="mx-auto max-w-[420px]">
+            <BujeokRite spec={spec} name={to} steps="seal" onDone={() => setOpened(true)} />
+          </div>
         </div>
       )}
     </main>

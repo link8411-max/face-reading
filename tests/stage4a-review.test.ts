@@ -1,7 +1,7 @@
 import { readFileSync } from 'node:fs'
 import { CATEGORIES } from '@/content/navigation'
 
-test('글꼴은 쓰는 굵기만: Sans 400·700, Gowun Batang 400·700', () => {
+test('글꼴은 쓰는 굵기만: Sans 400·700, Gowun Batang 400·700, 부적 붓 글꼴(한자 46자) 500 하나', () => {
   const layout = readFileSync('src/app/layout.tsx', 'utf8')
   // next/font/local: 파일마다 굵기를 적는다. 400·700 말고 다른 굵기 파일은 싣지 않는다
   for (const name of ['NotoSansKR', 'GowunBatang']) {
@@ -9,7 +9,10 @@ test('글꼴은 쓰는 굵기만: Sans 400·700, Gowun Batang 400·700', () => {
     expect(layout).toMatch(new RegExp(`${name}-Bold\\.woff2", weight: "700"`))
   }
   const weights = [...layout.matchAll(/weight: "(\d+)"/g)].map((m) => m[1])
-  expect(new Set(weights)).toEqual(new Set(['400', '700']))
+  expect(new Set(weights)).toEqual(new Set(['400', '700', '500']))
+  // 500은 부적 붓 글꼴(LXGWWenKaiTC-Bujeok) 하나에만 쓴다
+  expect(layout).toMatch(/LXGWWenKaiTC-Bujeok\.woff2", weight: "500"/)
+  expect(weights.filter((w) => w === '500')).toHaveLength(1)
 })
 
 test('globals.css의 body 규칙이 글꼴·배경·글자색을 덮어쓰지 않는다', () => {

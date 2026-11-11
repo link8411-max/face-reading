@@ -37,6 +37,10 @@ afterEach(() => {
   restoreStorage()
 })
 
+const skipRite = () => {
+  const b = screen.queryByRole('button', { name: '그냥 완성하기' })
+  if (b) fireEvent.click(b)
+}
 const make = () => screen.getByRole('button', { name: '부적 만들기' }) as HTMLButtonElement
 const pick = (name: string) => fireEvent.click(screen.getByRole('radio', { name }))
 const type = (label: string, value: string) => fireEvent.change(screen.getByLabelText(label), { target: { value } })
@@ -89,6 +93,7 @@ test('선물 완성 화면: 카드(받는 사람 이름 뒷면)와 "링크로 �
   type('받는 사람 이름', '민지')
   type('보내는 사람 이름', '철수')
   fireEvent.click(make())
+  skipRite()
   await screen.findByTestId('bujeok-card')
   expect(screen.queryByRole('button', { name: '공유하기' })).toBeNull()
   fireEvent.click(screen.getByRole('button', { name: '링크로 보내기' }))
@@ -122,9 +127,9 @@ test('착지: 해시 to=민지 → 마운트 뒤 "민지님께 부적이 도착�
   render(<GiftLanding spec={spec} />)
   expect(screen.getByText('민지님께 부적이 도착했어요')).toBeTruthy()
   expect(screen.queryByTestId('bujeok-card')).toBeNull()
-  fireEvent.click(screen.getByRole('button', { name: '열어 보기' }))
+  fireEvent.click(screen.getByRole('button', { name: '그냥 완성하기' }))
   expect(screen.getByTestId('bujeok-card')).toBeTruthy()
-  expect(screen.queryByRole('button', { name: '열어 보기' })).toBeNull()
+  expect(screen.queryByRole('button', { name: '그냥 완성하기' })).toBeNull()
   expect(screen.getByText('철수님이 보냈어요')).toBeTruthy()
   expect(screen.getByRole('button', { name: '잠금화면용 저장' })).toBeTruthy()
   expect(screen.getByRole('link', { name: '나도 보내기' }).getAttribute('href')).toBe('/bujeok?mode=gift&style=trad&finish=gold')
@@ -134,7 +139,7 @@ test('착지: 해시 to=민지 → 마운트 뒤 "민지님께 부적이 도착�
 test('착지: 이름이 없으면 "부적이 도착했어요", 보낸 사람 줄도 없다', () => {
   render(<GiftLanding spec={spec} />)
   expect(screen.getByText('부적이 도착했어요')).toBeTruthy()
-  fireEvent.click(screen.getByRole('button', { name: '열어 보기' }))
+  fireEvent.click(screen.getByRole('button', { name: '그냥 완성하기' }))
   expect(screen.queryByText(/님이 보냈어요/)).toBeNull()
 })
 
@@ -143,7 +148,7 @@ test('착지: 카카오가 해시(#to=…)를 떼 가도 이름 없이 정상으
     setHash(h)
     const { unmount } = render(<GiftLanding spec={spec} />)
     expect(screen.getByRole('heading', { level: 1 }).textContent).toBe('부적이 도착했어요')
-    fireEvent.click(screen.getByRole('button', { name: '열어 보기' }))
+    fireEvent.click(screen.getByRole('button', { name: '그냥 완성하기' }))
     expect(screen.getByTestId('bujeok-card')).toBeTruthy()
     expect(screen.queryByText(/님이 보냈어요/)).toBeNull()
     unmount()
@@ -184,14 +189,14 @@ test('이름이 잘못된 선물도 이름 없이 저장하고, 저장소를 못
   cleanup()
   breakStorageAccess()
   render(<GiftLanding spec={spec} />)
-  expect(screen.getByRole('button', { name: '열어 보기' })).toBeTruthy()
+  expect(screen.getByRole('button', { name: '그냥 완성하기' })).toBeTruthy()
 })
 
 test('내 부적 착지(me=1): 열어 보기 없이 바로 카드, "○○님의 부적", 버튼은 저장 · 내 부적함 · 선물 보내기, 부적함에는 저장하지 않는다', () => {
   setHash(H('민지'))
   render(<GiftLanding spec={spec} mine />)
   expect(screen.getByRole('heading', { level: 1 }).textContent).toBe('민지님의 부적')
-  expect(screen.queryByRole('button', { name: '열어 보기' })).toBeNull()
+  expect(screen.queryByRole('button', { name: '그냥 완성하기' })).toBeNull()
   expect(screen.getByTestId('bujeok-card')).toBeTruthy()
   expect(screen.getByRole('button', { name: '잠금화면용 저장' })).toBeTruthy()
   expect(screen.getByRole('link', { name: '내 부적함' }).getAttribute('href')).toBe('/bujeok/box')
@@ -207,7 +212,7 @@ test('내 부적 착지: 이름이 없으면 "나의 부적"', () => {
 
 test('선물 착지에도 내 부적함 버튼이 있다', () => {
   render(<GiftLanding spec={spec} />)
-  fireEvent.click(screen.getByRole('button', { name: '열어 보기' }))
+  fireEvent.click(screen.getByRole('button', { name: '그냥 완성하기' }))
   expect(screen.getByRole('link', { name: '내 부적함' }).getAttribute('href')).toBe('/bujeok/box')
 })
 
@@ -220,6 +225,7 @@ test('선물 보내기: 공유가 끝났거나 링크를 복사했을 때만 sen
     type('받는 사람 이름', '민지')
     type('보내는 사람 이름', '철수')
     fireEvent.click(make())
+    skipRite()
     await screen.findByTestId('bujeok-card')
     fireEvent.click(screen.getByRole('button', { name: '링크로 보내기' }))
     await waitFor(() => expect(shareResult).toHaveBeenCalled())
@@ -254,9 +260,17 @@ test('착지 페이지: 쿼리의 to·from은 무시하고, me=1이면 mine', as
 })
 
 test('착지 페이지: 잘못된 코드는 /bujeok 으로 redirect', async () => {
-  for (const c of ['trad-money-metal-9-gold', 'trad-money-metal-0', 'oil-money-metal-0-gold', 'x']) {
+  for (const c of ['trad-money-metal-9-gold', 'trad-money-metal-0', 'oil-money-metal-0-gold', 'x', 'trad-pass-wood-0-gold-zzz', 'cute-pass-wood-0-gold-s' + '0'.repeat(24)]) {
     await expect(GiftPage(props(c, { to: '민지' }))).rejects.toThrow('REDIRECT:/bujeok')
   }
+})
+
+test('착지 페이지: 옛 5칸 코드는 그대로 열리고 6칸(획) 코드는 획을 달고 열린다', async () => {
+  const old = (await GiftPage(props('trad-pass-wood-0-gold', {}))) as unknown as El
+  expect(old.props.spec.stroke).toBeUndefined()
+  const s6 = 's' + '5a'.repeat(12)
+  const r = (await GiftPage(props(`trad-pass-wood-0-gold-${s6}`, {}))) as unknown as El
+  expect(r.props.spec.stroke).toBe(s6)
 })
 
 test('착지 metadata: noindex, canonical /bujeok, 어떤 입력에도 메타 전체에 이름이 없다', async () => {
@@ -288,4 +302,18 @@ test('/bujeok 페이지는 mode·wish·style·finish를 허용 목록으로 걸�
 
 test('act 정리', async () => {
   await act(async () => {})
+})
+
+test('착지(받는 쪽): 닫힌 화면에 도장 찍기가 있고(열어 보기 버튼 없음), 키보드로 찍으면 카드가 열린다. 카드에는 도장이 있다', () => {
+  vi.useFakeTimers()
+  const stroke = 's' + '5a'.repeat(12)
+  render(<GiftLanding spec={{ ...spec, stroke }} />)
+  expect(screen.queryByRole('button', { name: '열어 보기' })).toBeNull()
+  expect(screen.getByText('보낸 사람이 그은 부적이에요. 도장을 찍어 완성해 주세요')).toBeTruthy()
+  expect(screen.queryByTestId('bujeok-card')).toBeNull()
+  fireEvent.keyDown(screen.getByRole('button', { name: '도장 찍기' }), { key: 'Enter' })
+  act(() => void vi.advanceTimersByTime(800))
+  vi.useRealTimers()
+  expect(screen.getByTestId('bujeok-card')).toBeTruthy()
+  expect(document.querySelector('[data-bujeok-art] svg [data-part=seal]')).not.toBeNull()
 })

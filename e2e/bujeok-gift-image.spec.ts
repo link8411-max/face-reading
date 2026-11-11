@@ -10,6 +10,7 @@ async function toGiftDone(page: Page) {
   await page.getByRole('radio', { name: '전통' }).click()
   await page.getByLabel('받는 사람 이름').fill(TO)
   await page.getByRole('button', { name: '부적 만들기' }).click()
+  await page.getByRole('button', { name: '그냥 완성하기' }).click() // 전통 선물은 보내는 사람이 긋기만 한다
   await expect(page.getByTestId('bujeok-card')).toBeVisible()
   await expect(page.getByRole('button', { name: '링크로 보내기' })).toBeVisible()
   await page.waitForTimeout(2500) // 완성 화면에서 그림을 미리 만들어 두는 시간

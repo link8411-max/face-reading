@@ -12,6 +12,13 @@ function pngSize(buf: Buffer) {
   return { w: buf.readUInt32BE(16), h: buf.readUInt32BE(20) }
 }
 
+/** 점안(마지막 한 획·도장) 화면이 뜨면 "그냥 완성하기"로 지나간다 */
+async function passRite(page: Page) {
+  const skip = page.getByRole('button', { name: '그냥 완성하기' })
+  await page.getByTestId('bujeok-card').or(skip).first().waitFor()
+  if (await skip.count()) await skip.click()
+}
+
 const FINISH_NAME = { paper: '종이', gold: '금박', holo: '홀로그램' } as const
 
 async function make(page: Page, wish: string, style: string, finish: keyof typeof FINISH_NAME = 'gold') {
@@ -23,6 +30,7 @@ async function make(page: Page, wish: string, style: string, finish: keyof typeo
   await expect(page.getByRole('radio', { name: '금박' })).toHaveAttribute('aria-checked', 'true') // 기본 마감
   await page.getByRole('radio', { name: FINISH_NAME[finish], exact: true }).click()
   await page.getByRole('button', { name: '부적 만들기' }).click()
+  await passRite(page)
   await expect(page.getByTestId('bujeok-card')).toBeVisible()
   for (const n of ['잠금화면용 저장', '공유하기', '다시 만들기', '뒤집기', '확대', '축소']) await expect(page.getByRole('button', { name: n })).toBeVisible()
   await expect(page.getByRole('link', { name: '선물하기' })).toHaveAttribute('href', `/bujeok?mode=gift&style=${style === '전통' ? 'trad' : 'cute'}`)
@@ -171,6 +179,7 @@ async function makeGift(page: Page, opts: { to: string; from?: string; wish?: st
   if (opts.from) await page.getByLabel('보내는 사람 이름').fill(opts.from)
   await expect(page.getByRole('button', { name: '부적 만들기' })).toBeEnabled()
   await page.getByRole('button', { name: '부적 만들기' }).click()
+  await passRite(page)
   await expect(page.getByTestId('bujeok-card')).toBeVisible()
   await expect(page.getByRole('button', { name: '링크로 보내기' })).toBeVisible()
   await page.getByRole('button', { name: '링크로 보내기' }).click()
@@ -178,7 +187,7 @@ async function makeGift(page: Page, opts: { to: string; from?: string; wish?: st
   return (await page.evaluate(() => (window as unknown as { __shared: { url: string } }).__shared.url)) as string
 }
 
-test('선물 만들기 → 링크를 새 탭에서 열기 → 열어 보기 → 세 버튼 → 나도 보내기는 같은 화풍으로 선물 모드', async ({ page, context }) => {
+test('선물 만들기 → 링크를 새 탭에서 열기 → 도장 건너뛰고 열기 → 세 버튼 → 나도 보내기는 같은 화풍으로 선물 모드', async ({ page, context }) => {
   const errors = trackErrors(page)
   const url = await makeGift(page, { to: '민지', from: '철수', wish: '연애', style: '귀여운', finish: 'holo' })
   expect(url).toMatch(/\/bujeok\/r\/cute-love-[a-z]+-\d-holo\?utm_source=share&utm_medium=friend_link#to=%EB%AF%BC%EC%A7%80&from=/)
@@ -195,7 +204,7 @@ test('선물 만들기 → 링크를 새 탭에서 열기 → 열어 보기 → 
   expect(await guest.title()).not.toMatch(/민지|철수/)
   expect(await guest.title()).toContain('부적이 도착했어요')
   expect(JSON.stringify(await guest.evaluate(() => (window as unknown as { dataLayer?: unknown[] }).dataLayer ?? []))).not.toMatch(/민지|철수|%EB%AF%BC/)
-  await guest.getByRole('button', { name: '열어 보기' }).click()
+  await guest.getByRole('button', { name: '그냥 완성하기' }).click()
   await expect(guest.getByTestId('bujeok-card')).toBeVisible()
   await expect(guest.getByText('철수님이 보냈어요')).toBeVisible()
   await expect(guest.getByRole('button', { name: '잠금화면용 저장' })).toBeVisible()
@@ -225,7 +234,7 @@ test('선물 만들기 → 링크를 새 탭에서 열기 → 열어 보기 → 
 
 test('착지 "내 부적 만들기"는 받은 소원·화풍·마감을 미리 고른다', async ({ page }) => {
   await page.goto('/bujeok/r/trad-pass-wood-2-paper#to=%EB%AF%BC%EC%A7%80')
-  await page.getByRole('button', { name: '열어 보기' }).click()
+  await page.getByRole('button', { name: '그냥 완성하기' }).click()
   await page.getByRole('link', { name: '내 부적 만들기' }).click()
   await expect(page).toHaveURL(/\/bujeok\?wish=pass&style=trad&finish=paper/)
   await expect(page.getByRole('radio', { name: '합격' })).toHaveAttribute('aria-checked', 'true')
@@ -294,7 +303,7 @@ test('완성 화면: 광고는 카드 아래에 있고 카드 위·앞에는 없
 test('착지: 열기 전에는 광고가 없고 연 뒤 카드 아래에 있다', async ({ page }) => {
   await page.goto('/bujeok/r/cute-pass-wood-1-paper#to=%EB%AF%BC%EC%A7%80')
   await expect(page.locator('iframe[title="쿠팡 추천 상품"]')).toHaveCount(0)
-  await page.getByRole('button', { name: '열어 보기' }).click()
+  await page.getByRole('button', { name: '그냥 완성하기' }).click()
   const frame = page.locator('iframe[title="쿠팡 추천 상품"]')
   await expect(frame).toHaveCount(1)
   await expect(frame).toHaveAttribute('src', /subId=bujeok-pass/)
@@ -317,6 +326,7 @@ test('내 부적을 만들면 주소가 내 부적 링크로 바뀌고, 새로�
   await page.getByRole('radio', { name: '귀여운' }).click()
   await page.getByLabel('이름').fill('민지')
   await page.getByRole('button', { name: '부적 만들기' }).click()
+  await passRite(page)
   await expect(page.getByTestId('bujeok-card')).toBeVisible()
   await expect(page.getByRole('button', { name: '내 부적 링크 보내기' })).toBeVisible()
   await expect(page).toHaveURL(/\/bujeok\/r\/cute-money-[a-z]+-\d-gold\?me=1#to=%EB%AF%BC%EC%A7%80$/)
@@ -327,7 +337,7 @@ test('내 부적을 만들면 주소가 내 부적 링크로 바뀌고, 새로�
 
   await page.reload()
   await expect(page.getByRole('heading', { level: 1 })).toHaveText('민지님의 부적')
-  await expect(page.getByRole('button', { name: '열어 보기' })).toHaveCount(0)
+  await expect(page.getByRole('button', { name: '그냥 완성하기' })).toHaveCount(0)
   await expect(page.getByTestId('bujeok-card')).toBeVisible()
   expect(page.url()).toBe(url)
   expect(await artOf(page)).toBe(before)
@@ -349,7 +359,7 @@ test('선물 링크를 열면 부적함 받은 부적에 들어가고, 누르면
   const errors = trackErrors(page)
   await page.goto('/bujeok/r/cute-pass-wood-1-paper#to=%EB%AF%BC%EC%A7%80&from=%EC%B2%A0%EC%88%98')
   await expect(page.getByRole('heading', { level: 1 })).toHaveText('민지님께 부적이 도착했어요')
-  await page.getByRole('button', { name: '열어 보기' }).click()
+  await page.getByRole('button', { name: '그냥 완성하기' }).click()
   await page.getByRole('link', { name: '내 부적함' }).click()
   await expect(page).toHaveURL(/\/bujeok\/box$/)
   await expect(page.getByRole('heading', { level: 2, name: '받은 부적' })).toBeVisible()
@@ -394,9 +404,69 @@ test('처음 열면 "좌우로 밀어 돌려 보세요" 안내가 뜨고, 카드
   await page.getByRole('radio', { name: '전통' }).click()
   await page.getByLabel('받는 사람 이름').fill('민지')
   await page.getByRole('button', { name: '부적 만들기' }).click()
+  await passRite(page)
   await expect(page.getByTestId('bujeok-card')).toBeVisible()
   const hint = page.getByText('좌우로 밀어 돌려 보세요')
   await expect(hint).toBeVisible({ timeout: 5000 }) // 등장 회전(1.5초)이 끝난 뒤
+  // 안내는 카드 위에 겹치지 않고 무대 아래에 있다
+  const stage = (await page.getByTestId('bujeok-stage').boundingBox())!
+  const h = (await hint.boundingBox())!
+  expect(h.y).toBeGreaterThanOrEqual(stage.y + stage.height - 1)
   await page.getByTestId('bujeok-flip').click()
   await expect(hint).toHaveCount(0)
+})
+
+// --- 점안: 마우스로 위에서 아래로 긋고 도장을 꾹 눌러 찍기 ---
+const spineD = (page: Page) => page.locator('[data-bujeok-art] svg [data-part=spine]').first().getAttribute('d')
+
+async function drawStroke(page: Page, pts: [number, number][]) {
+  const box = (await page.getByTestId('bujeok-rite-pad').boundingBox())!
+  const at = ([x, y]: [number, number]) => [box.x + (x / 240) * box.width, box.y + (y / 508) * box.height] as const
+  await page.mouse.move(...at(pts[0]))
+  await page.mouse.down()
+  for (const p of pts.slice(1)) await page.mouse.move(...at(p), { steps: 4 })
+  await page.mouse.up()
+}
+const GOOD: [number, number][] = [[120, 254], [124, 300], [116, 350], [123, 400], [119, 430], [108, 448], [95, 440]]
+
+test('점안: 짧게 그으면 안내가 뜨고 다시 긋게 한다. 제대로 긋고 도장을 꾹 눌러 찍으면 6칸 주소가 되고, 새로 열어도 같은 몸통이 나온다', async ({ page, context }) => {
+  const errors = trackErrors(page)
+  await page.setViewportSize({ width: 390, height: 1000 })
+  await page.goto('/bujeok')
+  await page.getByRole('radio', { name: '합격' }).click()
+  await page.getByRole('radio', { name: '전통' }).click()
+  await page.getByRole('radio', { name: '종이', exact: true }).click()
+  await page.getByRole('button', { name: '부적 만들기' }).click()
+  await expect(page.getByText('마지막 한 획을 그어 부적을 완성해요')).toBeVisible()
+  await expect(page.getByRole('button', { name: '그냥 완성하기' })).toBeVisible()
+  await drawStroke(page, [[120, 254], [121, 280], [121, 300]])
+  await expect(page.getByText('점선을 따라 아래까지 쭉 그어 주세요')).toBeVisible()
+  await expect(page.getByTestId('bujeok-card')).toHaveCount(0)
+  await drawStroke(page, GOOD)
+  const seal = page.getByRole('button', { name: '도장 찍기' })
+  await expect(seal).toBeVisible()
+  // 짧게 누르면 다시
+  const sb = (await seal.boundingBox())!
+  await page.mouse.move(sb.x + sb.width / 2, sb.y + sb.height / 2)
+  await page.mouse.down()
+  await page.mouse.up()
+  await expect(page.getByText('조금 더 길게 눌러 주세요')).toBeVisible()
+  await page.mouse.down()
+  await page.waitForTimeout(550)
+  await page.mouse.up()
+  await expect(page.getByTestId('bujeok-card')).toBeVisible({ timeout: 5000 })
+  await expect(page).toHaveURL(/\/bujeok\/r\/trad-pass-[a-z]+-\d-paper-s[0-9a-z]{24}\?me=1$/)
+  const url = page.url()
+  const d = await spineD(page)
+  expect(d).toBeTruthy()
+
+  const other = await context.newPage()
+  await other.goto(new URL(url).pathname + new URL(url).search)
+  await expect(other.getByTestId('bujeok-card')).toBeVisible()
+  expect(await spineD(other)).toBe(d)
+  // 기본 획과는 다르다(그은 획이 실렸다)
+  await other.goto(new URL(url).pathname.replace(/-s[0-9a-z]{24}$/, '') + '?me=1')
+  await expect(other.getByTestId('bujeok-card')).toBeVisible()
+  expect(await spineD(other)).not.toBe(d)
+  expect(errors).toEqual([])
 })
