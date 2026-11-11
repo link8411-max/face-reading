@@ -29,8 +29,20 @@ function nameOf(id: string): string {
   return allSamgukCharacters.find((x) => x.id === id)?.name ?? id
 }
 
+// 검색 제목 실험(2026-11-11): 네이버에서 노출은 많은데 클릭률이 0.2~1.6%였던 다섯 명만 인물의 가장 극적인 한 줄로 바꿨다.
+// 비교 기준(서치어드바이저 최근 30일, 11/10 갱신): 등애 노출 420·0.2%, 여포 330·0.3%, 관우 285·0.4%, 조운 265·0.8%, 유비 253·1.6%.
+// 2주 뒤 다시 보고, 오르면 나머지 인물에도 넓힌다. 문장은 열전 summary·funFacts에 있는 사실만 쓴다.
+export const HOOK_TITLES: Record<string, string> = {
+  dengai: '등애 | 담요 두르고 낭떠러지를 굴러 촉을 무너뜨린 장수',
+  lvbu: '여포 | 양아버지 둘을 죽인 천하제일 무장의 최후',
+  guanyu: '관우 | 화웅을 벤 건 정말 관우였을까? 연의와 정사',
+  zhaoyun: '조운 조자룡 | 아두를 안고 조조 대군을 뚫은 장수',
+  liubei: '유비 | 돗자리 짜던 소년이 황제가 되기까지',
+}
+
 // 예: "관우 열전 | 자 운장, 뜻·무기·관계도 – 운명을 읽다" (48자 이하가 되도록 뒤쪽부터 줄인다)
 export function personTitle(id: string): string {
+  if (HOOK_TITLES[id]) return HOOK_TITLES[id] + BRAND
   const p = getPerson(id)
   const name = nameOf(id)
   const candidates = [

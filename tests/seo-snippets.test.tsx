@@ -118,15 +118,24 @@ test('삼국지 장수 수 문구는 실제 장수 수와 같다 (옛 52명이 �
   expect(readFileSync('src/content/navigation.ts', 'utf8')).toContain(`${samgukCharacters.length}명`)
 })
 
-test('MBTI 16개: 제목은 "별명 유형 특징·궁합 1위 <1위>"로 시작, 설명은 별명으로 시작', async () => {
+// 검색 제목 실험(2026-11-11): ESFP·ISFJ·ISFP만 유형 코드를 앞에 둔 제목과 주변 평 설명. 나머지 13유형은 대조군으로 그대로.
+const MBTI_HOOK = new Set(['ESFP', 'ISFJ', 'ISFP'])
+
+test('MBTI 16개: 대조군은 "별명 유형 특징·궁합 1위 <1위>", 실험 세 유형은 "유형 별명 특징 | 찰떡 궁합 <1위>"', async () => {
   for (const T of MBTI_TYPES) {
     const m = await mbtiMeta({ params: Promise.resolve({ type: T.toLowerCase() }) })
     const title = String(m.title)
     const desc = String(m.description)
     const best = bestMatches(T, 'love', 1)[0]
     const nick = mbtiProfiles[T].nickname
-    expect(title.startsWith(`${nick} ${T} 특징·궁합 1위 ${best}`), `${T}: ${title}`).toBe(true)
-    expect(desc.startsWith(`${nick} ${T}와 연애로 잘 맞는 유형 1위는 ${best}`), `${T}: ${desc}`).toBe(true)
+    if (MBTI_HOOK.has(T)) {
+      expect(title.startsWith(`${T} ${nick} 특징 | 찰떡 궁합 ${best}`), `${T}: ${title}`).toBe(true)
+      expect(desc, T).toMatch(new RegExp(`^"[^"]+" 소리 자주 듣는 ${T}\\. 연애로 잘 맞는 1위는 ${best}`))
+      expect(desc.length, T).toBeLessThanOrEqual(110)
+    } else {
+      expect(title.startsWith(`${nick} ${T} 특징·궁합 1위 ${best}`), `${T}: ${title}`).toBe(true)
+      expect(desc.startsWith(`${nick} ${T}와 연애로 잘 맞는 유형 1위는 ${best}`), `${T}: ${desc}`).toBe(true)
+    }
   }
 })
 

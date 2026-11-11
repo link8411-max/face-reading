@@ -136,3 +136,14 @@ test('관계도 SVG와 글 목록', async () => {
   expect(html).toContain('<svg')
   expect(html).toContain('혈연')
 })
+
+test('검색 제목 실험: 다섯 인물은 이름으로 시작하는 한 줄 제목, 48자 이하', async () => {
+  const { HOOK_TITLES } = await import('@/lib/people/portrait')
+  expect(Object.keys(HOOK_TITLES).sort()).toEqual(['dengai', 'guanyu', 'liubei', 'lvbu', 'zhaoyun'])
+  for (const id of Object.keys(HOOK_TITLES)) {
+    const t = personTitle(id)
+    expect(t, id).toBe(HOOK_TITLES[id] + ' – 운명을 읽다')
+    expect(t.length, id).toBeLessThanOrEqual(48)
+  }
+  expect(personTitle('caocao').startsWith('조조 열전')).toBe(true)
+})

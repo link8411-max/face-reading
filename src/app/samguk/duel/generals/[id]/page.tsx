@@ -16,6 +16,13 @@ const BRAND = " – 운명을 읽다";
 const STAT_KEYS = ["통솔", "무력", "지력", "정치", "매력"] as const;
 const ROLE_LABEL = { starter: "시작 장수", recruit: "영입 장수", boss: "보스", mob: "졸개" } as const;
 
+// 검색 제목 실험(2026-11-11): "하후돈"·"여포"로 찾는 사람에게 "일기토 능력치"만 보여 클릭률이 0.2%·0.4%(노출 474·473)였다.
+// 인물 이야기를 앞에 두고 능력치는 뒤로. 2주 뒤 서치어드바이저로 비교한다.
+const DUEL_HOOK_TITLES: Record<string, string> = {
+  xiaohoudun: "하후돈 | 화살 맞은 눈알을 삼킨 맹장, 능력치·필살기",
+  lvbu: "여포 | 사람 중엔 여포, 능력치·필살기 방천화극",
+};
+
 // 일기토 장수 페이지에 나오는 12명 (졸개 제외)
 const GENERALS = DUEL_GENERALS.filter((g) => g.role !== "mob");
 
@@ -35,7 +42,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const g = getDuelGeneral(id);
   const c = getCharacterById(id);
   if (!g || !c || g.role === "mob") return {};
-  const title = `${g.name} 일기토 능력치·필살기${BRAND}`;
+  const title = `${DUEL_HOOK_TITLES[id] ?? `${g.name} 일기토 능력치·필살기`}${BRAND}`;
   const sig = SKILLS[DUEL_GENERAL_INTRO[id].signature].name;
   const description = `삼국지 일기토 ${g.name}(${g.kind})의 코에이 능력치와 필살기 ${sig}, 기술 4가지, 보스별 상성을 정리했어요.`;
   const url = `${SITE}/samguk/duel/generals/${id}`;
