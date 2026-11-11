@@ -34,4 +34,6 @@ export interface BujeokSpec {
   el: ElKey
   variant: number
   finish: Finish
+  /** 전통 화풍 몸통 획(encodeStroke 결과, 's'+24자). 없으면 기본 획 */
+  stroke?: string
 }

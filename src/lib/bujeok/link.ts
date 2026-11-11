@@ -1,6 +1,7 @@
 // 부적 선물 링크와 이름 검사. 링크에는 화풍·소원·기운·변형 번호·마감과 (선택) 이름만 싣는다. 생년월일은 싣지 않는다.
 import { SITE } from '@/lib/shareBase'
 import { BANNED_NAMES } from './bannedNames'
+import { decodeStroke } from './stroke'
 import { EL_KEYS, FINISHES, STYLES, VARIANTS, WISHES, type BujeokSpec } from './keys'
 
 const NAME_RE = /^[가-힣A-Za-z0-9 ]+$/
@@ -16,13 +17,14 @@ export function cleanName(raw: unknown): string | null {
 }
 
 export function bujeokCode(spec: BujeokSpec): string {
-  return `${spec.style}-${spec.wish}-${spec.el}-${spec.variant}-${spec.finish}`
+  const base = `${spec.style}-${spec.wish}-${spec.el}-${spec.variant}-${spec.finish}`
+  return spec.style === 'trad' && spec.stroke ? `${base}-${spec.stroke}` : base
 }
 
 export function parseBujeokCode(code: string): BujeokSpec | null {
   const p = code.split('-')
-  if (p.length !== 5) return null
-  const [style, wish, el, v, finish] = p
+  if (p.length !== 5 && p.length !== 6) return null
+  const [style, wish, el, v, finish, stroke] = p
   if (!/^(0|[1-9]\d?)$/.test(v)) return null
   const variant = Number(v)
   if (variant >= VARIANTS) return null
@@ -30,7 +32,13 @@ export function parseBujeokCode(code: string): BujeokSpec | null {
   if (!(WISHES as readonly string[]).includes(wish)) return null
   if (!(EL_KEYS as readonly string[]).includes(el)) return null
   if (!(FINISHES as readonly string[]).includes(finish)) return null
-  return { style, wish, el, variant, finish } as BujeokSpec
+  const spec = { style, wish, el, variant, finish } as BujeokSpec
+  if (p.length === 6) {
+    // 획 칸은 전통 화풍에서 디코드가 되는 때만 받는다
+    if (style !== 'trad' || !decodeStroke(stroke)) return null
+    spec.stroke = stroke
+  }
+  return spec
 }
 
 // 이름은 링크의 # 뒤에만 싣는다. 해시는 서버로 가지 않고 GA 기본 수집·서버 접근 로그에 들어가지 않는다.

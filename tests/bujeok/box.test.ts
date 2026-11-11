@@ -91,6 +91,13 @@ describe('box', () => {
     expect(loadBox()).toEqual([good])
   })
 
+  test('6칸(획) 코드도 저장하고 복원한다', () => {
+    const C = 'trad-pass-wood-0-gold-s' + 'a'.repeat(24)
+    addToBox(item({ code: C, kind: 'mine', to: null }))
+    expect(loadBox()!.map((i) => i.code)).toEqual([C])
+    expect(boxItemHref({ code: C, to: null, from: null, kind: 'mine' })).toBe(`/bujeok/r/${C}?me=1`)
+  })
+
   test('넣을 때도 검사한다: 틀린 코드·이름은 저장하지 않는다', () => {
     addToBox(item({ code: 'bad' }))
     addToBox(item({ to: '<b>' }))

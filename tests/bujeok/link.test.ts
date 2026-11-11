@@ -1,6 +1,7 @@
 import { describe, expect, test } from 'vitest'
 import { cleanName, bujeokCode, parseBujeokCode, bujeokGiftUrl, bujeokMineUrl, bujeokOgUrl, giftHeadline, mineHeadline, parseNameHash } from '@/lib/bujeok/link'
 import { BANNED_NAMES } from '@/lib/bujeok/bannedNames'
+import { DEFAULT_SPINE, encodeStroke } from '@/lib/bujeok/stroke'
 import { STYLES, WISHES, EL_KEYS, VARIANTS, FINISHES, type BujeokSpec } from '@/lib/bujeok/keys'
 
 const spec: BujeokSpec = { style: 'trad', wish: 'money', el: 'metal', variant: 2, finish: 'gold' }
@@ -30,6 +31,24 @@ describe('code', () => {
   })
   test.each(['trad-money-metal-4', 'trad-money-metal--1', 'oil-money-metal-0', 'trad-money-metal', 'trad-money-metal-0-x', 'trad-money-metal-1.5', '', 'trad-money-metal-01', 'trad-money-metal- 1', 'trad-money-metal-0', 'trad-money-metal-0-foil', 'trad-money-metal-0-gold-x', 'trad-money-metal-0-GOLD', 'trad-money-metal-4-gold'])('잘못된 코드 "%s" → null', (c) => {
     expect(parseBujeokCode(c)).toBeNull()
+  })
+  test('5칸 코드는 획이 없다', () => {
+    expect(parseBujeokCode('trad-money-metal-2-gold')!.stroke).toBeUndefined()
+    expect(parseBujeokCode('trad-pass-wood-0-gold')).toEqual({ style: 'trad', wish: 'pass', el: 'wood', variant: 0, finish: 'gold' })
+  })
+  test('6칸(획) 왕복', () => {
+    const stroke = encodeStroke(DEFAULT_SPINE)
+    const s: BujeokSpec = { ...spec, stroke }
+    expect(bujeokCode(s)).toBe(`trad-money-metal-2-gold-${stroke}`)
+    expect(parseBujeokCode(bujeokCode(s))).toEqual(s)
+  })
+  test('cute는 획을 싣지 않고, cute+6칸·망가진 6칸·7칸은 null', () => {
+    const stroke = encodeStroke(DEFAULT_SPINE)
+    expect(bujeokCode({ ...spec, style: 'cute', stroke })).toBe('cute-money-metal-2-gold')
+    expect(parseBujeokCode(`cute-money-metal-2-gold-${stroke}`)).toBeNull()
+    expect(parseBujeokCode('trad-pass-wood-0-gold-zzz')).toBeNull()
+    expect(parseBujeokCode(`trad-money-metal-2-gold-${stroke}-${stroke}`)).toBeNull()
+    expect(parseBujeokCode('trad-money-metal-2-gold-S' + 'a'.repeat(24))).toBeNull()
   })
   test('코드 형식', () => expect(bujeokCode(spec)).toBe('trad-money-metal-2-gold'))
 })
