@@ -1,0 +1,172 @@
+<title>입체 부적 카드 시안</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Gowun+Batang:wght@400;700&family=Noto+Sans+KR:wght@400;700&display=swap">
+<style>
+/* 배치: 어두운 무대 한가운데 카드 한 장, 아래에 고르기 두 줄. 손으로 돌려 보는 것이 주인공 */
+:root{
+  color-scheme: dark;
+  --ground:#0f0b0a; --panel:#1d1614; --line:#3a2d28; --text:#f1e7d6; --dim:#a8998a;
+  --gold:#e9c46a; --jusa:#b3261e;
+  --font-gowun-batang:"Gowun Batang"; --font-noto-sans-kr:"Noto Sans KR";
+  --serif:"Gowun Batang",serif;
+}
+html,body{height:100%}
+body{background:radial-gradient(90% 60% at 50% 38%,#2b2620 0%,var(--ground) 70%) fixed,var(--ground);color:var(--text);font-family:var(--serif);font-size:15px;line-height:1.6;
+  padding-block:20px 28px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));overflow-x:hidden}
+.wrap{max-width:520px;margin:0 auto;display:flex;flex-direction:column;gap:14px;align-items:center}
+.tag{font-size:12px;letter-spacing:.08em;color:var(--gold);border:1px solid var(--line);border-radius:999px;padding:2px 12px}
+h1{font-size:22px;margin:0;text-align:center;text-wrap:balance}
+.hint{color:var(--dim);margin:0;text-align:center;font-size:14px}
+.stage{position:relative;width:100%;height:min(62vh,560px);min-height:400px;display:grid;place-items:center;touch-action:none;cursor:grab;user-select:none;-webkit-user-select:none}
+.stage:active{cursor:grabbing}
+canvas#dust{position:absolute;inset:0;width:100%;height:100%;pointer-events:none}
+.scene{perspective:1100px;height:92%;aspect-ratio:var(--ar,240/508)}
+.card{position:relative;width:100%;height:100%;transform-style:preserve-3d;transform:rotateX(var(--rx,0deg)) rotateY(var(--ry,0deg));will-change:transform}
+.face,.slab{position:absolute;inset:0;border-radius:var(--r,10px);backface-visibility:hidden;-webkit-backface-visibility:hidden;overflow:hidden}
+.slab{backface-visibility:visible;-webkit-backface-visibility:visible;background:var(--edge,#8a6a1f)}
+.front{transform:translateZ(5px);box-shadow:0 0 0 1px rgba(255,220,140,.25)}
+.back{transform:rotateY(180deg) translateZ(5px);background:var(--backbg,#e6c35c);color:var(--backfg,#7a1712);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:5%;padding:10%;text-align:center}
+.front svg{width:100%;height:100%;display:block}
+.sheen,.holo{position:absolute;inset:0;pointer-events:none}
+.sheen{background:linear-gradient(105deg,transparent 30%,rgba(255,255,255,.0) 40%,rgba(255,250,225,.75) 50%,rgba(255,255,255,0) 60%,transparent 70%);background-size:300% 100%;background-position:var(--sx,50%) 0;mix-blend-mode:soft-light}
+.holo{opacity:var(--holo,0);background:repeating-linear-gradient(115deg,#ff5f6d 0%,#ffc371 12%,#f9f871 24%,#7bffb1 36%,#6ad7ff 48%,#b28dff 60%,#ff5f6d 72%);background-size:260% 260%;background-position:var(--sx,50%) var(--sy,50%);mix-blend-mode:color-dodge}
+.shadow{position:absolute;left:50%;bottom:1%;width:46%;height:5%;transform:translateX(-50%) scaleX(var(--sh,1));background:radial-gradient(closest-side,rgba(0,0,0,.6),transparent);filter:blur(4px)}
+.seal{width:44%;aspect-ratio:1;border-radius:50%;border:3px double currentColor;display:grid;place-items:center;font-size:clamp(34px,11vw,60px);font-weight:700}
+.back .to{font-size:clamp(18px,5.4vw,26px);font-weight:700}
+.back p{margin:0;font-size:clamp(12px,3.4vw,15px);line-height:1.7}
+.back .foot{font-size:11px;opacity:.75;letter-spacing:.06em}
+.rows{display:flex;flex-direction:column;gap:10px;width:100%}
+.row{display:flex;gap:8px;align-items:center;justify-content:center;flex-wrap:wrap}
+.row>span{font-size:12px;color:var(--dim);letter-spacing:.06em;min-width:3em;text-align:right}
+button{font:inherit;color:var(--text);background:var(--panel);border:1px solid var(--line);border-radius:999px;padding:7px 16px;cursor:pointer}
+button[aria-pressed=true]{background:var(--gold);color:#2a1d08;border-color:var(--gold);font-weight:700}
+button:focus-visible{outline:2px solid var(--gold);outline-offset:2px}
+.note{color:var(--dim);font-size:13px;margin:0;text-align:center;max-width:44ch}
+</style>
+
+<div class="wrap">
+  <span class="tag">버리는 시안</span>
+  <h1>손으로 돌려 보는 부적</h1>
+  <p class="hint">카드를 좌우로 밀어 돌려 보세요. 뒷면에 받는 사람이 적혀 있습니다.</p>
+
+  <div class="stage" id="stage" role="img" aria-label="돌려 볼 수 있는 부적 카드">
+    <canvas id="dust"></canvas>
+    <div class="scene">
+      <div class="card" id="card">
+        <div class="slab" style="transform:translateZ(3px)"></div>
+        <div class="slab" style="transform:translateZ(1px)"></div>
+        <div class="slab" style="transform:translateZ(-1px)"></div>
+        <div class="slab" style="transform:translateZ(-3px)"></div>
+        <div class="face front"><div id="art" style="position:absolute;inset:0"></div><div class="holo"></div><div class="sheen"></div></div>
+        <div class="face back">
+          <div class="seal" id="seal">福</div>
+          <div class="to">민지에게</div>
+          <p id="mean">재물을 부르고 보배가 들어온다는 뜻이에요.<br>모으는 재미가 붙는 한 해가 되기를 바라요.</p>
+          <div class="foot">2026년 11월 11일 · 철수 드림<br>운명을 읽다 · unse-ai.com</div>
+          <div class="sheen"></div>
+        </div>
+      </div>
+    </div>
+    <div class="shadow"></div>
+  </div>
+
+  <div class="rows">
+    <div class="row" id="styles"><span>화풍</span>
+      <button type="button" data-v="trad" aria-pressed="true">전통</button>
+      <button type="button" data-v="cute" aria-pressed="false">귀여운</button>
+    </div>
+    <div class="row" id="finishes"><span>마감</span>
+      <button type="button" data-v="paper" aria-pressed="false">종이</button>
+      <button type="button" data-v="gold" aria-pressed="true">금박</button>
+      <button type="button" data-v="holo" aria-pressed="false">홀로그램</button>
+    </div>
+  </div>
+  <p class="note">실제 사이트에서는 폰을 기울여도 빛이 따라 움직이게 할 수 있습니다. 이 시안 화면에서는 손으로 미는 것만 됩니다.</p>
+</div>
+
+<script>
+const SVGS={"trad":"<svg viewBox=\"0 0 300 520\" role=\"img\" aria-label=\"재물 부적\" xmlns=\"http://www.w3.org/2000/svg\"><defs><filter id=\"bujeok-brush\" x=\"-5%\" y=\"-5%\" width=\"110%\" height=\"110%\"><feTurbulence type=\"fractalNoise\" baseFrequency=\".05\" numOctaves=\"2\" seed=\"4\"></feTurbulence><feDisplacementMap in=\"SourceGraphic\" scale=\"3.2\"></feDisplacementMap></filter><filter id=\"bujeok-grain\"><feTurbulence type=\"fractalNoise\" baseFrequency=\".9\" numOctaves=\"2\" seed=\"7\"></feTurbulence><feColorMatrix values=\"0 0 0 0 .35  0 0 0 0 .22  0 0 0 0 .05  0 0 0 .18 0\"></feColorMatrix><feComposite in2=\"SourceGraphic\" operator=\"in\"></feComposite></filter><linearGradient id=\"bujeok-edge\" x1=\"0\" x2=\"1\"><stop offset=\"0\" stop-color=\"#C99E3A\" stop-opacity=\".55\"></stop><stop offset=\".12\" stop-color=\"#C99E3A\" stop-opacity=\"0\"></stop><stop offset=\".88\" stop-color=\"#C99E3A\" stop-opacity=\"0\"></stop><stop offset=\"1\" stop-color=\"#C99E3A\" stop-opacity=\".55\"></stop></linearGradient></defs><rect x=\"30\" y=\"6\" width=\"240\" height=\"508\" fill=\"#E6C35C\"></rect><rect x=\"30\" y=\"6\" width=\"240\" height=\"508\" fill=\"url(#bujeok-edge)\"></rect><rect x=\"30\" y=\"6\" width=\"240\" height=\"508\" filter=\"url(#bujeok-grain)\"></rect><g fill=\"none\" stroke=\"#B3261E\" stroke-linecap=\"round\" stroke-linejoin=\"round\" filter=\"url(#bujeok-brush)\"><rect data-a=\"draw\" data-part=\"border\" data-d=\"700\" x=\"42\" y=\"18\" width=\"216\" height=\"484\" stroke-width=\"3\"></rect><rect data-a=\"draw\" data-d=\"600\" x=\"49\" y=\"25\" width=\"202\" height=\"470\" stroke-width=\"1.2\"></rect><path data-a=\"draw\" data-part=\"head\" d=\"M118 64 Q150 32 182 64\" stroke-width=\"4\"></path><circle data-a=\"pop\" cx=\"118\" cy=\"64\" r=\"6\" fill=\"#B3261E\" stroke=\"none\"></circle><circle data-a=\"pop\" cx=\"150\" cy=\"48\" r=\"6\" fill=\"#B3261E\" stroke=\"none\"></circle><circle data-a=\"pop\" cx=\"182\" cy=\"64\" r=\"6\" fill=\"#B3261E\" stroke=\"none\"></circle><path data-a=\"draw\" data-part=\"body\" d=\"M92 98 Q150 78 208 98\" stroke-width=\"7\"></path><path data-a=\"draw\" d=\"M112 106 v10 M150 102 v14 M188 106 v10\" stroke-width=\"5\"></path><path data-a=\"draw\" d=\"M150 124 L198 206 L150 288 L102 206 Z\" stroke-width=\"6.5\"></path><path data-a=\"draw\" d=\"M150 160 L176 206 L150 252 L124 206 Z\" stroke-width=\"6.5\"></path><path data-a=\"draw\" d=\"M150 112 V300\" stroke-width=\"9\"></path><path data-a=\"draw\" data-part=\"symbol\" d=\"M112 345 a38 38 0 1 0 76 0 a38 38 0 1 0 -76 0\" stroke-width=\"7\"></path><path data-a=\"draw\" d=\"M132 327 H168 V363 H132 Z\" stroke-width=\"6\"></path><path data-a=\"draw\" d=\"M78 345 Q58 345 64 320 M222 345 Q242 345 236 320\" stroke-width=\"5\"></path><path data-a=\"draw\" d=\"M150 383 V396 Q150 412 136 412 Q124 412 124 402 Q124 394 134 395\" stroke-width=\"5\"></path></g><g data-part=\"phrase\" aria-label=\"招財進寶\"><text data-a=\"fade\" x=\"72\" y=\"452\" text-anchor=\"middle\" font-size=\"26\" font-weight=\"700\" fill=\"#B3261E\" style=\"font-family:var(--font-gowun-batang), &quot;Noto Serif KR&quot;, serif\">招</text><text data-a=\"fade\" x=\"106\" y=\"452\" text-anchor=\"middle\" font-size=\"26\" font-weight=\"700\" fill=\"#B3261E\" style=\"font-family:var(--font-gowun-batang), &quot;Noto Serif KR&quot;, serif\">財</text><text data-a=\"fade\" x=\"140\" y=\"452\" text-anchor=\"middle\" font-size=\"26\" font-weight=\"700\" fill=\"#B3261E\" style=\"font-family:var(--font-gowun-batang), &quot;Noto Serif KR&quot;, serif\">進</text><text data-a=\"fade\" x=\"174\" y=\"452\" text-anchor=\"middle\" font-size=\"26\" font-weight=\"700\" fill=\"#B3261E\" style=\"font-family:var(--font-gowun-batang), &quot;Noto Serif KR&quot;, serif\">寶</text></g><circle data-a=\"pop\" cx=\"62\" cy=\"479\" r=\"6\" fill=\"#8A8377\"></circle><text data-a=\"fade\" x=\"74\" y=\"483\" font-size=\"11\" fill=\"#B3261E\" style=\"font-family:var(--font-gowun-batang), &quot;Noto Serif KR&quot;, serif\">쇠의 기운</text><g data-a=\"stamp\" data-part=\"stamp\"><rect x=\"212\" y=\"436\" width=\"34\" height=\"54\" rx=\"3\" fill=\"#B3261E\" filter=\"url(#bujeok-brush)\"></rect><text x=\"229\" y=\"459\" text-anchor=\"middle\" font-size=\"17\" font-weight=\"700\" fill=\"#F5E2A6\" style=\"font-family:var(--font-gowun-batang), &quot;Noto Serif KR&quot;, serif\">민</text><text x=\"229\" y=\"479\" text-anchor=\"middle\" font-size=\"17\" font-weight=\"700\" fill=\"#F5E2A6\" style=\"font-family:var(--font-gowun-batang), &quot;Noto Serif KR&quot;, serif\">지</text></g></svg>","cute":"<svg viewBox=\"0 0 300 520\" role=\"img\" aria-label=\"액막이 부적\" xmlns=\"http://www.w3.org/2000/svg\"><rect x=\"24\" y=\"6\" width=\"252\" height=\"508\" rx=\"34\" fill=\"#FFFAF2\"></rect><rect data-a=\"fade\" data-part=\"border\" x=\"36\" y=\"18\" width=\"228\" height=\"484\" rx=\"24\" fill=\"none\" stroke=\"#F3A8B4\" stroke-width=\"3\" stroke-dasharray=\"2 9\" stroke-linecap=\"round\"></rect><rect data-a=\"pop\" x=\"58\" y=\"58\" width=\"184\" height=\"52\" rx=\"26\" fill=\"#FFE3E8\"></rect><text data-a=\"fade\" data-part=\"head\" x=\"150\" y=\"96\" text-anchor=\"middle\" font-size=\"27\" font-weight=\"700\" fill=\"#5B4037\" stroke=\"#5B4037\" stroke-width=\"1.2\" stroke-linejoin=\"round\" style=\"font-family:var(--font-noto-sans-kr), sans-serif;paint-order:stroke\">나쁜 건 저리 가</text><g class=\"bujeok-bob\" data-part=\"symbol\"><circle data-a=\"pop\" stroke=\"#5B4037\" stroke-width=\"6\" stroke-linecap=\"round\" stroke-linejoin=\"round\" fill=\"#FFC46B\" cx=\"106\" cy=\"224\" r=\"15\"></circle><circle data-a=\"pop\" stroke=\"#5B4037\" stroke-width=\"6\" stroke-linecap=\"round\" stroke-linejoin=\"round\" fill=\"#FFC46B\" cx=\"194\" cy=\"224\" r=\"15\"></circle><path data-a=\"pop\" stroke=\"#5B4037\" stroke-width=\"6\" stroke-linecap=\"round\" stroke-linejoin=\"round\" fill=\"#FFC46B\" d=\"M90 278 C90 232 118 210 150 210 C182 210 210 232 210 278 C210 318 182 340 150 340 C118 340 90 318 90 278 Z\"></path><path data-a=\"draw\" stroke=\"#5B4037\" stroke-width=\"5\" stroke-linecap=\"round\" stroke-linejoin=\"round\" fill=\"none\" d=\"M150 213 v17 M133 217 l4 14 M167 217 l-4 14\"></path><path data-a=\"draw\" stroke=\"#5B4037\" stroke-width=\"3.5\" stroke-linecap=\"round\" stroke-linejoin=\"round\" fill=\"none\" d=\"M98 292 h-16 M100 302 l-15 5 M202 292 h16 M200 302 l15 5\"></path><circle data-a=\"pop\" cx=\"126\" cy=\"272\" r=\"6.5\" fill=\"#5B4037\"></circle><circle data-a=\"pop\" cx=\"174\" cy=\"272\" r=\"6.5\" fill=\"#5B4037\"></circle><circle data-a=\"pop\" cx=\"109\" cy=\"290\" r=\"10\" fill=\"#FF9AA8\" opacity=\".7\"></circle><circle data-a=\"pop\" cx=\"191\" cy=\"290\" r=\"10\" fill=\"#FF9AA8\" opacity=\".7\"></circle><path data-a=\"draw\" d=\"M137 287 Q150 301 163 287\" fill=\"none\" stroke=\"#5B4037\" stroke-width=\"5\" stroke-linecap=\"round\"></path></g><g data-part=\"body\"><path class=\"bujeok-tw\" data-a=\"pop\" transform=\"translate(64 176) scale(1.3)\" d=\"M0 -12 Q9 1 6 6 Q3 11 0 11 Q-3 11 -6 6 Q-9 1 0 -12Z\" fill=\"#7DB7E8\"></path><path class=\"bujeok-tw\" data-a=\"pop\" transform=\"translate(238 186) scale(1)\" d=\"M0 -12 Q9 1 6 6 Q3 11 0 11 Q-3 11 -6 6 Q-9 1 0 -12Z\" fill=\"#7DB7E8\"></path><path class=\"bujeok-tw\" data-a=\"pop\" transform=\"translate(56 300) scale(0.9)\" d=\"M0 -12 Q9 1 6 6 Q3 11 0 11 Q-3 11 -6 6 Q-9 1 0 -12Z\" fill=\"#7DB7E8\"></path><path class=\"bujeok-tw\" data-a=\"pop\" transform=\"translate(244 312) scale(1.3)\" d=\"M0 -12 Q9 1 6 6 Q3 11 0 11 Q-3 11 -6 6 Q-9 1 0 -12Z\" fill=\"#7DB7E8\"></path><path class=\"bujeok-tw\" data-a=\"pop\" transform=\"translate(92 366) scale(0.8)\" d=\"M0 -12 Q9 1 6 6 Q3 11 0 11 Q-3 11 -6 6 Q-9 1 0 -12Z\" fill=\"#7DB7E8\"></path><path class=\"bujeok-tw\" data-a=\"pop\" transform=\"translate(210 370) scale(1)\" d=\"M0 -12 Q9 1 6 6 Q3 11 0 11 Q-3 11 -6 6 Q-9 1 0 -12Z\" fill=\"#7DB7E8\"></path></g><text data-a=\"fade\" data-part=\"phrase\" x=\"150\" y=\"402\" text-anchor=\"middle\" font-size=\"14\" fill=\"#B48A7C\" style=\"font-family:var(--font-noto-sans-kr), sans-serif;paint-order:stroke\">액막이 부적 · 물의 기운</text><g data-a=\"stamp\" data-part=\"stamp\"><rect x=\"87.84\" y=\"424\" width=\"124.32000000000001\" height=\"46\" rx=\"23\" fill=\"#E2574C\"></rect><text x=\"150\" y=\"455.64\" text-anchor=\"middle\" font-size=\"24\" font-weight=\"700\" fill=\"#fff\" style=\"font-family:var(--font-noto-sans-kr), sans-serif;paint-order:stroke\">민지 꺼</text></g></svg>"};
+const GOLD='<linearGradient id="goldfoil" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#fff3c4"/><stop offset=".3" stop-color="#e9c46a"/><stop offset=".55" stop-color="#b8862b"/><stop offset=".8" stop-color="#f6dd95"/><stop offset="1" stop-color="#c9982f"/></linearGradient>';
+let style='trad', finish='gold';
+const card=document.getElementById('card'), art=document.getElementById('art'), stage=document.getElementById('stage');
+
+function paint(){
+  let s=SVGS[style];
+  const trad=style==='trad';
+  if(finish!=='paper'){
+    s=s.replace(/<svg([^>]*)>/,'<svg$1><defs>'+GOLD+'</defs>');
+    if(trad){
+      s=s.replaceAll('#E6C35C','#17140f').replaceAll('#C99E3A','#000000')      // 종이 → 붉은 옻칠
+         .replaceAll('#B3261E','url(#goldfoil)').replaceAll('#F5E2A6','#17140f') // 붓선 → 금박, 도장 글자는 바탕색
+         .replace('0 0 0 0 .35  0 0 0 0 .22  0 0 0 0 .05  0 0 0 .18 0','0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 0 .35 0');
+    }else{
+      s=s.replaceAll('#FFFAF2','#2b1d3a').replaceAll('#F3A8B4','url(#goldfoil)').replaceAll('#B48A7C','#e9c46a')
+         .replace(/(<text[^>]*data-part="head"[^>]*)fill="#5B4037" stroke="#5B4037"/,'$1fill="url(#goldfoil)" stroke="url(#goldfoil)"').replaceAll('#FFE3E8','#3c2a50');
+    }
+  }
+  s=s.replace('viewBox="0 0 300 520"',trad?'viewBox="30 6 240 508"':'viewBox="24 6 252 508"');
+  art.innerHTML=s;
+  stage.style.setProperty('--ar',trad?'240/508':'252/508');
+  const dark=finish!=='paper';
+  card.style.setProperty('--r',trad?'6px':'13% / 6.5%');
+  card.style.setProperty('--edge',dark?'#b8862b':(trad?'#c99e3a':'#f3a8b4'));
+  card.style.setProperty('--backbg',dark?(trad?'#17140f':'#2b1d3a'):(trad?'#e6c35c':'#fffaf2'));
+  card.style.setProperty('--backfg',dark?'#e9c46a':(trad?'#8f1d17':'#5b4037'));
+  card.style.setProperty('--holo',finish==='holo'?'.42':'0');
+  document.getElementById('seal').textContent=trad?'福':'복';
+  document.getElementById('mean').innerHTML=trad?'재물을 부르고 보배가 들어온다는 뜻이에요.<br>모으는 재미가 붙는 한 해가 되기를 바라요.':'나쁜 일은 사라지고 좋은 일이 온다는 뜻이에요.<br>마음 편한 날이 이어지기를 바라요.';
+}
+function chips(id,set){
+  document.getElementById(id).addEventListener('click',e=>{
+    const b=e.target.closest('button'); if(!b) return;
+    document.querySelectorAll('#'+id+' button').forEach(x=>x.setAttribute('aria-pressed',x===b));
+    set(b.dataset.v); paint();
+  });
+}
+chips('styles',v=>style=v); chips('finishes',v=>finish=v);
+
+// 돌리기: 끌면 따라 돌고, 놓으면 관성으로 돌다가 가까운 면(앞·뒤)으로 천천히 돌아온다
+let ry=0, rx=0, vy=0, dragging=false, touched=false, lx=0, ly=0, t0=performance.now();
+const reduce=matchMedia('(prefers-reduced-motion: reduce)').matches;
+stage.addEventListener('pointerdown',e=>{dragging=true;touched=true;lx=e.clientX;ly=e.clientY;vy=0;stage.setPointerCapture(e.pointerId)});
+stage.addEventListener('pointermove',e=>{
+  if(!dragging) return;
+  const dx=e.clientX-lx, dy=e.clientY-ly; lx=e.clientX; ly=e.clientY;
+  ry+=dx*.55; vy=dx*.55; rx=Math.max(-16,Math.min(16,rx-dy*.2));
+});
+const up=()=>{dragging=false};
+stage.addEventListener('pointerup',up); stage.addEventListener('pointercancel',up);
+stage.addEventListener('keydown',e=>{if(e.key==='ArrowLeft'){vy=-9;touched=true}if(e.key==='ArrowRight'){vy=9;touched=true}});
+stage.tabIndex=0;
+
+function apply(){
+  card.style.setProperty('--ry',ry.toFixed(2)+'deg');
+  card.style.setProperty('--rx',rx.toFixed(2)+'deg');
+  const a=((ry%360)+360)%360, k=((a+90)%180)/180;            // 한 면을 지나는 동안 0→1
+  card.style.setProperty('--sx',(100-k*100).toFixed(1)+'%');
+  card.style.setProperty('--sy',(50+rx*2).toFixed(1)+'%');
+  stage.style.setProperty('--sh',Math.max(.15,Math.abs(Math.cos(ry*Math.PI/180))).toFixed(2));
+}
+function tick(now){
+  if(!touched && !reduce){ ry=Math.sin((now-t0)/1400)*22; rx=Math.sin((now-t0)/2100)*4; }
+  else if(!dragging){
+    ry+=vy; vy*=.94;
+    if(Math.abs(vy)<.6){ const target=Math.round(ry/180)*180; ry+=(target-ry)*.06; }
+    rx*=.92;
+  }
+  apply(); dust(now); requestAnimationFrame(tick);
+}
+
+// 금가루
+const cv=document.getElementById('dust'), cx=cv.getContext('2d'); let P=[];
+function size(){const r=cv.getBoundingClientRect(),d=Math.min(2,devicePixelRatio||1);cv.width=r.width*d;cv.height=r.height*d;cx.setTransform(d,0,0,d,0,0);
+  P=Array.from({length:42},()=>({x:Math.random()*r.width,y:Math.random()*r.height,r:.6+Math.random()*1.8,s:.15+Math.random()*.45,p:Math.random()*6.28}))}
+function dust(now){
+  const w=cv.clientWidth,h=cv.clientHeight; cx.clearRect(0,0,w,h);
+  for(const p of P){ if(!reduce){p.y-=p.s; p.x+=Math.sin(now/900+p.p)*.25; if(p.y<-4){p.y=h+4;p.x=Math.random()*w}}
+    cx.globalAlpha=.25+.55*Math.abs(Math.sin(now/700+p.p)); cx.fillStyle='#f3d27a'; cx.beginPath(); cx.arc(p.x,p.y,p.r,0,6.28); cx.fill(); }
+  cx.globalAlpha=1;
+}
+addEventListener('resize',size);
+paint(); size(); apply(); requestAnimationFrame(tick);
+</script>
