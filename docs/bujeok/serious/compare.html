@@ -1,0 +1,55 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>진지한 부적 비교 시안</title>
+<style>
+  @font-face { font-family: Gowun; src: url(../../../src/fonts/GowunBatang-Regular.woff2); }
+  @font-face { font-family: Gowun; font-weight: 700; src: url(../../../src/fonts/GowunBatang-Bold.woff2); }
+  :root { --paper:#FBF6F1; --ink:#2E2A27; --muted:#6B6259; --line:#E6DED2; }
+  * { box-sizing: border-box; }
+  body { margin:0; background:var(--paper); color:var(--ink); font-family: Gowun, serif; }
+  main { max-width: 760px; margin: 0 auto; padding: 28px 16px 40px; }
+  h1 { font-size: 24px; margin: 0 0 6px; }
+  p.lead { color: var(--muted); margin: 0 0 22px; font-size: 15px; }
+  .row { display:grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-bottom: 22px; }
+  .cell { background:#1A1714; border-radius: 22px; padding: 18px 14px 12px; text-align:center; }
+  .cell img, .cell svg { width: 100%; max-width: 250px; height: auto; display:block; margin: 0 auto; filter: drop-shadow(0 10px 18px rgba(0,0,0,.45)); }
+  .tag { color:#E9DFC9; font-size: 14px; margin-top: 10px; }
+  .tag b { color:#F1C86A; }
+  h2 { font-size: 17px; margin: 0 0 10px; }
+  ul { margin: 0; padding-left: 18px; color: var(--muted); font-size: 14px; line-height: 1.7; }
+</style>
+</head>
+<body>
+<main>
+  <h1>합격 부적, 지금과 새 시안</h1>
+  <p class="lead">같은 소원(합격·金榜題名)을 진짜 부적 짜임으로 다시 그렸습니다. 왼쪽이 지금 사이트, 오른쪽이 새 시안입니다.</p>
+
+  <div class="row">
+    <div class="cell"><img src="current-paper.svg" alt="지금 종이 부적"><div class="tag">지금 · 종이</div></div>
+    <div class="cell"><svg id="newPaper" viewBox="0 0 240 508"></svg><div class="tag"><b>새 시안</b> · 종이</div></div>
+  </div>
+  <div class="row">
+    <div class="cell"><img src="current-gold.svg" alt="지금 금박 부적"><div class="tag">지금 · 금박</div></div>
+    <div class="cell"><svg id="newGold" viewBox="0 0 240 508"></svg><div class="tag"><b>새 시안</b> · 금박</div></div>
+  </div>
+
+  <h2>바뀐 점</h2>
+  <ul>
+    <li>짜임: 머리글 勅令(칙령), 해·달, 별 셋(三台), 가운데 부문, 양옆 글귀(金榜題名 · 急急如律令), 아래 도장.</li>
+    <li>선: 붓처럼 시작은 눌러 굵게, 끝은 가늘게 빠지고, 가로획은 얇고 세로획은 굵습니다. 먹 번짐과 마른 붓 자국도 넣었습니다.</li>
+    <li>종이: 괴황지 색에 섬유 결, 얼룩, 가장자리 그을림을 넣었습니다.</li>
+    <li>도장: 한글 '복' 대신 吉을 새긴 붉은 도장입니다.</li>
+    <li>글씨: 이 시안은 맥에 깔린 행서 글꼴로 그렸습니다. 사이트에 넣을 때는 무료 붓글씨 글꼴로 바꾸고, 쓰는 한자만 잘라 넣습니다.</li>
+  </ul>
+</main>
+
+<script src="art.js"></script>
+<script>
+draw(document.getElementById('newPaper'), 'paper')
+draw(document.getElementById('newGold'), 'gold')
+</script>
+</body>
+</html>
