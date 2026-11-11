@@ -246,3 +246,24 @@ test('?mode=gift&wish=pass: 선물 모드와 합격 소원이 미리 골라져 �
   expect(screen.getByRole('radio', { name: '내 부적' }).getAttribute('aria-checked')).toBe('false')
   expect(screen.getByRole('radio', { name: '합격' }).getAttribute('aria-checked')).toBe('true')
 })
+
+test('소원 고르기: 열한 개가 WISH_ORDER 순서로 3열 격자에 보이고, 새 소원으로도 부적이 만들어진다', async () => {
+  const { WISH_ORDER } = await import('@/lib/bujeok/keys')
+  const { WISH_TEXT } = await import('@/content/bujeok')
+  render(<BujeokClient />)
+  const group = screen.getByRole('radiogroup', { name: '어떤 소원을 담을까요?' })
+  expect(group.className).toContain('grid-cols-3')
+  const labels = [...group.querySelectorAll('[role=radio]')].map((e) => e.textContent)
+  expect(labels).toEqual(WISH_ORDER.map((w) => WISH_TEXT[w].label))
+  expect(labels).toHaveLength(11)
+  pick('삼재 막이')
+  pick('전통')
+  fireEvent.click(make())
+  // 삼재 막이의 기본 기운은 water
+  expect(await screen.findByText(EL_TEXT.water.line)).toBeTruthy()
+})
+
+test('?wish=samjae로 열면 삼재 막이가 미리 골라져 있다', () => {
+  render(<BujeokClient initial={{ wish: 'samjae' }} />)
+  expect(screen.getByRole('radio', { name: '삼재 막이' }).getAttribute('aria-checked')).toBe('true')
+})

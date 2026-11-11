@@ -74,7 +74,93 @@ const MASCOT: Record<Wish, { faceY: number; draw: (fill: string) => ReactNode }>
       </>
     ),
   },
+  // 네잎클로버
+  allgood: {
+    faceY: 268,
+    draw: (fill) => (
+      <>
+        <path data-a="draw" {...body} fill="none" d="M150 322 Q146 342 164 348" />
+        <path data-a="pop" {...body} fill={fill} d={CLOVER} />
+      </>
+    ),
+  },
+  // 넥타이 맨 곰
+  career: {
+    faceY: 256,
+    draw: (fill) => (
+      <>
+        <circle data-a="pop" {...body} fill={fill} cx="100" cy="212" r="19" />
+        <circle data-a="pop" {...body} fill={fill} cx="200" cy="212" r="19" />
+        <path data-a="draw" {...body} fill="#6C7BD6" d="M150 316 L138 326 L150 334 L162 326 Z" />
+        <path data-a="draw" {...body} fill="#6C7BD6" d="M143 332 L134 360 L150 370 L166 360 L157 332 Z" />
+        <circle data-a="pop" {...body} fill={fill} cx="150" cy="256" r="58" />
+        <ellipse data-a="pop" cx="150" cy="276" rx="24" ry="17" fill="#FFF3E0" />
+        <ellipse data-a="pop" cx="150" cy="264" rx="6" ry="4.5" fill={INK} />
+      </>
+    ),
+  },
+  // 복돼지
+  business: {
+    faceY: 254,
+    draw: (fill) => (
+      <>
+        <path data-a="pop" {...body} fill={fill} d="M104 232 L92 196 L130 214 Z" />
+        <path data-a="pop" {...body} fill={fill} d="M196 232 L208 196 L170 214 Z" />
+        <ellipse data-a="pop" {...body} fill={fill} cx="150" cy="268" rx="68" ry="58" />
+        <ellipse data-a="pop" cx="150" cy="270" rx="26" ry="17" fill="#FFE6EC" />
+        <circle data-a="pop" cx="142" cy="262" r="3.2" fill={INK} />
+        <circle data-a="pop" cx="158" cy="262" r="3.2" fill={INK} />
+        <circle data-a="pop" {...body} strokeWidth={5} fill="#FFD35E" cx="150" cy="206" r="15" />
+        <path data-a="draw" {...body} strokeWidth={3.5} fill="none" d="M144 200 H156 V212 H144 Z" />
+      </>
+    ),
+  },
+  // 지붕 있는 작은 집
+  family: {
+    faceY: 284,
+    draw: (fill) => (
+      <>
+        <rect data-a="pop" {...body} fill="#F6A97A" x="172" y="204" width="18" height="34" />
+        <rect data-a="pop" {...body} fill={fill} x="98" y="260" width="104" height="80" rx="6" />
+        <path data-a="pop" {...body} fill="#F6A97A" d="M82 266 L150 198 L218 266 Z" />
+        <circle data-a="pop" {...body} strokeWidth={4.5} fill={PAL.cutePaper} cx="150" cy="238" r="9" />
+        <path data-a="draw" {...body} strokeWidth={4.5} fill={PAL.cutePaper} d="M138 340 V330 a12 12 0 0 1 24 0 V340" />
+      </>
+    ),
+  },
+  // 방패 든 해태
+  samjae: {
+    faceY: 250,
+    draw: (fill) => (
+      <>
+        <circle data-a="pop" {...body} fill={fill} cx="102" cy="218" r="15" />
+        <circle data-a="pop" {...body} fill={fill} cx="198" cy="218" r="15" />
+        <path data-a="pop" {...body} fill="#FFE9A8" d="M142 204 L150 172 L158 204 Z" />
+        <circle data-a="pop" {...body} fill={fill} cx="150" cy="250" r="56" />
+        <circle data-a="pop" {...body} fill={fill} cx="112" cy="326" r="13" />
+        <circle data-a="pop" {...body} fill={fill} cx="188" cy="326" r="13" />
+        <path data-a="pop" {...body} fill="#FFE9A8" d="M122 312 H178 V332 Q178 350 150 360 Q122 350 122 332 Z" />
+        <path data-a="draw" {...body} strokeWidth={4} fill="none" d="M150 320 V348" />
+      </>
+    ),
+  },
+  // 연등
+  wish: {
+    faceY: 268,
+    draw: (fill) => (
+      <>
+        <path data-a="draw" {...body} strokeWidth={4.5} fill="none" d="M150 200 V184" />
+        <circle data-a="pop" {...body} strokeWidth={4.5} fill="none" cx="150" cy="178" r="7" />
+        <path data-a="draw" {...body} strokeWidth={4.5} fill="none" d="M136 338 V358 M164 338 V358" />
+        <path data-a="pop" {...body} fill={fill} d="M96 240 Q96 212 150 212 Q204 212 204 240 V300 Q204 336 150 340 Q96 336 96 300 Z" />
+        <path data-a="draw" {...body} strokeWidth={4} fill="none" d="M98 242 H202 M99 312 H201" />
+      </>
+    ),
+  },
 }
+
+// 네잎클로버: 지름 76 원 넷의 합집합을 한 줄 경로로
+const CLOVER = 'M150 216.3 A38 38 0 1 1 203.7 270 A38 38 0 1 1 150 323.7 A38 38 0 1 1 96.3 270 A38 38 0 1 1 150 216.3 Z'
 
 export default function CuteBujeok({ spec, name }: KitProps) {
   const { border, head } = partsFor(spec)

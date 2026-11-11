@@ -1,6 +1,6 @@
 import { expect, test } from 'vitest'
 import { pickElement, elementFromBirth, partsFor, randomVariant } from '@/lib/bujeok/compose'
-import { EL_KEYS, WISHES, VARIANTS, STYLES, type ElKey } from '@/lib/bujeok/keys'
+import { EL_KEYS, WISHES, WISH_ORDER, WISH_DEFAULT_EL, VARIANTS, STYLES, type ElKey } from '@/lib/bujeok/keys'
 
 test('가장 적은 기운이 하나면 그것', () => {
   expect(pickElement({ 목: 2, 화: 0, 토: 2, 금: 1, 수: 1 }, 'money', 15)).toBe('fire')
@@ -30,7 +30,7 @@ test('같은 입력은 같은 결과', () => {
   expect(elementFromBirth(b, 'love')).toBe(a)
 })
 
-test('분포: 1950~2010년 매달 1·15일, 소원 5개 전체에서 한 기운이 40%를 넘지 않는다', () => {
+test('분포: 1950~2010년 매달 1·15일, 소원 11개 전체에서 한 기운이 40%를 넘지 않는다', () => {
   const tally: Record<ElKey, number> = { wood: 0, fire: 0, earth: 0, metal: 0, water: 0 }
   let total = 0
   for (let y = 1950; y <= 2010; y++)
@@ -58,4 +58,12 @@ test('partsFor: variant 0..3이 (border, head) 네 조합을 한 번씩 낸다',
 test('randomVariant는 0..VARIANTS-1', () => {
   expect(randomVariant(() => 0)).toBe(0)
   expect(randomVariant(() => 0.999999)).toBe(VARIANTS - 1)
+})
+
+test('소원은 11개이고 WISH_ORDER는 같은 11개를 다른 순서(많이 찾을 순)로 담는다', () => {
+  expect(WISHES).toHaveLength(11)
+  expect(WISHES.slice(0, 5)).toEqual(['money', 'pass', 'health', 'love', 'guard']) // 기존 키 순서 고정
+  expect([...WISH_ORDER].sort()).toEqual([...WISHES].sort())
+  expect(WISH_ORDER).toEqual(['money', 'pass', 'allgood', 'health', 'love', 'career', 'business', 'family', 'wish', 'samjae', 'guard'])
+  for (const w of WISHES) expect(EL_KEYS).toContain(WISH_DEFAULT_EL[w])
 })

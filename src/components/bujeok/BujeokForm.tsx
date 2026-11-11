@@ -1,9 +1,9 @@
 'use client'
-// 부적 만들기 입력: 소원(5)·화풍(2)·마감(3, 기본 금박)은 필수, 생년월일과 이름은 선택.
+// 부적 만들기 입력: 소원(11)·화풍(2)·마감(3, 기본 금박)은 필수, 생년월일과 이름은 선택.
 import BirthDateFields from '@/components/BirthDateFields'
 import BujeokSvg from './BujeokSvg'
 import type { BirthDateInput } from '@/lib/birthDate'
-import { FINISHES, FINISH_LABEL, STYLES, WISHES, WISH_DEFAULT_EL, type BujeokStyle, type Finish, type Wish } from '@/lib/bujeok/keys'
+import { FINISHES, FINISH_LABEL, STYLES, WISH_ORDER, WISH_DEFAULT_EL, type BujeokStyle, type Finish, type Wish } from '@/lib/bujeok/keys'
 import { WISH_TEXT } from '@/content/bujeok'
 
 export const STYLE_LABEL: Record<BujeokStyle, string> = { trad: '전통', cute: '귀여운' }
@@ -74,8 +74,8 @@ export default function BujeokForm({
 
       <div className="bg-white rounded-[28px] p-6 mb-6 border border-line">
         <p id="bujeok-wish-label" className="text-sm font-medium mb-2">어떤 소원을 담을까요?</p>
-        <div role="radiogroup" aria-labelledby="bujeok-wish-label" className="flex flex-wrap gap-2 mb-6">
-          {WISHES.map((w) => {
+        <div role="radiogroup" aria-labelledby="bujeok-wish-label" className="grid grid-cols-3 gap-2 mb-6">
+          {WISH_ORDER.map((w) => {
             const on = values.wish === w
             return (
               <button
@@ -84,7 +84,7 @@ export default function BujeokForm({
                 role="radio"
                 aria-checked={on}
                 onClick={() => set({ wish: w })}
-                className={`h-11 px-5 rounded-full text-sm font-medium border transition ${on ? 'bg-ink text-paper border-ink' : 'bg-white text-ink border-line'}`}
+                className={`h-11 px-1 rounded-full text-sm font-medium whitespace-nowrap border transition ${on ? 'bg-ink text-paper border-ink' : 'bg-white text-ink border-line'}`}
               >
                 {WISH_TEXT[w].label}
               </button>

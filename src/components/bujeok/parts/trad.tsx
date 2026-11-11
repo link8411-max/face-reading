@@ -22,6 +22,23 @@ const SYMBOL: Record<Wish, string[]> = {
   health: [ring(150, 331, 9), ring(150, 357, 15)],
   love: [ring(139, 345, 14), ring(161, 345, 14)],
   guard: ['M130 368 V326 H170 V368', 'M130 346 H170'],
+  // 네잎클로버: 작은 고리 넷
+  allgood: [ring(141, 336, 8), ring(159, 336, 8), ring(141, 354, 8), ring(159, 354, 8)],
+  // 오르는 계단
+  career: ['M126 364 H139 V350 H152 V336 H165 V322', 'M154 322 H168 V336'],
+  // 동전 더미
+  business: ['M130 330 a20 8 0 1 0 40 0 a20 8 0 1 0 -40 0', 'M130 330 V347 a20 8 0 0 0 40 0 V330', 'M130 347 V362 a20 8 0 0 0 40 0 V347'],
+  // 지붕 아래 두 사람
+  family: ['M124 342 L150 316 L176 342', ring(140, 358, 4), ring(160, 358, 4)],
+  // 방패
+  samjae: ['M150 320 L172 328 V344 Q172 360 150 370 Q128 360 128 344 V328 Z', 'M150 334 V356'],
+  // 연등
+  wish: ['M138 326 H162', 'M138 326 Q122 346 138 366 H162 Q178 346 162 326', 'M150 314 V326', 'M150 366 V373', 'M126 346 H174'],
+}
+
+/** 글귀 줄 배치: 4자는 간격 34·글자 26, 5자는 간격 27·글자 22. 도장(가장 넓을 때 x=192부터)보다 왼쪽에서 끝난다 */
+export function phraseLayout(n: number): { x0: number; step: number; size: number } {
+  return n > 4 ? { x0: 70, step: 27, size: 22 } : { x0: 72, step: 34, size: 26 }
 }
 
 export default function TradBujeok({ spec, name, lite }: KitProps) {
@@ -36,6 +53,7 @@ export default function TradBujeok({ spec, name, lite }: KitProps) {
   const sh = rows * 20 + 14
   const sx = 246 - sw
   const sy = 490 - sh
+  const pl = phraseLayout([...w.hanja].length)
   const brush = lite ? undefined : 'url(#bujeok-brush)'
   const line = { fill: 'none', stroke: J, strokeLinecap: 'round', strokeLinejoin: 'round' } as const
   return (
@@ -113,7 +131,7 @@ export default function TradBujeok({ spec, name, lite }: KitProps) {
 
       <g data-part="phrase" aria-label={w.hanja}>
         {[...w.hanja].map((c, i) => (
-          <text key={i} data-a="fade" x={72 + i * 34} y="452" textAnchor="middle" fontSize="26" fontWeight="700" fill={J} style={SERIF}>
+          <text key={i} data-a="fade" x={pl.x0 + i * pl.step} y="452" textAnchor="middle" fontSize={pl.size} fontWeight="700" fill={J} style={SERIF}>
             {c}
           </text>
         ))}

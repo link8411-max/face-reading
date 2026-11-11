@@ -372,12 +372,14 @@ public/
 **구조**
 | 위치 | 내용 |
 |------|------|
-| `src/lib/bujeok/` | 순수 함수. `keys.ts`(화풍 2·소원 5·기운 5·변형 4·마감 3, `BujeokSpec`)·`compose.ts`(기운 고르기, 생년월일 → 기운)·`link.ts`(링크 코드 `<화풍>-<소원>-<기운>-<변형>-<마감>` 다섯 조각, `cleanName`, `bujeokGiftUrl`, `bujeokMineUrl`, `parseNameHash`, `bujeokOgUrl`, `giftHeadline`, `mineHeadline`)·`spin.ts`(회전 관성·확대 범위)·`palette.ts`(`themeFor` 마감별 색)·`wallpaper.ts`(잠금화면 1170×2532)·`birthHandoff.ts`(사주→부적 생년월일, 메모리만)·`box.ts`(부적함, localStorage `bujeok-box-v1`)·`bannedNames.ts`·`bannedPhrases.ts` |
-| `src/content/bujeok.ts` | 소원·기운 문구(`WISH_TEXT`, `EL_TEXT`). 한자 글귀는 실제 쓰이는 길상 문구 다섯 개뿐 |
+| `src/lib/bujeok/` | 순수 함수. `keys.ts`(화풍 2·소원 11·기운 5·변형 4·마감 3, `BujeokSpec`, `WISH_ORDER`=소원 고르기 화면 순서)·`compose.ts`(기운 고르기, 생년월일 → 기운)·`link.ts`(링크 코드 `<화풍>-<소원>-<기운>-<변형>-<마감>` 다섯 조각, `cleanName`, `bujeokGiftUrl`, `bujeokMineUrl`, `parseNameHash`, `bujeokOgUrl`, `giftHeadline`, `mineHeadline`)·`spin.ts`(회전 관성·확대 범위)·`palette.ts`(`themeFor` 마감별 색)·`wallpaper.ts`(잠금화면 1170×2532)·`birthHandoff.ts`(사주→부적 생년월일, 메모리만)·`box.ts`(부적함, localStorage `bujeok-box-v1`)·`bannedNames.ts`·`bannedPhrases.ts` |
+| `src/content/bujeok.ts` | 소원·기운 문구(`WISH_TEXT`, `EL_TEXT`). 한자 글귀는 실제 쓰이는 길상 문구 열한 개뿐(가족 평안 家和萬事成만 5자, 나머지 4자) |
 | `src/components/bujeok/` | `BujeokClient`(form → done, 내 부적/선물 모드)·`BujeokForm`·`BujeokDone`·`BujeokCard`(입체 카드: 앞면 `BujeokSvg`, 뒷면 이름·뜻·응원 한 줄, 확대·축소, 뒤집기 버튼)·`GiftLanding`(선물·내 부적 착지)·`BujeokBox`(부적함 화면)·`useNameHash`·`useBox`·`BujeokAd`·`HouseBanner`·`useWallpaperSave`·`parts/{trad,cute}`(SVG 부품, 전부 코드로 그림) |
-| 라우트 | `/bujeok`(`?mode=gift&style=&wish=&finish=`를 허용 목록으로만 받음, 서버 페이지가 집시세 신고가를 읽어 내려 줌, 구조화 데이터·`PageGuide`는 layout이 아니라 page에서 렌더), `/bujeok/r/[code]`(착지: noindex·canonical `/bujeok`·사이트맵 제외, 잘못된 코드는 `/bujeok`으로 redirect. 이름은 **해시**: `/bujeok/r/<code>?utm…#to=<이름>&from=<이름>`이 선물, `?me=1#to=<이름>`이 내 부적 — `me=1`이면 "열어 보기" 없이 바로 카드가 나오고 머리말이 "○○님의 부적"/"나의 부적"), `/bujeok/box`(내 부적함: 클라이언트 페이지, noindex·canonical `/bujeok`·사이트맵 제외), `/dev/bujeok-lab`(개발 전용, 부품 격자) |
+| 라우트 | `/bujeok`(`?mode=gift&style=&wish=&finish=`를 허용 목록으로만 받음, 서버 페이지가 집시세 신고가를 읽어 내려 줌, 구조화 데이터·`PageGuide`는 layout이 아니라 page에서 렌더), `/bujeok/r/[code]`(착지: noindex·canonical `/bujeok`·사이트맵 제외, 잘못된 코드는 `/bujeok`으로 redirect. 이름은 **해시**: `/bujeok/r/<code>?utm…#to=<이름>&from=<이름>`이 선물, `?me=1#to=<이름>`이 내 부적 — `me=1`이면 "열어 보기" 없이 바로 카드가 나오고 머리말이 "○○님의 부적"/"나의 부적"), `/bujeok/box`(내 부적함: 클라이언트 페이지, noindex·canonical `/bujeok`·사이트맵 제외), `/dev/bujeok-lab`(개발 전용, 마감별 소원 11장 격자 + 전체 1320 조합) |
 | OG | `/api/og/result?kind=bujeok&style=&wish=&finish=`(1200×630, 이름·기운(el)은 받지 않는다. 종이는 노란 종이, 금박·홀로그램은 먹색 바탕. 붉은 바탕 없음) |
 | 메뉴 | 사주·운세 묶음 "소원을 담은 부적". 사주·신년운세 결과의 "이어서 보면 좋아요"에서 `NextSteps birth={…}`로 생년월일을 메모리로만 넘긴다 |
+
+**소원 11개(설계 16절, 2026-11-12)**: 재물 money·합격 pass·건강 health·연애 love·액막이 guard(원래 다섯, `WISHES` 앞 순서 고정)에 만사형통 allgood·취업·승진 career·사업·개업 business·가족 평안 family·삼재 막이 samjae·소원성취 wish를 뒤에 붙였다. 고르기 화면은 `WISH_ORDER`(재물·합격·만사형통·건강·연애·취업·사업·가족·소원성취·삼재·액막이)로 3열 격자(320px에서 줄바꿈·넘침 없음 확인). 전통 글귀 줄은 4자(글자 26·간격 34)와 5자(22·27)를 `phraseLayout`으로 배치하고 도장 왼쪽에서 끝난다(테스트). 귀여운 캐릭터는 클로버·넥타이 곰·복돼지·집·방패 든 해태·연등. 삼재 막이는 2027 띠별 글(삼재띠)과 `/fortune/2027` 허브 삼재 문단에서 `/bujeok?wish=samjae`로 잇는다. 기운 분포는 11개 전체에서 한 기운 최대 27%.
 
 **규칙 (테스트로 고정)**
 - **빨간 바탕 금지**: 금박·홀로그램 바탕은 먹색 `#17140F`, 무대도 붉은 기운 없는 어두운 중성색.

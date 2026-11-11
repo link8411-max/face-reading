@@ -19,14 +19,14 @@ describe('cleanName', () => {
 })
 
 describe('code', () => {
-  test('600개 전부 왕복', () => {
+  test('1320개(2화풍 × 11소원 × 5기운 × 4변형 × 3마감) 전부 왕복', () => {
     let n = 0
     for (const style of STYLES) for (const wish of WISHES) for (const el of EL_KEYS) for (let variant = 0; variant < VARIANTS; variant++) for (const finish of FINISHES) {
       const s = { style, wish, el, variant, finish }
       expect(parseBujeokCode(bujeokCode(s))).toEqual(s)
       n++
     }
-    expect(n).toBe(600)
+    expect(n).toBe(1320)
   })
   test.each(['trad-money-metal-4', 'trad-money-metal--1', 'oil-money-metal-0', 'trad-money-metal', 'trad-money-metal-0-x', 'trad-money-metal-1.5', '', 'trad-money-metal-01', 'trad-money-metal- 1', 'trad-money-metal-0', 'trad-money-metal-0-foil', 'trad-money-metal-0-gold-x', 'trad-money-metal-0-GOLD', 'trad-money-metal-4-gold'])('잘못된 코드 "%s" → null', (c) => {
     expect(parseBujeokCode(c)).toBeNull()

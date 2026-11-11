@@ -18,15 +18,15 @@ const dom = (spec: BujeokSpec, name: string | null = '민지') => {
 }
 const spec = (over: Partial<BujeokSpec> = {}): BujeokSpec => ({ style: 'trad', wish: 'money', el: 'metal', variant: 0, finish: 'paper', ...over })
 
-test('600개 조합 모두 렌더되고 viewBox가 0 0 300 520', () => {
-  expect(ALL).toHaveLength(600)
+test('1320개 조합 모두 렌더되고 viewBox가 0 0 300 520', () => {
+  expect(ALL).toHaveLength(1320)
   const seen = new Set<string>()
   for (const s of ALL) {
     const h = html(s)
     expect(h).toContain('viewBox="0 0 300 520"')
     seen.add(h)
   }
-  expect(seen.size).toBe(600) // 조합마다(마감 포함) 그림이 다르다
+  expect(seen.size).toBe(1320) // 조합마다(마감 포함) 그림이 다르다
 })
 
 test('그려지는 요소 순서: 처음은 테두리, 마지막은 도장', () => {
@@ -47,7 +47,7 @@ test('이름이 있으면 도장에 이름 글자가 있고, 없으면 "복"', (
   expect(dom(spec(), '김 하늘이네').querySelector('[data-part=stamp]')!.textContent).toHaveLength(4)
 })
 
-test('전통 화풍에는 소원의 한자 네 글자가 순서대로 있다', () => {
+test('전통 화풍에는 소원의 한자 글귀(4자, 가족 평안은 5자)가 순서대로 있다', () => {
   for (const wish of WISHES) expect(dom(spec({ wish })).querySelector('[data-part=phrase]')!.textContent).toBe(WISH_TEXT[wish].hanja)
 })
 
@@ -118,6 +118,42 @@ test('한 화면에 마감이 다른 카드가 여러 장 있어도 gradient·fi
   const all = FINISHES.flatMap(ids)
   expect(new Set(all).size).toBe(all.length)
   for (const f of DARK_FINISHES) expect(ids(f).some((id) => id.includes('gold'))).toBe(true)
+})
+
+test('전통 글귀 줄: 모든 글자가 종이 안에 있고 도장보다 왼쪽에서 끝난다 (4자·5자 모두)', () => {
+  for (const wish of WISHES) {
+    for (const name of [null, '민지', '김하늘이네']) {
+      const d = dom(spec({ wish }), name)
+      const stamp = d.querySelector('[data-part=stamp] rect')!
+      const stampX = Number(stamp.getAttribute('x'))
+      const glyphs = [...d.querySelectorAll('[data-part=phrase] text')]
+      expect(glyphs).toHaveLength([...WISH_TEXT[wish].hanja].length)
+      const size = Number(glyphs[0].getAttribute('font-size'))
+      let prevRight = 30
+      for (const g of glyphs) {
+        const x = Number(g.getAttribute('x'))
+        expect(g.getAttribute('text-anchor')).toBe('middle')
+        expect(x - size / 2, wish).toBeGreaterThanOrEqual(prevRight - 0.01) // 글자끼리 겹치지 않는다
+        expect(x - size / 2, wish).toBeGreaterThanOrEqual(49) // 안쪽 테두리(49) 안
+        prevRight = x + size / 2
+        expect(prevRight, wish).toBeLessThanOrEqual(251) // 안쪽 테두리(251) 안
+      }
+      // 글귀 줄(y≈452)은 도장(y≥~460) 위에 있어 x가 겹쳐도 닿지 않지만, 규칙상 도장보다 왼쪽에서 끝나게 한다
+      expect(prevRight, `${wish} ${name}`).toBeLessThanOrEqual(stampX)
+    }
+  }
+})
+
+test('귀여운 캐릭터는 소원마다 다르고 비어 있지 않다. 전통 가운데 상징은 소원마다 다른 선을 더한다', () => {
+  const cute = WISHES.map((wish) => dom(spec({ style: 'cute', wish }), null).querySelector('[data-part=symbol]')!.innerHTML)
+  expect(new Set(cute).size).toBe(WISHES.length)
+  for (const c of cute) expect(c.length).toBeGreaterThan(300)
+  // 전통: 링(data-part=symbol) 뒤에 이어지는 상징 선(data-a=draw의 d)을 모아 비교
+  const sym = WISHES.map((wish) => {
+    const ds = [...dom(spec({ wish }), null).querySelectorAll('[data-a=draw]')].map((e) => e.getAttribute('d'))
+    return ds.slice(ds.findIndex((d) => d?.startsWith('M112 345')) + 1).join('|')
+  })
+  expect(new Set(sym).size).toBe(WISHES.length)
 })
 
 test('crop이면 카드 영역만 viewBox로 잡는다', () => {

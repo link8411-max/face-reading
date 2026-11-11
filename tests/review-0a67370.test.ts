@@ -64,6 +64,7 @@ test('미리보기 이미지: 부적은 화풍·소원·마감이 허용 목록 
   expect(q('kind=bujeok&style=cute&wish=guard&finish=holo')).toBe(true)
   expect(q('kind=bujeok&style=cute&wish=guard&finish=paper')).toBe(true)
   // 기운은 그림에 쓰이지 않아 같은 이미지가 5벌 캐시되므로 받지 않는다
+  for (const w of ['allgood', 'career', 'business', 'family', 'samjae', 'wish']) expect(q(`kind=bujeok&style=cute&wish=${w}&finish=gold`), w).toBe(true)
   expect(q('kind=bujeok&style=trad&wish=money&el=metal&finish=gold')).toBe(false)
   expect(q('kind=bujeok&style=trad&wish=money')).toBe(false)
   expect(q('kind=bujeok&style=trad&wish=money&finish=silver')).toBe(false)

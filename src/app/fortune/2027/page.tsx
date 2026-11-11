@@ -108,6 +108,9 @@ export default function Zodiac2027Hub() {
             ))}
             {SAMJAE_LEAD_END} {SAMJAE_TAIL} {SAMJAE_NOTE}
           </p>
+          <p className="mt-3">
+            <Link href="/bujeok?wish=samjae" className="font-bold text-accent">삼재 막이 부적 만들기</Link>
+          </p>
         </section>
         <ContentCta href="/face2" title="띠 운세 봤으면 내 얼굴 관상도?" desc="사진 한 장이면 관상 풀이가 1분 안에 나와요. 사진은 저장하지 않아요." label="내 관상 보기" />
         <section>

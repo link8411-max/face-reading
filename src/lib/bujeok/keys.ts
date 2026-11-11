@@ -3,8 +3,12 @@
 export const STYLES = ['trad', 'cute'] as const
 export type BujeokStyle = (typeof STYLES)[number]
 
-export const WISHES = ['money', 'pass', 'health', 'love', 'guard'] as const
+/** 기존 다섯 개의 순서는 그대로 두고 새 소원은 뒤에 붙인다(화면 순서는 WISH_ORDER) */
+export const WISHES = ['money', 'pass', 'health', 'love', 'guard', 'allgood', 'career', 'business', 'family', 'samjae', 'wish'] as const
 export type Wish = (typeof WISHES)[number]
+
+/** 소원 고르기 화면 순서: 많이 찾을 순서(설계 16절) */
+export const WISH_ORDER: readonly Wish[] = ['money', 'pass', 'allgood', 'health', 'love', 'career', 'business', 'family', 'wish', 'samjae', 'guard']
 
 /** ELEMENTS(목화토금수)와 같은 순서 */
 export const EL_KEYS = ['wood', 'fire', 'earth', 'metal', 'water'] as const
@@ -13,7 +17,10 @@ export type ElKey = (typeof EL_KEYS)[number]
 /** 테두리 2 × 머리 문양 2 */
 export const VARIANTS = 4
 
-export const WISH_DEFAULT_EL: Record<Wish, ElKey> = { money: 'metal', pass: 'wood', health: 'earth', love: 'fire', guard: 'water' }
+export const WISH_DEFAULT_EL: Record<Wish, ElKey> = {
+  money: 'metal', pass: 'wood', health: 'earth', love: 'fire', guard: 'water',
+  allgood: 'earth', career: 'metal', business: 'wood', family: 'earth', samjae: 'water', wish: 'fire',
+}
 
 /** 마감: 종이(승인한 그림 그대로) · 금박(먹색 바탕에 금색 선) · 홀로그램(금박 + 각도에 따라 무지갯빛) */
 export const FINISHES = ['paper', 'gold', 'holo'] as const

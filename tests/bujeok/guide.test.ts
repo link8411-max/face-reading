@@ -24,8 +24,11 @@ test('지금의 카드를 설명한다: 손으로 돌려 보기·마감 세 가�
   expect(all).not.toMatch(/붓으로|그려지|그려 드려요|그리는 모습/)
 })
 
-test('소원 다섯 가지의 한자 글귀와 한글 뜻이 본문에 있다', () => {
+test('소원 열한 가지의 한자 글귀와 한글 뜻이 본문에 있다', () => {
+  expect(WISHES).toHaveLength(11)
+  expect(g.summary).toContain('열한 가지')
   for (const w of WISHES) {
+    expect(all).toContain(WISH_TEXT[w].label)
     expect(all).toContain(WISH_TEXT[w].hanja)
     expect(all).toContain(WISH_TEXT[w].hanjaMeaning)
   }

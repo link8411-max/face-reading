@@ -50,6 +50,12 @@ export const MASCOT_COLOR: Record<Wish, string> = {
   health: '#FFB9A8',
   love: '#FF9AA8',
   guard: '#FFC46B',
+  allgood: '#B6E3A0',
+  career: '#C9B8F0',
+  business: '#FFC9D4',
+  family: '#FFE0A8',
+  samjae: '#9ED8DC',
+  wish: '#FFD98E',
 }
 
 /** 카드(종이) 영역. SVG 좌표계(0 0 300 520) 기준이고 화풍마다 다르다 */

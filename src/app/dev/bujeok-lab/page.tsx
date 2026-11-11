@@ -1,4 +1,4 @@
-// 개발 전용: 부적 그림 승인용 화면(production 404). 화풍 × 마감별 소원 5장 + 돌려 보는 카드 하나 + 전체 600 조합.
+// 개발 전용: 부적 그림 승인용 화면(production 404). 화풍 × 마감별 소원 11장 + 돌려 보는 카드 하나 + 전체 1320 조합.
 import { notFound } from 'next/navigation'
 import BujeokCard from '@/components/bujeok/BujeokCard'
 import BujeokSvg from '@/components/bujeok/BujeokSvg'
@@ -7,7 +7,7 @@ import { WISH_TEXT } from '@/content/bujeok'
 
 export default function BujeokLab() {
   if (process.env.NODE_ENV === 'production') notFound()
-  const names = ['민지', '서준', null, '김하늘', '할머니']
+  const names = ['민지', '서준', null, '김하늘', '할머니', '하윤', null, '이서', '도윤', null, '지아']
   return (
     <main className="mx-auto max-w-[1100px] px-4 py-8">
       <h1 className="font-serif text-2xl font-bold">부적 그림 확인</h1>
@@ -17,7 +17,7 @@ export default function BujeokLab() {
           {FINISHES.map((finish) => (
             <div key={finish} className="mt-4">
               <h3 className="text-sm font-medium text-muted">{FINISH_LABEL[finish]}</h3>
-              <div className="mt-2 grid grid-cols-5 gap-3" data-testid={`lab-${style}-${finish}`}>
+              <div className="mt-2 grid grid-cols-4 gap-3 sm:grid-cols-6" data-testid={`lab-${style}-${finish}`}>
                 {WISHES.map((wish, i) => (
                   <figure key={wish} className="rounded-[22px] bg-[#1c1512] p-3">
                     <BujeokSvg spec={{ style, wish, el: WISH_DEFAULT_EL[wish], variant: i % VARIANTS, finish }} name={names[i]} />

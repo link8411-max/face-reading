@@ -72,6 +72,9 @@ export default function Zodiac2027Article({ slug }: { slug: ZodiacSlug }) {
               {FORTUNE_YEAR.year}년 {FORTUNE_YEAR.간지}년은 {z.띠}띠의 <strong>날삼재</strong>예요. 돼지·토끼·양띠는 2025년 들삼재, 2026년 눌삼재를 지나 올해 삼재가 끝나요.
               날삼재는 삼재가 나가는 마지막 해라, 그동안 미뤄 둔 일을 차분히 마무리하면 다음 흐름으로 가볍게 넘어간다고 봐요.
             </p>
+            <p className="mt-3">
+              <Link href="/bujeok?wish=samjae" className="font-bold text-accent">삼재 막이 부적 만들기</Link>
+            </p>
           </section>
         )}
 
