@@ -1,5 +1,6 @@
 'use client'
-// 완성 화면 아래쪽: 문구 + 버튼. 내 부적: 잠금화면용 저장 · 공유하기 · 내 부적 링크 보내기 · 선물하기 · 다시 만들기 · 내 부적함 / 선물: 카카오톡으로 보내기(주) · 링크로 보내기 · 그림 저장 · 다시 만들기 · 내 부적함
+// 완성 화면 아래쪽: 문구 + 큰 버튼 둘 + 작은 글자 링크 한 줄. 내 부적: 큰 버튼 잠금화면으로 간직하기 · 친구에게도 하나 선물하기 / 작은 줄 내 부적 링크 보내기 · 다시 만들기 · 내 부적함.
+// 선물: 큰 버튼 카카오톡으로 보내기(주) · 링크로 보내기 / 작은 줄 그림 저장 · 다시 만들기 · 내 부적함
 import { useState, type ReactNode } from 'react'
 import Link from 'next/link'
 import { Icon } from '@/components/icons'
@@ -13,14 +14,11 @@ import { useWallpaperSave } from './useWallpaperSave'
 import { useGiftImage } from './useGiftImage'
 import { addToBox } from '@/lib/bujeok/box'
 import { bujeokCode, bujeokGiftUrl, bujeokMineUrl, bujeokOgUrl, giftHeadline } from '@/lib/bujeok/link'
-import { SITE, UTM } from '@/lib/shareBase'
 import type { BujeokSpec } from '@/lib/bujeok/keys'
 import { EL_TEXT, WISH_TEXT } from '@/content/bujeok'
 
 const SHARE_TITLE = '운명을 읽다 · 나만의 부적'
-const SHARE_TEXT = '소원 하나 골라서 손으로 돌려 보는 부적 카드를 받아 봤어요. 잠금화면으로 저장해 뒀어요.'
 const MINE_LINK_TEXT = '언제든 다시 열어 볼 수 있어요'
-const SHARE_IMAGE = `${SITE}/api/og?title=${encodeURIComponent('나만의 부적')}&subtitle=${encodeURIComponent('손으로 돌려 보는 부적 카드')}`
 
 export interface GiftInfo { to: string; from: string | null }
 
@@ -29,10 +27,6 @@ export default function BujeokDone({ spec, getSvg, onRetry, gift, ad, mineName =
   const { saving, saveNotice, save } = useWallpaperSave(spec, getSvg)
   // 선물: 이름 도장이 찍힌 앞면 그림(1080×1350)을 완성 화면이 뜨면 미리 만들어 두고 공유에 같이 보낸다(카카오톡은 카드 이미지로 올린다)
   const giftImage = useGiftImage(spec, getSvg, !!gift, gift?.to ?? null)
-  // 내 부적: 공유 링크는 시작 화면(/bujeok)이다. 이름·생년월일·소원은 싣지 않는다. (선물은 아래 sendKakao·sendLink가 따로 보낸다)
-  const { busy, notice, share } = useResultShare(
-    gift ? null : { testName: 'bujeok', title: SHARE_TITLE, text: SHARE_TEXT, url: `${SITE}/bujeok?${UTM('bujeok')}`, imageUrl: SHARE_IMAGE },
-  )
 
   // 내 부적 링크: 카톡 "나와의 채팅" 등에 보관해 두고 언제든 같은 카드를 다시 연다. 이름은 # 뒤
   const mineLink = useResultShare(
@@ -99,7 +93,11 @@ export default function BujeokDone({ spec, getSvg, onRetry, gift, ad, mineName =
     }
   }
 
-  const pill = 'h-12 rounded-full bg-white text-ink border border-line text-sm font-medium flex items-center justify-center gap-1.5 disabled:opacity-50'
+  const big = 'h-[52px] rounded-full flex items-center justify-center gap-2 text-[15px] font-medium disabled:opacity-50'
+  const bigMain = `${big} bg-ink text-paper`
+  const bigSub = `${big} bg-white text-ink border border-line`
+  const linkBtn = 'inline-flex items-center min-h-11 px-2 underline underline-offset-[3px] disabled:opacity-50'
+  const dot = <span aria-hidden className="opacity-50">·</span>
   return (
     <div>
       <div className="mt-5 text-center">
@@ -116,59 +114,45 @@ export default function BujeokDone({ spec, getSvg, onRetry, gift, ad, mineName =
       <div className="no-screenshot flex flex-col mt-5">
         {gift ? (
           <>
-            <button type="button" onClick={() => void sendKakao()} disabled={!!giftBusy} className="h-[52px] rounded-full flex items-center justify-center gap-2 bg-ink text-paper text-[15px] font-medium disabled:opacity-50">
+            <button type="button" onClick={() => void sendKakao()} disabled={!!giftBusy} className={bigMain}>
               <Icon name="heart" size={18} />
               카카오톡으로 보내기
             </button>
-            <button type="button" onClick={() => void sendLink()} disabled={!!giftBusy} className={`mt-2 ${pill} h-[52px] text-[15px]`}>
+            <button type="button" onClick={() => void sendLink()} disabled={!!giftBusy} className={`mt-2 ${bigSub}`}>
               <Icon name="share" size={18} />
               링크로 보내기
             </button>
-            <button type="button" onClick={() => void saveGift()} disabled={!!giftBusy} className={`mt-2 ${pill}`}>
-              <Icon name="download" size={16} />
-              그림 저장
-            </button>
             {giftBusy === 'kakao' && <p className="mt-2 text-xs text-center text-muted">카카오톡 보낼 준비 중…</p>}
             {giftNotice && <p role="status" className="mt-2 text-xs text-center text-muted">{giftNotice}</p>}
-            <button type="button" onClick={onRetry} className={`mt-2 ${pill}`}>
-              <Icon name="refresh" size={16} />
-              다시 만들기
-            </button>
-            <Link href="/bujeok/box" className={`mt-2 ${pill}`}>
-              내 부적함
-            </Link>
+            <div className="bj-linkrow">
+              <button type="button" onClick={() => void saveGift()} disabled={!!giftBusy} className={linkBtn}>그림 저장</button>
+              {dot}
+              <button type="button" onClick={onRetry} className={linkBtn}>다시 만들기</button>
+              {dot}
+              <Link href="/bujeok/box" className={linkBtn}>내 부적함</Link>
+            </div>
           </>
         ) : (
           <>
-            <button type="button" onClick={() => void save()} disabled={saving} className="h-[52px] rounded-full flex items-center justify-center gap-2 bg-ink text-paper text-[15px] font-medium disabled:opacity-50">
+            <button type="button" onClick={() => void save()} disabled={saving} className={bigMain}>
               <Icon name="download" size={18} />
-              {saving ? '이미지 만드는 중…' : '잠금화면용 저장'}
+              {saving ? '이미지 만드는 중…' : '잠금화면으로 간직하기'}
             </button>
             {saveNotice && <p role="status" className="mt-2 text-xs text-center text-muted">{saveNotice}</p>}
-            <button type="button" onClick={() => void share()} disabled={busy} className={`mt-2 ${pill} h-[52px] text-[15px]`}>
-              <Icon name="share" size={18} />
-              {busy ? '공유 준비 중…' : '공유하기'}
-            </button>
-            {notice && <p role="status" className="mt-2 text-xs text-center text-muted">{notice}</p>}
-            <button type="button" onClick={() => void mineLink.share()} disabled={mineLink.busy} className={`mt-2 ${pill}`}>
-              <Icon name="share" size={16} />
-              {mineLink.busy ? '링크 만드는 중…' : '내 부적 링크 보내기'}
-            </button>
-            <p className="mt-1.5 text-xs text-center text-muted">{MINE_LINK_TEXT}</p>
-            {mineLink.notice && <p role="status" className="mt-1 text-xs text-center text-muted">{mineLink.notice}</p>}
-            <div className="grid grid-cols-2 gap-2 mt-2">
-              <Link href={`/bujeok?mode=gift&style=${spec.style}`} className={pill}>
-                <Icon name="heart" size={16} />
-                선물하기
-              </Link>
-              <button type="button" onClick={onRetry} className={pill}>
-                <Icon name="refresh" size={16} />
-                다시 만들기
-              </button>
-            </div>
-            <Link href="/bujeok/box" className={`mt-2 ${pill}`}>
-              내 부적함
+            <Link href={`/bujeok?mode=gift&style=${spec.style}&finish=${spec.finish}`} className={`mt-2 ${bigSub}`}>
+              <Icon name="heart" size={18} />
+              친구에게도 하나 선물하기
             </Link>
+            <div className="bj-linkrow">
+              <button type="button" onClick={() => void mineLink.share()} disabled={mineLink.busy} className={linkBtn}>
+                {mineLink.busy ? '링크 만드는 중…' : '내 부적 링크 보내기'}
+              </button>
+              {dot}
+              <button type="button" onClick={onRetry} className={linkBtn}>다시 만들기</button>
+              {dot}
+              <Link href="/bujeok/box" className={linkBtn}>내 부적함</Link>
+            </div>
+            {mineLink.notice && <p role="status" className="mt-1 text-xs text-center text-muted">{mineLink.notice}</p>}
           </>
         )}
       </div>

@@ -61,12 +61,12 @@ test('완성 화면이 뜨면 그림을 미리 만든다(누르기 전에)', asy
   expect(renderGiftImage.mock.calls[0].slice(1)).toEqual(['trad', 'gold', 'pass', '민지'])
 })
 
-test('선물 완성 화면 버튼 순서: 카카오톡으로 보내기 → 링크로 보내기 → 그림 저장 (옛 "선물 보내기"는 없다)', () => {
+test('선물 완성 화면 버튼 순서: 큰 버튼 카카오톡으로 보내기 → 링크로 보내기, 작은 글자 줄 그림 저장 · 다시 만들기 · 내 부적함', () => {
   mount()
   const names = screen.getAllByRole('button').map((b) => b.textContent?.trim())
-  expect(names.slice(0, 3)).toEqual(['카카오톡으로 보내기', '링크로 보내기', '그림 저장'])
+  expect(names.slice(0, 4)).toEqual(['카카오톡으로 보내기', '링크로 보내기', '그림 저장', '다시 만들기'])
   expect(screen.queryByRole('button', { name: '선물 보내기' })).toBeNull()
-  expect(screen.queryByRole('button', { name: '잠금화면용 저장' })).toBeNull()
+  expect(screen.queryByRole('button', { name: '잠금화면으로 간직하기' })).toBeNull()
 })
 
 test('카카오톡이 아닌 브라우저에서도 Kakao SDK sendDefault로 카드를 보낸다(업로드한 그림, 제목·설명·버튼·링크)', async () => {
@@ -204,6 +204,6 @@ test('내 부적(선물이 아님) 모드는 선물 그림을 만들지 않고 �
   render(<BujeokDone spec={spec} getSvg={svg} onRetry={() => {}} />)
   await settle()
   expect(renderGiftImage).not.toHaveBeenCalled()
-  expect(screen.getByRole('button', { name: '공유하기' })).toBeTruthy()
+  expect(screen.getByRole('button', { name: '잠금화면으로 간직하기' })).toBeTruthy()
   expect(screen.queryByRole('button', { name: '카카오톡으로 보내기' })).toBeNull()
 })

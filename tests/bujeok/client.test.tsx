@@ -162,7 +162,7 @@ test('만들면 바로 완성 화면(카드)이 뜬다. 중간 단계는 없다'
   fireEvent.click(make())
   skipRite()
   expect(await screen.findByTestId('bujeok-card')).toBeTruthy()
-  expect(screen.getByRole('button', { name: '잠금화면용 저장' })).toBeTruthy()
+  expect(screen.getByRole('button', { name: '잠금화면으로 간직하기' })).toBeTruthy()
 })
 
 test('다시 만들기는 form으로 돌아가지 않고 변형 번호만 새로 뽑아 다시 그린다', async () => {
@@ -179,16 +179,18 @@ test('다시 만들기는 form으로 돌아가지 않고 변형 번호만 새로
   expect(document.querySelector('[data-bujeok-art] svg')!.innerHTML).not.toBe(before)
 })
 
-test('완성 화면에 네 버튼이 있고 선물하기는 /bujeok?mode=gift&style=로 간다', async () => {
+test('완성 화면: 큰 버튼 둘(잠금화면으로 간직하기·친구에게도 하나 선물하기)과 작은 줄(링크 보내기·다시 만들기·내 부적함). 공유하기는 없다', async () => {
   render(<BujeokClient />)
   pick('연애')
   pick('귀여운')
   fireEvent.click(make())
   skipRite()
   await screen.findByRole('button', { name: '다시 만들기' })
-  expect(screen.getByRole('button', { name: '잠금화면용 저장' })).toBeTruthy()
-  expect(screen.getByRole('button', { name: '공유하기' })).toBeTruthy()
-  expect(screen.getByRole('link', { name: '선물하기' }).getAttribute('href')).toBe('/bujeok?mode=gift&style=cute')
+  expect(screen.getByRole('button', { name: '잠금화면으로 간직하기' })).toBeTruthy()
+  expect(screen.queryByRole('button', { name: '공유하기' })).toBeNull()
+  expect(screen.getByRole('button', { name: '내 부적 링크 보내기' })).toBeTruthy()
+  expect(screen.getByRole('link', { name: '친구에게도 하나 선물하기' }).getAttribute('href')).toBe('/bujeok?mode=gift&style=cute&finish=gold')
+  expect(screen.getByRole('link', { name: '내 부적함' })).toBeTruthy()
 })
 
 test('넘겨받은 생년월일(takeHandedBirth)이 있으면 칸이 채워져 있다', () => {

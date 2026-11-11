@@ -16,7 +16,8 @@ import { bujeokCode, giftHeadline, mineHeadline, parseNameHash } from '@/lib/buj
 import type { BujeokSpec } from '@/lib/bujeok/keys'
 import { WISH_TEXT } from '@/content/bujeok'
 
-const pill = 'h-12 rounded-full bg-white text-ink border border-line text-sm font-medium flex items-center justify-center gap-1.5'
+const big = 'h-[52px] rounded-full flex items-center justify-center gap-2 text-[15px] font-medium disabled:opacity-50'
+const linkBtn = 'inline-flex items-center min-h-11 px-2 underline underline-offset-[3px]'
 
 export default function GiftLanding({ spec, mine = false, ad }: { spec: BujeokSpec; mine?: boolean; ad?: ReactNode }) {
   const { to, from } = useNameHash()
@@ -70,39 +71,24 @@ export default function GiftLanding({ spec, mine = false, ad }: { spec: BujeokSp
           </div>
           {ad}
           <div className="no-screenshot flex flex-col mt-5">
-            <button type="button" onClick={() => void save()} disabled={saving} className="h-[52px] rounded-full flex items-center justify-center gap-2 bg-ink text-paper text-[15px] font-medium disabled:opacity-50">
+            <button type="button" onClick={() => void save()} disabled={saving} className={`${big} bg-ink text-paper`}>
               <Icon name="download" size={18} />
-              {saving ? '이미지 만드는 중…' : '잠금화면용 저장'}
+              {saving ? '이미지 만드는 중…' : '잠금화면으로 간직하기'}
             </button>
             {saveNotice && <p role="status" className="mt-2 text-xs text-center text-muted">{saveNotice}</p>}
-            <div className="grid grid-cols-2 gap-2 mt-2">
-              {mine ? (
+            <Link href={`/bujeok?mode=gift&style=${spec.style}&finish=${spec.finish}`} className={`mt-2 ${big} bg-white text-ink border border-line`}>
+              <Icon name="heart" size={18} />
+              {mine ? '친구에게도 하나 선물하기' : '나도 하나 보내기'}
+            </Link>
+            <div className="bj-linkrow">
+              {!mine && (
                 <>
-                  <Link href="/bujeok/box" className={pill}>
-                    내 부적함
-                  </Link>
-                  <Link href={`/bujeok?mode=gift&style=${spec.style}&finish=${spec.finish}`} className={pill}>
-                    <Icon name="heart" size={16} />
-                    선물 보내기
-                  </Link>
-                </>
-              ) : (
-                <>
-                  <Link href={`/bujeok?mode=gift&style=${spec.style}&finish=${spec.finish}`} className={pill}>
-                    <Icon name="heart" size={16} />
-                    나도 보내기
-                  </Link>
-                  <Link href={`/bujeok?wish=${spec.wish}&style=${spec.style}&finish=${spec.finish}`} className={pill}>
-                    내 부적 만들기
-                  </Link>
+                  <Link href={`/bujeok?wish=${spec.wish}&style=${spec.style}&finish=${spec.finish}`} className={linkBtn}>내 부적 만들기</Link>
+                  <span aria-hidden className="opacity-50">·</span>
                 </>
               )}
+              <Link href="/bujeok/box" className={linkBtn}>내 부적함</Link>
             </div>
-            {!mine && (
-              <Link href="/bujeok/box" className={`mt-2 ${pill}`}>
-                내 부적함
-              </Link>
-            )}
           </div>
         </div>
       ) : (

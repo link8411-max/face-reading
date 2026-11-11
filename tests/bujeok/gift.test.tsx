@@ -143,8 +143,8 @@ test('착지: 해시 to=민지 → 마운트 뒤 "민지님께 부적이 도착�
   expect(screen.getByTestId('bujeok-card')).toBeTruthy()
   expect(screen.queryByRole('button', { name: '그냥 완성하기' })).toBeNull()
   expect(screen.getByText('철수님이 보냈어요')).toBeTruthy()
-  expect(screen.getByRole('button', { name: '잠금화면용 저장' })).toBeTruthy()
-  expect(screen.getByRole('link', { name: '나도 보내기' }).getAttribute('href')).toBe('/bujeok?mode=gift&style=trad&finish=gold')
+  expect(screen.getByRole('button', { name: '잠금화면으로 간직하기' })).toBeTruthy()
+  expect(screen.getByRole('link', { name: '나도 하나 보내기' }).getAttribute('href')).toBe('/bujeok?mode=gift&style=trad&finish=gold')
   expect(screen.getByRole('link', { name: '내 부적 만들기' }).getAttribute('href')).toBe('/bujeok?wish=money&style=trad&finish=gold')
 })
 
@@ -204,16 +204,16 @@ test('이름이 잘못된 선물도 이름 없이 저장하고, 저장소를 못
   expect(screen.getByRole('button', { name: '그냥 완성하기' })).toBeTruthy()
 })
 
-test('내 부적 착지(me=1): 열어 보기 없이 바로 카드, "○○님의 부적", 버튼은 저장 · 내 부적함 · 선물 보내기, 부적함에는 저장하지 않는다', () => {
+test('내 부적 착지(me=1): 열어 보기 없이 바로 카드, "○○님의 부적", 버튼은 간직하기 · 친구에게도 하나 선물하기 · 내 부적함, 부적함에는 저장하지 않는다', () => {
   setHash(H('민지'))
   render(<GiftLanding spec={spec} mine />)
   expect(screen.getByRole('heading', { level: 1 }).textContent).toBe('민지님의 부적')
   expect(screen.queryByRole('button', { name: '그냥 완성하기' })).toBeNull()
   expect(screen.getByTestId('bujeok-card')).toBeTruthy()
-  expect(screen.getByRole('button', { name: '잠금화면용 저장' })).toBeTruthy()
+  expect(screen.getByRole('button', { name: '잠금화면으로 간직하기' })).toBeTruthy()
   expect(screen.getByRole('link', { name: '내 부적함' }).getAttribute('href')).toBe('/bujeok/box')
-  expect(screen.getByRole('link', { name: '선물 보내기' }).getAttribute('href')).toBe('/bujeok?mode=gift&style=trad&finish=gold')
-  expect(screen.queryByRole('link', { name: '나도 보내기' })).toBeNull()
+  expect(screen.getByRole('link', { name: '친구에게도 하나 선물하기' }).getAttribute('href')).toBe('/bujeok?mode=gift&style=trad&finish=gold')
+  expect(screen.queryByRole('link', { name: '나도 하나 보내기' })).toBeNull()
   expect(loadBox()).toEqual([])
 })
 
