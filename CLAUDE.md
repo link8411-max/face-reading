@@ -127,7 +127,7 @@ public/
 - 메뉴와 묶음은 `src/content/navigation.ts` 한 곳에서 정의한다(TABS, CATEGORIES, tabForPath). 홈 묶음 탭·허브(`/face-tests`, `/unse`)·하단 탭바·푸터가 모두 이걸 쓴다. 새 테스트를 추가하면 CATEGORIES에 항목을 넣는다.
 - 하단 탭바 `BottomTabBar`(모든 페이지, no-screenshot). 본문은 탭바 높이만큼 아래 여백이 있다.
 - 메인 순서(2026-11-07 개편 1단계, 설계 `docs/superpowers/specs/2026-11-07-site-revamp-design.md`): 관상 히어로(`FaceHero`, "내 관상 보러 가기") → 시즌 카드(`SeasonCard`, `src/content/season.ts`만 바꾸면 교체: 평소 /saju, 12/1~1월 /fortune 신년운세 — 교체값은 파일 주석) → 띠 칩(`ZodiacPicker`) → 친구랑 같이 해봐요(`PlayTogether`: 동물상·얼굴 궁합·MBTI 궁합·삼국지, 관상은 히어로와 겹쳐 뺌) → 쿠팡 배너 → 시즌 추천 → 묶음 탭 → FAQ. 홈 FAQ는 `src/content/homeFaq.ts`(화면·구조화 데이터 공용).
-- 하단 탭: 홈 / 관상(`/face-tests`) / 사주·운세(`/unse`) / 궁합(`/mbti`). URL은 그대로 두고 이름만 바꿨다.
+- 하단 탭(다섯, 2026-11-11): 홈 / 관상(`/face-tests`) / 사주·운세(`/unse`) / 부적(`/bujeok`, 아이콘 `spark`) / 궁합(`/mbti`). `tabForPath`는 `/bujeok`과 그 아래 전부(`/bujeok/r/…`·`/bujeok/box`)에 `bujeok`을 돌려준다(사주·운세 탭이 아님). 부적은 /unse 허브 목록에도 그대로 있다. 5칸이 320px에서 한 줄에 들어가는지는 `e2e/tabbar.spec.ts`가 잰다(`whitespace-nowrap`).
 - 허브 순서: 관상·얼굴 테스트 = [관상·동물상] 내 관상 풀이 → 동물상, [삼국지로 보는 얼굴] 닮은꼴 → 우리 팀 → 월드컵 → 열전 → 영상 → 일기토. 사주·운세 = 내 사주 풀이 → 신년운세 → 띠별 → 오늘의 운세, [MBTI] 오늘의 MBTI 운세. 궁합·MBTI = 얼굴 궁합 → MBTI 궁합 계산기 → MBTI 유형별 풀이(오늘의 MBTI 운세는 사주·운세에만).
 - 푸터는 같은 데이터를 쓰되 `footer: false` 항목은 뺀다(삼국지는 닮은꼴·열전만 푸터에).
 - 결과 사이 연결: `NEXT_BY_TEST`(navigation.ts, 같은 줄기 1 + 다른 줄기 1) → `components/result/NextSteps`("이어서 보면 좋아요"). 사주·신년운세·띠별 글·오늘의 운세·관상·동물상·삼국지·MBTI 유형·MBTI 궁합 계산기에 붙어 있다. 사진 결과에서는 같은 사진 칸을 `NextTests`가 맡으므로 NextSteps는 다른 줄기만 보인다(`withPhoto`). GA `next_test_click(test_name=간 곳)`. 생년월일 넘기기는 사주·신년운세 결과의 부적 카드 하나뿐이다(`handOffBirth`, 메모리로만 전달; 나머지는 링크만). `NEXT_BY_TEST`의 saju·fortune은 이제 서로 대신 부적으로 이어진다.

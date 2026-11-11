@@ -19,7 +19,7 @@ export default function BottomTabBar() {
       aria-label="하단 메뉴"
       className="no-screenshot fixed bottom-0 inset-x-0 z-50 bg-white border-t border-line pb-[env(safe-area-inset-bottom)]"
     >
-      <ul className="max-w-lg mx-auto grid grid-cols-4">
+      <ul className="max-w-lg mx-auto grid grid-cols-5">
         {TABS.map((t) => {
           const active = t.key === current;
           return (
@@ -27,7 +27,7 @@ export default function BottomTabBar() {
               <Link
                 href={t.href}
                 aria-current={active ? "page" : undefined}
-                className={`flex flex-col items-center justify-center gap-1 h-16 text-[11px] font-medium ${active ? "text-accent" : "text-ink"}`}
+                className={`flex flex-col items-center justify-center gap-1 h-16 text-[11px] font-medium whitespace-nowrap ${active ? "text-accent" : "text-ink"}`}
               >
                 <Icon name={t.icon} />
                 {t.label}

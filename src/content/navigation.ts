@@ -1,12 +1,13 @@
 // 사이트 메뉴(하단 탭)와 묶음별 항목 — 홈, 허브 페이지, 하단 탭바, 푸터가 모두 이 데이터를 쓴다.
 import type { IconName } from '@/components/icons'
 
-export type TabKey = 'home' | 'face' | 'unse' | 'mbti'
+export type TabKey = 'home' | 'face' | 'unse' | 'bujeok' | 'mbti'
 
 export const TABS: { key: TabKey; label: string; href: string; icon: IconName }[] = [
   { key: 'home', label: '홈', href: '/', icon: 'home' },
   { key: 'face', label: '관상', href: '/face-tests', icon: 'face' },
   { key: 'unse', label: '사주·운세', href: '/unse', icon: 'moon' },
+  { key: 'bujeok', label: '부적', href: '/bujeok', icon: 'spark' },
   { key: 'mbti', label: '궁합', href: '/mbti', icon: 'rings' },
 ]
 
@@ -21,7 +22,7 @@ export interface CategoryItem {
 }
 
 export interface Category {
-  key: Exclude<TabKey, 'home'>
+  key: Exclude<TabKey, 'home' | 'bujeok'>
   title: string
   tabLabel: string
   href: string
@@ -109,8 +110,9 @@ export const NEXT_BY_TEST: Record<NextFrom, [NextStep, NextStep]> = {
 }
 
 export function tabForPath(pathname: string): TabKey {
+  if (pathname.startsWith('/bujeok')) return 'bujeok'
   if (pathname === '/face-tests' || ['/face2', '/animal', '/samguk'].some((p) => pathname.startsWith(p))) return 'face'
-  if (pathname === '/unse' || pathname.startsWith('/fortune') || pathname.startsWith('/saju') || pathname.startsWith('/bujeok')) return 'unse'
+  if (pathname === '/unse' || pathname.startsWith('/fortune') || pathname.startsWith('/saju')) return 'unse'
   if (pathname.startsWith('/mbti') || pathname.startsWith('/face-match')) return 'mbti'
   return 'home'
 }

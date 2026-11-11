@@ -1,8 +1,8 @@
 import { TABS, CATEGORIES, FOOTER_EXTRA, tabForPath } from '@/content/navigation'
 import { SITEMAP_ROUTES } from '@/app/sitemap'
 
-test('탭 4개: 홈·관상·사주·운세·궁합 (주소는 그대로)', () => {
-  expect(TABS.map((t) => [t.label, t.href])).toEqual([['홈', '/'], ['관상', '/face-tests'], ['사주·운세', '/unse'], ['궁합', '/mbti']])
+test('탭 5개: 홈·관상·사주·운세·부적·궁합', () => {
+  expect(TABS.map((t) => [t.label, t.href])).toEqual([['홈', '/'], ['관상', '/face-tests'], ['사주·운세', '/unse'], ['부적', '/bujeok'], ['궁합', '/mbti']])
 })
 
 test('메뉴 데이터에 이모지가 없다 (선 아이콘으로 대체)', () => {
@@ -14,7 +14,7 @@ test('메뉴 데이터에 이모지가 없다 (선 아이콘으로 대체)', () 
 test.each([
   ['/', 'home'], ['/about', 'home'], ['/privacy', 'home'],
   ['/face2', 'face'], ['/animal', 'face'], ['/samguk', 'face'], ['/face-tests', 'face'],
-  ['/fortune', 'unse'], ['/bujeok', 'unse'], ['/bujeok/r/trad-money-metal-0-gold', 'unse'], ['/fortune/daily', 'unse'], ['/fortune/2027', 'unse'], ['/fortune/2027/sheep', 'unse'], ['/unse', 'unse'],
+  ['/fortune', 'unse'], ['/bujeok', 'bujeok'], ['/bujeok/r/trad-money-metal-0-gold', 'bujeok'], ['/bujeok/box', 'bujeok'], ['/fortune/daily', 'unse'], ['/fortune/2027', 'unse'], ['/fortune/2027/sheep', 'unse'], ['/unse', 'unse'],
   ['/mbti', 'mbti'], ['/face-match', 'mbti'], ['/face-match/r/cat-fox', 'mbti'], ['/samguk/team', 'face'],
 ])('tabForPath(%s) = %s', (path, key) => {
   expect(tabForPath(path)).toBe(key)
@@ -36,10 +36,10 @@ test('8단계 메뉴: 궁합 묶음에 얼굴 궁합, 얼굴 묶음에 우리 �
   expect(hrefs('face')).toContain('/samguk/team')
 })
 
-test('밈 능력고사는 푸터에만 항목이 있다: 묶음(홈 탭·허브)은 그대로, 하단 탭은 넷', () => {
+test('밈 능력고사는 푸터에만 항목이 있다: 묶음(홈 탭·허브)은 그대로, 하단 탭은 다섯', () => {
   expect(FOOTER_EXTRA.map((i) => [i.title, i.href])).toEqual([['밈 능력고사', '/exam/meme']])
   expect(CATEGORIES.flatMap((c) => c.items.map((i) => i.href))).not.toContain('/exam/meme')
-  expect(TABS).toHaveLength(4)
+  expect(TABS).toHaveLength(5)
   expect((SITEMAP_ROUTES as readonly string[]).includes('/exam/meme')).toBe(true)
   const { readFileSync } = require('node:fs')
   const layout = readFileSync('src/app/layout.tsx', 'utf8')
