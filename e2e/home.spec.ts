@@ -1,7 +1,8 @@
 import { test, expect } from '@playwright/test'
 import { trackErrors } from './helpers'
 
-test('관상 히어로 → 관상, 시즌 카드 → 내 사주 풀이', async ({ page }) => {
+test('관상 히어로 → 관상, 시즌 카드(수능 뒤) → 내 사주 풀이', async ({ page }) => {
+  await page.clock.setFixedTime(new Date('2026-11-25T10:00:00+09:00'))
   await page.goto('/')
   await expect(page.getByRole('heading', { name: /내 얼굴에는/ })).toBeVisible()
   await page.getByRole('link', { name: '내 관상 보러 가기' }).click()
@@ -56,7 +57,7 @@ test('홈 순서: 히어로 → 시즌 카드 → 띠 고르기 → 친구랑 �
   await page.goto('/')
   const y = async (loc: import('@playwright/test').Locator) => (await loc.boundingBox())!.y
   const hero = await y(page.getByRole('region', { name: /내 얼굴에는/ }))
-  const season = await y(page.getByRole('region', { name: '내 사주 풀이' }))
+  const season = await y(page.locator('section[aria-label^="수능"], section[aria-label="내 사주 풀이"]'))
   const picker = await y(page.getByRole('region', { name: '띠 바로 고르기' }))
   const together = await y(page.getByRole('region', { name: '친구랑 같이 해봐요' }))
   const banner = await y(page.locator('iframe[title="쿠팡 추천 상품"]'))
@@ -77,4 +78,37 @@ test('밈 능력고사: 홈 카드와 푸터에서 /exam/meme으로 간다', asy
   await expect(page.locator('footer a[href="/exam/meme"]')).toHaveCount(1)
   await card.click()
   await expect(page).toHaveURL(/\/exam\/meme$/)
+})
+
+test('시즌 카드(11/12): 수능 D-7 합격 부적 카드 → /bujeok?mode=gift&wish=pass, 선물·합격이 미리 골라져 있다', async ({ page }) => {
+  await page.clock.setFixedTime(new Date('2026-11-12T10:00:00+09:00'))
+  await page.goto('/')
+  const card = page.getByRole('region', { name: '수능 D-7' })
+  await expect(card).toContainText('수험생에게')
+  await expect(card).toContainText('이름 도장 찍힌 부적 카드, 카톡으로 선물')
+  await card.getByRole('link', { name: '합격 부적 보내기' }).click()
+  await expect(page).toHaveURL(/\/bujeok\?mode=gift&wish=pass$/)
+  await expect(page.getByRole('radio', { name: '선물 보내기' })).toHaveAttribute('aria-checked', 'true')
+  await expect(page.getByRole('radio', { name: '합격' })).toHaveAttribute('aria-checked', 'true')
+})
+
+test('시즌 카드: 수능 당일 D-DAY, 11/20 수고했어요, 11/21은 사주 카드', async ({ page }) => {
+  for (const [d, label] of [['2026-11-19', '수능 D-DAY'], ['2026-11-20', '수능 수고했어요'], ['2026-11-21', '내 사주 풀이']] as const) {
+    await page.clock.setFixedTime(new Date(`${d}T09:00:00+09:00`))
+    await page.goto('/')
+    await expect(page.getByRole('region', { name: label })).toBeVisible()
+  }
+})
+
+test('시즌 카드가 바뀌어도(사주 → 수능) 카드 높이가 같아 아래 칸이 밀리지 않는다', async ({ page }) => {
+  for (const width of [320, 360, 390]) {
+    await page.setViewportSize({ width, height: 800 })
+    await page.clock.setFixedTime(new Date('2026-11-25T09:00:00+09:00'))
+    await page.goto('/')
+    const saju = await page.getByRole('region', { name: '내 사주 풀이' }).evaluate((e) => e.getBoundingClientRect().height)
+    await page.clock.setFixedTime(new Date('2026-11-12T09:00:00+09:00'))
+    await page.goto('/')
+    const suneung = await page.getByRole('region', { name: '수능 D-7' }).evaluate((e) => e.getBoundingClientRect().height)
+    expect(Math.abs(saju - suneung), `${width}px`).toBeLessThanOrEqual(2)
+  }
 })

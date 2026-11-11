@@ -239,3 +239,10 @@ test('시작 화면의 "내 부적함 (N)"은 부적함에 하나라도 있을 �
   const link = await screen.findByRole('link', { name: '내 부적함 (2)' })
   expect(link.getAttribute('href')).toBe('/bujeok/box')
 })
+
+test('?mode=gift&wish=pass: 선물 모드와 합격 소원이 미리 골라져 있다', () => {
+  render(<BujeokClient initial={{ mode: 'gift', wish: 'pass' }} />)
+  expect(screen.getByRole('radio', { name: '선물 보내기' }).getAttribute('aria-checked')).toBe('true')
+  expect(screen.getByRole('radio', { name: '내 부적' }).getAttribute('aria-checked')).toBe('false')
+  expect(screen.getByRole('radio', { name: '합격' }).getAttribute('aria-checked')).toBe('true')
+})
