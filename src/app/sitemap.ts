@@ -3,6 +3,10 @@ import { ZODIAC_SLUGS } from '@/content/fortune2027Zodiac'
 import { MBTI_SLUGS } from '@/content/mbtiTypes'
 import { DUEL_GENERALS } from '@/lib/duel/generals'
 import { PEOPLE_IDS } from '@/content/samgukPeople'
+import rounds from '@/content/exam/meme-rounds.json'
+import { releasedWordRoutes } from '@/lib/exam/words'
+import { kstDate } from '@/lib/kst'
+import type { Round } from '@/lib/exam/types'
 
 const DUEL_GENERAL_ROUTES = DUEL_GENERALS.filter((g) => g.role !== 'mob').map((g) => `/samguk/duel/generals/${g.id}`)
 
@@ -39,6 +43,7 @@ export const SITEMAP_ROUTES = [
     '/samguk/cup/ranking',
     '/samguk/videos',
     '/exam/meme',
+    '/exam/meme/words',
 ]
 
 // 페이지 내용을 바꾸면 해당 라우트 날짜도 갱신할 것 (new Date()를 쓰면 매 요청마다 바뀌어 검색엔진이 무시함)
@@ -70,16 +75,21 @@ export const LAST_MODIFIED: Record<string, string> = {
     '/samguk/cup/ranking': '2026-11-04',
     '/samguk/videos': '2026-11-05',
     '/exam/meme': '2026-11-11',
+    '/exam/meme/words': '2026-11-12',
     ...Object.fromEntries(MBTI_SLUGS.map((s) => [`/mbti/${s}`, '2026-11-07'])),
 }
 
 type ChangeFrequency = MetadataRoute.Sitemap[number]['changeFrequency']
 
+// 낱말 페이지는 자정마다 새로 열리므로 6시간마다 다시 만든다(공개된 말만 넣는다)
+export const revalidate = 21600
+
 export default function sitemap(): MetadataRoute.Sitemap {
-    return SITEMAP_ROUTES.map((route) => ({
+    const words = releasedWordRoutes(kstDate(new Date()), rounds.rounds as unknown as Round[]).map(([route, day]) => ({ url: `${baseUrl}${route}`, lastModified: day, changeFrequency: 'monthly' as ChangeFrequency, priority: 0.6 }))
+    return [...SITEMAP_ROUTES.map((route) => ({
         url: `${baseUrl}${route}`,
         lastModified: LAST_MODIFIED[route],
         changeFrequency: (route === '/fortune/daily' || route === '/fortune/mbti' ? 'daily' : route === '/about' || route === '/privacy' ? 'yearly' : 'weekly') as ChangeFrequency,
         priority: route === '' ? 1 : route === '/about' || route === '/privacy' ? 0.3 : 0.8,
-    }))
+    })), ...words]
 }

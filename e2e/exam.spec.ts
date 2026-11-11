@@ -109,3 +109,36 @@ test('미리보기 이미지: 등급·맞힌 수만 받는다', async ({ request
   expect((await request.get('/api/og/result?kind=exam&grade=10&correct=4')).status()).toBe(400)
   expect((await request.get('/api/og/result?kind=exam&grade=3&correct=4&x=1')).status()).toBe(400)
 })
+
+test('시작 화면과 성적표에 지난 문제에 나온 말 모아 보기 링크', async ({ page }) => {
+  await page.goto('/exam/meme')
+  await expect(page.getByRole('link', { name: '지난 문제에 나온 말 모아 보기' })).toHaveAttribute('href', '/exam/meme/words')
+})
+
+test('말 모음 → 낱말 → 한 문제 → 오늘의 5문제 풀기(공개된 말이 없는 날은 빈 상태 문구)', async ({ page }) => {
+  const errors = trackErrors(page)
+  const res = await page.goto('/exam/meme/words')
+  expect(res?.status()).toBeLessThan(400)
+  await expect(page.getByRole('heading', { level: 1 })).toContainText('유행어 뜻 모음')
+  const links = page.locator('main a[href^="/exam/meme/words/"]')
+  if ((await links.count()) === 0) {
+    await expect(page.getByText('아직 열린 말이 없어요. 오늘 문제에 나온 말은 내일 열려요.')).toBeVisible()
+  } else {
+    await links.first().click()
+    await expect(page.getByRole('heading', { level: 1 })).toContainText(' 뜻')
+    await expect(page.getByText('이런 말이에요')).toBeVisible()
+    const quiz = page.locator('section[aria-label="이 말로 한 문제"]')
+    if (await quiz.count()) {
+      await quiz.locator('ul button').first().click()
+      await expect(quiz.getByRole('status')).toBeVisible()
+    }
+    await page.getByRole('link', { name: '오늘의 5문제 풀기' }).click()
+    await expect(page).toHaveURL(/\/exam\/meme$/)
+  }
+  expect(errors).toEqual([])
+})
+
+test('없는 말 주소는 404', async ({ page }) => {
+  const res = await page.goto('/exam/meme/words/없는-말')
+  expect(res?.status()).toBe(404)
+})

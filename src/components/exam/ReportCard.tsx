@@ -121,6 +121,7 @@ export default function ReportCard({ round, report, streak, challenge = null }: 
       </div>
       <CoupangBanner subId="exam-meme" />
       <p className="mt-5 text-center text-sm text-muted">내일 문제는 자정에 열려요</p>
+      <Link href="/exam/meme/words" className="mt-1 flex h-11 items-center justify-center text-sm text-muted underline underline-offset-4">지난 문제에 나온 말 모아 보기</Link>
       <Link href="/" className="mt-1 flex h-11 items-center justify-center text-[13px] text-muted">다른 테스트 보기</Link>
     </div>
   )

@@ -461,6 +461,7 @@ public/
 - 페이지: `/exam`(→ `/exam/meme` 리디렉션), `/exam/meme`, `/exam/meme/r/[code]`(공유 착지: noindex·canonical `/exam/meme`·사이트맵 제외, 잘못된 코드는 일반 시작 화면). 미리보기 `/api/og/result?kind=exam&grade=&correct=`. 홈 '친구랑 같이 해봐요' 카드와 푸터(`FOOTER_EXTRA`)에서 들어온다.
 - GA: `exam_start(result_id=meme)`, `exam_end(result_id=meme_g<등급>)`, 공유 `share_click(test_name=exam)`, 착지 `shared_landing`. 문제별 정오·태어난 해는 보내지 않는다.
 - 규칙: 해설은 카드의 `meaning`·`usage`·`origin`을 그대로 보여 준다(화면에서 문장을 짓지 않는다). 등급 표는 출시 뒤 바꾸지 않는다. 진행 중인 판은 시작한 회차로 끝난다(자정을 넘겨도). 문제마다 제한 시간이 다르다(`timeLimitMs`: 5초 + 읽을 글자×0.11초, 10~25초), 힌트는 한 판에 한 번(오답 둘 흐림, 그 문제 가산점 0). 테스트 `npx vitest run tests/exam`, E2E `e2e/exam.spec.ts`.
+- 낱말 페이지: `/exam/meme/words`(모음)·`/exam/meme/words/<말>`(말마다 하나, 주소는 `wordSlug`: 공백→`-`, 기호 제거, 한글 그대로). 본문은 전부 서버에서 그린 카드 문장이고 하단에 `이 말로 한 문제`(`WordQuiz`, 오답은 공개된 말에서만)와 `오늘의 5문제 풀기`가 있다. **공개 조건**: 얼린 회차에서 처음 나온 회차가 오늘 회차(`todayRoundNo`, 얼린 회차 수를 넘지 않음)보다 앞일 때만(`isReleased`). 오늘·앞으로 나올 말과 회차에 없는 말은 404(`notFound`)이고 모음·사이트맵에도 없다. `revalidate = 21600`(6시간, 자정에 새 말이 열려서. 짧게 잡으면 ISR 쓰기 비용). 본문은 공백 제외 300자 이상이 목표이나 삐삐 숫자 카드 5장은 못 미친다(카드 문장을 지어내 늘리지 않는다, `tests/exam/words.test.tsx`에 명단). 제목이 48자를 넘으면 뒤의 `| 밈 능력고사`를 뺀다(gloss는 줄이지 않는다).
 - (아래는 0단계 수집·카드 작성 기록)
 - 후보 수집: `node scripts/exam/collect.mjs`(찾기+확인, 5분쯤), `--no-find`(확인만), `--all`(전부 다시). Playwright로 네이버 블로그 검색과 "<말> 뜻" 검색을 읽는다(공식 검색 API는 개발자센터에서 빠져 키 없이 읽음). 화면이 바뀌어 요약이 비면 `parseVerify`를 고친다.
 - 설정 `scripts/exam/subjects/meme.json`: 검색어(`findQueries`), 씨앗(`seeds`, SNS에서 본 말을 손으로 넣는 곳), 금지어(`banned`), 뽑기 오탐 막는 말(`stopwords`).
