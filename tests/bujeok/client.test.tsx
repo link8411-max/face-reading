@@ -12,7 +12,7 @@ import { EL_TEXT } from '@/content/bujeok'
 
 beforeEach(() => {
   track.mockClear()
-  // jsdom에는 Web Animations가 없어 연출이 곧바로 끝난다
+  window.matchMedia = ((q: string) => ({ matches: q.includes('reduce'), media: q, addEventListener() {}, removeEventListener() {}, addListener() {}, removeListener() {}, onchange: null, dispatchEvent: () => false })) as unknown as typeof window.matchMedia
 })
 afterEach(cleanup)
 
@@ -48,7 +48,7 @@ test('2월 30일을 넣으면 안내 문구가 보이고 drawing으로 넘어가
   expect(screen.getByRole('alert').textContent).toContain('2월은 28일까지 있어요')
   expect((make() as HTMLButtonElement).disabled).toBe(true)
   fireEvent.click(make())
-  expect(screen.queryByTestId('bujeok-skip')).toBeNull()
+  expect(screen.queryByTestId('bujeok-card')).toBeNull()
   expect(make()).toBeTruthy()
 })
 
@@ -65,17 +65,39 @@ test('이름 칸은 선택이고, 넣은 이름이 cleanName을 통과하지 못
   expect((make() as HTMLButtonElement).disabled).toBe(false)
 })
 
+test('마감은 필수 선택이고 기본은 금박이다', async () => {
+  render(<BujeokClient />)
+  expect(screen.getByRole('radio', { name: '금박' }).getAttribute('aria-checked')).toBe('true')
+  expect(screen.getAllByRole('radio', { name: /종이|금박|홀로그램/ })).toHaveLength(3)
+  pick('홀로그램')
+  expect(screen.getByRole('radio', { name: '홀로그램' }).getAttribute('aria-checked')).toBe('true')
+  pick('재물')
+  pick('전통')
+  fireEvent.click(make())
+  await screen.findByTestId('bujeok-card')
+  expect(document.querySelector('[data-bujeok-art] svg')!.innerHTML).toContain('bujeok-gold-holo')
+})
+
+test('만들면 바로 완성 화면(카드)이 뜬다. 중간 단계는 없다', async () => {
+  render(<BujeokClient />)
+  pick('합격')
+  pick('귀여운')
+  fireEvent.click(make())
+  expect(await screen.findByTestId('bujeok-card')).toBeTruthy()
+  expect(screen.getByRole('button', { name: '잠금화면용 저장' })).toBeTruthy()
+})
+
 test('다시 만들기는 form으로 돌아가지 않고 변형 번호만 새로 뽑아 다시 그린다', async () => {
   render(<BujeokClient />)
   pick('건강')
   pick('전통')
   fireEvent.click(make())
   await screen.findByRole('button', { name: '다시 만들기' })
-  const before = document.querySelector('svg[role="img"]')!.innerHTML
+  const before = document.querySelector('[data-bujeok-art] svg')!.innerHTML
   fireEvent.click(screen.getByRole('button', { name: '다시 만들기' }))
   expect(screen.queryByRole('button', { name: '부적 만들기' })).toBeNull()
   await screen.findByRole('button', { name: '다시 만들기' })
-  expect(document.querySelector('svg[role="img"]')!.innerHTML).not.toBe(before)
+  expect(document.querySelector('[data-bujeok-art] svg')!.innerHTML).not.toBe(before)
 })
 
 test('완성 화면에 네 버튼이 있고 선물하기는 /bujeok?mode=gift&style=로 간다', async () => {

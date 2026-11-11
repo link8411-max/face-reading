@@ -2,8 +2,9 @@
 import type { ReactNode } from 'react'
 import { partsFor } from '@/lib/bujeok/compose'
 import type { ElKey, Wish } from '@/lib/bujeok/keys'
-import { EL_COLOR_CUTE, MASCOT_COLOR, PAL } from '@/lib/bujeok/palette'
+import { EL_COLOR_CUTE, MASCOT_COLOR, PAL, themeFor } from '@/lib/bujeok/palette'
 import { EL_TEXT, WISH_TEXT } from '@/content/bujeok'
+import GoldDefs from './GoldDefs'
 import type { KitProps } from './types'
 
 const INK = PAL.cuteInk
@@ -77,6 +78,7 @@ const MASCOT: Record<Wish, { faceY: number; draw: (fill: string) => ReactNode }>
 
 export default function CuteBujeok({ spec, name }: KitProps) {
   const { border, head } = partsFor(spec)
+  const t = themeFor('cute', spec.finish)
   const w = WISH_TEXT[spec.wish]
   const m = MASCOT[spec.wish]
   const y = m.faceY
@@ -86,21 +88,22 @@ export default function CuteBujeok({ spec, name }: KitProps) {
   const tagW = Math.max(84, [...tag].length * tagSize * 0.92 + 36)
   return (
     <>
-      <rect x="24" y="6" width="252" height="508" rx="34" fill={PAL.cutePaper} />
+      {t.foil && <defs><GoldDefs finish={spec.finish} /></defs>}
+      <rect x="24" y="6" width="252" height="508" rx="34" fill={t.paper} />
       {border === 0 ? (
-        <rect data-a="fade" data-part="border" x="36" y="18" width="228" height="484" rx="24" fill="none" stroke={PAL.cuteLine} strokeWidth="3" strokeDasharray="2 9" strokeLinecap="round" />
+        <rect data-a="fade" data-part="border" x="36" y="18" width="228" height="484" rx="24" fill="none" stroke={t.line} strokeWidth="3" strokeDasharray="2 9" strokeLinecap="round" />
       ) : (
         <>
-          <rect data-a="draw" data-part="border" data-d="800" x="35" y="17" width="230" height="486" rx="25" fill="none" stroke={PAL.cuteLine} strokeWidth="3" />
-          <rect data-a="draw" data-d="600" x="43" y="25" width="214" height="470" rx="18" fill="none" stroke={PAL.cuteLine} strokeWidth="1.2" />
+          <rect data-a="draw" data-part="border" data-d="800" x="35" y="17" width="230" height="486" rx="25" fill="none" stroke={t.line} strokeWidth="3" />
+          <rect data-a="draw" data-d="600" x="43" y="25" width="214" height="470" rx="18" fill="none" stroke={t.line} strokeWidth="1.2" />
         </>
       )}
 
-      {head === 1 && <rect data-a="pop" x="58" y="58" width="184" height="52" rx="26" fill="#FFE3E8" />}
-      <text data-a="fade" data-part="head" x="150" y="96" textAnchor="middle" fontSize={phraseSize} fontWeight="700" fill={INK} stroke={INK} strokeWidth="1.2" strokeLinejoin="round" style={ROUND}>
+      {head === 1 && <rect data-a="pop" x="58" y="58" width="184" height="52" rx="26" fill={t.pill} />}
+      <text data-a="fade" data-part="head" x="150" y="96" textAnchor="middle" fontSize={phraseSize} fontWeight="700" fill={t.head} stroke={t.head} strokeWidth="1.2" strokeLinejoin="round" style={ROUND}>
         {w.cutePhrase}
       </text>
-      {head === 0 && <path data-a="draw" d="M84 112 Q150 126 216 112" fill="none" stroke={PAL.cuteLine} strokeWidth="5" strokeLinecap="round" />}
+      {head === 0 && <path data-a="draw" d="M84 112 Q150 126 216 112" fill="none" stroke={t.line} strokeWidth="5" strokeLinecap="round" />}
 
       <g className="bujeok-bob" data-part="symbol">
         {m.draw(MASCOT_COLOR[spec.wish])}
@@ -117,7 +120,7 @@ export default function CuteBujeok({ spec, name }: KitProps) {
         ))}
       </g>
 
-      <text data-a="fade" data-part="phrase" x="150" y="402" textAnchor="middle" fontSize="14" fill="#B48A7C" style={ROUND}>
+      <text data-a="fade" data-part="phrase" x="150" y="402" textAnchor="middle" fontSize="14" fill={t.sub} style={ROUND}>
         {w.label} 부적 · {EL_TEXT[spec.el].name}
       </text>
 

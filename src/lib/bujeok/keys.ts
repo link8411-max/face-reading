@@ -15,9 +15,16 @@ export const VARIANTS = 4
 
 export const WISH_DEFAULT_EL: Record<Wish, ElKey> = { money: 'metal', pass: 'wood', health: 'earth', love: 'fire', guard: 'water' }
 
+/** 마감: 종이(승인한 그림 그대로) · 금박(먹색 바탕에 금색 선) · 홀로그램(금박 + 각도에 따라 무지갯빛) */
+export const FINISHES = ['paper', 'gold', 'holo'] as const
+export type Finish = (typeof FINISHES)[number]
+export const FINISH_LABEL: Record<Finish, string> = { paper: '종이', gold: '금박', holo: '홀로그램' }
+export const FINISH_DEFAULT: Finish = 'gold'
+
 export interface BujeokSpec {
   style: BujeokStyle
   wish: Wish
   el: ElKey
   variant: number
+  finish: Finish
 }

@@ -1,7 +1,7 @@
-// 부적 선물 링크와 이름 검사. 링크에는 화풍·소원·기운·변형 번호와 (선택) 이름만 싣는다. 생년월일은 싣지 않는다.
+// 부적 선물 링크와 이름 검사. 링크에는 화풍·소원·기운·변형 번호·마감과 (선택) 이름만 싣는다. 생년월일은 싣지 않는다.
 import { SITE } from '@/lib/shareBase'
 import { BANNED_NAMES } from './bannedNames'
-import { EL_KEYS, STYLES, VARIANTS, WISHES, type BujeokSpec } from './keys'
+import { EL_KEYS, FINISHES, STYLES, VARIANTS, WISHES, type BujeokSpec } from './keys'
 
 const NAME_RE = /^[가-힣A-Za-z0-9 ]+$/
 
@@ -16,20 +16,21 @@ export function cleanName(raw: unknown): string | null {
 }
 
 export function bujeokCode(spec: BujeokSpec): string {
-  return `${spec.style}-${spec.wish}-${spec.el}-${spec.variant}`
+  return `${spec.style}-${spec.wish}-${spec.el}-${spec.variant}-${spec.finish}`
 }
 
 export function parseBujeokCode(code: string): BujeokSpec | null {
   const p = code.split('-')
-  if (p.length !== 4) return null
-  const [style, wish, el, v] = p
+  if (p.length !== 5) return null
+  const [style, wish, el, v, finish] = p
   if (!/^(0|[1-9]\d?)$/.test(v)) return null
   const variant = Number(v)
   if (variant >= VARIANTS) return null
   if (!(STYLES as readonly string[]).includes(style)) return null
   if (!(WISHES as readonly string[]).includes(wish)) return null
   if (!(EL_KEYS as readonly string[]).includes(el)) return null
-  return { style, wish, el, variant } as BujeokSpec
+  if (!(FINISHES as readonly string[]).includes(finish)) return null
+  return { style, wish, el, variant, finish } as BujeokSpec
 }
 
 export function bujeokGiftUrl(spec: BujeokSpec, names: { to: string; from?: string }): string {
@@ -44,7 +45,7 @@ export function bujeokGiftUrl(spec: BujeokSpec, names: { to: string; from?: stri
 
 /** 미리보기 이미지 주소. 이름은 넣지 않는다 (CDN 캐시·개인정보) */
 export function bujeokOgUrl(spec: BujeokSpec): string {
-  return `${SITE}/api/og/result?kind=bujeok&style=${spec.style}&wish=${spec.wish}&el=${spec.el}`
+  return `${SITE}/api/og/result?kind=bujeok&style=${spec.style}&wish=${spec.wish}&el=${spec.el}&finish=${spec.finish}`
 }
 
 export function giftHeadline(to: string | null): string {

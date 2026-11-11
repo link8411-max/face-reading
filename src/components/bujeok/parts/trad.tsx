@@ -1,11 +1,11 @@
 // 전통 화풍: 노란 종이에 붉은 붓선. 몸통 문양은 기운, 가운데 상징은 소원, 테두리·머리 문양은 변형 번호가 정한다.
 import { partsFor } from '@/lib/bujeok/compose'
 import type { ElKey, Wish } from '@/lib/bujeok/keys'
-import { EL_COLOR, PAL } from '@/lib/bujeok/palette'
+import { EL_COLOR, themeFor } from '@/lib/bujeok/palette'
 import { EL_TEXT, WISH_TEXT } from '@/content/bujeok'
+import GoldDefs from './GoldDefs'
 import { ring, stampChars, type KitProps } from './types'
 
-const J = PAL.jusa
 const SERIF = { fontFamily: 'var(--font-gowun-batang), "Noto Serif KR", serif' }
 
 const BODY: Record<ElKey, string[]> = {
@@ -26,6 +26,8 @@ const SYMBOL: Record<Wish, string[]> = {
 
 export default function TradBujeok({ spec, name, lite }: KitProps) {
   const { border, head } = partsFor(spec)
+  const t = themeFor('trad', spec.finish)
+  const J = t.line
   const w = WISH_TEXT[spec.wish]
   const chars = stampChars(name)
   const cols = chars.length > 3 ? 2 : 1
@@ -38,28 +40,33 @@ export default function TradBujeok({ spec, name, lite }: KitProps) {
   const line = { fill: 'none', stroke: J, strokeLinecap: 'round', strokeLinejoin: 'round' } as const
   return (
     <>
-      {!lite && (
+      {(!lite || t.foil) && (
         <defs>
+          {t.foil && <GoldDefs finish={spec.finish} />}
+          {!lite && (
+            <>
           <filter id="bujeok-brush" x="-5%" y="-5%" width="110%" height="110%">
             <feTurbulence type="fractalNoise" baseFrequency=".05" numOctaves="2" seed="4" />
             <feDisplacementMap in="SourceGraphic" scale="3.2" />
           </filter>
-          <filter id="bujeok-grain">
+          <filter id={t.ids.grain}>
             <feTurbulence type="fractalNoise" baseFrequency=".9" numOctaves="2" seed="7" />
-            <feColorMatrix values="0 0 0 0 .35  0 0 0 0 .22  0 0 0 0 .05  0 0 0 .18 0" />
+            <feColorMatrix values={t.grain} />
             <feComposite in2="SourceGraphic" operator="in" />
           </filter>
-          <linearGradient id="bujeok-edge" x1="0" x2="1">
-            <stop offset="0" stopColor={PAL.paperEdge} stopOpacity=".55" />
-            <stop offset=".12" stopColor={PAL.paperEdge} stopOpacity="0" />
-            <stop offset=".88" stopColor={PAL.paperEdge} stopOpacity="0" />
-            <stop offset="1" stopColor={PAL.paperEdge} stopOpacity=".55" />
+          <linearGradient id={t.ids.edge} x1="0" x2="1">
+            <stop offset="0" stopColor={t.edge} stopOpacity=".55" />
+            <stop offset=".12" stopColor={t.edge} stopOpacity="0" />
+            <stop offset=".88" stopColor={t.edge} stopOpacity="0" />
+            <stop offset="1" stopColor={t.edge} stopOpacity=".55" />
           </linearGradient>
+            </>
+          )}
         </defs>
       )}
-      <rect x="30" y="6" width="240" height="508" fill={PAL.paper} />
-      {!lite && <rect x="30" y="6" width="240" height="508" fill="url(#bujeok-edge)" />}
-      {!lite && <rect x="30" y="6" width="240" height="508" filter="url(#bujeok-grain)" />}
+      <rect x="30" y="6" width="240" height="508" fill={t.paper} />
+      {!lite && <rect x="30" y="6" width="240" height="508" fill={`url(#${t.ids.edge})`} />}
+      {!lite && <rect x="30" y="6" width="240" height="508" filter={`url(#${t.ids.grain})`} />}
 
       <g {...line} filter={brush}>
         {border === 0 ? (
@@ -117,7 +124,7 @@ export default function TradBujeok({ spec, name, lite }: KitProps) {
       </text>
 
       <g data-a="stamp" data-part="stamp">
-        <rect x={sx} y={sy} width={sw} height={sh} rx="3" fill={J} filter={brush} />
+        <rect x={sx} y={sy} width={sw} height={sh} rx="3" fill={t.stampFill} filter={brush} />
         {chars.map((c, i) => (
           <text
             key={i}
@@ -126,7 +133,7 @@ export default function TradBujeok({ spec, name, lite }: KitProps) {
             textAnchor="middle"
             fontSize="17"
             fontWeight="700"
-            fill={PAL.stampInk}
+            fill={t.stampInk}
             style={SERIF}
           >
             {c}

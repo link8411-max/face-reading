@@ -1,17 +1,17 @@
 'use client'
-// /bujeok 화면: form → drawing → done. 서버 호출 없이 브라우저에서 그리고 저장한다.
-import { useRef, useState } from 'react'
+// /bujeok 화면: form → done. 완성 화면에서 카드가 돌며 나타난다(손으로 돌려 볼 수 있다). 서버 호출 없이 브라우저에서 만들고 저장한다.
+import { useEffect, useRef, useState } from 'react'
 import { useBackOrHome } from '@/hooks/useBackOrHome'
 import TestHeader from '@/components/test/TestHeader'
 import BujeokForm, { type FormValues } from './BujeokForm'
-import BujeokReveal from './BujeokReveal'
+import BujeokCard from './BujeokCard'
 import BujeokDone from './BujeokDone'
 import { track } from '@/lib/analytics'
 import { validateBirthDate } from '@/lib/birthDate'
 import { elementFromBirth, randomVariant } from '@/lib/bujeok/compose'
 import { takeHandedBirth } from '@/lib/bujeok/birthHandoff'
 import { cleanName } from '@/lib/bujeok/link'
-import { VARIANTS, WISH_DEFAULT_EL, type BujeokSpec, type BujeokStyle, type Wish } from '@/lib/bujeok/keys'
+import { FINISH_DEFAULT, VARIANTS, WISH_DEFAULT_EL, type BujeokSpec, type BujeokStyle, type Wish } from '@/lib/bujeok/keys'
 
 export type Mode = 'mine' | 'gift'
 export interface Initial { mode?: Mode; wish?: Wish; style?: BujeokStyle }
@@ -19,13 +19,14 @@ export interface Initial { mode?: Mode; wish?: Wish; style?: BujeokStyle }
 const BIRTH_FAIL = '날짜를 다시 확인해 주세요. 음력 윤달은 그 해에 있는 달만 고를 수 있어요.'
 const NAME_FAIL = '이름은 한글·영문·숫자로 8자까지 적어 주세요.'
 
-type Phase = 'form' | 'drawing' | 'done'
+type Phase = 'form' | 'done'
 
 function initialValues(initial?: Initial): FormValues {
   const b = takeHandedBirth()
   return {
     wish: initial?.wish ?? null,
     style: initial?.style ?? null,
+    finish: FINISH_DEFAULT,
     birth: b ? { year: String(b.year), month: String(b.month), day: String(b.day) } : { year: '', month: '', day: '' },
     isLunar: b?.isLunar ?? false,
     isLeap: b?.isLeapMonth ?? false,
@@ -43,7 +44,7 @@ export default function BujeokClient({ initial }: { initial?: Initial }) {
   const [failText, setFailText] = useState<string | null>(null)
   const panel = useRef<HTMLDivElement>(null)
 
-  const { wish, style, birth, isLunar, isLeap } = values
+  const { wish, style, finish, birth, isLunar, isLeap } = values
   const anyBirth = !!(birth.year || birth.month || birth.day)
   const dateCheck = validateBirthDate(birth, new Date(), { lunar: isLunar })
   const birthBlocked = anyBirth && !dateCheck.ok
@@ -75,9 +76,9 @@ export default function BujeokClient({ initial }: { initial?: Initial }) {
     }
     const n = cleanName(rawName)
     setMadeName(n)
-    setSpec({ style, wish, el, variant: randomVariant() })
+    setSpec({ style, wish, el, variant: randomVariant(), finish })
     setPlayKey((k) => k + 1)
-    setPhase('drawing')
+    setPhase('done')
     track('test_start', { test_name: 'bujeok' })
     track('result_view', { test_name: 'bujeok', result_id: `${style}_${wish}` })
   }
@@ -87,12 +88,16 @@ export default function BujeokClient({ initial }: { initial?: Initial }) {
     // 같은 소원·기운에서 변형 번호만 새로 뽑는다(현재와 다른 번호)
     const variant = (spec.variant + 1 + Math.floor(Math.random() * (VARIANTS - 1))) % VARIANTS
     setSpec({ ...spec, variant })
-    setPlayKey((k) => k + 1)
-    setPhase('drawing')
+    setPlayKey((k) => k + 1) // 새 카드가 다시 돌며 나타난다
+    setPhase('done')
     track('result_view', { test_name: 'bujeok', result_id: `${spec.style}_${spec.wish}` })
   }
 
-  const inRun = phase !== 'form' && spec
+  const inRun = phase === 'done' && spec
+  // 폼 아래쪽에서 눌러도 카드가 화면에 들어오게 한다(다시 만들기도 같다)
+  useEffect(() => {
+    if (inRun) panel.current?.scrollIntoView?.({ block: 'nearest' })
+  }, [inRun, playKey])
   return (
     <div className="min-h-screen bg-paper text-ink">
       <main className="mx-auto px-[22px] max-w-lg pb-6">
@@ -100,14 +105,10 @@ export default function BujeokClient({ initial }: { initial?: Initial }) {
 
         {inRun ? (
           <div>
-            <div ref={panel} className="mx-auto max-w-[340px] rounded-[28px] bg-[#1c1512] p-4">
-              <BujeokReveal spec={spec} name={madeName} playKey={playKey} onDone={() => setPhase('done')} />
+            <div ref={panel} className="mx-auto max-w-[420px]">
+              <BujeokCard spec={spec} name={madeName} enter playKey={playKey} />
             </div>
-            {phase === 'done' ? (
-              <BujeokDone spec={spec} getSvg={() => panel.current?.querySelector('svg') ?? null} onRetry={retry} />
-            ) : (
-              <p className="mt-5 text-center text-sm text-muted" role="status">붓으로 부적을 그리고 있어요…</p>
-            )}
+            <BujeokDone spec={spec} getSvg={() => panel.current?.querySelector('[data-bujeok-art] svg') ?? null} onRetry={retry} />
           </div>
         ) : (
           <>

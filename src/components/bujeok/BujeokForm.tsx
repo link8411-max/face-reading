@@ -1,17 +1,19 @@
 'use client'
-// 부적 만들기 입력: 소원(5)·화풍(2)은 필수, 생년월일과 이름은 선택.
+// 부적 만들기 입력: 소원(5)·화풍(2)·마감(3, 기본 금박)은 필수, 생년월일과 이름은 선택.
 import BirthDateFields from '@/components/BirthDateFields'
 import BujeokSvg from './BujeokSvg'
 import type { BirthDateInput } from '@/lib/birthDate'
-import { STYLES, WISHES, WISH_DEFAULT_EL, type BujeokStyle, type Wish } from '@/lib/bujeok/keys'
+import { FINISHES, FINISH_LABEL, STYLES, WISHES, WISH_DEFAULT_EL, type BujeokStyle, type Finish, type Wish } from '@/lib/bujeok/keys'
 import { WISH_TEXT } from '@/content/bujeok'
 
 export const STYLE_LABEL: Record<BujeokStyle, string> = { trad: '전통', cute: '귀여운' }
-const STYLE_HINT: Record<BujeokStyle, string> = { trad: '붉은 글씨 노란 종이', cute: '말랑한 캐릭터' }
+const STYLE_HINT: Record<BujeokStyle, string> = { trad: '붓글씨 한자 부적', cute: '말랑한 캐릭터' }
+const FINISH_HINT: Record<Finish, string> = { paper: '노란 종이에 붉은 선', gold: '먹색 바탕에 금색 선', holo: '금박에 무지갯빛이 비쳐요' }
 
 export interface FormValues {
   wish: Wish | null
   style: BujeokStyle | null
+  finish: Finish
   birth: BirthDateInput
   isLunar: boolean
   isLeap: boolean
@@ -38,8 +40,8 @@ export default function BujeokForm({
   return (
     <div>
       <div className="mt-2.5 mb-6">
-        <h2 className="font-serif font-bold text-[27px] leading-[1.4] break-keep">소원을 붓으로 그린<br />나만의 부적</h2>
-        <p className="mt-2.5 text-sm text-muted break-keep">소원 하나를 고르면 부적이 그려져요. 잠금화면으로 저장해 두고 힘이 필요할 때 꺼내 보세요.</p>
+        <h2 className="font-serif font-bold text-[27px] leading-[1.4] break-keep">소원을 담은<br />나만의 부적</h2>
+        <p className="mt-2.5 text-sm text-muted break-keep">소원 하나를 고르면 손으로 돌려 볼 수 있는 부적 카드가 만들어져요. 잠금화면으로 저장해 두고 힘이 필요할 때 꺼내 보세요.</p>
       </div>
 
       <div className="bg-white rounded-[28px] p-6 mb-6 border border-line">
@@ -77,7 +79,7 @@ export default function BujeokForm({
                 className={`rounded-[22px] p-3 text-center border transition ${on ? 'border-ink bg-card-2' : 'border-line bg-white'}`}
               >
                 <span aria-hidden className="block mx-auto w-[88px] rounded-xl bg-[#1c1512] p-1.5">
-                  <BujeokSvg spec={{ style: s, wish: previewWish, el: WISH_DEFAULT_EL[previewWish], variant: 0 }} name={null} lite className="block w-full h-auto" />
+                  <BujeokSvg spec={{ style: s, wish: previewWish, el: WISH_DEFAULT_EL[previewWish], variant: 0, finish: values.finish }} name={null} lite className="block w-full h-auto" />
                 </span>
                 <span className="mt-2 block text-sm font-medium">{STYLE_LABEL[s]}</span>
                 <span className="block text-xs text-muted">{STYLE_HINT[s]}</span>
@@ -85,6 +87,28 @@ export default function BujeokForm({
             )
           })}
         </div>
+
+        <p id="bujeok-finish-label" className="text-sm font-medium mb-2">어떤 마감으로 받을까요?</p>
+        <div role="radiogroup" aria-labelledby="bujeok-finish-label" className="grid grid-cols-3 gap-2 mb-1">
+          {FINISHES.map((f) => {
+            const on = values.finish === f
+            return (
+              <button
+                key={f}
+                type="button"
+                role="radio"
+                aria-checked={on}
+                aria-label={FINISH_LABEL[f]}
+                onClick={() => set({ finish: f })}
+                className={`rounded-[18px] px-2 py-3 text-center border transition ${on ? 'border-ink bg-card-2' : 'border-line bg-white'}`}
+              >
+                <span className="block text-sm font-medium">{FINISH_LABEL[f]}</span>
+                <span className="block text-xs text-muted break-keep">{FINISH_HINT[f]}</span>
+              </button>
+            )
+          })}
+        </div>
+        <p className="text-xs text-muted mb-6 break-keep">저장하는 잠금화면 이미지도 고른 마감 그대로예요.</p>
 
         <p className="text-sm font-medium mb-1">생년월일 <span className="text-muted font-normal">(선택)</span></p>
         <p className="text-xs text-muted mb-3 break-keep">넣으면 사주에서 부족한 기운을 채워 주는 쪽으로 그려요. 비워 두면 소원에 맞는 기운으로 그려요. 생년월일은 저장하지 않아요.</p>

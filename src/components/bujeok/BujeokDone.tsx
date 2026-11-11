@@ -34,7 +34,7 @@ export default function BujeokDone({ spec, getSvg, onRetry }: { spec: BujeokSpec
     setSaving(true)
     setSaveNotice(null)
     try {
-      const blob = await renderWallpaper(svg, spec.style)
+      const blob = await renderWallpaper(svg, spec.style, spec.finish)
       saveImage(blob, 'bujeok.png')
       track('share_click', { test_name: 'bujeok', method: 'save_image' })
     } catch {

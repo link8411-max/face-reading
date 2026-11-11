@@ -316,8 +316,25 @@
 @media (prefers-reduced-motion: no-preference) {
   .bujeok-bob { animation: bujeok-bob 2.4s ease-in-out infinite; transform-box: fill-box; transform-origin: center; }
   .bujeok-tw { animation: bujeok-tw 1.8s ease-in-out infinite; }
-  .bujeok-sway { animation: bujeok-sway 5s ease-in-out infinite; transform-origin: 50% 0; }
 }
 @keyframes bujeok-bob { 0%, 100% { translate: 0 0; rotate: -1.5deg; } 50% { translate: 0 -7px; rotate: 1.5deg; } }
 @keyframes bujeok-tw { 0%, 100% { opacity: .55; } 50% { opacity: 1; } }
-@keyframes bujeok-sway { 0%, 100% { rotate: -.7deg; } 50% { rotate: .7deg; } }
+
+/* 부적 입체 카드 (BujeokCard): 어두운 중성색 무대, 붉은 기운 없음 */
+.bj-stage { position: relative; width: 100%; height: clamp(400px, 62vh, 560px); display: grid; place-items: center; overflow: hidden; border-radius: 28px; cursor: grab; user-select: none; -webkit-user-select: none; background: radial-gradient(90% 60% at 50% 38%, #2b2620 0%, #0f0b0a 70%), #0f0b0a; }
+.bj-stage:active { cursor: grabbing; }
+.bj-stage:focus-visible { outline: 2px solid #e9c46a; outline-offset: 2px; }
+.bj-dust { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; }
+.bj-zoomer { height: 92%; aspect-ratio: var(--ar, 240/508); transform: scale(var(--zoom, 1)); }
+.bj-scene { perspective: 1100px; width: 100%; height: 100%; }
+.bj-card { position: relative; width: 100%; height: 100%; transform-style: preserve-3d; transform: rotateX(var(--rx, 0deg)) rotateY(var(--ry, 0deg)); will-change: transform; }
+.bj-face, .bj-slab { position: absolute; inset: 0; border-radius: var(--r, 6px); backface-visibility: hidden; -webkit-backface-visibility: hidden; overflow: hidden; }
+.bj-slab { backface-visibility: visible; -webkit-backface-visibility: visible; background: var(--edge, #8a6a1f); }
+.bj-front { transform: translateZ(5px); box-shadow: 0 0 0 1px rgba(255, 220, 140, .25); }
+.bj-front svg { width: 100%; height: 100%; display: block; }
+.bj-back { transform: rotateY(180deg) translateZ(5px); background: var(--backbg, #17140f); color: var(--backfg, #e9c46a); display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 5%; padding: 10%; text-align: center; }
+.bj-sheen, .bj-holo { position: absolute; inset: 0; pointer-events: none; }
+.bj-sheen { background: linear-gradient(105deg, transparent 30%, rgba(255, 255, 255, 0) 40%, rgba(255, 250, 225, .75) 50%, rgba(255, 255, 255, 0) 60%, transparent 70%); background-size: 300% 100%; background-position: var(--sx, 50%) 0; mix-blend-mode: soft-light; }
+.bj-holo { opacity: var(--holo, 0); background: repeating-linear-gradient(115deg, #ff5f6d 0%, #ffc371 12%, #f9f871 24%, #7bffb1 36%, #6ad7ff 48%, #b28dff 60%, #ff5f6d 72%); background-size: 260% 260%; background-position: var(--sx, 50%) var(--sy, 50%); mix-blend-mode: color-dodge; }
+.bj-shadow { position: absolute; left: 50%; bottom: 1%; width: 46%; height: 5%; transform: translateX(-50%) scaleX(var(--sh, 1)); background: radial-gradient(closest-side, rgba(0, 0, 0, .6), transparent); filter: blur(4px); pointer-events: none; }
+.bj-seal { width: 44%; aspect-ratio: 1; border-radius: 50%; border: 3px double currentColor; display: grid; place-items: center; font-size: clamp(34px, 11vw, 60px); font-weight: 700; }

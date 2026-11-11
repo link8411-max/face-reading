@@ -49,7 +49,7 @@ test('분포: 1950~2010년 매달 1·15일, 소원 5개 전체에서 한 기운�
 test('partsFor: variant 0..3이 (border, head) 네 조합을 한 번씩 낸다', () => {
   const seen = new Set<string>()
   for (let v = 0; v < VARIANTS; v++) {
-    const p = partsFor({ style: STYLES[0], wish: 'money', el: 'metal', variant: v })
+    const p = partsFor({ style: STYLES[0], wish: 'money', el: 'metal', variant: v, finish: 'paper' })
     seen.add(`${p.border}${p.head}`)
   }
   expect(seen.size).toBe(4)
