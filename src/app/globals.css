@@ -12,6 +12,16 @@
   --color-blush: #E9BCA8;
   --color-navy-game: #23263A;
   --color-gold-game: #E8B547;
+  /* 부적 전용 (src/lib/bujeok/palette.ts와 같은 값) */
+  --color-bujeok-paper: #E6C35C;
+  --color-bujeok-jusa: #B3261E;
+  --color-bujeok-cute-paper: #FFFAF2;
+  --color-bujeok-cute-ink: #5B4037;
+  --color-bujeok-el-wood: #3E7B55;
+  --color-bujeok-el-fire: #D0532F;
+  --color-bujeok-el-earth: #A9762B;
+  --color-bujeok-el-metal: #8A8377;
+  --color-bujeok-el-water: #2F5F8A;
   /* 일기토 천 바탕(캔버스 틀과 같은 녹색 체커 디더) */
   --color-cloth: #1E3A24;
   --color-cloth-2: #27482C;
@@ -301,3 +311,13 @@
   75% { transform: scale(0.93) rotate(-6deg); }
   100% { transform: scale(1) rotate(-6deg); }
 }
+
+/* 부적: 완성 뒤 살짝 움직임 */
+@media (prefers-reduced-motion: no-preference) {
+  .bujeok-bob { animation: bujeok-bob 2.4s ease-in-out infinite; transform-box: fill-box; transform-origin: center; }
+  .bujeok-tw { animation: bujeok-tw 1.8s ease-in-out infinite; }
+  .bujeok-sway { animation: bujeok-sway 5s ease-in-out infinite; transform-origin: 50% 0; }
+}
+@keyframes bujeok-bob { 0%, 100% { translate: 0 0; rotate: -1.5deg; } 50% { translate: 0 -7px; rotate: 1.5deg; } }
+@keyframes bujeok-tw { 0%, 100% { opacity: .55; } 50% { opacity: 1; } }
+@keyframes bujeok-sway { 0%, 100% { rotate: -.7deg; } 50% { rotate: .7deg; } }

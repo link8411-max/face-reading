@@ -26,6 +26,7 @@ const TOKENS: [string, string][] = [
   ['paper', '#FBF6F1'], ['card', '#ECE5D9'], ['card-2', '#F1EBE2'], ['line', '#E6DED2'],
   ['ink', '#2E2A27'], ['muted', '#6B6259'], ['accent', '#9A4F35'], ['blush', '#E9BCA8'],
   ['navy-game', '#23263A'], ['gold-game', '#E8B547'],
+  ['bujeok-paper', '#E6C35C'], ['bujeok-jusa', '#B3261E'], ['bujeok-cute-paper', '#FFFAF2'], ['bujeok-cute-ink', '#5B4037'],
 ]
 
 test('뉴트럴 색 토큰', () => {
