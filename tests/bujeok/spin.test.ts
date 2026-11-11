@@ -1,5 +1,5 @@
 import { expect, test } from 'vitest'
-import { ZOOM, clampZoom, pinchZoom, restFace, sheenPos, stepSpin, type SpinState } from '@/lib/bujeok/spin'
+import { HINT, hintAngle, hintRy, ZOOM, clampZoom, pinchZoom, restFace, sheenPos, stepSpin, type SpinState } from '@/lib/bujeok/spin'
 
 const run = (s: SpinState, n: number, dragging = false) => {
   for (let i = 0; i < n; i++) s = stepSpin(s, dragging)
@@ -51,4 +51,36 @@ test('pinchZoom', () => {
   expect(pinchZoom(1, 100, 1000)).toBe(2)
   expect(pinchZoom(1, 0, 50)).toBe(1)
   expect(pinchZoom(2, 100, 10)).toBe(0.7)
+})
+
+test('hintAngle: 0에서 시작해 0으로 돌아오고, 36도를 넘지 않고, 끝나면 null', () => {
+  expect(hintAngle(0)).toBe(0)
+  expect(HINT.ms).toBe(2400)
+  expect(Math.abs(hintAngle(HINT.ms - 1)!)).toBeLessThan(0.5)
+  expect(hintAngle(HINT.ms)).toBeNull()
+  expect(hintAngle(HINT.ms + 5000)).toBeNull()
+  let max = 0
+  let sign = 0
+  let crossings = 0
+  for (let t = 0; t < HINT.ms; t += 4) {
+    const a = hintAngle(t)!
+    max = Math.max(max, Math.abs(a))
+    const sg = Math.sign(a)
+    if (sg !== 0 && sign !== 0 && sg !== sign) crossings++
+    if (sg !== 0) sign = sg
+  }
+  expect(max).toBeLessThanOrEqual(36)
+  expect(max).toBeGreaterThan(30) // 눈에 띄게 돌아간다
+  expect(crossings).toBeGreaterThanOrEqual(5) // 세 번 흔들림(좌우 여섯 번 방향 바뀜 중 가운데 다섯 번 이상)
+})
+
+test('hintRy: 첫 흔들기 → 가만히 → 6초 뒤 한 번 더 → 끝(null)', () => {
+  expect(hintRy(0)).toBe(0)
+  expect(Math.abs(hintRy(300)!)).toBeGreaterThan(1)
+  expect(hintRy(HINT.ms + 100)).toBe(0)
+  expect(hintRy(HINT.repeatAt - 1)).toBe(0)
+  expect(HINT.repeatAt).toBe(6000)
+  expect(Math.abs(hintRy(HINT.repeatAt + 300)!)).toBeGreaterThan(1)
+  expect(hintRy(HINT.repeatAt + HINT.ms)).toBeNull()
+  expect(hintRy(60000)).toBeNull()
 })

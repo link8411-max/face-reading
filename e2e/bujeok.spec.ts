@@ -384,3 +384,16 @@ test('/bujeok/box: noindex이고 사이트맵에 없다', async ({ request }) =>
   expect(html).toContain('<link rel="canonical" href="https://unse-ai.com/bujeok"')
   expect(await (await request.get('/sitemap.xml')).text()).not.toContain('/bujeok/box')
 })
+
+test('처음 열면 "좌우로 밀어 돌려 보세요" 안내가 뜨고, 카드를 건드리면 사라진다', async ({ page }) => {
+  await page.goto('/bujeok?mode=gift')
+  await page.getByRole('radio', { name: '합격' }).click()
+  await page.getByRole('radio', { name: '전통' }).click()
+  await page.getByLabel('받는 사람 이름').fill('민지')
+  await page.getByRole('button', { name: '부적 만들기' }).click()
+  await expect(page.getByTestId('bujeok-card')).toBeVisible()
+  const hint = page.getByText('좌우로 밀어 돌려 보세요')
+  await expect(hint).toBeVisible({ timeout: 5000 }) // 등장 회전(1.5초)이 끝난 뒤
+  await page.getByTestId('bujeok-flip').click()
+  await expect(hint).toHaveCount(0)
+})

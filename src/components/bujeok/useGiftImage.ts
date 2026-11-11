@@ -8,7 +8,7 @@ import { GIFT_PREP_DELAY_MS, pickKakaoImage, type KakaoImage } from '@/lib/bujeo
 import { uploadKakaoImage } from '@/lib/kakao'
 import type { BujeokSpec } from '@/lib/bujeok/keys'
 
-export function useGiftImage(spec: BujeokSpec, getSvg: () => SVGSVGElement | null, enabled: boolean) {
+export function useGiftImage(spec: BujeokSpec, getSvg: () => SVGSVGElement | null, enabled: boolean, to: string | null = null) {
   const filePromise = useRef<Promise<File | null>>(Promise.resolve(null))
   const upload = useRef<Promise<KakaoImage | null> | null>(null)
   const svgGetter = useRef(getSvg)
@@ -27,7 +27,7 @@ export function useGiftImage(spec: BujeokSpec, getSvg: () => SVGSVGElement | nul
         try {
           const svg = svgGetter.current()
           if (!svg) return resolve(null)
-          const blob = await renderGiftImage(svg, spec.style, spec.finish)
+          const blob = await renderGiftImage(svg, spec.style, spec.finish, spec.wish, to)
           resolve(alive ? new File([blob], GIFT_IMAGE_NAME, { type: 'image/png' }) : null)
         } catch {
           resolve(null)
@@ -40,7 +40,7 @@ export function useGiftImage(spec: BujeokSpec, getSvg: () => SVGSVGElement | nul
       alive = false
       clearTimeout(timer.id)
     }
-  }, [spec, enabled])
+  }, [spec, enabled, to])
 
   return {
     /** 선물 PNG(만드는 중이면 끝나길 기다린다, 실패하면 null) */

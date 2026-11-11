@@ -28,7 +28,7 @@ export default function BujeokDone({ spec, getSvg, onRetry, gift, ad, mineName =
   const text = WISH_TEXT[spec.wish]
   const { saving, saveNotice, save } = useWallpaperSave(spec, getSvg)
   // 선물: 이름 도장이 찍힌 앞면 그림(1080×1350)을 완성 화면이 뜨면 미리 만들어 두고 공유에 같이 보낸다(카카오톡은 카드 이미지로 올린다)
-  const giftImage = useGiftImage(spec, getSvg, !!gift)
+  const giftImage = useGiftImage(spec, getSvg, !!gift, gift?.to ?? null)
   // 내 부적: 공유 링크는 시작 화면(/bujeok)이다. 이름·생년월일·소원은 싣지 않는다. (선물은 아래 sendKakao·sendLink가 따로 보낸다)
   const { busy, notice, share } = useResultShare(
     gift ? null : { testName: 'bujeok', title: SHARE_TITLE, text: SHARE_TEXT, url: `${SITE}/bujeok?${UTM('bujeok')}`, imageUrl: SHARE_IMAGE },

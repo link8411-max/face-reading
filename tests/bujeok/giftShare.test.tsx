@@ -58,7 +58,7 @@ const upOk = () => vi.fn<(a: { file: File[] }) => Promise<unknown>>(async () => 
 test('완성 화면이 뜨면 그림을 미리 만든다(누르기 전에)', async () => {
   mount()
   await waitFor(() => expect(renderGiftImage).toHaveBeenCalledTimes(1), { timeout: 3000 })
-  expect(renderGiftImage.mock.calls[0].slice(1)).toEqual(['trad', 'gold'])
+  expect(renderGiftImage.mock.calls[0].slice(1)).toEqual(['trad', 'gold', 'pass', '민지'])
 })
 
 test('선물 완성 화면 버튼 순서: 카카오톡으로 보내기 → 링크로 보내기 → 그림 저장 (옛 "선물 보내기"는 없다)', () => {

@@ -15,7 +15,7 @@ export function useWallpaperSave(spec: BujeokSpec, getSvg: () => SVGSVGElement |
     setSaving(true)
     setSaveNotice(null)
     try {
-      const blob = await renderWallpaper(svg, spec.style, spec.finish)
+      const blob = await renderWallpaper(svg, spec.style, spec.finish, spec.wish)
       saveImage(blob, 'bujeok.png')
       track('share_click', { test_name: 'bujeok', method: 'save_image' })
     } catch {

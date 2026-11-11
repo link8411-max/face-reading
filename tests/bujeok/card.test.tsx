@@ -1,7 +1,7 @@
 // @vitest-environment jsdom
 import { act, cleanup, fireEvent, render, screen } from '@testing-library/react'
 import { afterEach, beforeEach, expect, test, vi } from 'vitest'
-import BujeokCard from '@/components/bujeok/BujeokCard'
+import BujeokCard, { resetHintForTests } from '@/components/bujeok/BujeokCard'
 import type { BujeokSpec } from '@/lib/bujeok/keys'
 import { WISH_TEXT } from '@/content/bujeok'
 
@@ -10,7 +10,10 @@ const spec: BujeokSpec = { style: 'trad', wish: 'money', el: 'metal', variant: 0
 function mockMotion(reduce: boolean) {
   window.matchMedia = ((q: string) => ({ matches: reduce && q.includes('reduce'), media: q, addEventListener() {}, removeEventListener() {}, addListener() {}, removeListener() {}, onchange: null, dispatchEvent: () => false })) as unknown as typeof window.matchMedia
 }
-beforeEach(() => mockMotion(false))
+beforeEach(() => {
+  mockMotion(false)
+  resetHintForTests()
+})
 afterEach(() => {
   cleanup()
   vi.restoreAllMocks()
@@ -186,4 +189,99 @@ test('언마운트하면 rAF를 멈춘다', () => {
   const { unmount } = render(<BujeokCard spec={spec} name={null} />)
   unmount()
   expect(cancel).toHaveBeenCalled()
+})
+
+// --- 처음 한 번 알려 주기: 좌우 흔들기 + "좌우로 밀어 돌려 보세요" ---
+const HINT_TEXT = '좌우로 밀어 돌려 보세요'
+const ryNow = () => Number(card().style.getPropertyValue('--ry').replace('deg', ''))
+
+test('힌트: 등장 회전이 끝난 뒤에야 안내가 뜨고, 그 뒤 카드가 ±36도 안에서 좌우로 흔들린다', () => {
+  const raf = fakeRaf()
+  render(<BujeokCard spec={spec} name={null} enter />)
+  expect(screen.queryByText(HINT_TEXT)).toBeNull() // 등장 중
+  raf.tick(100) // 1.6초 > 1.5초 등장
+  expect(screen.getByText(HINT_TEXT)).toBeTruthy()
+  let max = 0
+  let min = 0
+  for (let i = 0; i < 140; i++) {
+    raf.tick()
+    max = Math.max(max, ryNow())
+    min = Math.min(min, ryNow())
+  }
+  expect(max).toBeGreaterThan(25)
+  expect(min).toBeLessThan(-25)
+  expect(max).toBeLessThanOrEqual(36)
+  expect(min).toBeGreaterThanOrEqual(-36)
+})
+
+test('힌트: 흔드는 동안은 한가한 흔들림 대신 힌트 각도만 쓴다(22도를 넘는 값이 나오고 끝나면 0으로 돌아옴)', () => {
+  const raf = fakeRaf()
+  render(<BujeokCard spec={spec} name={null} />)
+  raf.tick(160) // 2.56초: 첫 흔들기 끝
+  expect(Math.abs(ryNow())).toBeLessThan(0.5)
+  raf.tick(60) // 가만히 있는 구간
+  expect(ryNow()).toBe(0)
+})
+
+test('힌트: 6초쯤 뒤 한 번 더 흔들고, 그 뒤로 안내 글은 처음 건드릴 때까지 남는다', () => {
+  const raf = fakeRaf()
+  render(<BujeokCard spec={spec} name={null} />)
+  raf.tick(330) // 5.3초
+  expect(ryNow()).toBe(0)
+  let moved = false
+  for (let i = 0; i < 60; i++) {
+    raf.tick()
+    if (Math.abs(ryNow()) > 20) moved = true
+  }
+  expect(moved).toBe(true)
+  raf.tick(400)
+  expect(screen.getByText(HINT_TEXT)).toBeTruthy()
+})
+
+test('힌트 취소: 포인터를 누르면 흔들기가 멈추고 안내가 사라진다', () => {
+  const raf = fakeRaf()
+  render(<BujeokCard spec={spec} name={null} />)
+  raf.tick(10)
+  expect(screen.getByText(HINT_TEXT)).toBeTruthy()
+  pointer('pointerdown', 1, 100, 100)
+  expect(screen.queryByText(HINT_TEXT)).toBeNull()
+  pointer('pointerup', 1, 100, 100)
+  raf.tick(600) // 관성으로 가까운 면에 붙어 멈춘다. 힌트의 두 번째 흔들기(6초)가 와도 따르지 않는다
+  expect(ryNow()).toBe(0)
+  raf.tick(400)
+  expect(ryNow()).toBe(0)
+})
+
+test('힌트 취소: 뒤집기 버튼·키보드 회전·휠 확대도 안내를 지운다', () => {
+  for (const act1 of [
+    () => fireEvent.click(screen.getByTestId('bujeok-flip')),
+    () => fireEvent.keyDown(stage(), { key: 'ArrowRight' }),
+    () => { act(() => { stage().dispatchEvent(new WheelEvent('wheel', { deltaY: -100, ctrlKey: true, bubbles: true, cancelable: true })) }) },
+  ]) {
+    resetHintForTests()
+    const { unmount } = render(<BujeokCard spec={spec} name={null} />)
+    expect(screen.getByText(HINT_TEXT)).toBeTruthy()
+    act1()
+    expect(screen.queryByText(HINT_TEXT)).toBeNull()
+    unmount()
+  }
+})
+
+test('힌트: 한 번 건드렸으면 같은 화면에서 카드를 다시 세워도 안내가 다시 뜨지 않는다', () => {
+  const { unmount } = render(<BujeokCard spec={spec} name={null} />)
+  pointer('pointerdown', 1, 100, 100)
+  pointer('pointerup', 1, 100, 100)
+  unmount()
+  render(<BujeokCard spec={spec} name={null} />)
+  expect(screen.queryByText(HINT_TEXT)).toBeNull()
+})
+
+test('움직임 줄이기: 흔들지 않고 안내만 보인다(루프도 멈춤)', () => {
+  mockMotion(true)
+  const raf = fakeRaf()
+  render(<BujeokCard spec={spec} name={null} enter />)
+  expect(screen.getByText(HINT_TEXT)).toBeTruthy()
+  raf.tick(200)
+  expect(ryNow()).toBe(0)
+  expect(raf.pending()).toBe(0)
 })

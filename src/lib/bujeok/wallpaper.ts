@@ -2,7 +2,8 @@
 // 글꼴(사이트 글꼴 변수·한자 대체 글꼴)이 저장 이미지에서도 그대로 나오도록 SVG를 캔버스에 직접 그리지 않고,
 // 화면 밖에 같은 비율의 DOM을 세워 기존 캡처 경로(modern-screenshot)로 찍는다.
 import { CARD_BOX, PAL } from './palette'
-import type { BujeokStyle, Finish } from './keys'
+import type { BujeokStyle, Finish, Wish } from './keys'
+import { WISH_TEXT } from '@/content/bujeok'
 
 export const WALLPAPER = { w: 1170, h: 2532 } as const
 
@@ -11,7 +12,7 @@ const SCALE = 3
 
 /** 부적 자리(이미지 픽셀). 위 3분의 1은 시계·알림 자리라 비운다. 그림 비율 300:520 */
 export function wallpaperLayout(): { x: number; y: number; w: number; h: number } {
-  const w = 840
+  const w = 760 // 카드 아래에 "<소원> 부적" 한 줄과 워터마크가 들어갈 자리를 남긴다
   const h = Math.round((w * 520) / 300)
   return { x: (WALLPAPER.w - w) / 2, y: 900, w, h }
 }
@@ -29,14 +30,41 @@ const HOLO_FIXED = 'repeating-linear-gradient(115deg,#ff5f6d 0%,#ffc371 12%,#f9f
 
 export const WATERMARK = '운명을 읽다 · unse-ai.com'
 
+/** 그림 아래 설명 한 줄. size는 이미지 픽셀 */
+export interface CaptionLine { text: string; size: number; weight: 400 | 700; opacity: number; gapBefore: number }
+export interface CaptionBlock { top: number; left: number; width: number; lines: CaptionLine[] }
+
+export const CAPTION_LINE_HEIGHT = 1.35
+
+/** 줄 수까지 보수적으로 어림한 높이(한글 한 글자 = 글자 크기 한 칸, 넘치면 다음 줄) */
+export function estimateCaptionHeight(lines: CaptionLine[], width: number): number {
+  return lines.reduce((sum, l, i) => {
+    const rows = Math.max(1, Math.ceil((l.text.length * l.size) / width))
+    return sum + (i === 0 ? 0 : l.gapBefore) + rows * l.size * CAPTION_LINE_HEIGHT
+  }, 0)
+}
+
+/** 잠금화면: 카드 아래, 워터마크 위에 "<소원> 부적" 한 줄(이름은 넣지 않는다) */
+export function wallpaperCaption(wish: Wish): CaptionBlock {
+  const card = wallpaperLayout()
+  return {
+    top: card.y + card.h + 36,
+    left: 80,
+    width: WALLPAPER.w - 160,
+    lines: [{ text: `${WISH_TEXT[wish].label} 부적`, size: 52, weight: 700, opacity: 0.95, gapBefore: 0 }],
+  }
+}
+
 /** 그림을 놓는 틀: 전체 크기(이미지 픽셀)·카드 자리·워터마크 위치·글자 크기. 잠금화면과 선물 이미지가 같은 코드로 찍는다 */
 export interface StillFrame {
   size: { w: number; h: number }
   layout: { x: number; y: number; w: number; h: number }
-  markTop: number
+  /** 워터마크 위치(없으면 워터마크를 넣지 않는다) */
+  markTop?: number
   markSize: number
+  caption?: CaptionBlock
 }
-const WALLPAPER_FRAME: StillFrame = { size: WALLPAPER, layout: wallpaperLayout(), markTop: WALLPAPER.h - 150, markSize: 34 }
+const wallpaperFrame = (wish: Wish): StillFrame => ({ size: WALLPAPER, layout: wallpaperLayout(), markTop: WALLPAPER.h - 150, markSize: 34, caption: wallpaperCaption(wish) })
 
 function buildStage(svg: SVGSVGElement, style: BujeokStyle, finish: Finish, frame: StillFrame): { host: HTMLElement; stage: HTMLElement } {
   const L = frame.layout
@@ -59,8 +87,20 @@ function buildStage(svg: SVGSVGElement, style: BujeokStyle, finish: Finish, fram
   clone.style.cssText = `position:absolute;left:${px(L.x)};top:${px(L.y)};width:${px(L.w)};height:${px(L.h)};display:block;`
   const mark = document.createElement('div')
   mark.textContent = WATERMARK
-  mark.style.cssText = `position:absolute;left:0;right:0;top:${px(frame.markTop)};text-align:center;font-family:var(--font-noto-sans-kr),sans-serif;font-size:${px(frame.markSize)};letter-spacing:.04em;color:${bgFor(style, finish).mark};opacity:.8;`
+  mark.style.cssText = `position:absolute;left:0;right:0;top:${px(frame.markTop ?? 0)};text-align:center;font-family:var(--font-noto-sans-kr),sans-serif;font-size:${px(frame.markSize)};letter-spacing:.04em;color:${bgFor(style, finish).mark};opacity:.8;`
   stage.append(clone)
+  if (frame.caption) {
+    const c = frame.caption
+    const box = document.createElement('div')
+    box.style.cssText = `position:absolute;left:${px(c.left)};top:${px(c.top)};width:${px(c.width)};text-align:center;font-family:var(--font-noto-sans-kr),sans-serif;color:${bgFor(style, finish).mark};word-break:keep-all;overflow-wrap:anywhere;`
+    for (const l of c.lines) {
+      const row = document.createElement('div')
+      row.textContent = l.text
+      row.style.cssText = `margin-top:${px(l.gapBefore)};font-size:${px(l.size)};line-height:${CAPTION_LINE_HEIGHT};font-weight:${l.weight};opacity:${l.opacity};`
+      box.append(row)
+    }
+    stage.append(box)
+  }
   if (finish === 'holo') {
     const b = CARD_BOX[style]
     const k = L.w / 300
@@ -69,7 +109,7 @@ function buildStage(svg: SVGSVGElement, style: BujeokStyle, finish: Finish, fram
     holo.style.cssText = `position:absolute;left:${px(L.x + b.x * k)};top:${px(L.y + b.y * k)};width:${px(b.w * k)};height:${px(b.h * k)};border-radius:${radius};background:${HOLO_FIXED};background-size:260% 260%;background-position:50% 50%;opacity:.3;`
     stage.append(holo)
   }
-  stage.append(mark)
+  if (frame.markTop !== undefined) stage.append(mark)
   host.appendChild(stage)
   return { host, stage }
 }
@@ -104,4 +144,4 @@ export async function renderStill(svg: SVGSVGElement, style: BujeokStyle, finish
 }
 
 /** 잠금화면 PNG(1170×2532) */
-export const renderWallpaper = (svg: SVGSVGElement, style: BujeokStyle, finish: Finish = 'paper') => renderStill(svg, style, finish, WALLPAPER_FRAME)
+export const renderWallpaper = (svg: SVGSVGElement, style: BujeokStyle, finish: Finish, wish: Wish) => renderStill(svg, style, finish, wallpaperFrame(wish))

@@ -48,3 +48,27 @@ export function pinchZoom(startZoom: number, startDist: number, dist: number): n
   if (!(startDist > 0)) return clampZoom(startZoom)
   return clampZoom((startZoom * dist) / startDist)
 }
+
+/** 처음 건드리기 전 한 번 알려 주는 좌우 흔들기. 세 번 흔들고(약 ±35°) 0으로 돌아온다. 6초쯤 뒤 한 번 더 */
+export const HINT = { amp: 35, swings: 3, ms: 2400, repeatAt: 6000 } as const
+
+const smooth = (x: number) => {
+  const k = Math.min(1, Math.max(0, x))
+  return k * k * (3 - 2 * k)
+}
+
+/** 흔들기 한 번의 각도(도). 0에서 시작해 0으로 끝나고, 끝(ms) 이후는 null */
+export function hintAngle(tMs: number): number | null {
+  if (!Number.isFinite(tMs) || tMs < 0) return 0
+  if (tMs >= HINT.ms) return null
+  const k = tMs / HINT.ms
+  const env = Math.min(smooth(k / 0.08), smooth((1 - k) / 0.25)) // 시작은 부드럽게 올라가고, 끝은 천천히 가라앉는다
+  return HINT.amp * Math.sin(2 * Math.PI * HINT.swings * k) * env
+}
+
+/** 카드가 앞면에 멈춘 뒤 흐른 시간(ms)에 따른 각도: 첫 흔들기 → 가만히 → 한 번 더 → 끝(null, 한가한 흔들림이 이어받는다) */
+export function hintRy(clockMs: number): number | null {
+  if (clockMs < HINT.ms) return hintAngle(clockMs)
+  if (clockMs < HINT.repeatAt) return 0
+  return hintAngle(clockMs - HINT.repeatAt)
+}

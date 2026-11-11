@@ -3,11 +3,11 @@
 // 한 손가락으로 가로로 밀면 돌고(놓으면 관성으로 돌다 가까운 면에 멈춤), 세로로 밀면 페이지가 스크롤되고(touch-action: pan-y),
 // 두 손가락으로 벌리면 커진다. 마우스 휠은 페이지 스크롤이고, 트랙패드 핀치(ctrl+휠)만 확대·축소한다.
 // 움직임은 전부 requestAnimationFrame 하나가 spin.ts의 순수 함수로 계산해 CSS 변수에 쓴다(React 다시 그리기 없음).
-import { useEffect, useRef, useState, type CSSProperties, type PointerEvent as ReactPointerEvent } from 'react'
+import { useCallback, useEffect, useRef, useState, type CSSProperties, type PointerEvent as ReactPointerEvent } from 'react'
 import BujeokSvg from './BujeokSvg'
 import { CARD_BOX, themeFor } from '@/lib/bujeok/palette'
 import type { BujeokSpec } from '@/lib/bujeok/keys'
-import { ZOOM, clampZoom, pinchZoom, restFace, sheenPos, stepSpin } from '@/lib/bujeok/spin'
+import { ZOOM, clampZoom, hintRy, pinchZoom, restFace, sheenPos, stepSpin } from '@/lib/bujeok/spin'
 import { WATERMARK } from '@/lib/bujeok/wallpaper'
 import { WISH_TEXT } from '@/content/bujeok'
 
@@ -28,6 +28,13 @@ const ENTER_FROM = -540
 const SWAY_DEG = 22
 const DUST_COUNT = 42
 
+/** 이 페이지를 보는 동안 한 번이라도 건드렸으면 안내를 다시 띄우지 않는다 */
+let hintDismissed = false
+export function resetHintForTests() {
+  hintDismissed = false
+}
+const HINT_TEXT = '좌우로 밀어 돌려 보세요'
+
 const prefersReduce = () => typeof window !== 'undefined' && typeof window.matchMedia === 'function' && window.matchMedia('(prefers-reduced-motion: reduce)').matches
 const round2 = (z: number) => Math.round(z * 100) / 100
 
@@ -39,6 +46,8 @@ interface Motion {
   entering: boolean
   entT: number
   swayT: number
+  /** 등장이 끝나고(또는 처음부터) 흐른 시간: 안내 흔들기 일정 */
+  hintClock: number
   /** 한 손가락으로 끄는 중 */
   dragging: boolean
   /** 두 손가락으로 벌리는 중: 돌리지 않는다 */
@@ -67,10 +76,16 @@ function CardInner({ spec, name, from, enter = false }: BujeokCardProps) {
   const mo = useRef<Motion | null>(null)
   if (mo.current === null) {
     const entering = enter && !prefersReduce()
-    mo.current = { ry: entering ? ENTER_FROM : 0, vy: 0, rx: 0, touched: false, entering, entT: 0, swayT: 0, dragging: false, pinching: false, face: 'front', tiltX: 0, tiltY: 0 }
+    mo.current = { ry: entering ? ENTER_FROM : 0, vy: 0, rx: 0, touched: false, entering, entT: 0, swayT: 0, hintClock: 0, dragging: false, pinching: false, face: 'front', tiltX: 0, tiltY: 0 }
   }
   const [face, setFace] = useState<Face>('front')
   const [entering, setEntering] = useState(() => enter && !prefersReduce())
+  const [hintOn, setHintOn] = useState(() => !hintDismissed && !(enter && !prefersReduce()))
+  /** 처음 건드리면 안내(흔들기·글)를 영영 끈다 */
+  const dismissHint = useCallback(() => {
+    hintDismissed = true
+    setHintOn(false)
+  }, [])
   const [zoom, setZoomState] = useState(1)
   const zoomRef = useRef(1)
   const setZoom = (z: number) => {
@@ -104,6 +119,7 @@ function CardInner({ spec, name, from, enter = false }: BujeokCardProps) {
       /* 포인터 캡처를 못 해도 돌리기는 된다 */
     }
     m.touched = true
+    dismissHint()
     m.entering = false
     setEntering(false)
     if (pts.current.size === 1) {
@@ -177,6 +193,7 @@ function CardInner({ spec, name, from, enter = false }: BujeokCardProps) {
       setEntering(false)
     }
     m.touched = true
+    dismissHint()
     kick.current()
     m.vy = 11 // 놓으면 관성으로 한 면 돌고 가까운 면에 멈춘다
     setFace((f) => (f === 'front' ? 'back' : 'front'))
@@ -187,6 +204,7 @@ function CardInner({ spec, name, from, enter = false }: BujeokCardProps) {
     const m = mo.current!
     if (e.key === 'ArrowLeft' || e.key === 'ArrowRight') {
       m.touched = true
+      dismissHint()
       kick.current()
       m.entering = false
       setEntering(false)
@@ -201,11 +219,12 @@ function CardInner({ spec, name, from, enter = false }: BujeokCardProps) {
     const onWheel = (e: WheelEvent) => {
       if (!e.ctrlKey) return
       e.preventDefault()
+      dismissHint()
       setZoom(zoomRef.current * Math.exp(-e.deltaY * 0.002))
     }
     el.addEventListener('wheel', onWheel, { passive: false })
     return () => el.removeEventListener('wheel', onWheel)
-  }, [])
+  }, [dismissHint])
 
   // ---- 안드로이드에서만: 폰을 기울이면 빛이 살짝 따라온다(권한 창이 필요한 기기는 건너뜀) ----
   useEffect(() => {
@@ -294,12 +313,22 @@ function CardInner({ spec, name, from, enter = false }: BujeokCardProps) {
           m.entering = false
           m.ry = 0
           m.swayT = 0
+          m.hintClock = 0
           setEntering(false)
+          if (!hintDismissed) setHintOn(true)
         }
         return true
       }
       if (!m.touched && !reduce) {
-        // 건드리기 전에는 혼자 천천히 좌우로 흔들린다
+        // 건드리기 전: 처음 몇 초는 안내 흔들기(한가한 흔들림을 대신한다), 그 뒤엔 혼자 천천히 좌우로 흔들린다
+        m.hintClock += dt
+        const h = hintRy(m.hintClock)
+        if (h !== null) {
+          m.ry = h
+          m.rx = 0
+          m.swayT = 0
+          return true
+        }
         m.swayT += dt
         m.ry = Math.sin(m.swayT / 1400) * SWAY_DEG
         m.rx = Math.sin(m.swayT / 2100) * 4
@@ -421,6 +450,14 @@ function CardInner({ spec, name, from, enter = false }: BujeokCardProps) {
           </div>
         </div>
         <div className="bj-shadow" aria-hidden="true" />
+        {hintOn && (
+          <div className="bj-hint no-screenshot" data-testid="bujeok-hint">
+            <svg width="22" height="16" viewBox="0 0 22 16" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+              <path d="M2 8h18M6 4 2 8l4 4M16 4l4 4-4 4" />
+            </svg>
+            {HINT_TEXT}
+          </div>
+        )}
       </div>
 
       <div className="no-screenshot mt-3 flex items-center justify-center gap-2">

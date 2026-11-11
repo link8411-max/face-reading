@@ -110,4 +110,29 @@ test('그림 저장: 이름 도장이 찍힌 1080×1350 PNG를 내려받는다',
   expect(buf.length).toBeGreaterThan(5000)
   expect(pngDims(buf)).toEqual({ w: 1080, h: 1350 })
   if (SHOT_DIR) writeFileSync(`${SHOT_DIR}/gift-image.png`, buf)
+
+  // 아래 한글 설명 띠: 카드 아래에 글자 픽셀이 있고, 좌우·아래 여백에는 없다(안쪽에 들어간다)
+  const b64 = buf.toString('base64')
+  const r = await page.evaluate(async (data) => {
+    const bmp = await createImageBitmap(await (await fetch(`data:image/png;base64,${data}`)).blob())
+    const c = document.createElement('canvas')
+    c.width = bmp.width
+    c.height = bmp.height
+    const g = c.getContext('2d')!
+    g.drawImage(bmp, 0, 0)
+    const bg = Array.from(g.getImageData(5, 1340, 1, 1).data)
+    // 구역 안에서 바탕과 다른 픽셀 수
+    const diff = (x: number, y: number, w: number, h: number) => {
+      const d = g.getImageData(x, y, w, h).data
+      let n = 0
+      for (let i = 0; i < d.length; i += 4) if (Math.abs(d[i] - bg[0]) + Math.abs(d[i + 1] - bg[1]) + Math.abs(d[i + 2] - bg[2]) > 60) n++
+      return n
+    }
+    return { band: diff(80, 944, 920, 330), left: diff(0, 910, 60, 440), right: diff(1020, 910, 60, 440), bottom: diff(0, 1310, 1080, 40), l1: diff(80, 944, 920, 70), l2: diff(80, 1016, 920, 50), l3: diff(80, 1100, 920, 180) }
+  }, b64)
+  expect(r.band).toBeGreaterThan(3000)
+  expect(r.l1).toBeGreaterThan(800) // 첫 줄 "민지님께 · 합격 부적"
+  expect(r.left).toBe(0)
+  expect(r.right).toBe(0)
+  expect(r.bottom).toBe(0)
 })
