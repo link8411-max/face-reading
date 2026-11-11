@@ -33,14 +33,29 @@ export function parseBujeokCode(code: string): BujeokSpec | null {
   return { style, wish, el, variant, finish } as BujeokSpec
 }
 
+// 이름은 링크의 # 뒤에만 싣는다. 해시는 서버로 가지 않고 GA 기본 수집·서버 접근 로그에 들어가지 않는다.
+function nameHash(to: string | null | undefined, from?: string | null): string {
+  const parts: string[] = []
+  const t = cleanName(to)
+  const f = cleanName(from)
+  if (t) parts.push(`to=${encodeURIComponent(t)}`)
+  if (f) parts.push(`from=${encodeURIComponent(f)}`)
+  return parts.length ? `#${parts.join('&')}` : ''
+}
+
 export function bujeokGiftUrl(spec: BujeokSpec, names: { to: string; from?: string }): string {
-  const q: string[] = []
-  const to = cleanName(names.to)
-  const from = cleanName(names.from)
-  if (to) q.push(`to=${encodeURIComponent(to)}`)
-  if (from) q.push(`from=${encodeURIComponent(from)}`)
-  q.push('utm_source=share', 'utm_medium=friend_link')
-  return `${SITE}/bujeok/r/${bujeokCode(spec)}?${q.join('&')}`
+  return `${SITE}/bujeok/r/${bujeokCode(spec)}?utm_source=share&utm_medium=friend_link${nameHash(names.to, names.from)}`
+}
+
+/** 내 부적 링크: 열어 보기 없이 바로 카드가 나온다 */
+export function bujeokMineUrl(spec: BujeokSpec, name?: string | null): string {
+  return `${SITE}/bujeok/r/${bujeokCode(spec)}?me=1${nameHash(name)}`
+}
+
+/** 링크 해시(`#to=…&from=…`)에서 이름을 꺼낸다. cleanName을 못 넘으면 null */
+export function parseNameHash(hash: string): { to: string | null; from: string | null } {
+  const params = new URLSearchParams(hash.replace(/^#/, ''))
+  return { to: cleanName(params.get('to')), from: cleanName(params.get('from')) }
 }
 
 /** 미리보기 이미지 주소. 이름은 넣지 않는다 (CDN 캐시·개인정보) */
@@ -50,4 +65,8 @@ export function bujeokOgUrl(spec: BujeokSpec): string {
 
 export function giftHeadline(to: string | null): string {
   return to ? `${to}님께 부적이 도착했어요` : '부적이 도착했어요'
+}
+
+export function mineHeadline(to: string | null): string {
+  return to ? `${to}님의 부적` : '나의 부적'
 }

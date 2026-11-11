@@ -17,6 +17,7 @@ import BujeokClient from '@/components/bujeok/BujeokClient'
 import GiftLanding from '@/components/bujeok/GiftLanding'
 import BujeokPage from '@/app/bujeok/page'
 import GiftPage, { generateMetadata } from '@/app/bujeok/r/[code]/page'
+import { kakaoFeed } from '@/lib/kakao'
 import { bujeokCode, bujeokGiftUrl, parseBujeokCode } from '@/lib/bujeok/link'
 import type { BujeokSpec } from '@/lib/bujeok/keys'
 
@@ -25,6 +26,7 @@ const spec: BujeokSpec = { style: 'trad', wish: 'money', el: 'metal', variant: 1
 beforeEach(() => {
   track.mockClear()
   shareResult.mockClear()
+  window.location.hash = ''
   window.matchMedia = ((q: string) => ({ matches: q.includes('reduce'), media: q, addEventListener() {}, removeEventListener() {}, addListener() {}, removeListener() {}, onchange: null, dispatchEvent: () => false })) as unknown as typeof window.matchMedia
 })
 afterEach(cleanup)
@@ -91,15 +93,26 @@ test('선물 완성 화면: 카드(받는 사람 이름 뒷면)와 "선물 보�
   expect(got).toMatchObject({ style: 'cute', wish: 'love', finish: 'paper' })
   expect(arg.url).toBe(bujeokGiftUrl(got, { to: '민지', from: '철수' }))
   expect(arg.url).not.toMatch(/birth|year|19\d\d/)
+  expect(arg.url.split('#')[0]).not.toMatch(/민지|철수|%EB/)
+  expect(arg.url.split('#')[1]).toContain('to=')
   expect(arg.text).toContain('민지님께 부적이 도착했어요')
+  // 카카오톡 카드: 제목은 보내는 화면에서 만든 문구(이름 포함), 링크는 해시 주소
+  const card = kakaoFeed({ title: 't', text: arg.text, url: arg.url, imageUrl: 'i' })
+  expect(card.content.title).toBe('민지님께 부적이 도착했어요')
+  expect(card.content.link.webUrl).toBe(arg.url)
+  expect(card.content.link.webUrl).toContain('#to=')
   // 이름은 GA에 가지 않는다
   expect(JSON.stringify(track.mock.calls)).not.toMatch(/민지|철수/)
   expect(track).toHaveBeenCalledWith('result_view', { test_name: 'bujeok', result_id: 'cute_love' })
 })
 
 // --- 착지 화면 ---
-test('착지: to=민지 → 닫힌 상태에 "민지님께 부적이 도착했어요", 열어 보기를 누르면 카드와 "철수님이 보냈어요"와 세 버튼', () => {
-  render(<GiftLanding spec={spec} to="민지" from="철수" />)
+const setHash = (h: string) => { window.location.hash = h }
+const H = (to?: string, from?: string) => '#' + [to && `to=${encodeURIComponent(to)}`, from && `from=${encodeURIComponent(from)}`].filter(Boolean).join('&')
+
+test('착지: 해시 to=민지 → 마운트 뒤 "민지님께 부적이 도착했어요", 열어 보기를 누르면 카드와 "철수님이 보냈어요"와 세 버튼', () => {
+  setHash(H('민지', '철수'))
+  render(<GiftLanding spec={spec} />)
   expect(screen.getByText('민지님께 부적이 도착했어요')).toBeTruthy()
   expect(screen.queryByTestId('bujeok-card')).toBeNull()
   fireEvent.click(screen.getByRole('button', { name: '열어 보기' }))
@@ -112,34 +125,43 @@ test('착지: to=민지 → 닫힌 상태에 "민지님께 부적이 도착했�
 })
 
 test('착지: 이름이 없으면 "부적이 도착했어요", 보낸 사람 줄도 없다', () => {
-  render(<GiftLanding spec={spec} to={null} from={null} />)
+  render(<GiftLanding spec={spec} />)
   expect(screen.getByText('부적이 도착했어요')).toBeTruthy()
   fireEvent.click(screen.getByRole('button', { name: '열어 보기' }))
   expect(screen.queryByText(/님이 보냈어요/)).toBeNull()
 })
 
+test('착지: 9자·이모지·태그 해시는 이름 없이', () => {
+  for (const bad of ['가나다라마바사아자', '민지😀', '<b>민지</b>']) {
+    setHash(H(bad, bad))
+    const { unmount } = render(<GiftLanding spec={spec} />)
+    expect(screen.getByRole('heading', { level: 1 }).textContent).toBe('부적이 도착했어요')
+    expect(document.body.textContent).not.toContain(bad)
+    unmount()
+  }
+})
+
 test('착지: shared_landing 이벤트는 result_id `<화풍>_<소원>`이고 이름이 없다', () => {
-  render(<GiftLanding spec={spec} to="민지" from="철수" />)
+  setHash(H('민지', '철수'))
+  render(<GiftLanding spec={spec} />)
   expect(track).toHaveBeenCalledWith('shared_landing', { test_name: 'bujeok', result_id: 'trad_money' })
   expect(JSON.stringify(track.mock.calls)).not.toMatch(/민지|철수/)
 })
 
-// --- 착지 서버 페이지 ---
+// --- 서버 페이지 ---
 const q = (o: Record<string, string>) => Promise.resolve(o)
 const props = (code: string, o: Record<string, string> = {}) => ({ params: Promise.resolve({ code }), searchParams: q(o) })
-type El = { props: { spec: BujeokSpec; to: string | null; from: string | null } }
+type El = { props: { spec: BujeokSpec; mine?: boolean; to?: unknown; from?: unknown } }
 
-test('착지 페이지: to·from이 통과하면 그대로, 9자·이모지·태그면 이름 없이', async () => {
+test('착지 페이지: 쿼리의 to·from은 무시하고, me=1이면 mine', async () => {
   const code = bujeokCode(spec)
-  const ok = (await GiftPage(props(code, { to: '민지', from: '철수' }))) as unknown as El
-  expect(ok.props.to).toBe('민지')
-  expect(ok.props.from).toBe('철수')
-  expect(ok.props.spec).toEqual(spec)
-  for (const bad of ['가나다라마바사아자', '민지😀', '<b>민지</b>', '   ']) {
-    const r = (await GiftPage(props(code, { to: bad, from: bad }))) as unknown as El
-    expect(r.props.to).toBeNull()
-    expect(r.props.from).toBeNull()
-  }
+  const r = (await GiftPage(props(code, { to: '민지', from: '철수' }))) as unknown as El
+  expect(r.props.spec).toEqual(spec)
+  expect(r.props.to).toBeUndefined()
+  expect(r.props.from).toBeUndefined()
+  expect(r.props.mine).toBeFalsy()
+  const mine = (await GiftPage(props(code, { me: '1' }))) as unknown as El
+  expect(mine.props.mine).toBe(true)
 })
 
 test('착지 페이지: 잘못된 코드는 /bujeok 으로 redirect', async () => {
@@ -148,19 +170,21 @@ test('착지 페이지: 잘못된 코드는 /bujeok 으로 redirect', async () =
   }
 })
 
-test('착지 metadata: noindex, canonical /bujeok, og:image에 이름 없음, 제목의 이름은 통과분만', async () => {
+test('착지 metadata: noindex, canonical /bujeok, 어떤 입력에도 메타 전체에 이름이 없다', async () => {
   const code = bujeokCode(spec)
-  const m = await generateMetadata(props(code, { to: '민지', from: '철수' }))
-  expect(m.robots).toEqual({ index: false, follow: true })
-  expect(m.alternates?.canonical).toBe('https://unse-ai.com/bujeok')
-  expect(String(m.title)).toContain('민지님께 부적이 도착했어요')
-  const img = (m.openGraph?.images as { url: string }[])[0].url
-  expect(img).toContain('kind=bujeok')
-  expect(img).not.toMatch(/to=|from=|민지|철수|%EB%AF%BC/)
-  expect(JSON.stringify((m.twitter as { images: unknown }).images)).not.toMatch(/민지|철수|to=/)
-  const evil = await generateMetadata(props(code, { to: '<script>alert(1)</script>' }))
-  expect(String(evil.title)).not.toMatch(/script|</)
-  expect(String(evil.title)).toContain('부적이 도착했어요')
+  for (const o of [{ to: '민지', from: '철수' }, { to: '<script>alert(1)</script>' }, { me: '1', to: '민지', from: '철수' }, { to: '가나다라마바사아자' }]) {
+    const m = await generateMetadata(props(code, o))
+    expect(m.robots).toEqual({ index: false, follow: true })
+    expect(m.alternates?.canonical).toBe('https://unse-ai.com/bujeok')
+    const all = JSON.stringify(m)
+    expect(all).not.toMatch(/민지|철수|<script|alert|가나다라|%EB%AF%BC/)
+    const img = (m.openGraph?.images as { url: string }[])[0].url
+    expect(img).toContain('kind=bujeok')
+    expect(img).not.toMatch(/to=|from=/)
+  }
+  expect(String((await generateMetadata(props(code, { to: '민지' }))).title)).toContain('부적이 도착했어요')
+  expect(String((await generateMetadata(props(code, { me: '1' }))).title)).toContain('나의 부적')
+  expect(JSON.stringify((await generateMetadata(props(code, { me: '1' }))).openGraph)).toContain('나의 부적')
 })
 
 // --- /bujeok 쿼리 ---

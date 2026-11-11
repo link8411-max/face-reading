@@ -1,5 +1,5 @@
 import { describe, expect, test } from 'vitest'
-import { cleanName, bujeokCode, parseBujeokCode, bujeokGiftUrl, bujeokOgUrl, giftHeadline } from '@/lib/bujeok/link'
+import { cleanName, bujeokCode, parseBujeokCode, bujeokGiftUrl, bujeokMineUrl, bujeokOgUrl, giftHeadline, mineHeadline, parseNameHash } from '@/lib/bujeok/link'
 import { BANNED_NAMES } from '@/lib/bujeok/bannedNames'
 import { STYLES, WISHES, EL_KEYS, VARIANTS, FINISHES, type BujeokSpec } from '@/lib/bujeok/keys'
 
@@ -35,29 +35,53 @@ describe('code', () => {
 })
 
 describe('url', () => {
-  test('선물 링크에 이름이 인코딩되고 다른 값은 없다', () => {
-    const u = new URL(bujeokGiftUrl(spec, { to: '민지', from: '철수' }))
+  test('선물 링크: 이름은 # 뒤에만 있고 쿼리에는 utm만 있다', () => {
+    const raw = bujeokGiftUrl(spec, { to: '민지', from: '철수' })
+    const u = new URL(raw)
     expect(u.origin + u.pathname).toBe('https://unse-ai.com/bujeok/r/trad-money-metal-2-gold')
-    expect([...u.searchParams.keys()].sort()).toEqual(['from', 'to', 'utm_medium', 'utm_source'])
-    expect(u.searchParams.get('to')).toBe('민지')
-    expect(u.searchParams.get('from')).toBe('철수')
-    expect(u.searchParams.get('utm_source')).toBe('share')
-    expect(u.searchParams.get('utm_medium')).toBe('friend_link')
+    expect([...u.searchParams.keys()].sort()).toEqual(['utm_medium', 'utm_source'])
+    expect(u.search).not.toMatch(/민지|철수|%EB/)
+    const [before, after] = raw.split('#')
+    expect(before).not.toMatch(/민지|철수|%EB%AF|to=|from=/)
+    expect(after).toBe('to=%EB%AF%BC%EC%A7%80&from=%EC%B2%A0%EC%88%98')
+    expect(parseNameHash(u.hash)).toEqual({ to: '민지', from: '철수' })
   })
   test('보내는 사람이 없으면 from 없음, 검사 못 넘긴 이름은 싣지 않는다', () => {
-    const u = new URL(bujeokGiftUrl(spec, { to: '민지' }))
-    expect(u.searchParams.has('from')).toBe(false)
-    const bad = new URL(bujeokGiftUrl(spec, { to: '<b>', from: '민지😀' }))
-    expect(bad.searchParams.has('to')).toBe(false)
-    expect(bad.searchParams.has('from')).toBe(false)
+    expect(bujeokGiftUrl(spec, { to: '민지' }).split('#')[1]).toBe('to=%EB%AF%BC%EC%A7%80')
+    const bad = bujeokGiftUrl(spec, { to: '<b>', from: '민지😀' })
+    expect(bad).not.toContain('#')
+  })
+  test('내 부적 링크: me=1, 이름은 # 뒤', () => {
+    const raw = bujeokMineUrl(spec, '민지')
+    expect(raw.split('#')[0]).toBe('https://unse-ai.com/bujeok/r/trad-money-metal-2-gold?me=1')
+    expect(raw.split('#')[1]).toBe('to=%EB%AF%BC%EC%A7%80')
+    expect(bujeokMineUrl(spec, null)).toBe('https://unse-ai.com/bujeok/r/trad-money-metal-2-gold?me=1')
+    expect(bujeokMineUrl(spec, '민지😀')).not.toContain('#')
   })
   test('미리보기 주소에 이름이 없다', () => {
     const o = bujeokOgUrl(spec)
     expect(o).not.toMatch(/to=|from=/)
     expect(o).toContain('/api/og/result?kind=bujeok&style=trad&wish=money&el=metal&finish=gold')
   })
-  test('giftHeadline', () => {
+  test('giftHeadline·mineHeadline', () => {
     expect(giftHeadline('민지')).toBe('민지님께 부적이 도착했어요')
     expect(giftHeadline(null)).toBe('부적이 도착했어요')
+    expect(mineHeadline('민지')).toBe('민지님의 부적')
+    expect(mineHeadline(null)).toBe('나의 부적')
+  })
+})
+
+describe('parseNameHash', () => {
+  test('정상, # 유무, 한쪽만', () => {
+    expect(parseNameHash('#to=%EB%AF%BC%EC%A7%80&from=%EC%B2%A0%EC%88%98')).toEqual({ to: '민지', from: '철수' })
+    expect(parseNameHash('to=%EB%AF%BC%EC%A7%80')).toEqual({ to: '민지', from: null })
+    expect(parseNameHash('')).toEqual({ to: null, from: null })
+    expect(parseNameHash('#')).toEqual({ to: null, from: null })
+  })
+  test('9자·이모지·태그·공백·깨진 인코딩은 이름 없음', () => {
+    for (const bad of ['가나다라마바사아자', '민지😀', '<b>민지</b>', '   ']) {
+      expect(parseNameHash(`#to=${encodeURIComponent(bad)}&from=${encodeURIComponent(bad)}`)).toEqual({ to: null, from: null })
+    }
+    expect(parseNameHash('#to=%E0%A4%A&from=%')).toEqual({ to: null, from: null })
   })
 })
