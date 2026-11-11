@@ -337,6 +337,17 @@
   background: radial-gradient(120% 60% at 50% 18%, #2A2219 0%, #15110D 55%, #0E0B09 100%) top / 100% 100vh no-repeat, #0E0B09;
 }
 .bj-dark .bg-white { background-color: #1C1712; }
+/* 먹빛 화면(.bj-dark)이 있는 페이지는 공용 푸터·하단 탭바도 먹빛을 따른다(모양은 그대로, 색 토큰만 바꿈). 다른 페이지는 .bj-dark가 없어 그대로 */
+body:has(.bj-dark) { background-color: #0E0B09; }
+body:has(.bj-dark) footer, body:has(.bj-dark) nav[aria-label='하단 메뉴'] {
+  --color-ink: #EADFC8;
+  --color-muted: #B9AC94;
+  --color-line: #3A2F22;
+  --color-accent: #F2B08A;
+  --color-card-2: #15110D;
+}
+body:has(.bj-dark) footer { background-color: #15110D; }
+body:has(.bj-dark) nav[aria-label='하단 메뉴'] { background-color: #1C1712; }
 .bj-dark .bg-ink.text-paper { background-color: #E9C46A; color: #17140F; }
 .bj-dark input { color-scheme: dark; }
 .bj-top { display: flex; justify-content: space-between; align-items: center; margin-top: 2px; font-size: 14px; }
