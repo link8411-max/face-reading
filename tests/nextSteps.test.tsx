@@ -50,3 +50,13 @@ test('사주·신년운세 결과는 부적으로 잇는다', () => {
 test.each(['src/app/saju/SajuClient.tsx', 'src/app/fortune/FortuneClient.tsx'])('%s는 NextSteps에 입력한 생년월일(birth)을 넘긴다', (f) => {
   expect(readFileSync(f, 'utf8')).toMatch(/<NextSteps from="(saju|fortune)" birth=\{/)
 })
+
+test('모든 결과 연결 아래에 오늘의 밈 능력고사 칸이 하나 붙는다(사진 결과 포함)', () => {
+  for (const from of Object.keys(NEXT_BY_TEST) as (keyof typeof NEXT_BY_TEST)[]) {
+    for (const withPhoto of [false, true]) {
+      const html = renderToStaticMarkup(<NextSteps from={from} withPhoto={withPhoto} />)
+      expect(html.match(/href="\/exam\/meme"/g), `${from} ${withPhoto}`).toHaveLength(1)
+      expect(html).toContain('data-next-step="exam"')
+    }
+  }
+})

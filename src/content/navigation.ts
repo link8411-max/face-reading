@@ -84,7 +84,7 @@ export const FOOTER_EXTRA: { title: string; href: string }[] = [{ title: '밈 �
 // 결과 화면 아래 "이어서 보면 좋아요": 같은 줄기 1개 + 다른 줄기 1개 (설계 4절).
 // samePhoto: 같은 사진으로 이어지는 칸 — 사진 결과에서는 NextTests(사진 넘기기)가 이미 보여 주므로 NextSteps는 뺀다.
 export type NextFrom = 'saju' | 'fortune' | 'zodiac' | 'daily' | 'face' | 'animal' | 'samguk' | 'mbti'
-export type NextTestName = 'saju' | 'fortune' | 'face' | 'animal' | 'face_match' | 'mbti_daily' | 'bujeok'
+export type NextTestName = 'saju' | 'fortune' | 'face' | 'animal' | 'face_match' | 'mbti_daily' | 'bujeok' | 'exam'
 export interface NextStep { href: string; title: string; desc: string; test: NextTestName; icon: IconName; samePhoto?: true }
 
 const STEP = {
@@ -108,6 +108,10 @@ export const NEXT_BY_TEST: Record<NextFrom, [NextStep, NextStep]> = {
   samguk: [STEP.faceSame, STEP.saju],
   mbti: [STEP.mbtiDaily, STEP.saju],
 }
+
+// 모든 "이어서 보면 좋아요" 아래에 한 줄로 붙는 매일 5문제 칸(2026-11-11, 이미 오는 검색 방문자를 시험으로 잇는다).
+// 줄기 규칙(같은 줄기 1 + 다른 줄기 1)과 별개라 NEXT_BY_TEST에 넣지 않는다.
+export const DAILY_EXAM_STEP: NextStep = { href: '/exam/meme', title: '오늘의 밈 능력고사', desc: '매일 자정에 열리는 5문제, 내 등급은?', test: 'exam', icon: 'spark' }
 
 export function tabForPath(pathname: string): TabKey {
   if (pathname.startsWith('/bujeok')) return 'bujeok'
