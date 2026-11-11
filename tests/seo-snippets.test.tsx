@@ -1,4 +1,4 @@
-import { readFileSync } from 'node:fs'
+import { existsSync, readFileSync } from 'node:fs'
 import { samgukCharacters } from '@/lib/samgukDB'
 // 검색 결과 제목·설명(스니펫): 클릭률 위주 문구, 길이 상한, 옛 문구 금지 (2026-10-27)
 import type { Metadata } from 'next'
@@ -11,6 +11,7 @@ import { metadata as face2 } from '@/app/face2/layout'
 import { metadata as animal } from '@/app/animal/layout'
 import { metadata as samguk } from '@/app/samguk/layout'
 import { metadata as duel } from '@/app/samguk/duel/layout'
+import { metadata as bujeok } from '@/app/bujeok/layout'
 import { metadata as examMeme } from '@/app/exam/meme/layout'
 import { generateMetadata as duelGeneralMeta } from '@/app/samguk/duel/generals/[id]/page'
 import { DUEL_GENERALS } from '@/lib/duel/generals'
@@ -34,7 +35,7 @@ const BANNED = [/2026/, /토정비결/, /하루 1회/, /Gemini/i, /AI가 당신�
 const BRAND = ' – 운명을 읽다'
 
 async function pages(): Promise<[string, Metadata][]> {
-  const list: [string, Metadata][] = [['/', root], ['/face2', face2], ['/animal', animal], ['/samguk', samguk], ['/fortune', fortune], ['/fortune/mbti', mbtiDaily], ['/samguk/duel', duel], ['/exam/meme', examMeme]]
+  const list: [string, Metadata][] = [['/', root], ['/face2', face2], ['/animal', animal], ['/samguk', samguk], ['/fortune', fortune], ['/fortune/mbti', mbtiDaily], ['/samguk/duel', duel], ['/exam/meme', examMeme], ['/bujeok', bujeok]]
   for (const g of DUEL_GENERALS.filter((x) => x.role !== 'mob')) list.push([`/samguk/duel/generals/${g.id}`, await duelGeneralMeta({ params: Promise.resolve({ id: g.id }) })])
   list.push(['/samguk/people', await peopleHubMeta()], ['/samguk/people/ranking', await peopleRankingMeta()])
   for (const id of PEOPLE_IDS) list.push([`/samguk/people/${id}`, await personMeta({ params: Promise.resolve({ id }) })])
@@ -143,4 +144,16 @@ test('MBTI 유형 페이지 위쪽에 사진 테스트(/face2) 연결 한 줄', 
   const html = renderToStaticMarkup(<MbtiArticle type="ISFP" />)
   expect(html).toContain('내 얼굴은 무슨 상일까')
   expect(html).toContain('href="/face2"')
+})
+
+test('/bujeok: 미리보기 이미지는 정지 그림 1200×630(og·twitter 같음), 설명에 옛 다섯 소원 문구·효험 단정 없음', () => {
+  const og = bujeok.openGraph as { images?: { url: string; width: number; height: number }[] }
+  const tw = bujeok.twitter as { images?: string[] }
+  expect(og.images?.[0]).toMatchObject({ url: '/bujeok/og-bujeok.png', width: 1200, height: 630 })
+  expect(tw.images).toEqual(['/bujeok/og-bujeok.png'])
+  expect(existsSync('public/bujeok/og-bujeok.png')).toBe(true)
+  const d = String(bujeok.description)
+  expect(d).toContain('소원 11가지')
+  expect(d).not.toContain('재물·합격·건강·연애·액막이')
+  expect(d).not.toMatch(/반드시|100%|보장|틀림없이/)
 })

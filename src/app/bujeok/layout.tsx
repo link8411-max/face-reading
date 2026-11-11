@@ -2,8 +2,8 @@ import type { Metadata } from 'next'
 
 const SITE = 'https://unse-ai.com'
 const TITLE = '무료 부적 만들기 | 손으로 돌려 보는 부적 카드, 잠금화면 저장 – 운명을 읽다'
-const DESCRIPTION = '재물·합격·건강·연애·액막이 중 소원 하나를 고르면 손으로 돌려 보는 부적 카드를 만들어 드려요. 종이·금박·홀로그램 마감을 고르고, 확대해서 뒷면의 뜻까지 볼 수 있어요. 잠금화면 이미지로 저장하거나 친구에게 이름을 넣어 선물해 보세요.'
-const IMAGE = `/api/og?title=${encodeURIComponent('나만의 부적')}&subtitle=${encodeURIComponent('손으로 돌려 보는 부적 카드')}`
+const DESCRIPTION = '합격·재물·건강 등 소원 11가지 중 하나를 고르고 마지막 한 획을 직접 그어 완성하는 부적 카드예요. 잠금화면 저장과 선물까지 무료예요.'
+const IMAGE = '/bujeok/og-bujeok.png' // 1200×630, scripts/bujeok-examples.ts가 만든 정지 그림
 
 // 구조화 데이터와 본문 가이드는 선물 착지(/bujeok/r/…)에 중첩되지 않게 page.tsx에서 렌더한다 (/fortune과 같은 방식)
 export const metadata: Metadata = {
