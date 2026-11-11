@@ -1,0 +1,75 @@
+'use client'
+// 선물 착지 화면: 닫힌 상태("○○님께 부적이 도착했어요") → "열어 보기"를 누르면 카드가 돌며 나타난다.
+// 이름은 서버가 cleanName으로 거른 값만 받는다. GA에는 이름을 보내지 않는다.
+import { useEffect, useRef, useState, type ReactNode } from 'react'
+import Link from 'next/link'
+import { Icon } from '@/components/icons'
+import BujeokCard from './BujeokCard'
+import { useWallpaperSave } from './useWallpaperSave'
+import { track } from '@/lib/analytics'
+import { giftHeadline } from '@/lib/bujeok/link'
+import type { BujeokSpec } from '@/lib/bujeok/keys'
+import { WISH_TEXT } from '@/content/bujeok'
+
+const pill = 'h-12 rounded-full bg-white text-ink border border-line text-sm font-medium flex items-center justify-center gap-1.5'
+
+export default function GiftLanding({ spec, to, from, ad }: { spec: BujeokSpec; to: string | null; from: string | null; ad?: ReactNode }) {
+  const [opened, setOpened] = useState(false)
+  const panel = useRef<HTMLDivElement>(null)
+  const { saving, saveNotice, save } = useWallpaperSave(spec, () => panel.current?.querySelector('[data-bujeok-art] svg') ?? null)
+  const text = WISH_TEXT[spec.wish]
+
+  useEffect(() => {
+    track('shared_landing', { test_name: 'bujeok', result_id: `${spec.style}_${spec.wish}` })
+  }, [spec.style, spec.wish])
+
+  return (
+    <main className="mx-auto px-[22px] max-w-lg pt-8 pb-10 min-h-screen bg-paper text-ink">
+      {opened ? (
+        <div>
+          <h1 className="font-serif font-bold text-[24px] leading-[1.4] text-center break-keep">{giftHeadline(to)}</h1>
+          {from && <p className="mt-1 text-sm text-center text-muted">{from}님이 보냈어요</p>}
+          <div ref={panel} className="mx-auto mt-4 max-w-[420px]">
+            <BujeokCard spec={spec} name={to} from={from} enter />
+          </div>
+          <div className="mt-5 text-center">
+            {spec.style === 'trad' && (
+              <p className="text-sm text-ink break-keep">
+                <span className="font-serif font-bold tracking-wider mr-1.5">{text.hanja}</span>
+                <span className="text-muted">{text.hanjaMeaning}</span>
+              </p>
+            )}
+            <p className="mt-1.5 text-sm text-muted break-keep">{text.sub}</p>
+          </div>
+          {ad}
+          <div className="no-screenshot flex flex-col mt-5">
+            <button type="button" onClick={() => void save()} disabled={saving} className="h-[52px] rounded-full flex items-center justify-center gap-2 bg-ink text-paper text-[15px] font-medium disabled:opacity-50">
+              <Icon name="download" size={18} />
+              {saving ? '이미지 만드는 중…' : '잠금화면용 저장'}
+            </button>
+            {saveNotice && <p role="status" className="mt-2 text-xs text-center text-muted">{saveNotice}</p>}
+            <div className="grid grid-cols-2 gap-2 mt-2">
+              <Link href={`/bujeok?mode=gift&style=${spec.style}&finish=${spec.finish}`} className={pill}>
+                <Icon name="heart" size={16} />
+                나도 보내기
+              </Link>
+              <Link href={`/bujeok?wish=${spec.wish}&style=${spec.style}&finish=${spec.finish}`} className={pill}>
+                내 부적 만들기
+              </Link>
+            </div>
+          </div>
+        </div>
+      ) : (
+        <div className="text-center pt-16">
+          <p className="text-sm text-muted">운명을 읽다</p>
+          <h1 className="mt-3 font-serif font-bold text-[27px] leading-[1.4] break-keep">{giftHeadline(to)}</h1>
+          {from && <p className="mt-2 text-sm text-muted">{from}님이 보냈어요</p>}
+          <p className="mt-3 text-sm text-muted break-keep">열어서 손으로 돌려 보세요. 잠금화면에 저장해 둘 수도 있어요.</p>
+          <button type="button" onClick={() => setOpened(true)} className="mt-8 w-full h-[56px] rounded-full bg-ink text-paper text-base font-medium">
+            열어 보기
+          </button>
+        </div>
+      )}
+    </main>
+  )
+}

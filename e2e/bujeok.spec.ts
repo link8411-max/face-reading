@@ -148,3 +148,115 @@ test('?mode=gift&style=cute로 열면 화풍이 미리 골라져 있고, 모르�
   await expect(page.getByRole('radio', { name: '귀여운' })).toHaveAttribute('aria-checked', 'true')
   await expect(page.getByRole('radio', { name: '재물' })).toHaveAttribute('aria-checked', 'false')
 })
+
+// --- 선물하기와 착지 ---
+async function makeGift(page: Page, opts: { to: string; from?: string; wish?: string; style?: string; finish?: keyof typeof FINISH_NAME }) {
+  await page.addInitScript(() => {
+    ;(navigator as unknown as { share: (d: unknown) => Promise<void> }).share = async (d) => {
+      ;(window as unknown as { __shared: unknown }).__shared = d
+    }
+  })
+  await page.goto('/bujeok?mode=gift')
+  await expect(page.getByLabel('년도')).toHaveCount(0) // 선물에는 생년월일 칸이 없다
+  await expect(page.getByRole('button', { name: '부적 만들기' })).toBeDisabled()
+  await page.getByRole('radio', { name: opts.wish ?? '합격' }).click()
+  await page.getByRole('radio', { name: opts.style ?? '전통' }).click()
+  await page.getByRole('radio', { name: FINISH_NAME[opts.finish ?? 'gold'], exact: true }).click()
+  await page.getByLabel('받는 사람 이름').fill(opts.to)
+  if (opts.from) await page.getByLabel('보내는 사람 이름').fill(opts.from)
+  await expect(page.getByRole('button', { name: '부적 만들기' })).toBeEnabled()
+  await page.getByRole('button', { name: '부적 만들기' }).click()
+  await expect(page.getByTestId('bujeok-card')).toBeVisible()
+  await expect(page.getByRole('button', { name: '선물 보내기' })).toBeVisible()
+  await page.getByRole('button', { name: '선물 보내기' }).click()
+  await expect.poll(() => page.evaluate(() => (window as unknown as { __shared?: unknown }).__shared !== undefined)).toBe(true)
+  return (await page.evaluate(() => (window as unknown as { __shared: { url: string } }).__shared.url)) as string
+}
+
+test('선물 만들기 → 링크를 새 탭에서 열기 → 열어 보기 → 세 버튼 → 나도 보내기는 같은 화풍으로 선물 모드', async ({ page, context }) => {
+  const errors = trackErrors(page)
+  const url = await makeGift(page, { to: '민지', from: '철수', wish: '연애', style: '귀여운', finish: 'holo' })
+  expect(url).toMatch(/\/bujeok\/r\/cute-love-[a-z]+-\d-holo\?to=%EB%AF%BC%EC%A7%80&from=/)
+  const events1 = JSON.stringify(await events(page))
+  expect(events1).not.toMatch(/민지|철수/)
+
+  const guest = await context.newPage()
+  const gErrors = trackErrors(guest)
+  await guest.goto(new URL(url).pathname + new URL(url).search)
+  await expect(guest.getByRole('heading', { level: 1 })).toHaveText('민지님께 부적이 도착했어요')
+  await expect(guest.getByTestId('bujeok-card')).toHaveCount(0)
+  await guest.getByRole('button', { name: '열어 보기' }).click()
+  await expect(guest.getByTestId('bujeok-card')).toBeVisible()
+  await expect(guest.getByText('철수님이 보냈어요')).toBeVisible()
+  await expect(guest.getByRole('button', { name: '잠금화면용 저장' })).toBeVisible()
+  await expect(guest.getByRole('link', { name: '나도 보내기' })).toBeVisible()
+  await expect(guest.getByRole('link', { name: '내 부적 만들기' })).toBeVisible()
+  // 뒷면에 받는 사람 이름과 보낸 사람
+  await expect(guest.getByTestId('bujeok-card')).toHaveAttribute('data-entering', 'false', { timeout: 10_000 })
+  await guest.getByTestId('bujeok-flip').click()
+  await expect(guest.getByTestId('bujeok-back')).toContainText('민지')
+  await expect(guest.getByTestId('bujeok-back')).toContainText('철수')
+  // 받은 쪽 저장 이미지
+  const [dl] = await Promise.all([guest.waitForEvent('download', { timeout: 30_000 }), guest.getByRole('button', { name: '잠금화면용 저장' }).click()])
+  expect(pngSize(readFileSync((await dl.path())!))).toEqual({ w: 1170, h: 2532 })
+  const landing = (await events(guest)).filter((e) => e[0] === 'shared_landing')
+  expect(landing).toEqual([['shared_landing', { test_name: 'bujeok', result_id: 'cute_love' }]])
+  expect(JSON.stringify(await events(guest))).not.toMatch(/민지|철수/)
+
+  await guest.getByRole('link', { name: '나도 보내기' }).click()
+  await expect(guest).toHaveURL(/\/bujeok\?mode=gift&style=cute&finish=holo/)
+  await expect(guest.getByRole('radio', { name: '귀여운' })).toHaveAttribute('aria-checked', 'true')
+  await expect(guest.getByRole('radio', { name: '홀로그램', exact: true })).toHaveAttribute('aria-checked', 'true')
+  await expect(guest.getByLabel('받는 사람 이름')).toHaveValue('')
+  await expect(guest.getByRole('radio', { name: '재물' })).toHaveAttribute('aria-checked', 'false')
+  expect(errors).toEqual([])
+  expect(gErrors).toEqual([])
+})
+
+test('착지 "내 부적 만들기"는 받은 소원·화풍·마감을 미리 고른다', async ({ page }) => {
+  await page.goto('/bujeok/r/trad-pass-wood-2-paper?to=%EB%AF%BC%EC%A7%80')
+  await page.getByRole('button', { name: '열어 보기' }).click()
+  await page.getByRole('link', { name: '내 부적 만들기' }).click()
+  await expect(page).toHaveURL(/\/bujeok\?wish=pass&style=trad&finish=paper/)
+  await expect(page.getByRole('radio', { name: '합격' })).toHaveAttribute('aria-checked', 'true')
+  await expect(page.getByRole('radio', { name: '종이', exact: true })).toHaveAttribute('aria-checked', 'true')
+})
+
+test('이름이 잘못된 링크(9자·태그)는 이름 없이 열리고 원문이 화면·메타에 실리지 않는다', async ({ page, request }) => {
+  for (const bad of ['%EA%B0%80%EB%82%98%EB%8B%A4%EB%9D%BC%EB%A7%88%EB%B0%94%EC%82%AC%EC%95%84%EC%9E%90', '%3Cscript%3Ealert(1)%3C%2Fscript%3E']) {
+    const path = `/bujeok/r/trad-money-metal-0-gold?to=${bad}&from=${bad}`
+    await page.goto(path)
+    await expect(page.getByRole('heading', { level: 1 })).toHaveText('부적이 도착했어요')
+    const html = await (await request.get(path)).text()
+    // 화면 본문·제목·메타에는 원문이 없다(Next가 주소 쿼리를 자기 라우터 상태로 싣는 부분은 화면에 그려지지 않는다)
+    const shown = html.replace(/<script[\s\S]*?<\/script>/g, '')
+    expect(shown).not.toContain('alert(1)')
+    expect(shown).not.toContain('가나다라마바사아자')
+    expect(shown).toContain('부적이 도착했어요')
+  }
+})
+
+test('착지 메타: noindex, canonical /bujeok, 미리보기 이미지 주소에 이름 없음. 이미지는 실제로 받아진다', async ({ request }) => {
+  const html = await (await request.get('/bujeok/r/trad-money-metal-0-gold?to=%EB%AF%BC%EC%A7%80')).text()
+  expect(html).toMatch(/<meta name="robots" content="noindex/)
+  expect(html).toContain('<link rel="canonical" href="https://unse-ai.com/bujeok"')
+  expect(html).toContain('민지님께 부적이 도착했어요')
+  const og = html.match(/<meta property="og:image" content="([^"]+)"/)![1].replace(/&amp;/g, '&')
+  expect(og).toContain('kind=bujeok')
+  expect(og).not.toMatch(/to=|from=|민지/)
+  const img = await request.get(new URL(og).pathname + new URL(og).search)
+  expect(img.status()).toBe(200)
+  expect(img.headers()['content-type']).toContain('image/png')
+  // 이름을 달면 미리보기 이미지는 요청을 받지 않는다
+  expect((await request.get(new URL(og).pathname + new URL(og).search + '&to=x')).status()).toBe(400)
+})
+
+test('잘못된 코드는 /bujeok 으로 가고, 사이트맵에 /bujeok/r/ 은 없다', async ({ page, request }) => {
+  for (const c of ['trad-money-metal-9-gold', 'trad-money-metal-0', 'oil-money-metal-0-gold']) {
+    await page.goto(`/bujeok/r/${c}?to=%EB%AF%BC%EC%A7%80`)
+    await expect(page).toHaveURL(/\/bujeok$/)
+    await expect(page.getByRole('button', { name: '부적 만들기' })).toBeVisible()
+  }
+  const xml = await (await request.get('/sitemap.xml')).text()
+  expect(xml).not.toContain('/bujeok/r/')
+})

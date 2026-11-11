@@ -13,6 +13,9 @@ import { parseCupShare } from '@/lib/cup/shareLanding';
 import { BOARDS } from '@/lib/cup/boards';
 import { mbtiProfiles } from '@/content/mbtiTypes';
 import { GRADE_NAME } from '@/lib/exam/score';
+import { WISH_TEXT } from '@/content/bujeok';
+import { FOIL, PAL } from '@/lib/bujeok/palette';
+import type { BujeokStyle, Finish, Wish } from '@/lib/bujeok/keys';
 
 export const runtime = 'edge';
 
@@ -23,6 +26,10 @@ export async function GET(request: NextRequest) {
   const q = new URL(request.url).searchParams;
   if (!ogQueryOk(q)) return new Response('bad request', { status: 400 });
   const kind = q.get('kind') ?? '';
+  if (kind === 'bujeok') {
+    // ogQueryOk가 화풍·소원·기운·마감을 허용 목록으로 확인했다. 이름은 받지 않는다.
+    return bujeokImage(q.get('style') as BujeokStyle, q.get('wish') as Wish, q.get('finish') as Finish);
+  }
   let big = '', score = '', phrase = '', label = '';
   let image: ArrayBuffer | undefined;
   let portraitMissing = false; // 초상화를 못 받았으면 잠깐만 캐시해 다음 요청에 다시 그린다
@@ -108,5 +115,39 @@ export async function GET(request: NextRequest) {
       </div>
     ),
     { width: 1200, height: 630, headers: { 'Cache-Control': portraitMissing ? 'public, max-age=60, s-maxage=300' : OG_CACHE_CONTROL } },
+  );
+}
+
+// 부적 미리보기 1200×630. 마감에 맞는 바탕(종이 노랑 / 먹색), 붉은 바탕 없음, 이름 없음.
+// 이 경로는 글꼴을 따로 싣지 않는다. 한자 글귀(전통)도 대체 글꼴로 그려지는 것을 로컬에서 눈으로 확인했다(2026-11-11, 두부 글자 없음).
+function bujeokImage(style: BujeokStyle, wish: Wish, finish: Finish) {
+  const t = WISH_TEXT[wish];
+  const foil = finish !== 'paper';
+  const bg = foil ? FOIL.lacquer : style === 'trad' ? PAL.paper : PAL.cutePaper;
+  const ink = foil ? FOIL.gold : style === 'trad' ? '#3A2A10' : PAL.cuteInk;
+  const sub = foil ? '#CDBE9E' : style === 'trad' ? '#5C4720' : PAL.cuteSub;
+  const edge = foil ? FOIL.goldDeep : style === 'trad' ? PAL.paperEdge : PAL.cuteLine;
+  const phrase = style === 'cute' ? t.cutePhrase : t.hanja;
+  const holo = finish === 'holo' ? 'linear-gradient(90deg,#ff5f6d,#ffc371,#f9f871,#7bffb1,#6ad7ff,#b28dff)' : null;
+  return new ImageResponse(
+    (
+      <div style={{ width: '100%', height: '100%', display: 'flex', backgroundColor: bg, padding: '40px' }}>
+        <div style={{ flex: 1, display: 'flex', alignItems: 'center', border: `6px solid ${edge}`, borderRadius: '36px', padding: '0 80px' }}>
+          <div style={{ display: 'flex', flexDirection: 'column', flex: 1 }}>
+            <div style={{ display: 'flex', fontSize: '30px', color: sub, fontWeight: 700 }}>운명을 읽다 · 나만의 부적</div>
+            <div style={{ display: 'flex', fontSize: '120px', fontWeight: 700, color: ink, marginTop: '16px', lineHeight: 1.1 }}>{t.label} 부적</div>
+            <div style={{ display: 'flex', fontSize: '40px', color: ink, marginTop: '24px', wordBreak: 'keep-all', maxWidth: '640px' }}>{phrase}</div>
+            <div style={{ display: 'flex', fontSize: '28px', color: sub, marginTop: '40px' }}>받아서 손으로 돌려 보세요 · unse-ai.com</div>
+          </div>
+          <div style={{ display: 'flex', width: '230px', height: '430px', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', border: `6px solid ${edge}`, borderRadius: '24px', backgroundColor: foil ? '#241E17' : style === 'trad' ? '#F0D27A' : '#FFFFFF' }}>
+            {holo ? <div style={{ display: 'flex', width: '170px', height: '10px', borderRadius: '5px', backgroundImage: holo, marginBottom: '28px' }} /> : null}
+            <div style={{ display: 'flex', fontSize: '84px', fontWeight: 700, color: ink }}>{t.label}</div>
+            <div style={{ display: 'flex', width: '120px', height: '4px', backgroundColor: edge, margin: '22px 0' }} />
+            <div style={{ display: 'flex', fontSize: '40px', color: sub }}>부적</div>
+          </div>
+        </div>
+      </div>
+    ),
+    { width: 1200, height: 630, headers: { 'Cache-Control': OG_CACHE_CONTROL } },
   );
 }

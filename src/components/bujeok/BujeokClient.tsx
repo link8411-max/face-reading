@@ -11,10 +11,10 @@ import { validateBirthDate } from '@/lib/birthDate'
 import { elementFromBirth, randomVariant } from '@/lib/bujeok/compose'
 import { takeHandedBirth } from '@/lib/bujeok/birthHandoff'
 import { cleanName } from '@/lib/bujeok/link'
-import { FINISH_DEFAULT, VARIANTS, WISH_DEFAULT_EL, type BujeokSpec, type BujeokStyle, type Wish } from '@/lib/bujeok/keys'
+import { FINISH_DEFAULT, VARIANTS, WISH_DEFAULT_EL, type BujeokSpec, type BujeokStyle, type Finish, type Wish } from '@/lib/bujeok/keys'
 
 export type Mode = 'mine' | 'gift'
-export interface Initial { mode?: Mode; wish?: Wish; style?: BujeokStyle }
+export interface Initial { mode?: Mode; wish?: Wish; style?: BujeokStyle; finish?: Finish }
 
 const BIRTH_FAIL = '날짜를 다시 확인해 주세요. 음력 윤달은 그 해에 있는 달만 고를 수 있어요.'
 const NAME_FAIL = '이름은 한글·영문·숫자로 8자까지 적어 주세요.'
@@ -26,11 +26,12 @@ function initialValues(initial?: Initial): FormValues {
   return {
     wish: initial?.wish ?? null,
     style: initial?.style ?? null,
-    finish: FINISH_DEFAULT,
+    finish: initial?.finish ?? FINISH_DEFAULT,
     birth: b ? { year: String(b.year), month: String(b.month), day: String(b.day) } : { year: '', month: '', day: '' },
     isLunar: b?.isLunar ?? false,
     isLeap: b?.isLeapMonth ?? false,
     name: '',
+    from: '',
   }
 }
 
@@ -39,7 +40,9 @@ export default function BujeokClient({ initial }: { initial?: Initial }) {
   const [values, setValues] = useState<FormValues>(() => initialValues(initial))
   const [phase, setPhase] = useState<Phase>('form')
   const [spec, setSpec] = useState<BujeokSpec | null>(null)
+  const [mode, setMode] = useState<Mode>(initial?.mode === 'gift' ? 'gift' : 'mine')
   const [madeName, setMadeName] = useState<string | null>(null)
+  const [madeFrom, setMadeFrom] = useState<string | null>(null)
   const [playKey, setPlayKey] = useState(0)
   const [failText, setFailText] = useState<string | null>(null)
   const panel = useRef<HTMLDivElement>(null)
@@ -47,12 +50,19 @@ export default function BujeokClient({ initial }: { initial?: Initial }) {
   const { wish, style, finish, birth, isLunar, isLeap } = values
   const anyBirth = !!(birth.year || birth.month || birth.day)
   const dateCheck = validateBirthDate(birth, new Date(), { lunar: isLunar })
-  const birthBlocked = anyBirth && !dateCheck.ok
+  const birthBlocked = anyBirth && !dateCheck.ok && mode !== 'gift'
   const birthError = dateCheck.error ?? (birthBlocked ? '년·월·일을 모두 넣거나 모두 비워 주세요' : null)
   const rawName = values.name.trim()
-  const nameOk = rawName === '' || cleanName(rawName) !== null
-  const nameError = nameOk ? null : NAME_FAIL
-  const canSubmit = !!wish && !!style && !birthBlocked && nameOk
+  const gift = mode === 'gift'
+  // 내 부적: 이름은 선택. 선물: 받는 사람 이름 필수, 보내는 사람 이름은 선택
+  const nameOk = gift ? cleanName(rawName) !== null : rawName === '' || cleanName(rawName) !== null
+  const nameError = nameOk || (gift && rawName === '') ? null : NAME_FAIL
+  const rawFrom = values.from.trim()
+  const fromOk = rawFrom === '' || cleanName(rawFrom) !== null
+  const fromError = fromOk ? null : NAME_FAIL
+  const canSubmit = !!wish && !!style && !birthBlocked && nameOk && fromOk
+  // 선물 모드에서는 생년월일 칸이 없으므로 넘겨받은 값이 있어도 쓰지 않는다
+  const useBirth = anyBirth && !gift
 
   const onValues = (next: FormValues) => {
     setFailText(null)
@@ -62,7 +72,7 @@ export default function BujeokClient({ initial }: { initial?: Initial }) {
   const start = () => {
     if (!wish || !style || !canSubmit) return
     let el = WISH_DEFAULT_EL[wish]
-    if (anyBirth) {
+    if (useBirth) {
       const r = elementFromBirth(
         { year: Number(birth.year), month: Number(birth.month), day: Number(birth.day), isLunar, isLeapMonth: isLunar && isLeap },
         wish,
@@ -76,6 +86,7 @@ export default function BujeokClient({ initial }: { initial?: Initial }) {
     }
     const n = cleanName(rawName)
     setMadeName(n)
+    setMadeFrom(gift ? cleanName(rawFrom) : null)
     setSpec({ style, wish, el, variant: randomVariant(), finish })
     setPlayKey((k) => k + 1)
     setPhase('done')
@@ -106,13 +117,13 @@ export default function BujeokClient({ initial }: { initial?: Initial }) {
         {inRun ? (
           <div>
             <div ref={panel} className="mx-auto max-w-[420px]">
-              <BujeokCard spec={spec} name={madeName} enter playKey={playKey} />
+              <BujeokCard spec={spec} name={madeName} from={madeFrom} enter playKey={playKey} />
             </div>
-            <BujeokDone spec={spec} getSvg={() => panel.current?.querySelector('[data-bujeok-art] svg') ?? null} onRetry={retry} />
+            <BujeokDone spec={spec} getSvg={() => panel.current?.querySelector('[data-bujeok-art] svg') ?? null} onRetry={retry} gift={gift && madeName ? { to: madeName, from: madeFrom } : undefined} />
           </div>
         ) : (
           <>
-            <BujeokForm values={values} onChange={onValues} birthError={birthError} nameError={nameError} canSubmit={canSubmit} onSubmit={start} />
+            <BujeokForm values={values} onChange={onValues} mode={mode} onModeChange={setMode} birthError={birthError} nameError={nameError} fromError={fromError} canSubmit={canSubmit} onSubmit={start} />
             {failText && <p role="alert" className="mt-3 text-sm text-center text-accent">{failText}</p>}
           </>
         )}
