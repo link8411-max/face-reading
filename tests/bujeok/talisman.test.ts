@@ -31,3 +31,15 @@ test('전체 획은 공통 위·기운·상징·공통 아래 순서이고 몸�
     expect(y).toBeLessThanOrEqual(450)
   }
 })
+
+test('취업·승진 계단은 몸통(가운데 x 113~127)을 비켜 왼쪽 아래에서 오른쪽 위로 오른다', async () => {
+  const { symbolStrokes } = await import('@/lib/bujeok/talisman')
+  const st = symbolStrokes('career')
+  const pts = st.flatMap((s) => s.pts)
+  expect(pts.every(([x]) => x < 113 || x > 127)).toBe(true)
+  expect(st.every((s) => s.w >= 6 * 1.75)).toBe(true) // 굵은 획
+  const first = st[0].pts[0]
+  const last = st[st.length - 1].pts.at(-1)!
+  expect(last[0]).toBeGreaterThan(first[0])
+  expect(last[1]).toBeLessThan(first[1])
+})

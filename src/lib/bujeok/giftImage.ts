@@ -1,5 +1,5 @@
 // 선물 보낼 때 같이 가는 부적 그림(채팅에서 바로 보이는 1080×1350 세로 이미지).
-// 앞면(이름 도장 포함)을 위쪽에 놓고 아래에 한글 설명 띠(누구에게·무슨 부적·뜻·사이트)를 넣는다(그림만 받아도 알 수 있게). 이 PNG는 보내는 사람의 공유창·카카오 업로드로만 나가고 우리 서버에는 가지 않는다.
+// 앞면을 위쪽에 놓고(전통 선물은 도장 없이 — 도장은 받는 사람이 점안에서 찍는다. 귀여운 선물은 이름 도장 태그가 찍혀 있다) 아래에 한글 설명 띠(누구에게·무슨 부적·뜻·사이트)를 넣는다(그림만 받아도 알 수 있게). 이 PNG는 보내는 사람의 공유창·카카오 업로드로만 나가고 우리 서버에는 가지 않는다.
 import { estimateCaptionHeight, renderStill, type CaptionLine, type StillFrame } from './wallpaper'
 import { WISH_TEXT } from '@/content/bujeok'
 import type { BujeokStyle, Finish, Wish } from './keys'
