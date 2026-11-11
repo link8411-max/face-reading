@@ -96,3 +96,14 @@ test('/bujeok/box 페이지: noindex, canonical /bujeok, 사이트맵에 없다'
   expect((SITEMAP_ROUTES as readonly string[]).some((r) => r.startsWith('/bujeok/'))).toBe(false)
   expect(typeof BoxPage).toBe('function')
 })
+
+test('부적함 머리에 실제 장수 "내 부적 N장"(만든 것+받은 것)과 "보낸 부적 N장"을 보이고, 항목마다 새긴 날짜를 보인다', () => {
+  addToBox({ code: A, to: '민지', from: null, kind: 'mine', madeAt: '2026-11-11' })
+  addToBox({ code: B, to: '철수', from: null, kind: 'received' })
+  addToBox({ code: C, to: '하늘', from: null, kind: 'sent' })
+  render(<BujeokBox />)
+  expect(screen.getByTestId('bujeok-box-count').textContent).toBe('내 부적 2장보낸 부적 1장')
+  expect(within(screen.getByRole('link', { name: /민지님의 부적/ })).getByText('2026년 11월 11일 새김')).toBeTruthy()
+  // 옛 항목은 저장한 날짜로 보인다
+  expect(within(screen.getByRole('link', { name: /철수님께 부적이 도착했어요/ })).getByText(/^\d{4}\.\d{1,2}\.\d{1,2}$/)).toBeTruthy()
+})

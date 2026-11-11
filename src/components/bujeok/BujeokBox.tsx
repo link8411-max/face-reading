@@ -6,7 +6,7 @@ import { useBackOrHome } from '@/hooks/useBackOrHome'
 import TestHeader from '@/components/test/TestHeader'
 import BujeokSvg from './BujeokSvg'
 import { useBox } from './useBox'
-import { boxItemHref, removeFromBox, type BoxItem, type BoxKind } from '@/lib/bujeok/box'
+import { boxItemHref, madeAtLabel, removeFromBox, type BoxItem, type BoxKind } from '@/lib/bujeok/box'
 import { giftHeadline, mineHeadline, parseBujeokCode } from '@/lib/bujeok/link'
 
 const GROUPS: { kind: BoxKind; title: string }[] = [
@@ -53,6 +53,11 @@ export default function BujeokBox() {
           </div>
         ) : (
           <div className="mt-2 space-y-8">
+            {/* 실제 이 기기에 저장된 장수만 센다(만든 것 + 받은 것, 보낸 것은 따로) */}
+            <p data-testid="bujeok-box-count" className="font-serif font-bold text-[22px]">
+              내 부적 {items.filter((i) => i.kind !== 'sent').length}장
+              {items.some((i) => i.kind === 'sent') && <span className="ml-2 text-sm font-normal text-muted">보낸 부적 {items.filter((i) => i.kind === 'sent').length}장</span>}
+            </p>
             {GROUPS.map(({ kind, title }) => {
               const list = items.filter((i) => i.kind === kind)
               if (list.length === 0) return null
@@ -72,7 +77,7 @@ export default function BujeokBox() {
                             </div>
                             <p className="mt-2 text-[13px] font-medium text-ink break-keep">{titleOf(i)}</p>
                             {i.kind === 'received' && i.from && <p className="text-xs text-muted break-keep">{i.from}님이 보냈어요</p>}
-                            <p className="text-xs text-muted">{dateOf(i.savedAt)}</p>
+                            <p className="text-xs text-muted">{madeAtLabel(i.madeAt) ? `${madeAtLabel(i.madeAt)} 새김` : dateOf(i.savedAt)}</p>
                           </Link>
                           {confirming === k ? (
                             <div className="mt-2">

@@ -10,6 +10,8 @@ import { useWallpaperSave } from './useWallpaperSave'
 import { useNameHash } from './useNameHash'
 import { track } from '@/lib/analytics'
 import { addToBox } from '@/lib/bujeok/box'
+import { useBox } from './useBox'
+import { kstDate } from '@/lib/kst'
 import { bujeokCode, giftHeadline, mineHeadline, parseNameHash } from '@/lib/bujeok/link'
 import type { BujeokSpec } from '@/lib/bujeok/keys'
 import { WISH_TEXT } from '@/content/bujeok'
@@ -23,6 +25,19 @@ export default function GiftLanding({ spec, mine = false, ad }: { spec: BujeokSp
   const panel = useRef<HTMLDivElement>(null)
   const { saving, saveNotice, save } = useWallpaperSave(spec, () => panel.current?.querySelector('[data-bujeok-art] svg') ?? null)
   const text = WISH_TEXT[spec.wish]
+  // 새긴 날: 받은 선물은 도장을 찍은 날, 내 부적 링크는 이 기기 부적함에 남은 날짜(없으면 줄을 뺀다)
+  const [stampedAt, setMadeAt] = useState<string | null>(null)
+  const box = useBox()
+  const madeAt = stampedAt ?? (mine ? (box?.find((i) => i.kind === 'mine' && i.code === bujeokCode(spec) && i.to === to)?.madeAt ?? null) : null)
+
+  // 도장을 찍는 순간이 "내 것이 되는 순간": 그날을 이 기기 부적함에 새긴 날로 남긴다(링크·서버로는 보내지 않는다)
+  const onStamped = () => {
+    const today = kstDate(new Date())
+    setMadeAt(today)
+    setOpened(true)
+    const n = parseNameHash(window.location.hash)
+    addToBox({ code: bujeokCode(spec), to: n.to, from: n.from, kind: 'received', madeAt: today })
+  }
 
   useEffect(() => {
     track('shared_landing', { test_name: 'bujeok', result_id: `${spec.style}_${spec.wish}` })
@@ -42,7 +57,7 @@ export default function GiftLanding({ spec, mine = false, ad }: { spec: BujeokSp
           <h1 className="font-serif font-bold text-[24px] leading-[1.4] text-center break-keep">{headline}</h1>
           {!mine && from && <p className="mt-1 text-sm text-center text-muted">{from}님이 보냈어요</p>}
           <div ref={panel} className="mx-auto mt-4 max-w-[420px]">
-            <BujeokCard spec={spec} name={to} from={mine ? null : from} enter />
+            <BujeokCard spec={spec} name={to} from={mine ? null : from} madeAt={madeAt} enter />
           </div>
           <div className="mt-5 text-center">
             {spec.style === 'trad' && (
@@ -97,7 +112,7 @@ export default function GiftLanding({ spec, mine = false, ad }: { spec: BujeokSp
           {from && <p className="mt-2 text-sm text-muted">{from}님이 보냈어요</p>}
           <p className="mt-3 mb-5 text-sm text-muted break-keep">도장을 찍으면 열려요. 열면 손으로 돌려 볼 수 있고, 잠금화면에 저장해 둘 수도 있어요.</p>
           <div className="mx-auto max-w-[420px]">
-            <BujeokRite spec={spec} name={to} steps="seal" onDone={() => setOpened(true)} />
+            <BujeokRite spec={spec} name={to} steps="seal" onDone={onStamped} />
           </div>
         </div>
       )}

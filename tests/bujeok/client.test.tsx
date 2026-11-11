@@ -243,6 +243,15 @@ test('내 부적을 만들면 부적함(mine)에 저장하고 주소를 /bujeok/
   expect(JSON.stringify(items)).not.toMatch(/birth|year/)
 })
 
+test('내 부적 점안을 끝낸 날(한국 시간)이 부적함 항목에 madeAt으로 남고 카드 뒷면에 "새김"으로 보인다. 주소에는 없다', async () => {
+  const { kstDate } = await import('@/lib/kst')
+  await makeMine('민지')
+  const today = kstDate(new Date())
+  expect(loadBox()![0].madeAt).toBe(today)
+  expect(screen.getByTestId('bujeok-made-at').textContent).toMatch(/^\d{4}년 \d{1,2}월 \d{1,2}일 새김$/)
+  expect(window.location.href).not.toContain(today)
+})
+
 test('이름이 없으면 해시도 없다. 생년월일은 주소·저장소 어디에도 없다', async () => {
   render(<BujeokClient />)
   pick('재물')

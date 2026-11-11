@@ -1,16 +1,26 @@
 // 부적함: 이 기기 브라우저(localStorage)에만 남기는 부적 링크 목록. 서버·GA로 보내지 않는다.
-// 저장하는 값은 코드·받는 이름·보낸 이름·종류·저장 시각뿐이다. 생년월일은 저장하지 않는다(코드에는 기운만 들어 있다).
+// 저장하는 값은 코드·받는 이름·보낸 이름·종류·저장 시각, 그리고 새긴 날짜(madeAt, 점안을 끝낸 날 'YYYY-MM-DD')뿐이다. 생년월일은 저장하지 않는다(코드에는 기운만 들어 있다).
 // 저장소를 못 쓰는 환경(사생활 보호 창, 인앱 브라우저)에서는 loadBox가 null이고 나머지는 조용히 아무것도 하지 않는다.
 import { cleanName, parseBujeokCode } from './link'
 
 export type BoxKind = 'mine' | 'sent' | 'received'
-export interface BoxItem { code: string; to: string | null; from: string | null; kind: BoxKind; savedAt: number }
+/** madeAt: 이 기기에서 점안을 끝내 '내 것'이 된 날(한국 시간 YYYY-MM-DD). 링크·서버·GA에는 보내지 않는다. 옛 항목은 없다 */
+export interface BoxItem { code: string; to: string | null; from: string | null; kind: BoxKind; savedAt: number; madeAt?: string }
+
+const MADE_AT = /^\d{4}-\d{2}-\d{2}$/
+/** 'YYYY-MM-DD' → '2026년 11월 11일'. 모양이 다르면 null */
+export function madeAtLabel(madeAt: string | null | undefined): string | null {
+  if (!madeAt || !MADE_AT.test(madeAt)) return null
+  const [y, m, d] = madeAt.split('-').map(Number)
+  if (m < 1 || m > 12 || d < 1 || d > 31) return null
+  return `${y}년 ${m}월 ${d}일`
+}
 
 const KEY = 'bujeok-box-v1'
 export const BOX_MAX = 60
 const KINDS: readonly string[] = ['mine', 'sent', 'received']
 
-const sameItem = (a: Omit<BoxItem, 'savedAt'>, b: Omit<BoxItem, 'savedAt'>) => a.code === b.code && a.to === b.to && a.from === b.from && a.kind === b.kind
+const sameItem = (a: Pick<BoxItem, 'code' | 'to' | 'from' | 'kind'>, b: Pick<BoxItem, 'code' | 'to' | 'from' | 'kind'>) => a.code === b.code && a.to === b.to && a.from === b.from && a.kind === b.kind
 
 /** 검사를 통과하면 알려진 필드만 담은 새 객체, 아니면 null */
 function clean(raw: unknown): BoxItem | null {
@@ -28,7 +38,9 @@ function clean(raw: unknown): BoxItem | null {
       names.push(n)
     }
   }
-  return { code: r.code, to: names[0], from: names[1], kind: r.kind as BoxKind, savedAt: r.savedAt }
+  const out: BoxItem = { code: r.code, to: names[0], from: names[1], kind: r.kind as BoxKind, savedAt: r.savedAt }
+  if (typeof r.madeAt === 'string' && madeAtLabel(r.madeAt)) out.madeAt = r.madeAt
+  return out
 }
 
 export const BOX_UNAVAILABLE = 'unavailable'
@@ -89,10 +101,15 @@ export function addToBox(item: Omit<BoxItem, 'savedAt'>): void {
   if (!next) return
   const cur = loadBox()
   if (cur === null) return
+  // 날짜 없이 다시 넣으면(착지를 또 열었을 때) 이미 새긴 날짜는 지킨다
+  if (!next.madeAt) {
+    const prevAt = cur.find((i) => sameItem(i, next))?.madeAt
+    if (prevAt) next.madeAt = prevAt
+  }
   write([next, ...cur.filter((i) => !sameItem(i, next))].slice(0, BOX_MAX))
 }
 
-export function removeFromBox(item: Omit<BoxItem, 'savedAt'>): void {
+export function removeFromBox(item: Pick<BoxItem, 'code' | 'to' | 'from' | 'kind'>): void {
   const cur = loadBox()
   if (cur === null) return
   const next = cur.filter((i) => !sameItem(i, item))

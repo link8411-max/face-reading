@@ -8,6 +8,7 @@ import BujeokSvg from './BujeokSvg'
 import { CARD_BOX, themeFor } from '@/lib/bujeok/palette'
 import type { BujeokSpec } from '@/lib/bujeok/keys'
 import { ZOOM, clampZoom, hintRy, pinchZoom, restFace, sheenPos, stepSpin } from '@/lib/bujeok/spin'
+import { madeAtLabel } from '@/lib/bujeok/box'
 import { WATERMARK } from '@/lib/bujeok/wallpaper'
 import { WISH_TEXT } from '@/content/bujeok'
 
@@ -23,6 +24,8 @@ export interface BujeokCardProps {
   playKey?: number
   /** 도장(전통은 吉·이름 도장)을 그리지 않는다: 선물을 보내는 사람의 카드(도장은 받는 사람이 찍는다) */
   hideSeal?: boolean
+  /** 새긴 날(YYYY-MM-DD). 있으면 뒷면에 "2026년 11월 11일 새김" */
+  madeAt?: string | null
 }
 
 const ENTER_MS = 1500
@@ -65,7 +68,7 @@ export default function BujeokCard(props: BujeokCardProps) {
   return <CardInner key={props.playKey ?? 0} {...props} />
 }
 
-function CardInner({ spec, name, from, enter = false, hideSeal }: BujeokCardProps) {
+function CardInner({ spec, name, from, enter = false, hideSeal, madeAt }: BujeokCardProps) {
   const theme = themeFor(spec.style, spec.finish)
   const box = CARD_BOX[spec.style]
   const text = WISH_TEXT[spec.wish]
@@ -437,6 +440,7 @@ function CardInner({ spec, name, from, enter = false, hideSeal }: BujeokCardProp
               <div className="bj-face bj-back" data-testid="bujeok-back">
                 <div className="bj-seal" aria-hidden="true">{spec.style === 'trad' ? '福' : '복'}</div>
                 {name && <div style={{ fontSize: 'clamp(18px, 5.4vw, 26px)', fontWeight: 700 }}>{name}에게</div>}
+                {madeAtLabel(madeAt) && <div data-testid="bujeok-made-at" style={{ fontSize: 'clamp(12px, 3.4vw, 14px)', opacity: 0.85, letterSpacing: '.04em' }}>{madeAtLabel(madeAt)} 새김</div>}
                 <p style={{ margin: 0, fontSize: 'clamp(12px, 3.4vw, 15px)', lineHeight: 1.7 }}>
                   {text.hanjaMeaning}
                   <br />

@@ -142,3 +142,31 @@ describe('box', () => {
     expect(boxItemHref({ code: A, to: null, from: null, kind: 'sent' })).toBe(`/bujeok/r/${A}`)
   })
 })
+
+describe('새긴 날(madeAt)', () => {
+  test('madeAt이 있으면 저장·복원되고, 모양이 틀리면 버린다. 없으면 키 자체가 없다', () => {
+    addToBox(item({ code: A, madeAt: '2026-11-11' }))
+    addToBox(item({ code: B, to: null }))
+    expect(loadBox()!.find((i) => i.code === A)!.madeAt).toBe('2026-11-11')
+    expect('madeAt' in loadBox()!.find((i) => i.code === B)!).toBe(false)
+    store.setItem(KEY, JSON.stringify([{ code: A, to: null, from: null, kind: 'mine', savedAt: 1, madeAt: '어제' }, { code: B, to: null, from: null, kind: 'mine', savedAt: 1, madeAt: '2026-13-40' }]))
+    expect(loadBox()!.every((i) => !('madeAt' in i))).toBe(true)
+  })
+
+  test('날짜 없이 같은 항목을 다시 넣어도 이미 새긴 날짜는 지켜지고, 새 날짜가 오면 바뀐다', () => {
+    addToBox(item({ madeAt: '2026-11-11' }))
+    addToBox(item())
+    expect(loadBox()![0].madeAt).toBe('2026-11-11')
+    addToBox(item({ madeAt: '2026-11-12' }))
+    expect(loadBox()![0].madeAt).toBe('2026-11-12')
+    expect(loadBox()!.length).toBe(1)
+  })
+
+  test('madeAtLabel: 2026-11-11 → 2026년 11월 11일, 이상한 값은 null', async () => {
+    const { madeAtLabel } = await import('@/lib/bujeok/box')
+    expect(madeAtLabel('2026-11-11')).toBe('2026년 11월 11일')
+    expect(madeAtLabel('2026-01-05')).toBe('2026년 1월 5일')
+    expect(madeAtLabel(null)).toBeNull()
+    expect(madeAtLabel('nope')).toBeNull()
+  })
+})

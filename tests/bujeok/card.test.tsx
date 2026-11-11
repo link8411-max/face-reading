@@ -42,6 +42,17 @@ test('앞면에 SVG, 뒷면에 글귀 뜻과 응원 한 줄이 있다', () => {
   expect(back.textContent).toContain('민지에게')
 })
 
+test('새긴 날이 있으면 뒷면에 "2026년 11월 11일 새김", 없으면 줄이 없다(이름이 있으면 이름 줄이 그 위)', () => {
+  const { rerender } = render(<BujeokCard spec={spec} name="민지" madeAt="2026-11-11" />)
+  const t = screen.getByTestId('bujeok-back').textContent!
+  expect(t).toContain('2026년 11월 11일 새김')
+  expect(t.indexOf('민지에게')).toBeLessThan(t.indexOf('새김'))
+  rerender(<BujeokCard spec={spec} name="민지" />)
+  expect(screen.getByTestId('bujeok-back').textContent).not.toContain('새김')
+  rerender(<BujeokCard spec={spec} name={null} madeAt="이상한 값" />)
+  expect(screen.queryByTestId('bujeok-made-at')).toBeNull()
+})
+
 test('이름이 없으면 "에게" 줄이 없고, from이 있으면 "드림"', () => {
   const { rerender } = render(<BujeokCard spec={spec} name={null} />)
   expect(screen.getByTestId('bujeok-back').textContent).not.toContain('에게')

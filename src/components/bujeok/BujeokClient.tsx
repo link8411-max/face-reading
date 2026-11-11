@@ -16,6 +16,7 @@ import { elementFromBirth, randomVariant } from '@/lib/bujeok/compose'
 import { takeHandedBirth } from '@/lib/bujeok/birthHandoff'
 import { addToBox, removeFromBox } from '@/lib/bujeok/box'
 import { seasonDefaultWish } from '@/lib/bujeok/season'
+import { kstDate } from '@/lib/kst'
 import { bujeokCode, bujeokMineUrl, cleanName } from '@/lib/bujeok/link'
 import { FINISH_DEFAULT, VARIANTS, WISH_DEFAULT_EL, type BujeokSpec, type BujeokStyle, type Finish, type Wish } from '@/lib/bujeok/keys'
 
@@ -51,6 +52,8 @@ export default function BujeokClient({ initial, high = null }: { initial?: Initi
   const [madeFrom, setMadeFrom] = useState<string | null>(null)
   const [playKey, setPlayKey] = useState(0)
   const [failText, setFailText] = useState<string | null>(null)
+  // 점안을 끝낸 날(한국 시간 YYYY-MM-DD): 내 부적이 "내 것이 되는 순간". 이 기기 부적함과 카드 뒷면에만 쓴다
+  const [madeAt, setMadeAt] = useState<string | null>(null)
   const panel = useRef<HTMLDivElement>(null)
   const boxItems = useBox()
   // 내 부적 N장 = 만든 것 + 받은 것(보낸 것은 따로 센다). 이 기기 저장 개수 그대로
@@ -100,6 +103,7 @@ export default function BujeokClient({ initial, high = null }: { initial?: Initi
     }
     const n = cleanName(rawName)
     setMadeName(n)
+    setMadeAt(null)
     setMadeFrom(gift ? cleanName(rawFrom) : null)
     setSpec({ style, wish, el, variant: randomVariant(), finish })
     setPlayKey((k) => k + 1)
@@ -122,6 +126,7 @@ export default function BujeokClient({ initial, high = null }: { initial?: Initi
   // 점안이 끝나면 그은 획을 spec에 싣고 완성 화면으로(카드 등장 회전)
   const finishRite = (stroke: string | null) => {
     setSpec((prev) => (prev ? { ...prev, stroke: prev.style === 'trad' && stroke ? stroke : undefined } : prev))
+    setMadeAt(gift ? null : kstDate(new Date()))
     setPlayKey((k) => k + 1)
     setPhase('done')
   }
@@ -138,12 +143,12 @@ export default function BujeokClient({ initial, high = null }: { initial?: Initi
     const code = bujeokCode(spec)
     const prev = savedMine.current
     if (prev && prev.code !== code) removeFromBox({ code: prev.code, to: prev.to, from: null, kind: 'mine' })
-    addToBox({ code, to: madeName, from: null, kind: 'mine' })
+    addToBox({ code, to: madeName, from: null, kind: 'mine', ...(madeAt ? { madeAt } : {}) })
     savedMine.current = { code, to: madeName }
     if (origUrl.current === null) origUrl.current = window.location.pathname + window.location.search
     const u = new URL(bujeokMineUrl(spec, madeName))
     window.history.replaceState(window.history.state, '', u.pathname + u.search + u.hash)
-  }, [mineRun, spec, madeName])
+  }, [mineRun, spec, madeName, madeAt])
   // 시작 화면으로 돌아가면 주소도 처음으로 되돌린다
   useEffect(() => {
     if (mineRun || origUrl.current === null) return
@@ -167,7 +172,7 @@ export default function BujeokClient({ initial, high = null }: { initial?: Initi
         ) : inRun ? (
           <div>
             <div ref={panel} className="mx-auto max-w-[420px]">
-              <BujeokCard spec={spec} name={madeName} from={madeFrom} enter playKey={playKey} hideSeal={gift && spec.style === 'trad'} />
+              <BujeokCard spec={spec} name={madeName} from={madeFrom} madeAt={gift ? null : madeAt} enter playKey={playKey} hideSeal={gift && spec.style === 'trad'} />
             </div>
             {gift && spec.style === 'trad' && <p className="mt-2 text-sm text-center text-muted">도장은 받는 사람이 찍어요</p>}
             <BujeokDone spec={spec} getSvg={() => panel.current?.querySelector('[data-bujeok-art] svg') ?? null} onRetry={retry} gift={gift && madeName ? { to: madeName, from: madeFrom } : undefined} mineName={madeName} ad={<BujeokAd wish={spec.wish} high={high} />} />
