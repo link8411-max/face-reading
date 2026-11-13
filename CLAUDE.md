@@ -5,7 +5,7 @@
 git add . && git commit -m "메시지" && git push
 ```
 **Vercel 자동 배포** - push하면 끝
-- Vercel 함수 지역은 프로젝트 설정에서 **서울(icn1)** (2026-11-04, Supabase가 서울이라). Hobby 요금제는 프로젝트당 1지역이고 라우트의 `preferredRegion`은 적용되지 않는다. 지역 설정을 바꾸면 새 배포가 필요하다.
+- Vercel 함수 지역은 프로젝트 설정에서 **서울(icn1)** (2026-11-04, Supabase가 서울이라). 팀(`link8411-maxs-projects`)은 **Pro 요금제**다(2026-11-14 대시보드 확인, 예전 기록의 Hobby가 아님. 월 $20에 사용량 크레딧 $20 포함, 사용량은 https://vercel.com/link8411-maxs-projects/~/usage). 지금 설정은 서울 한 곳이고 라우트별 `preferredRegion`은 쓰지 않는다. 지역 설정을 바꾸면 새 배포가 필요하다.
 
 ## 테스트
 ```bash
