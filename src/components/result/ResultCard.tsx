@@ -35,7 +35,7 @@ export default function ResultCard({ eyebrow, title, summary, art, bars, chips, 
                   <span>{b.label}</span>
                   <span className="font-bold">{b.value}</span>
                 </div>
-                <div role="meter" aria-label={b.label} aria-valuenow={b.value} aria-valuemin={0} aria-valuemax={100} className="h-1.5 rounded-full bg-paper mt-[5px]">
+                <div role="meter" aria-label={b.label} aria-valuenow={b.value} aria-valuemin={0} aria-valuemax={100} className="h-1.5 rounded-full bg-card-2 mt-[5px]">
                   <div className="h-1.5 rounded-full bg-ink" style={{ width: `${Math.max(0, Math.min(100, b.value))}%` }} />
                 </div>
               </div>
@@ -44,13 +44,13 @@ export default function ResultCard({ eyebrow, title, summary, art, bars, chips, 
         ) : (
           <div className="flex-1 flex flex-wrap gap-1.5">
             {(chips ?? []).map((c) => (
-              <span key={c} className="text-xs bg-paper rounded-full px-3 py-1.5">{c}</span>
+              <span key={c} className="text-xs bg-card-2 rounded-full px-3 py-1.5">{c}</span>
             ))}
           </div>
         )}
       </div>
 
-      <div className="bg-paper rounded-[18px] mt-4 px-4 py-3.5 flex flex-col gap-2">
+      <div className="bg-card-2 rounded-[18px] mt-4 px-4 py-3.5 flex flex-col gap-2">
         {reasons.map((r) => (
           <p key={r.label} className="text-[13px] leading-relaxed">
             <span className="font-bold text-accent">{r.label}</span> {r.text}

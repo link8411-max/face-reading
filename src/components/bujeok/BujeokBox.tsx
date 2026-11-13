@@ -47,7 +47,7 @@ export default function BujeokBox() {
           <div className="mt-10 text-center">
             <p className="text-[15px] text-ink">아직 모은 부적이 없어요</p>
             <p className="mt-2 text-sm text-muted break-keep">부적을 만들거나 선물을 주고받으면 여기에 모여요.</p>
-            <Link href="/bujeok" className="mt-6 inline-flex h-[52px] px-8 rounded-full items-center justify-center bg-accent text-white text-[15px] font-medium">
+            <Link href="/bujeok" className="mt-6 inline-flex h-[52px] px-8 rounded-full items-center justify-center bg-ink text-paper text-[15px] font-medium">
               부적 만들기
             </Link>
           </div>
@@ -89,7 +89,7 @@ export default function BujeokBox() {
                                     removeFromBox(i)
                                     setConfirming(null)
                                   }}
-                                  className="h-9 px-3 rounded-full bg-accent text-white text-xs font-medium"
+                                  className="h-9 px-3 rounded-full bg-ink text-paper text-xs font-medium"
                                 >
                                   네, 지울게요
                                 </button>

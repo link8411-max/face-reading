@@ -94,7 +94,7 @@ export default function BujeokDone({ spec, getSvg, onRetry, gift, ad, mineName =
   }
 
   const big = 'h-[52px] rounded-full flex items-center justify-center gap-2 text-[15px] font-medium disabled:opacity-50'
-  const bigMain = `${big} bg-accent text-white`
+  const bigMain = `${big} bg-ink text-paper`
   const bigSub = `${big} bg-white text-ink border border-line`
   const linkBtn = 'inline-flex items-center min-h-11 px-2 underline underline-offset-[3px] disabled:opacity-50'
   const dot = <span aria-hidden className="opacity-50">·</span>

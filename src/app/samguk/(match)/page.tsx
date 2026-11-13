@@ -48,7 +48,7 @@ function StatLine({ label, value }: { label: string; value: number }) {
   return (
     <div className="flex items-center gap-3 text-[13px]">
       <span className="w-14 flex-none">{label}</span>
-      <div className="flex-1 bg-card rounded-full h-1.5">
+      <div className="flex-1 bg-card-2 rounded-full h-1.5">
         <div className="h-1.5 rounded-full bg-ink" style={{ width: `${value}%` }} />
       </div>
       <span className="w-8 text-right font-medium">{value}</span>

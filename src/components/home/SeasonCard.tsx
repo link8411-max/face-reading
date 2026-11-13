@@ -20,7 +20,7 @@ export default function SeasonCard() {
   return (
     <section aria-label={season.chip} className="bg-[#E6EDFF] rounded-[22px] p-5 flex items-center gap-3.5">
       <div className="flex-1">
-        <p className="text-xs font-medium text-[#4F5A43]">{season.chip}</p>
+        <p className="text-xs font-medium text-accent">{season.chip}</p>
         <h2 className="font-serif font-bold text-[17px] leading-[1.4] mt-1.5 whitespace-pre-line">{season.title}</h2>
         <p className="text-[13px] text-muted mt-1 max-[379px]:min-h-[39px]">{season.sub}</p>
         <Link href={season.cta.href} className="inline-flex items-center mt-3 h-11 px-5 rounded-full bg-accent text-white text-sm font-medium">
@@ -29,7 +29,7 @@ export default function SeasonCard() {
       </div>
       <svg width="64" height="64" viewBox="0 0 64 64" fill="none" aria-hidden="true">
         <circle cx="24" cy="32" r="16" fill="#F7F8FC" />
-        <circle cx="40" cy="32" r="16" fill="#CFD6C4" />
+        <circle cx="40" cy="32" r="16" fill="#C6F24E" />
         <path d="M32 22l2 5 5 2-5 2-2 5-2-5-5-2 5-2z" fill="#2D55FF" />
       </svg>
     </section>

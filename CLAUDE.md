@@ -40,6 +40,8 @@ npm run test:e2e     # E2E (next build 후 3200 포트): 전 페이지 로딩·�
 - 모양: 카드 `rounded-[22px]`~`rounded-[30px]`, 버튼 pill(`rounded-full`), 주 버튼 `h-[52px] bg-accent text-white`, 선택된 칩·토글은 `bg-ink text-paper`.
 - 옛 민화 색(#F5E6D3, #C41E3A 등)과 옛 토큰 이름(vermilion, gold, navy, paper-2), 4b 베이지·테라코타 색도 테스트로 막는다.
 
+- Pretendard에는 한자가 없다. 한자(일기토 열전 제목의 한자 이름, 丁未 등)와 일부 기호는 시스템 글꼴로 나온다(2026-11-13 받아들임). `loading.tsx`는 두지 않는다: 정적 페이지에 두면 서버 HTML 본문이 숨김 상태로 나가 JS를 덜 돌리는 검색 봇이 못 읽는다(테스트로 막음).
+
 ### 아이콘·이모지
 - 이모지는 제목·버튼·링크·메뉴에 쓰지 않는다(E2E `chrome-emoji.spec.ts`). 아이콘은 `src/components/icons.tsx`의 `Icon`(선 굵기 1.6) 한 세트, 얼굴 그림은 `SmileFace`, 장식은 `MoonDeco`.
 

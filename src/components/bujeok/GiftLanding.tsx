@@ -71,7 +71,7 @@ export default function GiftLanding({ spec, mine = false, ad }: { spec: BujeokSp
           </div>
           {ad}
           <div className="no-screenshot flex flex-col mt-5">
-            <button type="button" onClick={() => void save()} disabled={saving} className={`${big} bg-accent text-white`}>
+            <button type="button" onClick={() => void save()} disabled={saving} className={`${big} bg-ink text-paper`}>
               <Icon name="download" size={18} />
               {saving ? '이미지 만드는 중…' : '잠금화면으로 간직하기'}
             </button>

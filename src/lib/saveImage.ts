@@ -43,7 +43,7 @@ function showSaveModal(blob: Blob, ua: string) {
   modal.id = 'ios-save-modal'
   modal.setAttribute('role', 'dialog')
   modal.setAttribute('aria-label', '이미지 저장')
-  modal.style.cssText = 'position:fixed;inset:0;z-index:9999;background:rgba(46,42,39,0.95);display:flex;flex-direction:column;justify-content:center;align-items:center;padding:20px;gap:14px;'
+  modal.style.cssText = 'position:fixed;inset:0;z-index:9999;background:rgba(26,27,37,0.95);display:flex;flex-direction:column;justify-content:center;align-items:center;padding:20px;gap:14px;'
   const msg = document.createElement('p')
   msg.style.cssText = 'color:#F7F8FC;font-size:16px;text-align:center;margin:0;'
   msg.textContent = '이미지를 길게 눌러 저장하세요'

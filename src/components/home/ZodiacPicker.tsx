@@ -34,7 +34,7 @@ export default function ZodiacPicker() {
             type="button"
             onClick={() => setSelected(s)}
             aria-pressed={selected === s}
-            className={`h-10 px-4 rounded-full border text-sm transition ${selected === s ? "bg-ink text-paper border-ink" : "bg-white text-ink border-[#E2D8CA]"}`}
+            className={`h-10 px-4 rounded-full border text-sm transition ${selected === s ? "bg-ink text-paper border-ink" : "bg-white text-ink border-[#E1E6F5]"}`}
           >
             {zodiac2027[s].띠}
           </button>

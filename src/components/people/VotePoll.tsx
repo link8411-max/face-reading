@@ -103,7 +103,7 @@ export default function VotePoll({ kind, id, target, title, options, share }: Pr
                 {pct !== null && (
                   <span
                     aria-hidden="true"
-                    className={`absolute inset-y-0 left-0 ${mine ? 'bg-accent/25' : 'bg-card'}`}
+                    className={`absolute inset-y-0 left-0 ${mine ? 'bg-accent/25' : 'bg-card-2'}`}
                     style={{ width: `${pct}%` }}
                   />
                 )}

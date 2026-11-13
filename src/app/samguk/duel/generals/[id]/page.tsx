@@ -114,7 +114,7 @@ export default async function GeneralPage({ params }: Props) {
                 <tr key={k} className="border-b border-line last:border-0">
                   <th scope="row" className="w-16 text-left font-normal px-4 py-2.5">{k}</th>
                   <td className="py-2.5 pr-2">
-                    <div className="bg-card rounded-full h-1.5">
+                    <div className="bg-card-2 rounded-full h-1.5">
                       <div className="h-1.5 rounded-full bg-ink" style={{ width: `${c.stats[k]}%` }} />
                     </div>
                   </td>

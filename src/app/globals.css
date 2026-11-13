@@ -425,16 +425,5 @@ body:has(.bj-dark) nav[aria-label='하단 메뉴'] { background-color: #1C1712; 
 @keyframes bj-rite-spark { from { transform: translate(0, 0); opacity: 1; } to { transform: translate(var(--dx), var(--dy)); opacity: 0; } }
 @keyframes bj-rite-glow { 0% { opacity: 0; } 15% { opacity: 1; } 100% { opacity: 0; } }
 
-/* 페이지 이동 중 뼈대 화면(PageSkeleton)의 반짝임 */
-@keyframes skeleton-shimmer {
-  0%, 100% { opacity: 1; }
-  50% { opacity: 0.55; }
-}
-.skeleton-shimmer {
-  animation: skeleton-shimmer 1.2s ease-in-out infinite;
-}
 @media (prefers-reduced-motion: reduce) {
-  .skeleton-shimmer {
-    animation: none;
   }
-}

@@ -27,7 +27,7 @@ export default function MbtiDailyCard({ type, date, daily, captureRef, withMatch
         {type} <span className="text-base font-medium text-muted">{mbtiProfiles[type].nickname}</span>
       </h2>
       <p className="relative font-serif text-[19px] leading-[1.55] mt-3 break-keep">{daily.headline}</p>
-      <div className="bg-paper rounded-[18px] mt-4 px-4 py-3.5 flex flex-col gap-2">
+      <div className="bg-card-2 rounded-[18px] mt-4 px-4 py-3.5 flex flex-col gap-2">
         {rows.map(([label, text]) => (
           <p key={label} className="text-[13px] leading-relaxed">
             <span className="font-bold text-accent">{label}</span> {text}
@@ -36,7 +36,7 @@ export default function MbtiDailyCard({ type, date, daily, captureRef, withMatch
       </div>
       <div className="flex flex-wrap gap-1.5 mt-3">
         {[`행운의 색 ${daily.lucky.color}`, `행운의 시간 ${daily.lucky.time}`, daily.lucky.action].map((c) => (
-          <span key={c} className="text-xs bg-paper rounded-full px-3 py-1.5">{c}</span>
+          <span key={c} className="text-xs bg-card-2 rounded-full px-3 py-1.5">{c}</span>
         ))}
       </div>
       <p className="text-[13px] mt-3">

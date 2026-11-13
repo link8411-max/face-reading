@@ -57,7 +57,7 @@ export default function ThreeKingdomsMap({ count, selected, onSelect }: { count:
               className="group cursor-pointer outline-none"
               opacity={dim(r.key)}
             >
-              <polygon points={r.points} fill={on ? r.fillOn : r.fill} stroke={on ? '#2D55FF' : '#B8AE9F'} strokeWidth={on ? 3 : 1.5} strokeLinejoin="miter" shapeRendering="crispEdges" className="transition-colors group-hover:brightness-95 group-focus-visible:stroke-accent group-focus-visible:[stroke-width:3px]" />
+              <polygon points={r.points} fill={on ? r.fillOn : r.fill} stroke={on ? '#2D55FF' : '#B9C3E0'} strokeWidth={on ? 3 : 1.5} strokeLinejoin="miter" shapeRendering="crispEdges" className="transition-colors group-hover:brightness-95 group-focus-visible:stroke-accent group-focus-visible:[stroke-width:3px]" />
               <polygon points={r.points} fill="url(#tk-dots)" pointerEvents="none" shapeRendering="crispEdges" />
               <text x={r.label[0]} y={r.label[1]} fontSize="26" fontWeight="700" className="font-serif" fill="#1A1B25" pointerEvents="none">{r.key}</text>
               <text x={r.label[0] + 2} y={r.label[1] + 20} fontSize="13" fill="#5E6070" pointerEvents="none">{count[r.key] ?? 0}명</text>
@@ -83,7 +83,7 @@ export default function ThreeKingdomsMap({ count, selected, onSelect }: { count:
         >
           {/* 눈에 보이는 칩은 작게, 누르는 영역은 위아래·좌우로 넓힌다(화면에서 44px 이상) */}
           <rect x="256" y="0" width="104" height="50" fill="#000" fillOpacity="0" />
-          <rect x="268" y="8" width="80" height="28" rx="14" fill={selected === '기타' ? '#1A1B25' : '#F7F8FC'} stroke={selected === '기타' ? '#1A1B25' : '#B8AE9F'} strokeWidth="1.5" className="group-focus-visible:stroke-accent group-focus-visible:[stroke-width:3px]" />
+          <rect x="268" y="8" width="80" height="28" rx="14" fill={selected === '기타' ? '#1A1B25' : '#F7F8FC'} stroke={selected === '기타' ? '#1A1B25' : '#B9C3E0'} strokeWidth="1.5" className="group-focus-visible:stroke-accent group-focus-visible:[stroke-width:3px]" />
           <text x="308" y="27" textAnchor="middle" fontSize="14" fontWeight="700" fill={selected === '기타' ? '#F7F8FC' : '#1A1B25'} pointerEvents="none">군웅</text>
         </g>
       </svg>

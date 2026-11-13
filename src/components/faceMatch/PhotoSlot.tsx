@@ -38,7 +38,7 @@ export default function PhotoSlot({ label, gender, onGender, image, onFile, erro
       ) : (
         <>
           <GenderPills value={gender} onChange={onGender} label={`${label} 성별`} disabled={disabled} />
-          <button type="button" aria-label={`${label} 사진 고르기`} disabled={disabled} onClick={() => fileRef.current?.click()} className="min-h-[150px] rounded-[18px] border-[1.5px] border-dashed border-[#D6C8B4] bg-paper flex flex-col items-center justify-center gap-2 p-3 overflow-hidden disabled:opacity-60">
+          <button type="button" aria-label={`${label} 사진 고르기`} disabled={disabled} onClick={() => fileRef.current?.click()} className="min-h-[150px] rounded-[18px] border-[1.5px] border-dashed border-[#B9C3E0] bg-paper flex flex-col items-center justify-center gap-2 p-3 overflow-hidden disabled:opacity-60">
             {image ? (
               // eslint-disable-next-line @next/next/no-img-element
               <img src={image} alt={`${label} 사진`} className="max-h-40 rounded-[14px] object-contain" />

@@ -58,7 +58,7 @@ test('주 버튼 흰 글씨가 포인트색 위에서 대비 4.5 이상', () => 
 test('옛 베이지·테라코타 색이 src에 남아 있지 않다(부적·게임 전용 색 제외)', () => {
   const { execSync } = require('node:child_process')
   // 일기토 게임 팔레트(src/game)는 화면 개편 범위 밖이라 뺀다(palette.ts·config.ts가 #6B6259를 쓴다)
-  const hits = execSync("grep -rniE '#(FBF6F1|ECE5D9|F1EBE2|E6DED2|2E2A27|6B6259|9A4F35|A4553A)' src --exclude-dir=game || true", { encoding: 'utf8' }).trim()
+  const hits = execSync("grep -rniE '#(FBF6F1|ECE5D9|F1EBE2|E6DED2|2E2A27|6B6259|9A4F35|A4553A|D6C8B4|E2D8CA|4F5A43|CFD6C4|B8AE9F)|rgba\\(46,42,39' src --exclude-dir=game || true", { encoding: 'utf8' }).trim()
   expect(hits).toBe('')
 })
 
@@ -99,4 +99,22 @@ test('임시 별칭 토큰(vermilion·gold·navy·paper-2)이 없다', () => {
 test('포인트색 작은 글씨가 카드 위에서도 대비 4.5 이상 (리뷰)', () => {
   expect(contrast(hex('accent'), hex('card'))).toBeGreaterThanOrEqual(4.5)
   expect(contrast(hex('accent'), hex('card-2'))).toBeGreaterThanOrEqual(4.5)
+})
+
+test('먹빛 부적 화면의 주 버튼은 금색 규칙(.bj-dark .bg-ink.text-paper)을 쓴다 — bg-accent는 먹빛에서 연살구라 흰 글씨가 안 보인다', () => {
+  const { execSync } = require('node:child_process')
+  const hits = execSync("grep -rln 'bg-accent text-white' src/components/bujeok src/app/bujeok || true", { encoding: 'utf8' }).trim()
+  expect(hits).toBe('')
+  expect(css).toMatch(/\.bj-dark \.bg-ink\.text-paper \{/)
+})
+
+test('흰 카드 안쪽 칸은 bg-paper 대신 bg-card-2 (저장 이미지에서 칸이 사라지지 않게)', () => {
+  for (const f of ['src/components/result/ResultCard.tsx', 'src/components/mbti/MbtiDailyCard.tsx', 'src/components/faceMatch/FaceMatchCard.tsx']) {
+    expect(readFileSync(f, 'utf8'), f).not.toMatch(/\bbg-paper\b/)
+  }
+})
+
+test('정적 페이지에 loading.tsx를 두지 않는다 — 서버 HTML의 본문이 숨김 상태(hidden)로 나가 네이버 봇이 못 읽을 수 있다', () => {
+  const { execSync } = require('node:child_process')
+  expect(execSync("find src/app -name loading.tsx", { encoding: 'utf8' }).trim()).toBe('')
 })

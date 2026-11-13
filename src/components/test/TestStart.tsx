@@ -66,7 +66,7 @@ export default function TestStart({
       <button
         type="button"
         onClick={() => fileRef.current?.click()}
-        className="mt-[18px] min-h-[290px] rounded-[28px] border-[1.5px] border-dashed border-[#D6C8B4] bg-card-2 flex flex-col items-center justify-center gap-3.5 p-4 overflow-hidden"
+        className="mt-[18px] min-h-[290px] rounded-[28px] border-[1.5px] border-dashed border-[#B9C3E0] bg-card-2 flex flex-col items-center justify-center gap-3.5 p-4 overflow-hidden"
       >
         {image ? (
           // eslint-disable-next-line @next/next/no-img-element
