@@ -1,7 +1,8 @@
 "use client";
 
 import type { Ref } from "react";
-import { useT } from "@/lib/i18n/LocaleProvider";
+import { useLocale, useT } from "@/lib/i18n/LocaleProvider";
+import CastSay from "@/components/cast/CastSay";
 import { useEnCopy } from "@/lib/i18n/copy";
 import ResultCard from "@/components/result/ResultCard";
 import {
@@ -18,6 +19,7 @@ export default function GuansangResultView({ result, captureRef, actions, after 
   after?: React.ReactNode;
 }) {
   const tr = useT();
+  const locale = useLocale();
   // 영어 페이지는 서버가 내려 준 영어 문구를, 그 밖(한국어)은 지금 문구를 쓴다
   const en = useEnCopy()?.guansang;
   const TYPES = en?.types ?? GUANSANG_TYPES;
@@ -35,6 +37,7 @@ export default function GuansangResultView({ result, captureRef, actions, after 
 
   return (
     <div className="pb-6 animate-fade-in">
+      <div className="mb-3"><CastSay cast="haetae" lineKey="say.face2.reveal" size="sm" locale={locale} /></div>
       <ResultCard captureRef={captureRef} cast="haetae" eyebrow={tr("face.eyebrow")} title={t.nickname} summary={t.oneLiner} chips={chips} reasons={reasons} />
       <p className="mt-3 text-center text-[11px] text-muted leading-relaxed">
         {SHAPES[result.shape].traditional} · {ZONES[result.zone].traditional} · {en?.schoolNote ?? SCHOOL_NOTE}

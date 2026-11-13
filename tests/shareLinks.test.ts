@@ -63,6 +63,15 @@ test('공유 주소: 유형 키와 점수, 유입 구분용 utm만 담는다', (
   expect(new URL(shareUrl('face', 'earth-mid')).searchParams.has('s')).toBe(false)
 })
 
+test('동물상 공유 주소에 그림 성별 g(f|m)를 담고, 파서는 f|m만 받는다', () => {
+  expect(shareUrl('animal', 'cat', 88, 'ko', { g: 'm' })).toBe('https://unse-ai.com/animal/r/cat?s=88&g=m&utm_source=share&utm_medium=friend_link&utm_campaign=animal')
+  expect(shareUrl('animal', 'cat', 88)).not.toContain('g=')
+  expect(shareUrl('face', 'earth-mid', undefined, 'ko', { g: 'm' })).not.toContain('g=')
+  expect(parseShared('animal', 'cat', '88', 'm')!.g).toBe('m')
+  expect(parseShared('animal', 'cat', '88', 'f')!.g).toBe('f')
+  for (const bad of ['x', '../etc', 'M', '', undefined, ['m', 'f']]) expect(parseShared('animal', 'cat', '88', bad)!.g, String(bad)).toBeUndefined()
+})
+
 // 리뷰 Important: 객체 프로토타입 키(constructor 등)로 500이 나지 않는다
 test.each(['constructor', '__proto__', 'toString', 'hasOwnProperty'])('관상 링크 키 %s는 허용 목록 밖이다', (k) => {
   expect(parseShared('face', k)).toBeNull()

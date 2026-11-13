@@ -8,6 +8,7 @@ import TenGodSummary from "./TenGodSummary";
 import AreaLines from "./AreaLines";
 import DaeunTimeline from "./DaeunTimeline";
 import SeunCard from "./SeunCard";
+import CastSay from "@/components/cast/CastSay";
 import BasisDetails, { boundaryText } from "./BasisDetails";
 
 // 내 사주 풀이 결과 본문. 버튼(actions)과 쿠팡 배너 등(after)은 페이지가 붙인다.
@@ -32,6 +33,8 @@ export default function SajuResultView({ result, captureRef, actions, after, bir
           {warn && <p>{boundaryText(warn)}</p>}
         </div>
       )}
+
+      <div className="mb-3"><CastSay cast="saja" lineKey="say.saju.reveal" /></div>
 
       <section ref={captureRef} className="bg-card border border-line rounded-[30px] p-4 space-y-3">
         {birthLine && <p className="no-screenshot text-center text-sm text-muted">{birthLine}</p>}
@@ -85,6 +88,8 @@ export default function SajuResultView({ result, captureRef, actions, after, bir
       </section>
 
       {actions}
+
+      <div className="mt-4"><CastSay cast="saja" lineKey="say.saju.explain" size="sm" /></div>
 
       <BasisDetails basis={result.basis} />
 

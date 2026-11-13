@@ -3,6 +3,8 @@ import Link from "next/link";
 import { redirect } from "next/navigation";
 import { josa, ogImageUrl, parseShared, SITE, TEST_NAME, type ShareKind, type SharedResult } from "@/lib/shareLinks";
 import { animalTypeDB } from "@/lib/animalTypeDB";
+import { animalArt } from "@/lib/animal/art";
+import type { AnimalKey } from "@/lib/animal/matcher";
 import { samgukCharacters } from "@/lib/samgukDB";
 import { DAY_MASTER_COPY } from "@/content/saju";
 import { STEM_BY_KEY } from "@/lib/saju/keys";
@@ -15,7 +17,7 @@ import { relatedFaces, videosForPerson } from "@/lib/videos/forPerson";
 import SharedLandingTracker from "./SharedLandingTracker";
 
 type P = Promise<{ key: string }>;
-type S = Promise<{ s?: string | string[] }>;
+type S = Promise<{ s?: string | string[]; g?: string | string[] }>;
 
 const one = (v?: string | string[]) => (Array.isArray(v) ? v[0] : v);
 
@@ -46,20 +48,27 @@ function summaryOf(r: SharedResult): string {
 
 export async function SharePage({ kind, params, searchParams }: { kind: ShareKind; params: P; searchParams: S }) {
   const { key } = await params;
-  const r = parseShared(kind, key, one((await searchParams).s));
+  const sp = await searchParams;
+  const r = parseShared(kind, key, one(sp.s), one(sp.g));
   if (!r) redirect(kind === "face" ? "/face2" : `/${kind}`);
   const samguk = kind === "samguk" ? { video: videosForPerson(await getChannelVideos(), r.key).own[0] ?? null, faces: relatedFaces(r.key) } : null;
   const scoreLabel = r.score !== null ? `닮음 ${r.score}%` : null;
+  // 동물상은 링크의 g(f|m)에 맞는 큰 그림이 카드 위에 나온다(g가 없으면 f)
+  const hero = kind === "animal" ? animalArt(r.key as AnimalKey, r.g ?? "f").src : null;
   return (
     <main className="max-w-lg mx-auto px-[22px] pt-8 pb-10">
       <SharedLandingTracker kind={kind} resultId={r.key} />
       <p className="text-sm text-muted">친구가 보낸 결과</p>
       <section className="relative overflow-hidden bg-card border border-line rounded-[30px] px-6 pt-7 pb-6 mt-3">
-        <span className="absolute -right-3 -top-2 pointer-events-none"><MoonDeco size={130} /></span>
+        {!hero && <span className="absolute -right-3 -top-2 pointer-events-none"><MoonDeco size={130} /></span>}
+        {hero && (
+          // eslint-disable-next-line @next/next/no-img-element
+          <img src={hero} alt={`${r.name} 결과 그림`} width={720} height={960} className="relative block -mx-6 -mt-7 mb-5 w-[calc(100%+48px)] max-w-none h-auto aspect-[3/4] object-cover" />
+        )}
         <h1 className="relative font-serif font-bold text-[26px] leading-[1.4] pr-16 break-keep">친구는 {kind === "saju" ? "친구가 풀어 본 사주예요" : kind === "samguk" ? `${josa(r.name, "을", "를")} 닮았대요` : `${josa(r.name, "이", "가")} 나왔어요`}</h1>
         {scoreLabel && <p className="relative text-accent-ink font-medium mt-2">{scoreLabel}</p>}
         <div className="flex gap-4 items-center mt-5">
-          {r.image ? (
+          {hero ? null : r.image ? (
             // eslint-disable-next-line @next/next/no-img-element
             <img src={r.image} alt={`${r.name} 도트 초상화`} className="w-24 h-28 object-cover rounded-2xl [image-rendering:pixelated] flex-none" />
           ) : (

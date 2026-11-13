@@ -19,6 +19,7 @@ import { useEnCopy } from "@/lib/i18n/copy";
 import { localePath } from "@/lib/i18n/locales";
 import { SHARE_PHRASE } from "@/content/en/share";
 import type { UiKey } from "@/lib/i18n/dict";
+import CastSay from "@/components/cast/CastSay";
 import ResultCard, { type ResultCardProps } from "@/components/result/ResultCard";
 import ResultActions from "@/components/result/ResultActions";
 import NextTests from "@/components/result/NextTests";
@@ -43,7 +44,7 @@ function cardProps(r: AnimalTypeResult, t: T, en?: Record<string, AnimalType>, g
     title: data.title,
     summary: en ? data.description.split(". ")[0].replace(/\.?$/, ".") : firstSentence(data.description),
     chips: data.personality.positive.slice(0, 3),
-    art: <img src={animalArt(r.type, g).face} alt={en ? `${data.name} ${t("fm.photoAlt")}` : `${data.name} 그림`} width={104} height={104} className="w-[104px] h-[104px] rounded-full object-cover" />,
+    hero: { src: animalArt(r.type, g).src, alt: en ? `${data.name} result illustration` : `${data.name} 결과 그림` },
     reasons: [
       { label: t("animal.charm"), text: data.charm },
       ...(en ? [] : [{ label: t("animal.face"), text: `${r.features.눈} · 얼굴형 ${r.features.얼굴형}` }]),
@@ -63,6 +64,7 @@ export default function AnimalTypePage() {
   const analyzeStep = useAnalyzeStep(loading, ANALYZE_STEPS.length);
   const steps = [t("analyzing.step1"), t("analyzing.step2"), t("analyzing.step3")];
   const [result, setResult] = useState<AnimalTypeResult | null>(null);
+  const [resultG, setResultG] = useState<"f" | "m">("f"); // 결과를 낸 때 고른 성별의 그림
   const [error, setError] = useState<string | null>(null);
   // 성별: 성별별 얼굴 기준값으로 z 점수를 낸다
   const [gender, setGender] = useRememberedGender(); // 다른 사진 테스트에서 고른 성별을 미리 고른다
@@ -70,7 +72,7 @@ export default function AnimalTypePage() {
   const imageRef = useRef<HTMLImageElement>(null);
 
   const { ref: resultRef, isCapturing, download } = useScreenshot<HTMLElement>();
-  const { busy, notice, share: shareCard } = useResultShare(result ? { testName: 'animal', title: t('animal.shareTitle'), text: en && enAnimals ? SHARE_PHRASE.animal(enAnimals[result.type].name, result.matchScore) : parseShared('animal', result.type, result.matchScore)!.phrase, url: shareUrl('animal', result.type, result.matchScore, locale), imageUrl: ogImageUrl('animal', result.type, result.matchScore, undefined, locale) } : null);
+  const { busy, notice, share: shareCard } = useResultShare(result ? { testName: 'animal', title: t('animal.shareTitle'), text: en && enAnimals ? SHARE_PHRASE.animal(enAnimals[result.type].name, result.matchScore) : parseShared('animal', result.type, result.matchScore)!.phrase, url: shareUrl('animal', result.type, result.matchScore, locale, { g: resultG }), imageUrl: ogImageUrl('animal', result.type, result.matchScore, undefined, locale) } : null);
 
   const d = result ? (enAnimals?.[result.type] ?? result.data) : null;
   const getShareOptions = () => ({
@@ -110,6 +112,7 @@ export default function AnimalTypePage() {
         return;
       }
       const matched = matchAnimal(r.z, animalCalibration.bias);
+      setResultG(artGender(gender));
       setResult(matched);
       track("result_view", { test_name: "animal", result_id: matched.type });
     } catch (err) {
@@ -161,7 +164,8 @@ export default function AnimalTypePage() {
         {/* Result Section */}
         {result && (
           <div className="pb-6 animate-fade-in">
-            <ResultCard captureRef={resultRef} cast="tiger" {...cardProps(result, t, en ? enAnimals : undefined, artGender(gender))} />
+            <div className="mb-3"><CastSay cast="tiger" lineKey="say.animal.reveal" size="sm" locale={locale} /></div>
+            <ResultCard captureRef={resultRef} {...cardProps(result, t, en ? enAnimals : undefined, resultG)} />
             <ResultActions
               from="animal"
               onShare={shareCard}

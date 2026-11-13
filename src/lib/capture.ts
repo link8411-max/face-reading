@@ -15,5 +15,17 @@ export async function settleMotion(el: Element, maxMs = 2500): Promise<void> {
     new Promise((r) => setTimeout(r, maxMs)),
   ])
   el.classList.add('motion-settled')
+  await waitForImages(el)
   await new Promise<void>((r) => requestAnimationFrame(() => requestAnimationFrame(() => r())))
+}
+
+// 카드 안 그림이 모두 불러와질 때까지 기다린다(최대 maxMs). 큰 그림이 덜 불러와진 채 찍으면 빈 칸이 된다. 실패해도 캡처는 진행한다.
+export async function waitForImages(el: Element, maxMs = 3000): Promise<void> {
+  const imgs = [...el.querySelectorAll('img')] as HTMLImageElement[]
+  const pending = imgs.filter((i) => !(i.complete && i.naturalWidth > 0))
+  if (pending.length === 0) return
+  await Promise.race([
+    Promise.all(pending.map((i) => new Promise<void>((r) => { i.addEventListener('load', () => r(), { once: true }); i.addEventListener('error', () => r(), { once: true }) }))),
+    new Promise((r) => setTimeout(r, maxMs)),
+  ])
 }

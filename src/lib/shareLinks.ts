@@ -32,6 +32,10 @@ export function clampScore(s: unknown): number | null {
   return Number.isFinite(n) ? Math.max(50, Math.min(99, Math.round(n))) : null
 }
 
+// 동물상 공유 링크의 그림 성별. f|m만 받고 그 밖의 값은 버린다(착지는 f로 보인다)
+export type ArtG = 'f' | 'm'
+export const parseG = (g: unknown): ArtG | undefined => (g === 'f' || g === 'm' ? g : undefined)
+
 export interface SharedResult {
   kind: ShareKind
   key: string
@@ -40,9 +44,10 @@ export interface SharedResult {
   phrase: string // 1인칭 공유 문구
   testPath: string
   image?: string // 삼국지 도트 초상화
+  g?: ArtG // 동물상: 링크에 담긴 그림 성별(없으면 착지가 f로 보여 준다)
 }
 
-export function parseShared(kind: ShareKind, key: string, s?: unknown): SharedResult | null {
+export function parseShared(kind: ShareKind, key: string, s?: unknown, g?: unknown): SharedResult | null {
   const base = { kind, key, testPath: TEST_PATH[kind] }
   if (kind === 'face') {
     // 객체 프로토타입 키(constructor 등)를 막으려 자기 키만 본다
@@ -64,16 +69,17 @@ export function parseShared(kind: ShareKind, key: string, s?: unknown): SharedRe
   if (kind === 'animal') {
     if (!(ANIMAL_KEYS as readonly string[]).includes(key)) return null
     const name = animalTypeDB[key].name
-    return { ...base, score, name, phrase: `나는 ${name} ${score}% 나왔어. 너는 무슨 상이야?` }
+    return { ...base, score, name, g: parseG(g), phrase: `나는 ${name} ${score}% 나왔어. 너는 무슨 상이야?` }
   }
   const c = samgukCharacters.find((x) => x.id === key)
   if (!c) return null
   return { ...base, score, name: c.name, image: `/images/samguk/${c.name}.jpg`, phrase: `나는 ${josa(c.name, '이랑', '랑')} ${score}% 닮았대. 너는 삼국지 속 누구야?` }
 }
 
-export function shareUrl(kind: ShareKind, key: string, score?: number, locale: Locale = 'ko'): string {
+export function shareUrl(kind: ShareKind, key: string, score?: number, locale: Locale = 'ko', extra?: { g?: ArtG }): string {
   const s = kind === 'face' || kind === 'saju' || score === undefined ? null : clampScore(score)
-  return `${SITE}${localePath(locale, TEST_PATH[kind])}/r/${encodeURIComponent(key)}?${s !== null ? `s=${s}&` : ''}${UTM(kind)}`
+  const g = kind === 'animal' ? parseG(extra?.g) : undefined
+  return `${SITE}${localePath(locale, TEST_PATH[kind])}/r/${encodeURIComponent(key)}?${s !== null ? `s=${s}&` : ''}${g ? `g=${g}&` : ''}${UTM(kind)}`
 }
 
 // MBTI 궁합 공유 링크는 계산기(/mbti/match, 검색 노출·정적)와 다른 주소 /mbti/r/infp-entj (검색 제외)

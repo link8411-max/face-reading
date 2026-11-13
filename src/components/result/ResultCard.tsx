@@ -15,13 +15,47 @@ export interface ResultCardProps {
   reasons: { label: string; text: string }[];
   captureRef?: Ref<HTMLElement>;
   cast?: CastKey; // 있으면 art 기본값이 그 캐릭터 그림
+  hero?: { src: string; alt: string }; // 있으면 카드 위쪽이 3:4 큰 그림(제목·요약·워터마크가 그 위에). art·cast 작은 그림 칸은 그리지 않는다
 }
 
 // 결과 카드 (디자인 시안 ResultCard): 캡처 한 장으로 완결되도록 결과 이름·그림·운 막대·근거·워터마크를 담는다.
-export default function ResultCard({ eyebrow, title, summary, art, bars, chips, reasons, captureRef, cast }: ResultCardProps) {
+export default function ResultCard({ eyebrow, title, summary, art, bars, chips, reasons, captureRef, cast, hero }: ResultCardProps) {
   const ci = cast ? CAST[cast] : null;
   const locale = useLocale();
   const t = useT();
+  if (hero) {
+    // 큰 그림 판(동물상): 그림 위에 닮음 칩·제목·요약·워터마크, 아래에 성격 칩과 근거
+    return (
+      <article ref={captureRef} className="reveal-card relative overflow-hidden bg-card border border-line rounded-[30px] flex flex-col text-ink">
+        <div className="relative">
+          <img src={hero.src} alt={hero.alt} width={720} height={960} className="block w-full h-auto aspect-[3/4] object-cover" style={{ background: ci?.bg }} />
+          <div aria-hidden className="absolute inset-x-0 bottom-0 h-[62%]" style={{ background: "linear-gradient(180deg, rgba(20,26,54,0), rgba(20,26,54,0.9) 55%, var(--color-card))" }} />
+          <div className="absolute inset-x-[22px] bottom-4 flex flex-col gap-2">
+            <span className="self-start px-2.5 py-1 rounded-full bg-lime text-paper text-xs font-bold">{eyebrow}</span>
+            <h2 className="font-serif font-bold text-[26px] leading-[1.35] break-keep">{title}</h2>
+            {summary && <p className="text-[13px] leading-relaxed text-muted">{summary}</p>}
+            <span className="text-[11px] text-muted">{`${t("brand.name")} · unse-ai.com`}</span>
+          </div>
+        </div>
+        <div className="px-[22px] pt-4 pb-5">
+          {(chips ?? []).length > 0 && (
+            <div className="flex flex-wrap gap-1.5">
+              {(chips ?? []).map((c, i) => (
+                <span key={c} className="reveal-pop text-xs bg-card-2 rounded-full px-3 py-1.5" style={{ "--d": `${0.7 + i * 0.12}s` } as React.CSSProperties}>{c}</span>
+              ))}
+            </div>
+          )}
+          <div className="bg-card-2 rounded-[18px] mt-3 px-4 py-3.5 flex flex-col gap-2">
+            {reasons.map((r) => (
+              <p key={r.label} className="text-[13px] leading-relaxed">
+                <span className="font-bold text-accent-ink">{r.label}</span> {r.text}
+              </p>
+            ))}
+          </div>
+        </div>
+      </article>
+    )
+  }
   return (
     <article ref={captureRef} className="reveal-card relative overflow-hidden bg-card border border-line rounded-[30px] px-[22px] pt-6 pb-5 flex flex-col text-ink">
       <svg width="120" height="120" viewBox="0 0 120 120" fill="none" aria-hidden="true" className="absolute -right-2.5 -top-1.5">

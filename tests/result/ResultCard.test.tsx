@@ -50,3 +50,16 @@ test('저장 방법: iOS(사파리·인앱)는 길게 눌러 저장 화면, 그 
   expect(saveMethod('Mozilla/5.0 (Linux; Android 14) Chrome/120')).toBe('download')
   expect(saveMethod('Mozilla/5.0 (Macintosh) Chrome/120')).toBe('download')
 })
+
+test('결과 카드 hero: 큰 그림 하나(720×960, alt)와 워터마크가 있고 작은 그림 칸은 없다', () => {
+  const html = renderToStaticMarkup(<ResultCard {...card} bars={undefined} chips={['친근함']} hero={{ src: '/images/animal/cat-m.webp', alt: '고양이상 결과 그림' }} />)
+  expect(html.match(/<img /g)).toHaveLength(1)
+  expect(html).toContain('src="/images/animal/cat-m.webp"')
+  expect(html).toContain('width="720"')
+  expect(html).toContain('height="960"')
+  expect(html).toContain('alt="고양이상 결과 그림"')
+  expect(html).toContain('운명을 읽다 · unse-ai.com')
+  expect(html).toContain('타고난 재물상')
+  expect(html).toContain('맑은 눈')
+  expect(html).not.toContain('<svg')
+})

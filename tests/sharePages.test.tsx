@@ -56,3 +56,15 @@ test('결과 링크 og:url에 점수가 있다(utm은 없음)', async () => {
   const m = await run('animal', 'cat', '87')
   expect((m.openGraph as { url?: string }).url).toBe('https://unse-ai.com/animal/r/cat?s=87')
 })
+
+import { renderToStaticMarkup } from 'react-dom/server'
+import { SharePage } from '@/components/share/SharePage'
+
+test('동물상 공유 착지: g에 맞는 큰 그림, 없거나 이상한 g면 여자 그림', async () => {
+  const html = async (g?: string) => renderToStaticMarkup(await SharePage({ kind: 'animal', params: Promise.resolve({ key: 'cat' }), searchParams: Promise.resolve({ s: '88', ...(g ? { g } : {}) }) }))
+  expect(await html('m')).toContain('src="/images/animal/cat-m.webp"')
+  expect(await html('f')).toContain('src="/images/animal/cat-f.webp"')
+  expect(await html()).toContain('src="/images/animal/cat-f.webp"')
+  expect(await html('zzz')).toContain('src="/images/animal/cat-f.webp"')
+  expect(await html('m')).toContain('width="720"')
+})
