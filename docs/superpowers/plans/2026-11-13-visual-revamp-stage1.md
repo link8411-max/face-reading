@@ -388,7 +388,7 @@ git commit -m "속도: 페이지 이동 중 뼈대 화면(loading.tsx)"
 **Interfaces:**
 - Consumes: 이미 있는 `prepareLandmarker()`(`src/lib/face/mediapipe.ts:38`). `/face2`·`/animal`·`/samguk`은 이미 마운트 때 부른다(`src/app/face2/page.tsx:52` 형식).
 
-- [ ] **Step 1: 실패하는 테스트**
+- [x] **Step 1: 실패하는 테스트**
 
 ```ts
 import { readFileSync } from 'node:fs'
@@ -412,17 +412,17 @@ test('사진을 받는 모든 테스트 시작 화면이 얼굴 인식 모델을
 
 Run: `npx vitest run tests/modelPrefetch.test.ts` → FAIL.
 
-- [ ] **Step 2: 미리 받기를 더한다**
+- [x] **Step 2: 미리 받기를 더한다**
 
 face-match와 team의 시작 화면 컴포넌트 마운트 효과에 `/face2`와 같은 한 줄을 넣는다:
 `import("@/lib/face/mediapipe").then((m) => m.prepareLandmarker()).catch(() => {});`
 
-- [ ] **Step 3: 전체 확인**
+- [x] **Step 3: 전체 확인**
 
 Run: `npm test && npm run test:e2e`
 Expected: 모두 PASS.
 
-- [ ] **Step 4: 커밋하고 사용자에게 보고**
+- [x] **Step 4: 커밋하고 사용자에게 보고**
 
 ```bash
 git add -A src tests/modelPrefetch.test.ts

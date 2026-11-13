@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import Link from "next/link";
 import CoupangBanner from "@/components/CoupangBanner";
 import { Icon } from "@/components/icons";
@@ -26,6 +26,10 @@ const MAX = 6;
 // 우리 팀 삼국지: 2~6명 사진 → 팀원별 닮은 장수 → 역할·팀의 기운·회사생활 STATUS. 사진은 폰 안에서만 분석한다.
 export default function TeamClient() {
   const [slots, setSlots] = useState<Slot[]>([empty(), empty()]);
+  // 시작 화면에서 얼굴 인식 모델을 미리 받아 둔다(분석 버튼을 누를 때 기다리지 않게)
+  useEffect(() => {
+    import("@/lib/face/mediapipe").then((m) => m.prepareLandmarker()).catch(() => {});
+  }, []);
   const [busy, setBusy] = useState(false);
   const running = useRef(false);
   const [done, setDone] = useState(false);

@@ -39,6 +39,10 @@ export default function FaceMatchClient({ invite }: { invite?: { key: AnimalKey;
     const g = loadGender();
     if (g) setMe((cur) => (cur.gender ? cur : { ...cur, gender: g }));
   }, []);
+  // 시작 화면에서 얼굴 인식 모델을 미리 받아 둔다(분석 버튼을 누를 때 기다리지 않게)
+  useEffect(() => {
+    import("@/lib/face/mediapipe").then((m) => m.prepareLandmarker()).catch(() => {});
+  }, []);
   const [busy, setBusy] = useState(false);
   const running = useRef(false);
   const [done, setDone] = useState(false);
