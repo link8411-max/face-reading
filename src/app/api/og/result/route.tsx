@@ -5,6 +5,8 @@ import { mbtiShared, parseFaceMatch, parseInvite, parseTeam } from '@/lib/shareL
 import { buildTeam } from '@/lib/samguk/team';
 import { REL_NAME } from '@/lib/faceMatch/compat';
 import { ogQueryOk, OG_CACHE_CONTROL } from '@/lib/ogQuery';
+import { castForKind, loadCastImage } from '@/lib/ogCast';
+import { CAST } from '@/content/cast';
 import { parseMbtiDailyKey } from '@/lib/shareLinks';
 import { duelShared } from '@/lib/duel/share';
 import { decodeRunKey } from '@/lib/duel/shareKey';
@@ -91,20 +93,31 @@ export async function GET(request: NextRequest) {
     return new Response('bad request', { status: 400 });
   }
 
+  // 종류별 캐릭터(오른쪽 45%). 그림을 못 받으면 지금 배치(그림 없이)로 그린다. 초상화가 주인공인 종류는 캐릭터가 없다.
+  const castKey = castForKind(kind);
+  const castImg = castKey && !image ? await loadCastImage(castKey, request.url) : undefined;
+  const castBg = castKey ? CAST[castKey].bg : '#EEF1FA';
+  const bigSize = castImg ? (big.length > 8 ? '60px' : '76px') : '96px';
+
   return new ImageResponse(
     (
       <div style={{ width: '100%', height: '100%', display: 'flex', backgroundColor: '#F7F8FC', padding: '48px' }}>
         <div style={{ position: 'relative', flex: 1, display: 'flex', alignItems: 'center', backgroundColor: '#FFFFFF', border: '3px solid #E1E6F5', borderRadius: '48px', padding: '56px 72px', overflow: 'hidden' }}>
-          <div style={{ display: 'flex', flexDirection: 'column', flex: 1 }}>
+          <div style={{ display: 'flex', flexDirection: 'column', flex: 1, maxWidth: castImg ? '600px' : undefined }}>
             <div style={{ display: 'flex', fontSize: '30px', color: '#2D55FF', fontWeight: 700 }}>운명을 읽다 · {label}</div>
-            <div style={{ display: 'flex', fontSize: '96px', fontWeight: 700, color: '#1A1B25', marginTop: '20px', lineHeight: 1.1 }}>{big}</div>
+            <div style={{ display: 'flex', fontSize: bigSize, fontWeight: 700, color: '#1A1B25', marginTop: '20px', lineHeight: 1.1 }}>{big}</div>
             {score ? <div style={{ display: 'flex', fontSize: '52px', fontWeight: 700, color: '#2D55FF', marginTop: '16px' }}>{score}</div> : null}
-            <div style={{ display: 'flex', fontSize: '34px', color: '#5E6070', marginTop: '28px', maxWidth: image ? '640px' : '900px', wordBreak: 'keep-all' }}>{phrase}</div>
+            <div style={{ display: 'flex', fontSize: '34px', color: '#5E6070', marginTop: '28px', maxWidth: image ? '640px' : castImg ? '560px' : '900px', wordBreak: 'keep-all' }}>{phrase}</div>
           </div>
           {image ? (
             // eslint-disable-next-line @next/next/no-img-element
             // @vercel/og는 img src로 ArrayBuffer를 받는다 (엣지 런타임에서 Buffer 없이)
             <img src={image as unknown as string} width={300} height={360} style={{ objectFit: 'cover', borderRadius: '24px', border: '8px solid #23263A' }} alt="" />
+          ) : castImg ? (
+            <div style={{ display: 'flex', position: 'absolute', right: '36px', top: '36px', width: '440px', height: '440px', borderRadius: '50%', backgroundColor: castBg, alignItems: 'center', justifyContent: 'center' }}>
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img src={castImg as unknown as string} width={400} height={400} style={{ objectFit: 'cover', borderRadius: '50%' }} alt="" />
+            </div>
           ) : (
             <div style={{ display: 'flex', position: 'absolute', right: '40px', top: '40px', width: '220px', height: '220px' }}>
               <div style={{ position: 'absolute', right: '40px', top: '30px', width: '180px', height: '180px', borderRadius: '50%', backgroundColor: '#EEF1FA', display: 'flex' }} />

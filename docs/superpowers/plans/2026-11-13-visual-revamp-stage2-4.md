@@ -255,7 +255,7 @@ test('무한 반복 움직임은 분석 중 화면 것뿐', () => {
 - 아이콘: 192·512·180(apple-touch)·96(badge)을 `haetae-face`에서 만든다. 192·512·180은 해태 얼굴을 `#2D55FF` 둥근 사각 위에, badge-96은 흰 단색 실루엣(알림용, 기존 규칙 유지). `favicon.ico`는 32·16을 같은 그림으로.
 - 레이아웃 `theme-color`는 1단계에서 이미 바뀌었다.
 
-- [ ] **Step 1: 실패하는 테스트**
+- [x] **Step 1: 실패하는 테스트**
 
 ```ts
 import { readFileSync } from 'node:fs'
@@ -270,9 +270,9 @@ test('일반 미리보기의 cast 매개변수는 허용 목록만', async () =>
 ```
 (`src/lib/ogCast.ts`에 `castParam(v: string | null): CastKey`와 `castForKind(kind: string): CastKey | null`을 만든다.)
 
-- [ ] **Step 2: 실패 확인 → Step 3: 구현 → Step 4: `npm test` PASS**
-- [ ] **Step 5: 눈으로 확인** — dev 서버에서 `/api/og/result?kind=face&key=earth-mid`, `kind=animal`, `kind=mbti`, `/api/og?title=전체&cast=saja`를 열어 4장을 `test-results/stage2/og-*.png`로 저장하고 글자와 그림이 겹치지 않는지 본다.
-- [ ] **Step 6: 커밋** — `"미리보기 이미지와 사이트 아이콘에 캐릭터"`
+- [x] **Step 2: 실패 확인 → Step 3: 구현 → Step 4: `npm test` PASS**
+- [x] **Step 5: 눈으로 확인** — dev 서버에서 `/api/og/result?kind=face&key=earth-mid`, `kind=animal`, `kind=mbti`, `/api/og?title=전체&cast=saja`를 열어 4장을 `test-results/stage2/og-*.png`로 저장하고 글자와 그림이 겹치지 않는지 본다.
+- [x] **Step 6: 커밋** — `"미리보기 이미지와 사이트 아이콘에 캐릭터"`
 
 ---
 
