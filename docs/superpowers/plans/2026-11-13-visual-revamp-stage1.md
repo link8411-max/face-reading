@@ -341,7 +341,7 @@ git commit -m "속도: 삼국지 초상화 작은 판(webp 256px)을 목록·카
 **Interfaces:**
 - Produces: `PageSkeleton(): JSX.Element` — 제목 줄 하나와 카드 세 개 모양의 회색 덩어리. `role="status"`, `aria-label="불러오는 중"`, 클래스 `no-screenshot`.
 
-- [ ] **Step 1: 실패하는 테스트**
+- [x] **Step 1: 실패하는 테스트**
 
 ```tsx
 import { renderToStaticMarkup } from 'react-dom/server'
@@ -362,13 +362,13 @@ test('뼈대의 반짝임은 움직임 줄이기 설정에서 꺼진다', () => 
 
 Run: `npx vitest run tests/pageSkeleton.test.tsx` → FAIL.
 
-- [ ] **Step 2: 만든다**
+- [x] **Step 2: 만든다**
 
 `PageSkeleton`: `max-w-lg mx-auto px-4 pt-5` 안에 `h-7 w-40 rounded-lg` 한 줄, `h-[200px] rounded-[28px]` 카드 하나, `h-[150px]` 2열 카드 두 개. 색은 `bg-card-2`, 클래스 `skeleton-shimmer`. `globals.css`에 `skeleton-shimmer` 키프레임(밝기 0.6초 왕복)과 `prefers-reduced-motion`에서 끄는 규칙을 더한다.
 
 `src/app/loading.tsx`는 `PageSkeleton`을 그대로 그린다. `src/app/samguk/duel/loading.tsx`는 `bg-cloth` 전체 화면 빈 `div`(뼈대가 게임 위에 번쩍이지 않게).
 
-- [ ] **Step 3: 통과 확인과 커밋**
+- [x] **Step 3: 통과 확인과 커밋**
 
 Run: `npm test` → PASS.
 
