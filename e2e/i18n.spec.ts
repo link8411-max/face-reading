@@ -166,7 +166,7 @@ test('영어 동물상: 사진 → 영어 결과 카드 → 공유 링크는 /en
   await expect(page.locator('a[href^="/bujeok"]')).toHaveCount(0)
   await expect(page.getByText('Match with a friend')).toBeVisible()
   await page.getByRole('button', { name: 'Share', exact: true }).click()
-  await expect.poll(async () => (await shared(page))?.url ?? '').toMatch(/\/en\/animal\/r\/[a-z]+\?s=\d\d&utm_source=share&utm_medium=friend_link/)
+  await expect.poll(async () => (await shared(page))?.url ?? '').toMatch(/\/en\/animal\/r\/[a-z]+\?s=\d\d&g=[fm]&utm_source=share&utm_medium=friend_link/)
   expect((await shared(page)).text).toMatch(/^I'm \d\d% .+ Face\. Which animal are you\?$/)
   expect(errors).toEqual([])
 })

@@ -88,6 +88,49 @@ test('삼국지 이미지 저장: 저장 PNG에 남색 카드 배경이 살아 �
   expect(px[0] + px[1] + px[2], `pixel ${px}`).toBeLessThan(250) // 남색(#23263A ≈ 35+38+58)
 })
 
+// 동물상 이미지 저장: 큰 그림이 다 불러와진 뒤 캡처되어 저장 PNG가 비어 있지 않다
+test('동물상 이미지 저장: 캡처 시점에 카드 안 그림이 불러와져 있고 저장 PNG가 세로로 긴 카드다', async ({ page }) => {
+  test.skip(!existsSync(FACE), '개발용 테스트 얼굴이 없으면 건너뜀')
+  await page.addInitScript(() => { Object.defineProperty(navigator, 'userAgent', { get: () => 'Mozilla/5.0 (Macintosh) Chrome/120' }) })
+  await page.goto('/animal')
+  await page.locator('input[type=file]').setInputFiles(FACE)
+  await page.getByRole('radio', { name: '남자' }).click()
+  await page.getByRole('button', { name: '동물상 찾기' }).click()
+  await expect(page.getByRole('button', { name: '이미지 저장' })).toBeVisible({ timeout: 30000 })
+  const hero = page.locator('article img[width="720"]')
+  await expect(hero).toHaveCount(1)
+  await expect(hero).toHaveAttribute('src', /\/images\/animal\/[a-z]+-m\.webp/)
+  const dl = page.waitForEvent('download', { timeout: 20000 })
+  await page.getByRole('button', { name: '이미지 저장' }).click()
+  // 누른 시점에 카드 그림이 불러와져 있다
+  expect(await hero.evaluate((i: HTMLImageElement) => i.complete && i.naturalWidth > 0)).toBe(true)
+  const buf = await (await dl).createReadStream().then(async (s) => { const c: Buffer[] = []; for await (const x of s!) c.push(x as Buffer); return Buffer.concat(c) })
+  expect(buf.length).toBeGreaterThan(20000)
+  const dim = await page.evaluate(async (b64) => {
+    const img = new Image(); img.src = `data:image/png;base64,${b64}`; await img.decode()
+    const c = document.createElement('canvas'); c.width = img.width; c.height = img.height
+    const ctx = c.getContext('2d')!; ctx.drawImage(img, 0, 0)
+    // 그림이 있는 윗부분이 단색이 아니다(색이 여러 가지)
+    const seen = new Set<string>()
+    for (let y = Math.round(img.height * 0.1); y < img.height * 0.5; y += 20) for (let x = 10; x < img.width; x += 20) seen.add(Array.from(ctx.getImageData(x, y, 1, 1).data.slice(0, 3).map((v) => v >> 4)).join())
+    return { w: img.width, h: img.height, colors: seen.size }
+  }, buf.toString('base64'))
+  expect(dim.h / dim.w, JSON.stringify(dim)).toBeGreaterThan(1.3)
+  expect(dim.colors, JSON.stringify(dim)).toBeGreaterThan(30)
+})
+
+test('동물상 공유 착지: g에 맞는 큰 그림, 이상한 g면 여자 그림, 그림 파일이 뜬다', async ({ page }) => {
+  const errors = trackErrors(page)
+  for (const [q, want] of [['&g=m', 'cat-m'], ['&g=f', 'cat-f'], ['', 'cat-f'], ['&g=zzz', 'cat-f']] as const) {
+    await page.goto(`/animal/r/cat?s=88${q}`)
+    const img = page.locator('main section img[width="720"]')
+    await expect(img).toHaveAttribute('src', new RegExp(`/images/animal/${want}\\.webp`))
+    await expect.poll(() => img.evaluate((i: HTMLImageElement) => i.complete && i.naturalWidth > 0)).toBe(true)
+    await expect(page.getByRole('link', { name: '나도 해보기' })).toBeVisible()
+  }
+  expect(errors).toEqual([])
+})
+
 // 카카오톡(안드로이드) 인앱: blob 다운로드가 "지원하지 않는 파일 형식"으로 실패하던 문제
 test.describe('카카오톡 인앱 브라우저', () => {
   // 서비스 워커가 외부 스크립트를 대신 받으면 차단·가짜 SDK가 적용되지 않으므로 끈다
