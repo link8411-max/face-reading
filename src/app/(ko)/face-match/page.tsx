@@ -16,7 +16,7 @@ export default function FaceMatchPage() {
     <main className="mx-auto px-[22px] max-w-lg">
       <header className="pt-5 pb-1 relative">
         <h1 className="text-sm font-medium text-center">얼굴 궁합 테스트</h1>
-        <LanguageSwitch className="absolute right-[-8px] top-1" />
+        <div className="absolute right-[-8px] top-1"><LanguageSwitch /></div>
       </header>
       <h2 className="mt-4 font-serif font-bold text-[27px] leading-[1.4] break-keep">우리 둘,<br />얼굴 궁합은 몇 점?</h2>
       <p className="mt-2.5 mb-5 text-sm text-muted leading-relaxed">두 사람의 얼굴로 동물상을 찾아 친구·연인·짝사랑 궁합을 알려 드려요.</p>

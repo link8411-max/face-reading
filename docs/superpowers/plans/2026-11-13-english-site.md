@@ -137,8 +137,8 @@
 
 ### Task 6: 마무리 확인
 
-- [ ] **Step 1: 전체 확인** — `npm test && npm run test:e2e`(기존 무관 실패 하나만)
-- [ ] **Step 2: 한국어 HTML 재비교** — Task 2 Step 1의 `before.json`과 지금을 다시 비교(`<title>`·canonical·`html lang`이 모든 한국어 주소에서 같아야 한다. 다른 곳은 `alternates` 링크가 더해진 것뿐).
-- [ ] **Step 3: 스크린숏** — 390px: `/en`, `/en/all`, `/en/face2`, `/en/animal`, `/en/face-match`, `/en/face2/r/earth-mid`, 한국어 `/face2` 머리(언어 메뉴 펼친 상태), 안내 띠가 뜬 `/face2`(쿠키 `lang_suggest=en`을 직접 넣고) → `test-results/i18n/`. 미리보기 `/api/og/result?kind=face&key=earth-mid&lang=en`.
-- [ ] **Step 4: CLAUDE.md** — "언어(한국어·영어)" 절 추가: 폴더 구조(`(ko)`·`en`), 언어 더하는 법, proxy 규칙(로봇 리디렉션 금지), 영어판 범위, 영어판에서 빼는 것(카카오·쿠팡·부적 선물).
-- [ ] **Step 5: 커밋과 보고** — `"영어판 문서"`. 커밋 목록, 테스트 결과, 비교 결과, 스크린숏 경로, 계획과 달라진 점. push 금지.
+- [x] **Step 1: 전체 확인** — `npm test && npm run test:e2e`(기존 무관 실패 하나만)
+- [x] **Step 2: 한국어 HTML 재비교** — Task 2 Step 1의 `before.json`과 지금을 다시 비교(`<title>`·canonical·`html lang`이 모든 한국어 주소에서 같아야 한다. 다른 곳은 `alternates` 링크가 더해진 것뿐).
+- [x] **Step 3: 스크린숏** — 390px: `/en`, `/en/all`, `/en/face2`, `/en/animal`, `/en/face-match`, `/en/face2/r/earth-mid`, 한국어 `/face2` 머리(언어 메뉴 펼친 상태), 안내 띠가 뜬 `/face2`(쿠키 `lang_suggest=en`을 직접 넣고) → `test-results/i18n/`. 미리보기 `/api/og/result?kind=face&key=earth-mid&lang=en`.
+- [x] **Step 4: CLAUDE.md** — "언어(한국어·영어)" 절 추가: 폴더 구조(`(ko)`·`en`), 언어 더하는 법, proxy 규칙(로봇 리디렉션 금지), 영어판 범위, 영어판에서 빼는 것(카카오·쿠팡·부적 선물).
+- [x] **Step 5: 커밋과 보고** — `"영어판 문서"`. 커밋 목록, 테스트 결과, 비교 결과, 스크린숏 경로, 계획과 달라진 점. push 금지.

@@ -203,7 +203,7 @@ export const UI = {
   'item.animal.title': 'Animal Face Test',
   'item.animal.desc': 'Puppy? Cat? Find your match among 8 animals',
   'item.faceMatch.title': 'Face Match',
-  'item.faceMatch.desc': 'How well do two faces match as friends, a couple or a crush?',
+  'item.faceMatch.desc': 'How well do two faces fit together?',
   'all.search': 'Search tests',
   'all.placeholder': 'Search tests (e.g. face, match)',
   'all.none': 'No matching tests. Try another word.',

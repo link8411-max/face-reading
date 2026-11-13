@@ -19,7 +19,7 @@ export default function FaceMatchPage() {
       <main className="mx-auto px-[22px] max-w-lg">
         <header className="pt-5 pb-1 relative">
           <h1 className="text-sm font-medium text-center">{t("en", "fm.title")}</h1>
-          <LanguageSwitch className="absolute right-[-8px] top-1" />
+          <div className="absolute right-[-8px] top-1"><LanguageSwitch /></div>
         </header>
         <h2 className="mt-4 font-serif font-bold text-[27px] leading-[1.4] break-keep">
           {lines[0]}

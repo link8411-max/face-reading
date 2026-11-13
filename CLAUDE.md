@@ -83,8 +83,10 @@ npm run test:e2e     # E2E (next build 후 3200 포트): 전 페이지 로딩·�
 ```
 src/
 ├── app/
-│   ├── page.tsx              # 메인 페이지 (/)
-│   ├── layout.tsx            # 루트 레이아웃 + SEO + PWA
+│   ├── (ko)/                 # 한국어 라우트 그룹(주소 그대로): page.tsx(/)·layout.tsx(루트)·face2·animal 등 아래 한국어 페이지 전부
+│   ├── en/                   # 영어 루트 레이아웃과 영어 페이지(/en/...) — 위 "언어" 절
+│   ├── page.tsx              # (현재는 (ko)/page.tsx) 메인 페이지 (/)
+│   ├── layout.tsx            # (현재는 (ko)/layout.tsx) 루트 레이아웃 + SEO + PWA
 │   ├── manifest.ts           # PWA 매니페스트
 │   ├── face2/page.tsx        # 무료 관상 분석 (/face2) - 무제한
 │   ├── animal/page.tsx       # 동물상 테스트 (/animal)
@@ -149,6 +151,20 @@ public/
 - 결과 사이 연결: `NEXT_BY_TEST`(navigation.ts, 같은 줄기 1 + 다른 줄기 1) → `components/result/NextSteps`("이어서 보면 좋아요"). 사주·신년운세·띠별 글·오늘의 운세·관상·동물상·삼국지·MBTI 유형·MBTI 궁합 계산기에 붙어 있다. 사진 결과에서는 같은 사진 칸을 `NextTests`가 맡으므로 NextSteps는 다른 줄기만 보인다(`withPhoto`). GA `next_test_click(test_name=간 곳)`. 생년월일 넘기기는 사주·신년운세 결과의 부적 카드 하나뿐이다(`handOffBirth`, 메모리로만 전달; 나머지는 링크만). `NEXT_BY_TEST`의 saju·fortune은 이제 서로 대신 부적으로 이어진다.
 - 디자인 토큰·글꼴은 위 "디자인 시스템 (블루·라임)" 참고.
 - 참여자 수·인기 순위 같은 숫자는 실제 집계 전까지 넣지 않는다(테스트로 막음).
+
+## 언어 (한국어·영어, 2026-11-13)
+
+설계 `docs/superpowers/specs/2026-11-13-visual-revamp-design.md` 5.5·5.6절, 계획 `docs/superpowers/plans/2026-11-13-english-site.md`.
+
+- **폴더**: 루트 레이아웃이 둘이다. `src/app/(ko)/`(한국어, `<html lang="ko">`, 주소는 그대로)와 `src/app/en/`(영어, `<html lang="en">`, 주소는 `/en/...`). `api`·`globals.css`·`manifest.ts`·`sitemap.ts`·`favicon.ico`만 `src/app/`에 남는다. 새 한국어 페이지는 `(ko)` 안에 만든다. 두 레이아웃은 `components/SiteShell`(본문 틀·푸터·탭바·방문 통계)·`SiteHead`(head 공통)·`lib/siteFonts`(글꼴)를 같이 쓴다.
+- **언어 목록은 `src/lib/i18n/locales.ts` 한 곳**(`LOCALES`·`LOCALE_LABEL`·`localePath`). 주소 짝·hreflang은 `lib/i18n/alternates.ts`(`EN_PATHS`가 영어판이 있는 한국어 경로, `counterpart`, `languageAlternates`).
+- **언어 하나 더하는 법(예: 일본어)**: ① `locales.ts`의 `LOCALES`·라벨·html lang에 한 줄 ② `src/content/ja/`에 문구 파일(`ui.ts`는 `src/content/ko/ui.ts`와 같은 키 전부) ③ `lib/i18n/dict.ts`의 `DICT`에 한 줄 ④ `src/app/ja/`(루트 레이아웃 + 페이지) ⑤ `alternates.ts`의 경로 규칙과 `sitemap.ts`가 목록을 따라가도록 확인. 문구 파일 키가 어긋나면 `tests/i18n`이 실패한다.
+- **화면 문구**: 공용 컴포넌트는 `useLocale()`/`useT()`(`LocaleProvider`)로 `t(locale, key)`를 쓴다. 한국어 값은 `src/content/ko/ui.ts`에 지금 화면 문구 그대로 있고, 한국어 렌더는 영어판 연결 전과 글자 하나 다르지 않다(`tests/i18n/pages.test.tsx` 스냅숏). 영어 문구는 `src/content/en/*`에서만 가져온다(화면에서 새 영어 문장을 짓지 않는다. 필요하면 `ui.ts` 양쪽에 키를 더한다).
+- **영어 결과 문구(큰 데이터)**는 영어 서버 페이지(`src/app/en/*/page.tsx`)가 `EnCopyProvider`(`lib/i18n/copy.tsx`)로 내려 준다. 한국어 페이지 번들에 영어 문구가 들어가지 않게 하려는 것이다. 영어 페이지는 한국어 페이지 컴포넌트를 그대로 재사용한다(분석·캡처 코드를 복사하지 않는다).
+- **proxy(`src/proxy.ts`, Next 16의 미들웨어 이름)와 로봇 규칙**: 리디렉션은 사용자가 고른 `lang` 쿠키가 있고 그 페이지의 다른 언어판이 있을 때만 한다(`lib/i18n/detect.ts` `decide`). **`lang` 쿠키가 없는 요청(검색 로봇)은 국가·브라우저 언어와 상관없이 절대 리디렉션하지 않는다**(구글 로봇은 주로 미국 IP라 그러면 한국어 페이지가 검색에서 사라진다). 접속 국가(`x-vercel-ip-country`)와 `accept-language`는 해외 방문자에게 `lang_suggest` 쿠키를 심는 데만 쓰고, 그러면 한국어 페이지 위에 "View this page in English" 띠(`LanguageBanner`, 마운트 뒤에만)가 뜬다. 닫으면 `lang=ko`를 기억한다. 언어 메뉴(`LanguageSwitch`)는 `lang` 쿠키를 쓰고 같은 페이지의 다른 언어판으로 가며, 짝이 없으면 그 언어 홈 + `?only=<지금 언어>`(영어 홈이 "This page is only in Korean"을 한 줄 보인다). 테스트 `tests/i18n/detect.test.ts`·`proxy.test.ts`·`e2e/i18n.spec.ts`.
+- **영어판 범위**: `/en`, `/en/all`, `/en/face2`, `/en/animal`, `/en/face-match`와 결과 공유 착지 `/en/face2/r/[key]`·`/en/animal/r/[type]`·`/en/face-match/r/[pair]`(noindex, canonical은 `/en/<테스트>`, 사이트맵 제외). 하단 탭은 Home·All 둘. 나머지 페이지는 한국어만(언어 메뉴를 누르면 영어 홈으로).
+- **영어판에서 빼는 것**: 카카오톡 공유(기본 공유창, 없으면 링크 복사), 쿠팡 배너, 부적 선물 줄(`GiftNudge`), 이어서 보면 좋아요(`NextSteps`), 친구 초대 링크(`/face-match/i`는 한국어만), 동물상의 얼굴 특징 묘사(한국어로만 계산되는 문구). 영어 공유 링크는 `shareUrl(kind, key, score, 'en')`처럼 locale 인자로 `/en` 접두어를 붙이고, 영어 미리보기 이미지는 `/api/og/result?...&lang=en`(`lang`은 `en`만, animal·face·face-match에만 허용).
+- **sitemap/hreflang**: `sitemap.ts`가 영어 주소 5개를 더하고 한국어·영어 항목 모두에 `alternates.languages`(ko·en·x-default=한국어)를 붙인다. 한국어 페이지 metadata에도 `alternates.languages`가 더해졌다(canonical·제목은 그대로).
 
 ## 신년운세 (연도별 갱신)
 - 기준 연도: `src/lib/fortuneYear.ts` (현재 2027 정미년). 해가 바뀌면 이 값과 `fortuneDB.띠별올해`·`오행.*.올해조언`, `src/content/fortune2027Zodiac.ts`(띠별 페이지 본문)를 함께 갱신한다.
@@ -428,8 +444,8 @@ GA: `test_name=bujeok`, `result_view`·`shared_landing`의 `result_id`는 `<화�
 |------|------|
 | 관상 해석 텍스트 수정 | `src/content/guansang.ts` (금지어 테스트 `tests/guansang/copy.test.ts`) |
 | 삼국지 인물 얼굴 프로필 | `src/lib/samguk/profiles.ts` |
-| 무료 관상 UI | `src/app/face2/page.tsx` |
-| 메인 페이지 | `src/app/page.tsx` |
+| 무료 관상 UI | `src/app/(ko)/face2/page.tsx` |
+| 메인 페이지 | `src/app/(ko)/page.tsx` |
 | 페이지 설명 본문/FAQ | `src/content/pageGuides.ts` |
 | 홈 FAQ(화면·구조화 데이터) | `src/content/homeFaq.ts` |
 | 오늘의 운세 문장 | `src/content/dailyFortuneText.ts` (검증 `npx vitest run tests/dailyEngine`) |
