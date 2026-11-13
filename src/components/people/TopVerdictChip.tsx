@@ -11,7 +11,7 @@ export default function TopVerdictChip({ id, options }: { id: string; options: {
   const top = options.reduce((best, o) => (counts[o.key] > counts[best.key] ? o : best), options[0])
   return (
     <p className="mt-2">
-      <span data-top-verdict className="inline-block rounded-full border border-accent/40 bg-card-2 px-3 py-1 text-xs text-accent">
+      <span data-top-verdict className="inline-block rounded-full border border-accent/40 bg-card-2 px-3 py-1 text-xs text-accent-ink">
         많이 고른 평 · {top.label}
       </span>
     </p>

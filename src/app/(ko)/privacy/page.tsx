@@ -32,7 +32,7 @@ export default function PrivacyPage() {
                     <li>입력 항목: 생년월일, 태어난 시간(운세용). 얼굴 사진은 이용자 브라우저 안에서만 분석되며 수집하지 않습니다.</li>
                     <li>자동 수집: IP 주소, 쿠키, 서비스 이용 기록, 접속 로그</li>
                 </ul>
-                <p className="mt-4 font-bold text-accent">
+                <p className="mt-4 font-bold text-accent-ink">
                     ※ 얼굴 사진은 이용자의 브라우저 안에서만 분석되며, 서버나 외부 서비스로 전송되거나 저장되지 않습니다.
                 </p>
             </section>

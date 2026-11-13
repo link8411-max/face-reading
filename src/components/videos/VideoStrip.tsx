@@ -19,7 +19,7 @@ export default function VideoStrip({ videos }: { videos: Video[] }) {
             <span className="text-xs font-bold leading-snug text-ink line-clamp-2">{v.title}</span>
           </TrackedVideoLink>
         ))}
-        <a href="/samguk/videos" className="flex h-[196px] w-[110px] shrink-0 items-center justify-center rounded-2xl border border-line bg-white text-sm font-bold text-accent">
+        <a href="/samguk/videos" className="flex h-[196px] w-[110px] shrink-0 items-center justify-center rounded-2xl border border-line bg-card text-sm font-bold text-accent-ink">
           전체 보기
         </a>
       </div>

@@ -23,7 +23,7 @@ export function OptionButtons({ q, state, cols }: { q: Question; state: OptionSt
         const dimmed = !answered && dim.has(i)
         const motion = isAnswer ? (selected === i ? 'ex-correct' : 'ex-reveal') : isWrongPick ? 'ex-wrong' : dimmed ? 'ex-dim' : ''
         const tone = isAnswer
-          ? 'border-accent bg-card text-accent font-bold'
+          ? 'border-accent bg-card text-accent-ink font-bold'
           : isWrongPick
             ? 'border-line bg-card-2 text-muted line-through'
             : dimmed || answered

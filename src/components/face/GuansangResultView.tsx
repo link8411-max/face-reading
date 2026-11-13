@@ -40,7 +40,7 @@ export default function GuansangResultView({ result, captureRef, actions, after 
         {SHAPES[result.shape].traditional} · {ZONES[result.zone].traditional} · {en?.schoolNote ?? SCHOOL_NOTE}
       </p>
 
-      <section className="mt-4 bg-white border border-line rounded-[22px] px-5 py-4 no-screenshot">
+      <section className="mt-4 bg-card border border-line rounded-[22px] px-5 py-4 no-screenshot">
         <h3 className="font-serif font-bold text-base">{tr("face.why")}</h3>
         <p className="mt-2 text-sm leading-relaxed">{en ? `${SHAPES[result.shape].evidence} ${ZONES[result.zone].evidence}` : evidenceText(result.shape, result.zone)}</p>
         {result.foreheadUncertain && <p className="mt-2 text-xs text-muted leading-relaxed">{en?.foreheadNote ?? FOREHEAD_NOTE}</p>}
@@ -51,7 +51,7 @@ export default function GuansangResultView({ result, captureRef, actions, after 
       <section className="no-screenshot mt-4 bg-card-2 rounded-[22px] px-5 py-4">
         <h3 className="font-serif font-bold text-base">{tr("face.caution")}</h3>
         <p className="mt-2 text-sm leading-relaxed">{t.caution.situation}</p>
-        <p className="mt-1.5 text-sm leading-relaxed text-accent">{t.caution.action}</p>
+        <p className="mt-1.5 text-sm leading-relaxed text-accent-ink">{t.caution.action}</p>
       </section>
 
       <section className="no-screenshot mt-3 bg-card-2 rounded-[22px] px-5 py-4">

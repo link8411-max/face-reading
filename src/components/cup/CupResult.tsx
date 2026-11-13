@@ -34,9 +34,9 @@ export default function CupResult({ board, title, champion, path, top5 }: Props)
 
   return (
     <div className="mt-5 text-center">
-      <p className="text-sm font-bold text-accent">{title} 월드컵</p>
+      <p className="text-sm font-bold text-accent-ink">{title} 월드컵</p>
       <h2 className="mt-1 font-serif text-xl font-bold">나의 최애 장수</h2>
-      <div className="mt-4 rounded-[30px] border border-line bg-white p-4">
+      <div className="mt-4 rounded-[30px] border border-line bg-card p-4">
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img src={champion.portrait} alt={`${champion.name} 초상`} width={224} height={280} className="mx-auto aspect-[4/5] w-56 max-w-full rounded-[22px] border border-line object-cover" />
         <p className="mt-3 font-serif text-[27px] font-bold leading-tight break-keep">{champion.name}</p>
@@ -64,11 +64,11 @@ export default function CupResult({ board, title, champion, path, top5 }: Props)
         )}
         <Link
           href={`/samguk/people/${champion.id}`}
-          className="flex h-[52px] w-full items-center justify-center rounded-full border border-line bg-white px-4 font-medium"
+          className="flex h-[52px] w-full items-center justify-center rounded-full border border-line bg-card px-4 font-medium"
         >
           {champion.name} 열전 보기
         </Link>
-        <Link href="/samguk/cup" className="flex h-[52px] w-full items-center justify-center rounded-full border border-line bg-white px-4 font-medium">
+        <Link href="/samguk/cup" className="flex h-[52px] w-full items-center justify-center rounded-full border border-line bg-card px-4 font-medium">
           다른 판 하기
         </Link>
       </div>
@@ -78,7 +78,7 @@ export default function CupResult({ board, title, champion, path, top5 }: Props)
           <h3 className="font-serif text-lg font-bold">{title} 우승 순위</h3>
           <ol className="mt-3 space-y-2">
             {top5.map((r, i) => (
-              <li key={r.id} className="flex items-center gap-3 rounded-full border border-line bg-white px-4 py-2.5 text-sm">
+              <li key={r.id} className="flex items-center gap-3 rounded-full border border-line bg-card px-4 py-2.5 text-sm">
                 <span className="w-6 text-center font-bold tabular-nums">{i + 1}</span>
                 <span className="font-medium">{r.name}</span>
                 <span className="ml-auto text-xs text-muted tabular-nums">{r.n}번 우승</span>

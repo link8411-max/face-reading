@@ -54,7 +54,7 @@ export default async function PeopleHubPage() {
     <div className="min-h-screen bg-paper text-ink">
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumb) }} />
       <main className="mx-auto px-[22px] max-w-lg pt-6 pb-12">
-        <p className="text-sm font-bold text-accent">삼국지 인물열전</p>
+        <p className="text-sm font-bold text-accent-ink">삼국지 인물열전</p>
         <h1 className="mt-1 font-serif font-bold text-[27px] leading-[1.3] break-keep">천하를 눌러 영웅을 만나 보세요</h1>
         <p className="mt-2 text-sm leading-relaxed text-muted break-keep">
           위·촉·오 삼국지 인물 {PEOPLE_IDS.length}명의 열전과 관계도예요. 지도에서 세력을 누르면 그 세력 인물만 모아 볼 수 있어요.
@@ -63,18 +63,18 @@ export default async function PeopleHubPage() {
         <PeopleBrowser cards={cards} afterMap={<VideoStrip videos={videos} />} />
 
         <nav aria-label="바로가기" className="mt-8 grid grid-cols-2 gap-3">
-          <a href="#relations" className="rounded-[22px] border border-line bg-white px-4 py-4 hover:border-accent/50 transition">
-            <Icon name="users" className="text-accent" />
+          <a href="#relations" className="rounded-[22px] border border-line bg-card px-4 py-4 hover:border-accent/50 transition">
+            <Icon name="users" className="text-accent-ink" />
             <span className="mt-2 block font-bold">관계도 보기</span>
             <span className="mt-0.5 block text-xs text-muted">세력별 관계도·관계 글</span>
           </a>
-          <Link href="/samguk/people/ranking" className="rounded-[22px] border border-line bg-white px-4 py-4 hover:border-accent/50 transition">
-            <Icon name="heart" className="text-accent" />
+          <Link href="/samguk/people/ranking" className="rounded-[22px] border border-line bg-card px-4 py-4 hover:border-accent/50 transition">
+            <Icon name="heart" className="text-accent-ink" />
             <span className="mt-2 block font-bold">응원 순위</span>
             <span className="mt-0.5 block text-xs text-muted">가장 응원받는 장수</span>
           </Link>
-          <Link href="/samguk/cup" className="col-span-2 rounded-[22px] border border-line bg-white px-4 py-4 hover:border-accent/50 transition">
-            <Icon name="shield" className="text-accent" />
+          <Link href="/samguk/cup" className="col-span-2 rounded-[22px] border border-line bg-card px-4 py-4 hover:border-accent/50 transition">
+            <Icon name="shield" className="text-accent-ink" />
             <span className="mt-2 block font-bold">장수 월드컵</span>
             <span className="mt-0.5 block text-xs text-muted">이야기를 읽고 고르는 장수 토너먼트</span>
           </Link>
@@ -87,7 +87,7 @@ export default async function PeopleHubPage() {
             {groups.map((g) => {
               const label = factionLabel(g.faction);
               return (
-                <details key={g.faction} className="bg-white rounded-[22px] border border-line px-5 py-4">
+                <details key={g.faction} className="bg-card rounded-[22px] border border-line px-5 py-4">
                   <summary className="cursor-pointer">
                     <h3 className="inline font-serif font-bold text-lg">{label}</h3>
                     <span className="ml-2 text-xs text-muted">{g.ids.length}명</span>

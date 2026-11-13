@@ -31,9 +31,9 @@ export default function NextTests({ current, image }: { current: PhotoTest; imag
             key={k}
             href={localePath(locale, TESTS[k].href)}
             onClick={() => { handOffPhoto(image); track("next_test_click", { test_name: k }); }}
-            className="bg-white border border-line rounded-[22px] px-4 py-3.5 flex flex-col gap-1.5"
+            className="bg-card border border-line rounded-[22px] px-4 py-3.5 flex flex-col gap-1.5"
           >
-            <Icon name={TESTS[k].icon} size={20} className="text-accent" />
+            <Icon name={TESTS[k].icon} size={20} className="text-accent-ink" />
             <span className="text-[15px] font-bold">{locale === "en" && TESTS[k].qKey ? t(TESTS[k].qKey!) : TESTS[k].question}</span>
             <span className="text-xs text-muted flex items-center gap-0.5">{t("next.sameFace")} <Icon name="chevron" size={14} /></span>
           </Link>

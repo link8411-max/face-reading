@@ -29,7 +29,7 @@ export default function ResultCard({ eyebrow, title, summary, art, bars, chips, 
         <circle cx="90" cy="36" r="29" fill="#EEF1FA" />
         <path d="M26 26l2 5 5 2-5 2-2 5-2-5-5-2 5-2z" fill="#2D55FF" />
       </svg>
-      <p className="relative text-xs font-medium text-accent">{eyebrow}</p>
+      <p className="relative text-xs font-medium text-accent-ink">{eyebrow}</p>
       <h2 className="relative font-serif font-bold text-[25px] leading-[1.4] mt-2 pr-16 break-keep">{title}</h2>
       {summary && <p className="relative text-[13px] leading-relaxed text-muted mt-2">{summary}</p>}
 
@@ -67,7 +67,7 @@ export default function ResultCard({ eyebrow, title, summary, art, bars, chips, 
       <div className="bg-card-2 rounded-[18px] mt-4 px-4 py-3.5 flex flex-col gap-2">
         {reasons.map((r) => (
           <p key={r.label} className="text-[13px] leading-relaxed">
-            <span className="font-bold text-accent">{r.label}</span> {r.text}
+            <span className="font-bold text-accent-ink">{r.label}</span> {r.text}
           </p>
         ))}
       </div>

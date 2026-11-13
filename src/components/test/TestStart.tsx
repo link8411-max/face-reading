@@ -25,7 +25,7 @@ function ErrorNote({ text }: { text: string }) {
     ref.current?.scrollIntoView({ block: "nearest", behavior: "smooth" });
   }, [text]);
   return (
-    <p ref={ref} role="alert" className="mt-4 rounded-[18px] bg-white border border-accent/40 text-accent text-sm p-3 text-center animate-shake-x">
+    <p ref={ref} role="alert" className="mt-4 rounded-[18px] bg-card border border-accent/40 text-accent-ink text-sm p-3 text-center animate-shake-x">
       {text}
     </p>
   );
@@ -91,10 +91,10 @@ export default function TestStart({
 
       <div className="flex flex-wrap gap-2 mt-3.5">
         {tips.map((t) => (
-          <span key={t} className="text-xs text-muted bg-white border border-line rounded-full px-3 py-[7px]">{t}</span>
+          <span key={t} className="text-xs text-muted bg-card border border-line rounded-full px-3 py-[7px]">{t}</span>
         ))}
         {image && (
-          <button type="button" onClick={() => { if (fileRef.current) fileRef.current.value = ""; onReset(); }} className="text-xs text-ink bg-white border border-line rounded-full px-3 py-[7px]">
+          <button type="button" onClick={() => { if (fileRef.current) fileRef.current.value = ""; onReset(); }} className="text-xs text-ink bg-card border border-line rounded-full px-3 py-[7px]">
             {t("start.anotherPhoto")}
           </button>
         )}
@@ -102,8 +102,8 @@ export default function TestStart({
 
       {error && <ErrorNote text={error} />}
 
-      <div className="mt-7 flex items-center gap-2.5 bg-white rounded-[18px] px-3.5 py-3">
-        <Icon name="shield" size={20} className="text-accent flex-none" />
+      <div className="mt-7 flex items-center gap-2.5 bg-card rounded-[18px] px-3.5 py-3">
+        <Icon name="shield" size={20} className="text-accent-ink flex-none" />
         <span className="text-xs leading-normal text-muted">{t("privacy.line")}</span>
       </div>
       <button

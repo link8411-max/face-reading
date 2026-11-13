@@ -44,7 +44,7 @@ export default function PersonVideos({ id, name, videos }: { id: string; name: s
             <Link
               key={o.id}
               href={`/samguk/people/${o.id}`}
-              className="flex items-center gap-1.5 rounded-full border border-line bg-white py-[3px] pl-[3px] pr-2.5 text-[13px]"
+              className="flex items-center gap-1.5 rounded-full border border-line bg-card py-[3px] pl-[3px] pr-2.5 text-[13px]"
             >
               {o.portrait ? (
                 // eslint-disable-next-line @next/next/no-img-element

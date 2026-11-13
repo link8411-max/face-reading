@@ -1,14 +1,15 @@
 @import "tailwindcss";
 
-/* 디자인 토큰: 시안 B(블루·라임, 2026-11-13): bg-paper, bg-card, text-ink, text-accent 등으로 쓴다 */
+/* 디자인 토큰: 밤 시안(2026-11-14): bg-paper, bg-card, text-ink, text-accent-ink 등으로 쓴다 */
 @theme {
-  --color-paper: #F7F8FC;
-  --color-card: #FFFFFF;
-  --color-card-2: #EEF1FA;
-  --color-line: #E1E6F5;
-  --color-ink: #1A1B25;
-  --color-muted: #5E6070;
-  --color-accent: #2D55FF;
+  --color-paper: #0B1026;
+  --color-card: #141A36;
+  --color-card-2: #1B2246;
+  --color-line: #2A3360;
+  --color-ink: #EEF0FA;
+  --color-muted: #A3A9C6;
+  --color-accent: #3E5BFF; /* 버튼 바탕(흰 글씨). 어두운 바탕 위 글자는 accent-ink */
+  --color-accent-ink: #9DB2FF;
   --color-lime: #C6F24E;
   --color-blush: #E9BCA8;
   --color-navy-game: #23263A;
@@ -29,6 +30,8 @@
   --color-cloth: #1E3A24;
   --color-cloth-2: #27482C;
 }
+
+html { color-scheme: dark; }
 
 @theme inline {
   --font-sans: var(--font-pretendard);
@@ -333,11 +336,11 @@
   --color-card: #1C1712;
   --color-card-2: #241D16;
   --color-accent: #F2B08A;
+  --color-accent-ink: #F2B08A;
   min-height: 100vh;
   color: #EADFC8;
   background: radial-gradient(120% 60% at 50% 18%, #2A2219 0%, #15110D 55%, #0E0B09 100%) top / 100% 100vh no-repeat, #0E0B09;
 }
-.bj-dark .bg-white { background-color: #1C1712; }
 /* 먹빛 화면(.bj-dark)이 있는 페이지는 공용 푸터·하단 탭바도 먹빛을 따른다(모양은 그대로, 색 토큰만 바꿈). 다른 페이지는 .bj-dark가 없어 그대로 */
 body:has(.bj-dark) { background-color: #0E0B09; }
 body:has(.bj-dark) footer, body:has(.bj-dark) nav[aria-label='하단 메뉴'] {
@@ -345,6 +348,7 @@ body:has(.bj-dark) footer, body:has(.bj-dark) nav[aria-label='하단 메뉴'] {
   --color-muted: #B9AC94;
   --color-line: #3A2F22;
   --color-accent: #F2B08A;
+  --color-accent-ink: #F2B08A;
   --color-card-2: #15110D;
 }
 body:has(.bj-dark) footer { background-color: #15110D; }

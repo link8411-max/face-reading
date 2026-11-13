@@ -16,7 +16,7 @@ function Face({ face, size, className = '' }: { face: Faces[string] | undefined;
     // eslint-disable-next-line @next/next/no-img-element
     <img src={portraitThumb(face.portrait)} alt="" style={box} loading="lazy" decoding="async" className={`rounded-full object-cover [image-rendering:pixelated] ${className}`} />
   ) : (
-    <span style={box} className={`flex items-center justify-center rounded-full border border-dashed border-line bg-white text-[11px] text-muted ${className}`}>
+    <span style={box} className={`flex items-center justify-center rounded-full border border-dashed border-line bg-card text-[11px] text-muted ${className}`}>
       {face.name.charAt(0)}
     </span>
   )
@@ -103,7 +103,7 @@ export default function VideosBrowser({ videos, faces }: { videos: Video[]; face
             type="button"
             aria-pressed={filter === null}
             onClick={() => setFilter(null)}
-            className={`flex h-9 shrink-0 items-center rounded-full border px-3 text-[13px] ${filter === null ? 'border-ink bg-ink text-paper' : 'border-line bg-white'}`}
+            className={`flex h-9 shrink-0 items-center rounded-full border px-3 text-[13px] ${filter === null ? 'border-ink bg-ink text-paper' : 'border-line bg-card'}`}
           >
             {`전체 ${videos.length}`}
           </button>
@@ -113,7 +113,7 @@ export default function VideosBrowser({ videos, faces }: { videos: Video[]; face
               type="button"
               aria-pressed={filter === c.id}
               onClick={() => setFilter(filter === c.id ? null : c.id)}
-              className={`flex h-9 shrink-0 items-center gap-1.5 rounded-full border py-0 pl-1 pr-3 text-[13px] ${filter === c.id ? 'border-ink bg-ink text-paper' : 'border-line bg-white'}`}
+              className={`flex h-9 shrink-0 items-center gap-1.5 rounded-full border py-0 pl-1 pr-3 text-[13px] ${filter === c.id ? 'border-ink bg-ink text-paper' : 'border-line bg-card'}`}
             >
               <Face face={faces[c.id]} size={28} />
               {c.n >= 2 ? `${faces[c.id].name} ${c.n}` : faces[c.id].name}
@@ -135,7 +135,7 @@ export default function VideosBrowser({ videos, faces }: { videos: Video[]; face
                 <span className="relative block aspect-[9/16] w-full overflow-hidden rounded-2xl bg-navy-game">
                   {/* eslint-disable-next-line @next/next/no-img-element */}
                   <img src={v.thumbnail} alt={`${v.title} 썸네일`} loading="lazy" className="absolute inset-0 h-full w-full object-cover" />
-                  {fresh && <span className="absolute left-2 top-2 rounded-full bg-accent px-2 py-[3px] text-[11px] font-bold text-paper">NEW</span>}
+                  {fresh && <span className="absolute left-2 top-2 rounded-full bg-accent px-2 py-[3px] text-[11px] font-bold text-white">NEW</span>}
                   <span className="absolute bottom-1.5 left-1.5 flex">
                     {v.people.slice(0, 3).map((p) => (
                       <Face key={p} face={faces[p]} size={24} className="-mr-1.5 border-2 border-paper" />

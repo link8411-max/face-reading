@@ -23,7 +23,7 @@ export default function DaeunTimeline({ daeun, dayStem }: { daeun: SajuResult["d
               <p className="text-base font-bold leading-none">{d.countingAge}~{d.countingAge + 9}세</p>
               <p className="mt-2 text-[11px] leading-snug break-keep">&lsquo;{TEN_GOD_COPY[tenGod].period}&rsquo;</p>
               <p className="mt-2 text-[10px] text-muted" lang="zh">{d.hanja}</p>
-              {d.isCurrent && <p className="mt-1 text-[10px] text-accent font-bold">지금</p>}
+              {d.isCurrent && <p className="mt-1 text-[10px] text-accent-ink font-bold">지금</p>}
             </li>
           ))}
         </ul>

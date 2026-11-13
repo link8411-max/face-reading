@@ -26,7 +26,7 @@ export interface FormValues {
   from: string
 }
 
-const inputCls = 'w-full px-4 py-3 bg-white border border-line rounded-xl text-center text-lg text-ink focus:outline-none focus:ring-2 focus:ring-accent/40 placeholder-muted/60'
+const inputCls = 'w-full px-4 py-3 bg-card border border-line rounded-xl text-center text-lg text-ink focus:outline-none focus:ring-2 focus:ring-accent/40 placeholder-muted/60'
 
 function Fold({ id, open, onToggle, title, children }: { id: string; open: boolean; onToggle: () => void; title: ReactNode; children: ReactNode }) {
   return (
@@ -128,7 +128,7 @@ export default function BujeokForm({
             aria-describedby={nameError ? 'bujeok-name-err' : undefined}
             className={inputCls}
           />
-          {nameError && <p id="bujeok-name-err" role="status" className="mt-2 text-sm text-center text-accent">{nameError}</p>}
+          {nameError && <p id="bujeok-name-err" role="status" className="mt-2 text-sm text-center text-accent-ink">{nameError}</p>}
           <p className="text-sm font-medium mt-4 mb-1"><label htmlFor="bujeok-from">보내는 사람 이름</label> <span className="text-muted font-normal">(선택)</span></p>
           <input
             id="bujeok-from"
@@ -142,7 +142,7 @@ export default function BujeokForm({
             aria-describedby={fromError ? 'bujeok-from-err' : undefined}
             className={inputCls}
           />
-          {fromError && <p id="bujeok-from-err" role="status" className="mt-2 text-sm text-center text-accent">{fromError}</p>}
+          {fromError && <p id="bujeok-from-err" role="status" className="mt-2 text-sm text-center text-accent-ink">{fromError}</p>}
         </div>
       )}
 
@@ -178,7 +178,7 @@ export default function BujeokForm({
                 aria-checked={on}
                 aria-label={STYLE_LABEL[s]}
                 onClick={() => set({ style: s })}
-                className={`rounded-[22px] p-3 text-center border transition ${on ? 'border-[#E9C46A] bg-card-2' : 'border-line bg-white'}`}
+                className={`rounded-[22px] p-3 text-center border transition ${on ? 'border-[#E9C46A] bg-card-2' : 'border-line bg-card'}`}
               >
                 <span aria-hidden className="block mx-auto w-[88px] rounded-xl bg-[#1c1512] p-1.5">
                   <BujeokSvg spec={{ style: s, wish, el: WISH_DEFAULT_EL[wish], variant: 0, finish }} name={null} lite className="block w-full h-auto" />
@@ -201,7 +201,7 @@ export default function BujeokForm({
                 aria-checked={on}
                 aria-label={FINISH_LABEL[f]}
                 onClick={() => set({ finish: f })}
-                className={`rounded-[18px] px-2 py-3 text-center border transition ${on ? 'border-[#E9C46A] bg-card-2' : 'border-line bg-white'}`}
+                className={`rounded-[18px] px-2 py-3 text-center border transition ${on ? 'border-[#E9C46A] bg-card-2' : 'border-line bg-card'}`}
               >
                 <span className="block text-sm font-medium">{FINISH_LABEL[f]}</span>
                 <span className="block text-xs text-muted break-keep">{FINISH_HINT[f]}</span>
@@ -223,7 +223,7 @@ export default function BujeokForm({
                 type="button"
                 onClick={() => set({ isLunar: lunar, isLeap: lunar ? values.isLeap : false })}
                 aria-pressed={values.isLunar === lunar}
-                className={`h-11 px-5 rounded-full text-sm font-medium border transition ${values.isLunar === lunar ? 'bg-ink text-paper border-transparent' : 'bg-white text-ink border-line'}`}
+                className={`h-11 px-5 rounded-full text-sm font-medium border transition ${values.isLunar === lunar ? 'bg-ink text-paper border-transparent' : 'bg-card text-ink border-line'}`}
               >
                 {lunar ? '음력' : '양력'}
               </button>
@@ -252,7 +252,7 @@ export default function BujeokForm({
             aria-describedby={nameError ? 'bujeok-name-err' : undefined}
             className={inputCls}
           />
-          {nameError && <p id="bujeok-name-err" role="status" className="mt-2 text-sm text-center text-accent">{nameError}</p>}
+          {nameError && <p id="bujeok-name-err" role="status" className="mt-2 text-sm text-center text-accent-ink">{nameError}</p>}
         </Fold>
       )}
     </div>

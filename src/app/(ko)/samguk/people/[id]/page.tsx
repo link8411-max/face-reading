@@ -105,7 +105,7 @@ export default async function PersonPage({ params }: Props) {
     ],
   };
 
-  const detailsClass = "bg-white rounded-[22px] border border-line px-5 py-4";
+  const detailsClass = "bg-card rounded-[22px] border border-line px-5 py-4";
   const summaryClass = "font-serif font-bold text-lg cursor-pointer";
 
   return (
@@ -128,7 +128,7 @@ export default async function PersonPage({ params }: Props) {
           <p className="leading-relaxed">{p.summary}</p>
           <ul className="mt-3 flex flex-wrap gap-2">
             {p.tags.map((t) => (
-              <li key={t} className="rounded-full border border-line bg-white px-3 py-1 text-xs">{t}</li>
+              <li key={t} className="rounded-full border border-line bg-card px-3 py-1 text-xs">{t}</li>
             ))}
           </ul>
           <div className="mt-4 bg-card-2 rounded-[22px] px-5 py-4">
@@ -169,7 +169,7 @@ export default async function PersonPage({ params }: Props) {
         {/* 6. 한눈에 보기 */}
         <section className="mt-6">
           <h2 className="font-serif font-bold text-lg mb-3">{c.name} 한눈에 보기</h2>
-          <dl className="bg-white rounded-[22px] border border-line px-5 py-4 space-y-3 text-sm leading-relaxed">
+          <dl className="bg-card rounded-[22px] border border-line px-5 py-4 space-y-3 text-sm leading-relaxed">
             <div>
               <dt className="text-xs text-muted">이름 뜻</dt>
               <dd>{p.nameMeaning}</dd>
@@ -286,7 +286,7 @@ export default async function PersonPage({ params }: Props) {
               {related.map((r, i) => (
                 <li key={`${r.otherId ?? r.otherName}-${i}`}>
                   {r.hasPage && r.otherId ? (
-                    <Link href={`/samguk/people/${r.otherId}`} className="flex items-center justify-between rounded-full border border-line bg-white px-4 py-2.5 text-sm hover:border-accent/50 transition">
+                    <Link href={`/samguk/people/${r.otherId}`} className="flex items-center justify-between rounded-full border border-line bg-card px-4 py-2.5 text-sm hover:border-accent/50 transition">
                       <span>{r.otherName}</span>
                       <span className="text-xs text-muted">{r.label}</span>
                     </Link>

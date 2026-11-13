@@ -76,7 +76,7 @@ export default function GiftLanding({ spec, mine = false, ad }: { spec: BujeokSp
               {saving ? '이미지 만드는 중…' : '잠금화면으로 간직하기'}
             </button>
             {saveNotice && <p role="status" className="mt-2 text-xs text-center text-muted">{saveNotice}</p>}
-            <Link href={`/bujeok?mode=gift&style=${spec.style}&finish=${spec.finish}`} className={`mt-2 ${big} bg-white text-ink border border-line`}>
+            <Link href={`/bujeok?mode=gift&style=${spec.style}&finish=${spec.finish}`} className={`mt-2 ${big} bg-card text-ink border border-line`}>
               <Icon name="heart" size={18} />
               {mine ? '친구에게도 하나 선물하기' : '나도 하나 보내기'}
             </Link>

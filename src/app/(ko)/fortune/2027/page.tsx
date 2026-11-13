@@ -59,7 +59,7 @@ export default function Zodiac2027Hub() {
           {ZODIAC_SLUGS.map((s) => {
             const z = zodiac2027[s];
             return (
-              <Link key={s} href={`/fortune/2027/${s}`} className="bg-white rounded-[22px] border border-line p-4 hover:border-accent/50">
+              <Link key={s} href={`/fortune/2027/${s}`} className="bg-card rounded-[22px] border border-line p-4 hover:border-accent/50">
                 <div className="font-serif font-bold text-lg">{z.띠}띠</div>
                 <div className="text-xs text-muted">{birthYears(s).slice(-3).join(" · ")}년생</div>
               </Link>
@@ -68,7 +68,7 @@ export default function Zodiac2027Hub() {
         </div>
         <section>
           <h2 className={h2}>12띠 한눈에 비교</h2>
-          <div className="overflow-x-auto rounded-[22px] border border-line bg-white">
+          <div className="overflow-x-auto rounded-[22px] border border-line bg-card">
             <table className="w-full text-sm">
               <caption className="caption-top text-left text-xs text-muted px-3 py-2">{FORTUNE_YEAR.year} {FORTUNE_YEAR.간지}년 12띠 한 줄 비교</caption>
               <thead>
@@ -84,7 +84,7 @@ export default function Zodiac2027Hub() {
                   return (
                     <tr key={s} className="border-t border-line align-top">
                       <th scope="row" className="px-3 py-2 text-left font-normal whitespace-nowrap">
-                        <Link href={`/fortune/2027/${s}`} className="font-bold text-accent">{z.띠}띠</Link>
+                        <Link href={`/fortune/2027/${s}`} className="font-bold text-accent-ink">{z.띠}띠</Link>
                         <div className="text-xs text-muted">{birthYears(s).slice(-2).join("·")}년생</div>
                       </th>
                       <td className="px-3 py-2">{z.올해관계}</td>
@@ -103,13 +103,13 @@ export default function Zodiac2027Hub() {
             {samjae.map((s, i) => (
               <span key={s}>
                 {i > 0 && "·"}
-                <Link href={`/fortune/2027/${s}`} className="font-bold text-accent">{zodiac2027[s].띠}띠</Link>
+                <Link href={`/fortune/2027/${s}`} className="font-bold text-accent-ink">{zodiac2027[s].띠}띠</Link>
               </span>
             ))}
             {SAMJAE_LEAD_END} {SAMJAE_TAIL} {SAMJAE_NOTE}
           </p>
           <p className="mt-3">
-            <Link href="/bujeok?wish=samjae" className="font-bold text-accent">삼재 막이 부적 만들기</Link>
+            <Link href="/bujeok?wish=samjae" className="font-bold text-accent-ink">삼재 막이 부적 만들기</Link>
           </p>
         </section>
         <ContentCta href="/face2" title="띠 운세 봤으면 내 얼굴 관상도?" desc="사진 한 장이면 관상 풀이가 1분 안에 나와요. 사진은 저장하지 않아요." label="내 관상 보기" />
@@ -117,7 +117,7 @@ export default function Zodiac2027Hub() {
           <h2 className={h2}>자주 묻는 질문</h2>
           <div className="space-y-2">
             {faqs.map((f) => (
-              <details key={f.q} className="bg-white rounded-[18px] border border-line px-4 py-3">
+              <details key={f.q} className="bg-card rounded-[18px] border border-line px-4 py-3">
                 <summary className="font-medium cursor-pointer">{f.q}</summary>
                 <p className="mt-2 leading-relaxed">{f.a}</p>
               </details>

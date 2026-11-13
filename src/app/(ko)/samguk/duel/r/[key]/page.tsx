@@ -42,7 +42,7 @@ export default async function DuelSharePage({ params }: Props) {
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img src={d.image} alt={`${d.starterName} 도트 초상화`} className="w-24 h-28 object-cover rounded-2xl border-4 border-gold-game [image-rendering:pixelated] flex-none" />
           <div>
-            <p className="text-accent font-medium">{k.cleared ? "클리어" : `${k.wave}번째 싸움`}</p>
+            <p className="text-accent-ink font-medium">{k.cleared ? "클리어" : `${k.wave}번째 싸움`}</p>
             <h1 className="font-serif font-bold text-[22px] leading-[1.45] mt-1 break-keep">{d.headline}</h1>
           </div>
         </div>

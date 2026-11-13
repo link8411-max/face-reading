@@ -402,7 +402,7 @@ function CardInner({ spec, name, from, enter = false, hideSeal, madeAt }: Bujeok
   const stageStyle = { touchAction: 'pan-y', '--ar': `${box.w}/${box.h}` } as CSSProperties
   const cardStyle = { '--r': theme.radius, '--edge': theme.cardEdge, '--backbg': theme.backBg, '--backfg': theme.backFg, '--holo': spec.finish === 'holo' ? '.42' : '0' } as CSSProperties
   const zStyle = { '--zoom': zoom } as CSSProperties
-  const pill = 'h-10 px-4 rounded-full bg-white text-ink border border-line text-sm font-medium disabled:opacity-40'
+  const pill = 'h-10 px-4 rounded-full bg-card text-ink border border-line text-sm font-medium disabled:opacity-40'
   const sheen = <div className="bj-sheen" />
 
   return (

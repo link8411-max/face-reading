@@ -27,19 +27,19 @@ export default function AboutPage() {
                 <h2 className="text-2xl font-bold mb-4 border-b-2 border-line pb-2">제공 서비스</h2>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div className="p-4 bg-card-2 rounded-lg">
-                        <h3 className="font-bold text-accent mb-2">AI 정밀 관상</h3>
+                        <h3 className="font-bold text-accent-ink mb-2">AI 정밀 관상</h3>
                         <p className="text-sm">얼굴 기준점을 측정해 전통 관상학으로 풀이하는 얼굴 분석 리포트 (사진은 브라우저 안에서만 분석)</p>
                     </div>
                     <div className="p-4 bg-card-2 rounded-lg">
-                        <h3 className="font-bold text-accent mb-2">2027 신년운세</h3>
+                        <h3 className="font-bold text-accent-ink mb-2">2027 신년운세</h3>
                         <p className="text-sm">생년월일로 보는 사주 기반 정미년 신년운세</p>
                     </div>
                     <div className="p-4 bg-card-2 rounded-lg">
-                        <h3 className="font-bold text-accent mb-2">매일의 행운</h3>
+                        <h3 className="font-bold text-accent-ink mb-2">매일의 행운</h3>
                         <p className="text-sm">띠별 오늘의 운세와 행운의 컬러/시간 처방</p>
                     </div>
                     <div className="p-4 bg-card-2 rounded-lg">
-                        <h3 className="font-bold text-accent mb-2">이색 테스트</h3>
+                        <h3 className="font-bold text-accent-ink mb-2">이색 테스트</h3>
                         <p className="text-sm">삼국지 닮은꼴, 동물상 테스트 등 즐거운 콘텐츠</p>
                     </div>
                 </div>

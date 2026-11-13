@@ -25,9 +25,9 @@ export default function NextSteps({ from, withPhoto = false, className = "mt-4",
               if (s.test === "bujeok" && birth) handOffBirth(birth);
               track("next_test_click", { test_name: s.test });
             }}
-            className="bg-white border border-line rounded-[22px] px-4 py-3.5 flex flex-col gap-1.5"
+            className="bg-card border border-line rounded-[22px] px-4 py-3.5 flex flex-col gap-1.5"
           >
-            <Icon name={s.icon} size={20} className="text-accent" />
+            <Icon name={s.icon} size={20} className="text-accent-ink" />
             <span className="text-[15px] font-bold">{s.title}</span>
             <span className="text-xs text-muted leading-normal flex items-start gap-0.5">{s.desc}<Icon name="chevron" size={14} className="shrink-0 mt-0.5" /></span>
           </Link>
@@ -39,7 +39,7 @@ export default function NextSteps({ from, withPhoto = false, className = "mt-4",
         onClick={() => track("next_test_click", { test_name: DAILY_EXAM_STEP.test })}
         className="mt-2 bg-card-2 border border-line rounded-[22px] px-4 py-3.5 flex items-center gap-3"
       >
-        <Icon name={DAILY_EXAM_STEP.icon} size={20} className="text-accent shrink-0" />
+        <Icon name={DAILY_EXAM_STEP.icon} size={20} className="text-accent-ink shrink-0" />
         <span className="flex-1 min-w-0">
           <span className="block text-[15px] font-bold">{DAILY_EXAM_STEP.title}</span>
           <span className="block text-xs text-muted leading-normal">{DAILY_EXAM_STEP.desc}</span>

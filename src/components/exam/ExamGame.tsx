@@ -191,7 +191,7 @@ export default function ExamGame({ rounds, challenge = null }: { rounds: Round[]
     return (
       <>
       <section className="ex-rise-lg mt-6 rounded-[30px] bg-card border border-line px-6 pt-7 pb-6 text-center">
-        <p className="text-sm font-medium text-accent">{viewRound.round}회차 · {roundDateLabel(viewRound.round)}</p>
+        <p className="text-sm font-medium text-accent-ink">{viewRound.round}회차 · {roundDateLabel(viewRound.round)}</p>
         {challenge && <p className="ex-emph mt-3 font-serif text-[19px] font-bold break-keep">친구는 {challenge.grade}등급. 이길 수 있어요?</p>}
         <h2 className="mt-3 font-serif text-[26px] font-bold leading-[1.35]">5문제, 2분이면 끝나요</h2>
         <p className="mt-2 text-sm leading-relaxed text-muted break-keep">문제마다 시간이 정해져 있어요. 힌트는 한 판에 한 번 쓸 수 있어요.</p>

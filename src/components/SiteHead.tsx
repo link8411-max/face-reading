@@ -10,7 +10,7 @@ export default function SiteHead({ appName, jsonLd }: { appName: string; jsonLd?
         <meta name="apple-mobile-web-app-status-bar-style" content="default" />
         <meta name="apple-mobile-web-app-title" content={appName} />
         <meta name="mobile-web-app-capable" content="yes" />
-        <meta name="theme-color" content="#F7F8FC" />
+        <meta name="theme-color" content="#0B1026" />
         <link rel="apple-touch-icon" href="/icons/apple-touch-icon-180.png" />
         {/* 애드센스: 태그 위치는 그대로(심사 중). adsbygoogle.js가 하이드레이션 전에 이 태그 바로 뒤에 show_ads_impl 스크립트를 끼워 넣어
             React가 아래 <script> 두 개를 한 칸씩 밀린 노드와 비교하며 하이드레이션 경고를 낸다(개발 서버 "1 Issue").

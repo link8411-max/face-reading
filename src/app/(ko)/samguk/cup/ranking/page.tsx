@@ -55,7 +55,7 @@ function Row({ id, rank, n, unit }: { id: string; rank: number; n: number; unit:
   const c = characterById(id);
   return (
     <li>
-      <Link href={`/samguk/people/${id}`} prefetch={false} className="flex min-h-[44px] items-center gap-3 rounded-full border border-line bg-white px-4 py-2.5 text-sm transition hover:border-accent/50">
+      <Link href={`/samguk/people/${id}`} prefetch={false} className="flex min-h-[44px] items-center gap-3 rounded-full border border-line bg-card px-4 py-2.5 text-sm transition hover:border-accent/50">
         <span className="w-7 text-center font-bold tabular-nums">{rank}</span>
         <span className="font-medium">{c?.name ?? id}</span>
         <span className="truncate text-xs text-muted">{c?.role}</span>

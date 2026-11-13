@@ -19,7 +19,7 @@ test('별명·칩 2개·자리 5줄·안내문', () => {
   expect(html).toContain(ZONE_COPY.mid.easy)
   expect(html).not.toContain(BALANCED_CHIP)
   expect(html.match(/rounded-full px-3 py-1\.5/g)).toHaveLength(2)
-  expect(html.match(/<span class="font-bold text-accent">/g)).toHaveLength(5)
+  expect(html.match(/<span class="font-bold text-accent-ink">/g)).toHaveLength(5)
   expect(html).toContain(LABEL_COPY.grow)
   expect(html).toContain(DISCLAIMER)
   expect(html).not.toContain(FOREHEAD_NOTE)

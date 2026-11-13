@@ -34,7 +34,7 @@ export default function BujeokBox() {
   const goBack = useBackOrHome()
   const items = useBox()
   const [confirming, setConfirming] = useState<string | null>(null)
-  const pill = 'h-10 px-4 rounded-full bg-white text-ink border border-line text-sm font-medium'
+  const pill = 'h-10 px-4 rounded-full bg-card text-ink border border-line text-sm font-medium'
 
   return (
     <div className="min-h-screen bg-paper text-ink">
@@ -93,7 +93,7 @@ export default function BujeokBox() {
                                 >
                                   네, 지울게요
                                 </button>
-                                <button type="button" onClick={() => setConfirming(null)} className="h-9 px-3 rounded-full bg-white text-ink border border-line text-xs font-medium">
+                                <button type="button" onClick={() => setConfirming(null)} className="h-9 px-3 rounded-full bg-card text-ink border border-line text-xs font-medium">
                                   취소
                                 </button>
                               </div>

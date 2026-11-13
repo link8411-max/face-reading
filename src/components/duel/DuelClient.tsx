@@ -672,7 +672,7 @@ export default function DuelClient() {
         >
           <div ref={hostRef} className="absolute inset-0 [&_canvas]:[image-rendering:pixelated]" aria-hidden />
           <OverlayButtons buttons={buttons} disabled={locked} onFocus={onFocus} onAction={onAction} onKeyDown={onKeyDown} hover={screen !== "battle"} />
-          {!painted && <p className="absolute inset-0 grid place-items-center text-sm text-paper bg-ink">불러오는 중…</p>}
+          {!painted && <p className="absolute inset-0 grid place-items-center text-sm text-ink bg-ink">불러오는 중…</p>}
         </div>
       </div>
       <p className="sr-only" aria-live="polite">
@@ -686,8 +686,8 @@ export default function DuelClient() {
       </p>
       {screen === "result" && record && (
         <div className="mt-4 mx-auto px-4 max-w-lg flex flex-col gap-3">
-          {notice && <p role="status" className="text-xs text-center text-paper">{notice}</p>}
-          {busy && <p role="status" className="text-xs text-center text-paper">공유 준비 중…</p>}
+          {notice && <p role="status" className="text-xs text-center text-ink">{notice}</p>}
+          {busy && <p role="status" className="text-xs text-center text-ink">공유 준비 중…</p>}
           {/* 폰(세로형)은 캔버스 별이 작아 처음부터 폼을 보인다. 넓은 화면은 캔버스 별을 누르면 나타난다 */}
           {showFeedbackForm(tall, stars) && (
             // 판마다 한 번: 키는 판(선두·싸움 수·클리어·행군 기록 수), 별점은 캔버스와 폼이 같은 값을 쓴다

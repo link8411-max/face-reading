@@ -32,7 +32,7 @@ export function ReportPaper({ round, report, streak, captureRef, settled = false
   const areas = areaCounts(round, report.marks)
   return (
     <article ref={captureRef} className={`${settled ? 'ex-settled ' : ''}relative overflow-hidden rounded-[30px] border border-line bg-card px-[22px] pt-6 pb-5 text-ink`}>
-      <p className="text-xs font-medium text-accent">운명을 읽다</p>
+      <p className="text-xs font-medium text-accent-ink">운명을 읽다</p>
       <h2 className="mt-1 font-serif text-[25px] font-bold leading-[1.4] break-keep">밈 능력고사 성적통지표</h2>
       <p className="mt-1 text-sm text-muted">{round.round}회차 · {roundDateLabel(round.round)}</p>
 
@@ -63,7 +63,7 @@ export function ReportPaper({ round, report, streak, captureRef, settled = false
             <span aria-hidden="true" className="h-[48px] leading-[48px]">등급</span>
           </p>
         </div>
-        <p className="ex-stamp rounded-[10px] border-2 border-accent px-3 py-2 text-center font-serif text-[17px] font-bold leading-snug text-accent break-keep" style={{ '--d': '1000ms' } as React.CSSProperties}>{GRADE_NAME[report.grade]}</p>
+        <p className="ex-stamp rounded-[10px] border-2 border-accent px-3 py-2 text-center font-serif text-[17px] font-bold leading-snug text-accent-ink break-keep" style={{ '--d': '1000ms' } as React.CSSProperties}>{GRADE_NAME[report.grade]}</p>
       </div>
 
       <div className="mt-4 flex gap-1.5" aria-label="문제별 결과">
@@ -116,7 +116,7 @@ export default function ReportCard({ round, report, streak, challenge = null }: 
         )}
         {notice && <p role="status" className="text-center text-xs text-muted">{notice}</p>}
         <GiftNudge from="exam" />
-        <button type="button" onClick={save} className="flex h-12 items-center justify-center gap-1.5 rounded-full border border-line bg-white text-sm font-medium">
+        <button type="button" onClick={save} className="flex h-12 items-center justify-center gap-1.5 rounded-full border border-line bg-card text-sm font-medium">
           <Icon name="download" size={16} />
           이미지 저장
         </button>

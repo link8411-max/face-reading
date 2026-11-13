@@ -58,7 +58,7 @@ export default function LanguageSwitch({ className = "" }: { className?: string 
         {LOCALE_LABEL[locale]}
       </button>
       {open && (
-        <ul role="menu" className="absolute right-0 top-full z-50 min-w-[120px] rounded-[16px] border border-line bg-white py-1 shadow-sm">
+        <ul role="menu" className="absolute right-0 top-full z-50 min-w-[120px] rounded-[16px] border border-line bg-card py-1 shadow-sm">
           {LOCALES.map((l) => (
             <li key={l} role="none">
               <button
@@ -67,7 +67,7 @@ export default function LanguageSwitch({ className = "" }: { className?: string 
                 aria-checked={l === locale}
                 lang={l}
                 onClick={() => choose(l)}
-                className={`w-full h-10 px-4 text-left text-sm ${l === locale ? "font-bold text-accent" : "text-ink"}`}
+                className={`w-full h-10 px-4 text-left text-sm ${l === locale ? "font-bold text-accent-ink" : "text-ink"}`}
               >
                 {LOCALE_LABEL[l]}
               </button>

@@ -37,7 +37,7 @@ export default function FactionMap({ ids, label }: { ids: string[]; label: strin
           const p = pos.get(e.a)!
           const q = pos.get(e.b)!
           return (
-            <g key={`${e.a}-${e.b}`} className={e.kin ? 'text-accent' : 'text-muted'}>
+            <g key={`${e.a}-${e.b}`} className={e.kin ? 'text-accent-ink' : 'text-muted'}>
               <line x1={p.x} y1={p.y} x2={q.x} y2={q.y} stroke="currentColor" strokeWidth={e.kin ? 2 : 1.2} strokeDasharray={e.kin ? undefined : '4 4'} />
             </g>
           )

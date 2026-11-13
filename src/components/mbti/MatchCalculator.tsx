@@ -17,7 +17,7 @@ export function TypeGroup({ label, value, onChange }: { label: string; value: Mb
       <div className="grid grid-cols-4 gap-1.5">
         {MBTI_TYPES.map((t) => (
           <button key={t} type="button" aria-pressed={value === t} onClick={() => onChange(t)}
-            className={`py-2 rounded-xl text-sm font-bold border transition ${value === t ? "bg-ink text-paper border-ink" : "bg-white border-line text-ink"}`}>
+            className={`py-2 rounded-xl text-sm font-bold border transition ${value === t ? "bg-ink text-paper border-ink" : "bg-card border-line text-ink"}`}>
             {t}
           </button>
         ))}
@@ -72,17 +72,17 @@ export default function MatchCalculator({ initial }: { initial?: { a: MbtiType; 
             <button type="button" onClick={() => { setFromShare(false); setA(null); setB(null); setShown(false); }} className="h-10 px-4 rounded-full bg-accent text-white text-sm font-medium flex-none">내 궁합 보기</button>
           </div>
         )}
-        <section aria-label="궁합 결과" ref={ref} className="bg-white border-2 border-accent/30 rounded-3xl p-5 text-center">
+        <section aria-label="궁합 결과" ref={ref} className="bg-card border-2 border-accent/30 rounded-3xl p-5 text-center">
           <p className="text-sm text-muted">MBTI 궁합</p>
-          <p className="font-serif text-3xl font-bold mt-1"><span className="text-accent">{a}</span> × <span className="text-ink">{b}</span></p>
-          <p className="mt-3"><span data-testid="total-score" className="text-5xl font-bold text-accent">{s.total}</span><span className="text-lg font-bold">점</span></p>
-          <p className="inline-block mt-2 text-sm font-bold px-3 py-1 rounded-full bg-card-2 text-accent">{s.label}</p>
+          <p className="font-serif text-3xl font-bold mt-1"><span className="text-accent-ink">{a}</span> × <span className="text-ink">{b}</span></p>
+          <p className="mt-3"><span data-testid="total-score" className="text-5xl font-bold text-accent-ink">{s.total}</span><span className="text-lg font-bold">점</span></p>
+          <p className="inline-block mt-2 text-sm font-bold px-3 py-1 rounded-full bg-card-2 text-accent-ink">{s.label}</p>
           <div className="space-y-1.5 mt-4 text-left"><Bar label="연애" score={s.love} /><Bar label="친구" score={s.friend} /><Bar label="직장" score={s.work} /></div>
           <ul className="text-left text-sm leading-relaxed mt-4 space-y-1">{s.lines.map((l) => <li key={l}>· {l}</li>)}</ul>
           <p className="text-xs text-muted mt-4">unse-ai.com/mbti/match · 재미로 보는 궁합</p>
         </section>
         <div className="grid grid-cols-2 gap-2">
-          <button type="button" onClick={() => { track("share_click", { test_name: "mbti_match", method: "save_image" }); download(opts); }} disabled={isCapturing} className="py-3 rounded-full bg-white border border-line font-bold">{isCapturing ? "저장 중…" : "결과 저장"}</button>
+          <button type="button" onClick={() => { track("share_click", { test_name: "mbti_match", method: "save_image" }); download(opts); }} disabled={isCapturing} className="py-3 rounded-full bg-card border border-line font-bold">{isCapturing ? "저장 중…" : "결과 저장"}</button>
           <button type="button" onClick={share} disabled={busy} className="py-3 rounded-full bg-accent text-white font-bold">공유하기</button>
         </div>
         {notice && <p role="status" className="text-xs text-center text-muted">{notice}</p>}
@@ -91,7 +91,7 @@ export default function MatchCalculator({ initial }: { initial?: { a: MbtiType; 
           <Link href={`/mbti/${a.toLowerCase()}`} className="text-center py-2.5 rounded-xl bg-card-2 font-bold">{a}: {mbtiProfiles[a].nickname}</Link>
           <Link href={`/mbti/${b.toLowerCase()}`} className="text-center py-2.5 rounded-xl bg-card-2 font-bold">{b}: {mbtiProfiles[b].nickname}</Link>
         </div>
-        <button type="button" onClick={() => setShown(false)} className="w-full py-3 rounded-full border border-line bg-white font-bold">다시 고르기</button>
+        <button type="button" onClick={() => setShown(false)} className="w-full py-3 rounded-full border border-line bg-card font-bold">다시 고르기</button>
       </div>
     );
   }

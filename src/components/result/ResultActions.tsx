@@ -32,7 +32,7 @@ export default function ResultActions({ from, onShare, onSave, onRetry, busy, no
           {lead.label}
         </Link>
       )}
-      <button type="button" onClick={onShare} disabled={busy} className={`press ${lead ? "mt-2 bg-white text-ink border border-line" : "mt-4 bg-accent text-white"} h-[52px] rounded-full flex items-center justify-center gap-2 text-[15px] font-medium disabled:opacity-50`}>
+      <button type="button" onClick={onShare} disabled={busy} className={`press ${lead ? "mt-2 bg-card text-ink border border-line" : "mt-4 bg-accent text-white"} h-[52px] rounded-full flex items-center justify-center gap-2 text-[15px] font-medium disabled:opacity-50`}>
         <Icon name="share" size={18} />
         {busy ? t("btn.sharePreparing") : t("btn.share")}
       </button>
@@ -40,17 +40,17 @@ export default function ResultActions({ from, onShare, onSave, onRetry, busy, no
       {!en && <GiftNudge from={from} />}
       <div className="grid grid-cols-2 gap-2 mt-2">
         {companion && (
-          <Link href={companion.href} className="press h-12 rounded-full bg-white text-ink border border-line text-sm font-medium flex items-center justify-center gap-1.5">
+          <Link href={companion.href} className="press h-12 rounded-full bg-card text-ink border border-line text-sm font-medium flex items-center justify-center gap-1.5">
             <Icon name="heart" size={16} />
             {companion.label}
           </Link>
         )}
-        <button type="button" onClick={onSave} disabled={busy} className="press h-12 rounded-full bg-white text-ink border border-line text-sm font-medium flex items-center justify-center gap-1.5 disabled:opacity-50">
+        <button type="button" onClick={onSave} disabled={busy} className="press h-12 rounded-full bg-card text-ink border border-line text-sm font-medium flex items-center justify-center gap-1.5 disabled:opacity-50">
           <Icon name="download" size={16} />
           {t("btn.saveImage")}
         </button>
         {!companion && (
-          <button type="button" onClick={onRetry} className="press h-12 rounded-full bg-white text-ink border border-line text-sm font-medium flex items-center justify-center gap-1.5">
+          <button type="button" onClick={onRetry} className="press h-12 rounded-full bg-card text-ink border border-line text-sm font-medium flex items-center justify-center gap-1.5">
             <Icon name="refresh" size={16} />
             {retry}
           </button>

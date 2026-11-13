@@ -12,7 +12,7 @@ export default function FaceHero({ locale = "ko" }: { locale?: Locale }) {
   return (
     <section aria-labelledby="face-hero-title" className="press relative overflow-hidden bg-card border border-line rounded-[28px] p-[22px] min-h-[210px]">
       <div className="relative z-10 max-w-[56%]">
-        <span className="inline-block text-xs font-bold bg-lime text-ink px-2.5 py-1 rounded-full">{t(locale, "home.badge")}</span>
+        <span className="inline-block text-xs font-bold bg-lime text-paper px-2.5 py-1 rounded-full">{t(locale, "home.badge")}</span>
         <h2 id="face-hero-title" className="font-serif font-extrabold text-[23px] leading-[1.3] tracking-tight mt-3 break-keep">
           {lines.map((l, i) => (
             <Fragment key={l}>

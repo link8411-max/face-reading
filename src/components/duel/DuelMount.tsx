@@ -10,7 +10,7 @@ const DuelClient = dynamic(() => import("./DuelClient"), {
   ssr: false,
   loading: () => (
     <div className="relative w-[320px] max-w-full mx-auto bg-cloth grid place-items-center" style={{ aspectRatio: "4 / 3" }}>
-      <p className="text-sm text-paper">일기토를 준비하는 중…</p>
+      <p className="text-sm text-ink">일기토를 준비하는 중…</p>
     </div>
   ),
 });

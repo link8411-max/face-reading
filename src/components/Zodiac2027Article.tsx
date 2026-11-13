@@ -7,7 +7,7 @@ import CoupangBanner from "@/components/CoupangBanner";
 import ContentCta from "@/components/ContentCta";
 import ArticleShare from "@/components/share/ArticleShare";
 
-const card = "bg-white rounded-[22px] border border-line p-5";
+const card = "bg-card rounded-[22px] border border-line p-5";
 const h2 = "font-serif font-bold text-lg mb-2";
 
 export function zodiacFaqs(slug: ZodiacSlug) {
@@ -50,7 +50,7 @@ export default function Zodiac2027Article({ slug }: { slug: ZodiacSlug }) {
     <div className="min-h-screen bg-paper text-ink">
       <main className="max-w-lg mx-auto px-4 py-8 space-y-5">
         <nav className="text-sm text-muted">
-          <Link href="/" className="hover:text-accent">홈</Link> › <Link href="/fortune/2027" className="hover:text-accent">{FORTUNE_YEAR.year} 띠별 운세</Link> › {z.띠}띠
+          <Link href="/" className="hover:text-accent-ink">홈</Link> › <Link href="/fortune/2027" className="hover:text-accent-ink">{FORTUNE_YEAR.year} 띠별 운세</Link> › {z.띠}띠
         </nav>
 
         <header className="text-center space-y-2">
@@ -73,7 +73,7 @@ export default function Zodiac2027Article({ slug }: { slug: ZodiacSlug }) {
               날삼재는 삼재가 나가는 마지막 해라, 그동안 미뤄 둔 일을 차분히 마무리하면 다음 흐름으로 가볍게 넘어간다고 봐요.
             </p>
             <p className="mt-3">
-              <Link href="/bujeok?wish=samjae" className="font-bold text-accent">삼재 막이 부적 만들기</Link>
+              <Link href="/bujeok?wish=samjae" className="font-bold text-accent-ink">삼재 막이 부적 만들기</Link>
             </p>
           </section>
         )}
@@ -131,7 +131,7 @@ export default function Zodiac2027Article({ slug }: { slug: ZodiacSlug }) {
           내 생년월일 사주로 {FORTUNE_YEAR.year} 운세 자세히 보기
         </Link>
 
-        <Link href="/mbti/match" className="block text-center py-3 bg-white border border-line rounded-2xl font-bold text-accent hover:bg-white">
+        <Link href="/mbti/match" className="block text-center py-3 bg-card border border-line rounded-2xl font-bold text-accent-ink hover:bg-card">
           MBTI 궁합도 보기
         </Link>
 
@@ -139,7 +139,7 @@ export default function Zodiac2027Article({ slug }: { slug: ZodiacSlug }) {
           <h2 className={h2}>자주 묻는 질문</h2>
           <div className="space-y-2">
             {faqs.map((f) => (
-              <details key={f.q} className="bg-white rounded-2xl border border-line px-4 py-3">
+              <details key={f.q} className="bg-card rounded-2xl border border-line px-4 py-3">
                 <summary className="font-medium cursor-pointer">{f.q}</summary>
                 <p className="mt-2 leading-relaxed">{f.a}</p>
               </details>
@@ -151,7 +151,7 @@ export default function Zodiac2027Article({ slug }: { slug: ZodiacSlug }) {
           <h2 className={h2}>다른 띠 {FORTUNE_YEAR.year} 운세</h2>
           <div className="grid grid-cols-4 gap-2 text-center text-sm">
             {ZODIAC_SLUGS.filter((s) => s !== slug).map((s) => (
-              <Link key={s} href={`/fortune/2027/${s}`} className="bg-white rounded-xl border border-line py-2 hover:bg-white">
+              <Link key={s} href={`/fortune/2027/${s}`} className="bg-card rounded-xl border border-line py-2 hover:bg-card">
                 {zodiac2027[s].띠}띠
               </Link>
             ))}

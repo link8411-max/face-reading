@@ -26,7 +26,7 @@ export default function BottomTabBar() {
   return (
     <nav
       aria-label={t("nav.bottom")}
-      className="no-screenshot fixed bottom-0 inset-x-0 z-50 bg-white border-t border-line pb-[env(safe-area-inset-bottom)]"
+      className="no-screenshot fixed bottom-0 inset-x-0 z-50 bg-card border-t border-line pb-[env(safe-area-inset-bottom)]"
     >
       <ul className={`relative max-w-lg mx-auto grid ${cols === 3 ? "grid-cols-3" : "grid-cols-2"}`}>
         <span
@@ -43,7 +43,7 @@ export default function BottomTabBar() {
               <Link
                 href={localePath(locale, tab.href)}
                 aria-current={active ? "page" : undefined}
-                className={`press flex flex-col items-center justify-center gap-1 h-16 text-[11px] font-semibold whitespace-nowrap ${active ? "text-accent" : "text-ink"}`}
+                className={`press flex flex-col items-center justify-center gap-1 h-16 text-[11px] font-semibold whitespace-nowrap ${active ? "text-accent-ink" : "text-ink"}`}
               >
                 <Icon name={tab.icon} className={active ? "tab-pop" : undefined} />
                 {en ? t(`tab.${tab.key}` as "tab.home") : tab.label}

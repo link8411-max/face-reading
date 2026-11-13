@@ -40,7 +40,7 @@ function Row({ id, rank, n }: { id: string; rank?: number; n?: number }) {
   const c = characterById(id);
   return (
     <li>
-      <Link href={`/samguk/people/${id}`} prefetch={false} className="flex items-center gap-3 rounded-full border border-line bg-white px-4 py-2.5 text-sm hover:border-accent/50 transition">
+      <Link href={`/samguk/people/${id}`} prefetch={false} className="flex items-center gap-3 rounded-full border border-line bg-card px-4 py-2.5 text-sm hover:border-accent/50 transition">
         {n !== undefined && <span className="w-7 text-center font-bold tabular-nums">{rank}</span>}
         <span className="font-medium">{c?.name ?? id}</span>
         <span className="text-xs text-muted truncate">{c?.role}</span>
@@ -62,7 +62,7 @@ function ClosedFactionLists({ groups }: { groups: { faction: "위" | "촉" | "�
   return (
     <div className="space-y-3">
       {groups.map((g) => (
-        <details key={g.faction} className="bg-white rounded-[22px] border border-line px-5 py-4">
+        <details key={g.faction} className="bg-card rounded-[22px] border border-line px-5 py-4">
           <summary className="cursor-pointer">
             <h3 className="inline font-serif font-bold text-base">{factionLabel(g.faction)}</h3>
             <span className="ml-2 text-xs text-muted">{g.ids.length}명</span>

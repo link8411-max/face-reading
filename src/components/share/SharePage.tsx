@@ -57,7 +57,7 @@ export async function SharePage({ kind, params, searchParams }: { kind: ShareKin
       <section className="relative overflow-hidden bg-card border border-line rounded-[30px] px-6 pt-7 pb-6 mt-3">
         <span className="absolute -right-3 -top-2 pointer-events-none"><MoonDeco size={130} /></span>
         <h1 className="relative font-serif font-bold text-[26px] leading-[1.4] pr-16 break-keep">친구는 {kind === "saju" ? "친구가 풀어 본 사주예요" : kind === "samguk" ? `${josa(r.name, "을", "를")} 닮았대요` : `${josa(r.name, "이", "가")} 나왔어요`}</h1>
-        {scoreLabel && <p className="relative text-accent font-medium mt-2">{scoreLabel}</p>}
+        {scoreLabel && <p className="relative text-accent-ink font-medium mt-2">{scoreLabel}</p>}
         <div className="flex gap-4 items-center mt-5">
           {r.image ? (
             // eslint-disable-next-line @next/next/no-img-element

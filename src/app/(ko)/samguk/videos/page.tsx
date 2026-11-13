@@ -43,7 +43,7 @@ export default async function VideosPage() {
           <p className="text-sm leading-relaxed text-muted">1분이면 끝나는 삼국지 한 장면. 정사와 연의가 어떻게 다른지 함께 봐요.</p>
         </div>
 
-        <Link href="/samguk" className="flex items-center gap-3 rounded-[22px] bg-navy-game px-4 py-3.5 text-paper">
+        <Link href="/samguk" className="flex items-center gap-3 rounded-[22px] bg-navy-game px-4 py-3.5 text-ink">
           <span className="flex" aria-hidden="true">
             {trio.map((src, i) => (
               // eslint-disable-next-line @next/next/no-img-element

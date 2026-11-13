@@ -14,7 +14,7 @@ export default function GiftNudge({ from }: { from: TestName }) {
       onClick={() => track("next_test_click", { test_name: "bujeok", result_id: `gift_${from}` })}
       className="no-screenshot mt-2 h-11 rounded-full bg-card-2 text-ink text-sm font-medium flex items-center justify-center gap-1.5"
     >
-      <Icon name="spark" size={16} className="text-accent" />
+      <Icon name="spark" size={16} className="text-accent-ink" />
       친구에게 부적 선물하기
       <Icon name="chevron" size={14} className="text-muted" />
     </Link>

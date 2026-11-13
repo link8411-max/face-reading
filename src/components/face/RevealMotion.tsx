@@ -12,7 +12,7 @@ import type { UiKey } from "@/lib/i18n/dict";
 
 const W = 390;
 const H = 488; // 4:5
-const ACCENT = "#2D55FF";
+const ACCENT = "#9DB2FF";
 const PALACE_GAP_MS = 400;
 
 interface Props {
@@ -196,7 +196,7 @@ export default function RevealMotion({ imageUrl, landmarks, zones, dominant, pal
       <button
         type="button"
         onClick={finish}
-        className="absolute right-4 top-4 z-10 rounded-full border border-line bg-white px-3.5 py-1.5 text-[13px] font-medium text-ink"
+        className="absolute right-4 top-4 z-10 rounded-full border border-line bg-card px-3.5 py-1.5 text-[13px] font-medium text-ink"
       >
         {tr("reveal.skip")}
       </button>
@@ -211,7 +211,7 @@ export default function RevealMotion({ imageUrl, landmarks, zones, dominant, pal
             <div className="h-2 flex-1 overflow-hidden rounded-full bg-card-2">
               <div
                 data-testid={`bar-${z}`}
-                className={`h-full rounded-full ${z === dominant ? "bg-current text-accent" : "bg-line"}`}
+                className={`h-full rounded-full ${z === dominant ? "bg-current text-accent-ink" : "bg-line"}`}
                 style={{ width: `${Math.round((zones[z] / maxZone) * 100)}%` }}
               />
             </div>
@@ -247,7 +247,7 @@ export default function RevealMotion({ imageUrl, landmarks, zones, dominant, pal
             return (
               <div
                 key={p.key}
-                className="absolute -translate-y-1/2 whitespace-nowrap rounded-full border border-line bg-white px-2 py-0.5 text-[11px] text-ink"
+                className="absolute -translate-y-1/2 whitespace-nowrap rounded-full border border-line bg-card px-2 py-0.5 text-[11px] text-ink"
                 style={{
                   left: `${left}%`,
                   top: `${Math.min(94, Math.max(6, ay))}%`,

@@ -62,7 +62,7 @@ export default function VideoFeed({
   }, [videos])
 
   return createPortal(
-    <div ref={root} role="dialog" aria-modal="true" aria-label="쇼츠 보기" className="fixed inset-0 z-[70] bg-ink text-paper">
+    <div ref={root} role="dialog" aria-modal="true" aria-label="쇼츠 보기" className="fixed inset-0 z-[70] bg-paper text-ink">
       <div ref={scroller} className="h-full snap-y snap-mandatory overflow-y-auto overscroll-contain">
         {videos.map((v, i) => {
           const badge = now === null ? null : videoBadge(v, now.getTime())
@@ -75,7 +75,7 @@ export default function VideoFeed({
                   {i === active ? (
                     <VideoPlayer key={v.id} video={v} slot="videos" className="!h-full !rounded-xl" />
                   ) : (
-                    <div className="relative h-full w-full overflow-hidden rounded-xl bg-ink">
+                    <div className="relative h-full w-full overflow-hidden rounded-xl bg-paper">
                       {/* eslint-disable-next-line @next/next/no-img-element */}
                       <img src={v.thumbnail} alt="" loading="lazy" className="absolute inset-0 h-full w-full object-cover" />
                     </div>
@@ -84,7 +84,7 @@ export default function VideoFeed({
               </div>
               <div className="mt-3 flex flex-col gap-2">
                 <p className="font-serif text-lg font-bold leading-snug">{v.title}</p>
-                {(fresh || views) && <p className="text-xs text-paper/80">{fresh ? 'NEW' : views}</p>}
+                {(fresh || views) && <p className="text-xs text-ink/80">{fresh ? 'NEW' : views}</p>}
                 <div className="flex flex-wrap gap-1.5">
                   {v.people.filter((p) => faces[p]).map((p) => {
                     const f = faces[p]
@@ -131,11 +131,11 @@ export default function VideoFeed({
           type="button"
           aria-label="목록으로"
           onClick={onClose}
-          className="pointer-events-auto flex h-11 w-11 items-center justify-center rounded-full bg-ink/50"
+          className="pointer-events-auto flex h-11 w-11 items-center justify-center rounded-full bg-paper/60"
         >
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18" /></svg>
         </button>
-        <span className="rounded-full bg-ink/50 px-3 py-1.5 text-xs">{active + 1} / {videos.length} · 위아래로 넘겨요</span>
+        <span className="rounded-full bg-paper/60 px-3 py-1.5 text-xs">{active + 1} / {videos.length} · 위아래로 넘겨요</span>
       </div>
 
       <div className="pointer-events-none absolute right-3 top-1/3 flex flex-col items-center gap-1.5" aria-hidden="true">

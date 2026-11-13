@@ -13,7 +13,7 @@ export default function MoreTests({ current, className = "mt-6", locale = "ko" }
     <section aria-labelledby="more-tests-title" className={`no-screenshot ${className}`}>
       <div className="flex items-baseline justify-between px-1">
         <h2 id="more-tests-title" className="text-sm font-bold">{t(locale, "more.title")}</h2>
-        <Link href={localePath(locale, "/all")} className="text-[13px] text-accent font-semibold">{t(locale, "btn.seeAll")}</Link>
+        <Link href={localePath(locale, "/all")} className="text-[13px] text-accent-ink font-semibold">{t(locale, "btn.seeAll")}</Link>
       </div>
       <ul className="flex gap-2.5 overflow-x-auto [scrollbar-width:none] -mx-4 px-4 mt-2.5">
         {items.map((i) => (

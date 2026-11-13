@@ -83,7 +83,7 @@ export default function VotePoll({ kind, id, target, title, options, share }: Pr
   const headCount = counts ? Object.values(counts).reduce((s, n) => s + n, 0) : 0
 
   return (
-    <div className="bg-white rounded-[22px] border border-line px-5 py-5">
+    <div className="bg-card rounded-[22px] border border-line px-5 py-5">
       <h2 className="font-serif font-bold text-lg break-keep">{title}</h2>
       <ul className="mt-3 space-y-2">
         {options.map((o) => {
@@ -98,7 +98,7 @@ export default function VotePoll({ kind, id, target, title, options, share }: Pr
                 aria-pressed={voted ? mine : undefined}
                 className={`relative w-full min-h-[48px] overflow-hidden rounded-2xl border px-4 py-2.5 text-left text-sm leading-snug ${
                   mine ? 'border-ink' : 'border-line'
-                } bg-white disabled:cursor-default`}
+                } bg-card disabled:cursor-default`}
               >
                 {pct !== null && (
                   <span

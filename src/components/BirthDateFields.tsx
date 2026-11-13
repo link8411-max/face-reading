@@ -4,7 +4,7 @@ import { useRef } from "react";
 import { sanitizeDigits, type BirthDateInput } from "@/lib/birthDate";
 
 const inputClass =
-  "w-full px-4 py-3 bg-white border border-line rounded-xl text-center text-lg text-ink focus:outline-none focus:ring-2 focus:ring-accent/40 placeholder-muted/60";
+  "w-full px-4 py-3 bg-card border border-line rounded-xl text-center text-lg text-ink focus:outline-none focus:ring-2 focus:ring-accent/40 placeholder-muted/60";
 
 // 생년월일 입력: 숫자만, 자릿수 제한, 다 채우면 다음 칸으로 자동 이동, 오류는 아래에 문구로 표시
 export default function BirthDateFields({
@@ -51,7 +51,7 @@ export default function BirthDateFields({
             value={value.day} onChange={(e) => setDay(e.target.value)} aria-invalid={!!error} className={inputClass} />
         </div>
       </div>
-      {error && <p role="alert" className="mt-2 text-sm text-center text-accent">{error}</p>}
+      {error && <p role="alert" className="mt-2 text-sm text-center text-accent-ink">{error}</p>}
     </div>
   );
 }

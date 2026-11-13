@@ -41,10 +41,10 @@ export default function HouseBanner({ high }: { high: WeeklyHigh }) {
         target="_blank"
         rel="nofollow noopener"
         onClick={() => track('house_banner_click', { slot: HOUSE_BANNER_SLOT })}
-        className="block rounded-[22px] border border-line bg-white px-5 py-4 text-left"
+        className="block rounded-[22px] border border-line bg-card px-5 py-4 text-left"
       >
         <span className="flex items-center justify-between text-xs">
-          <span className="text-accent font-medium">이번 주 신고가</span>
+          <span className="text-accent-ink font-medium">이번 주 신고가</span>
           <span className="text-muted">집시세</span>
         </span>
         <span className="mt-1.5 block text-[15px] font-medium text-ink break-keep">
