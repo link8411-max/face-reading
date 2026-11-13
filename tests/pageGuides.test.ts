@@ -86,10 +86,10 @@ test('/face2 sections: 15유형 + 5부위', () => {
   expect(s[1].items).toHaveLength(5)
 })
 
-test('/animal sections: 8종 전부', () => {
+test('/animal sections: 13종 전부', () => {
   const s = pageGuides['/animal'].sections!
   expect(s).toHaveLength(1)
-  expect(s[0].items).toHaveLength(8)
+  expect(s[0].items).toHaveLength(13)
   expect(new Set(s[0].items.map((i) => i.title))).toEqual(new Set(animalTypeList.map((k) => animalTypeDB[k].name)))
 })
 

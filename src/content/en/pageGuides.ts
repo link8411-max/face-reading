@@ -110,7 +110,7 @@ export const pageGuides: Record<EnGuideRoute, EnGuideData> = {
     related: ['/face2', '/samguk', '/fortune/daily'],
     sections: [
       {
-        heading: '8 animal faces: which one are you?',
+        heading: '13 animal faces: which one are you?',
         items: [
           { title: 'Puppy Face', body: 'Big eyes and a round face are the hallmarks. Gentle and bright, an impression that puts even new faces at ease.' },
           { title: 'Cat Face', body: 'Sharp, slightly upturned eyes and a slim face are the hallmarks. A mysterious, poised impression.' },
@@ -120,6 +120,11 @@ export const pageGuides: Record<EnGuideRoute, EnGuideData> = {
           { title: 'Deer Face', body: 'Clear, long-lashed eyes and a slim face are the hallmarks. An elegant, tidy impression with a quiet presence.' },
           { title: 'Tiger Face', body: 'Distinct eyes and an angular face are the hallmarks. A confident, charismatic impression.' },
           { title: 'Eagle Face', body: 'Deep, sharp eyes and distinct features are the hallmarks. An intense, chic impression that catches the eye.' },
+          { title: 'Desert Fox Face', body: 'Big, round eyes with softly lifted corners and a small, slim jawline are the hallmarks. A bright, curious impression.' },
+          { title: 'Dino Face', body: 'A wide, open smile line, a longer face and a generous nose are the hallmarks. A deadpan-but-cute impression with a surprise charm when you smile.' },
+          { title: 'Wolf Face', body: 'Upturned eye corners, brows close to the eyes and a straight nose bridge are the hallmarks. A calm, charismatic impression that reads as loyal.' },
+          { title: 'Squirrel Face', body: 'Round eyes, a short, compact face line and a small, full mouth are the hallmarks. An expressive, lively impression.' },
+          { title: 'Hamster Face', body: 'A round face, a short chin tip and small, close-set features are the hallmarks. A gentle, cozy impression that is easy to approach.' },
         ],
       },
     ],

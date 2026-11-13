@@ -111,7 +111,7 @@ export const UI = {
   // animal page
   'animal.title': 'Animal Face Test',
   'animal.heading': 'Which animal\ndo I look like?',
-  'animal.desc': 'An animal-face test from a single photo. Your eyes and face shape are matched to one of 8 animals, such as Puppy, Cat or Fox Face.',
+  'animal.desc': 'An animal-face test from a single photo. Your eyes and face shape are matched to one of 13 animals, such as Puppy, Cat or Fox Face.',
   'animal.tip1': 'A front-facing photo works best',
   'animal.tip2': 'In bright light',
   'animal.analyze': 'Find my animal',
@@ -201,7 +201,7 @@ export const UI = {
   'item.face2.title': 'AI Face Reading',
   'item.face2.desc': 'Your face read through 15 traditional types',
   'item.animal.title': 'Animal Face Test',
-  'item.animal.desc': 'Puppy? Cat? Find your match among 8 animals',
+  'item.animal.desc': 'Puppy? Cat? Find your match among 13 animals',
   'item.faceMatch.title': 'Face Match',
   'item.faceMatch.desc': 'How well do two faces fit together?',
   'all.search': 'Search tests',

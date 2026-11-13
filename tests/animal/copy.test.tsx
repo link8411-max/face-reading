@@ -21,8 +21,9 @@ test('동물상 결과 문구는 나이·성별과 상관없이 어울린다', (
 const zeros = () => Object.fromEntries(FEATURE_KEYS.map((k) => [k, 0])) as ZVector
 
 test('1·2등이 거의 같으면 두 번째 동물상도 함께 알려 준다', () => {
-  // 평균에 가까운 얼굴 (시연 사진 person1, 여자 기준 z)
-  const z = { ...zeros(), eyeAspect: 0.47, eyeSpacing: 0.58, noseLength: 0.43, mouthWidth: -0.7, lipFullness: 1.02, mouthCornerLift: -0.63, browGap: -0.38, eyeWidth: -0.37, browTilt: -0.33 }
+  // 고양이와 여우 프로필의 한가운데 얼굴(13종이 되면서 옛 시연 사진 z는 한 동물에 뚜렷이 가까워져 바꿈)
+  const mid = (k: string) => (((animalProfiles.cat.z as Record<string, number>)[k] ?? 0) + ((animalProfiles.fox.z as Record<string, number>)[k] ?? 0)) / 2
+  const z = Object.fromEntries(FEATURE_KEYS.map((k) => [k, mid(k)])) as ZVector
   const r = matchAnimal(z)
   expect(r.blend).toBeDefined()
   expect(r.blend).not.toBe(r.type)
@@ -44,7 +45,7 @@ test('다음 테스트 카드는 관상을 먼저 추천한다', () => {
   }
 })
 
-test('동물상 8종마다 결과 카드 일러스트가 있고 가볍다', () => {
+test('동물상 13종마다 결과 카드 일러스트가 있고 가볍다', () => {
   const { existsSync, statSync, readFileSync } = require('node:fs')
   for (const k of ANIMAL_KEYS) {
     const f = `public/images/animal/${k}.jpg`

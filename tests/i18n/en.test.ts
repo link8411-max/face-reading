@@ -70,7 +70,7 @@ describe('en 문구는 한국어와 같은 모양이다', () => {
     }
   });
 
-  it('animal: 8종과 키 집합이 같다', () => {
+  it('animal: 13종과 키 집합이 같다', () => {
     expect(Object.keys(enAnimal)).toEqual(expect.arrayContaining(Object.keys(koAnimal)));
     sameShape(koAnimal.animalTypeDB, enAnimal.animalTypeDB, 'animalTypeDB');
     expect(enAnimal.animalTypeList).toEqual(koAnimal.animalTypeList);

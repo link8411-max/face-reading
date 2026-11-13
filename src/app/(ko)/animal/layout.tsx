@@ -4,7 +4,7 @@ import { languageAlternates } from "@/lib/i18n/alternates";
 
 // 검색 결과 제목·설명 (클릭률 위주, 길이 상한은 tests/seo-snippets.test.tsx). og·트위터도 같은 문구
 const TITLE = "동물상 테스트 | 고양이상? 여우상? 남녀 따로 분석 – 운명을 읽다";
-const DESCRIPTION = "강아지상·고양이상·여우상 등 8가지 중 나는 무슨 상일까? 남녀 기준을 따로 두고 얼굴 사진 한 장을 분석해요. 가입 없이, 사진은 저장하지 않아요.";
+const DESCRIPTION = "강아지상·고양이상·여우상 등 13가지 중 나는 무슨 상일까? 남녀 기준을 따로 두고 얼굴 사진 한 장을 분석해요. 가입 없이, 사진은 저장하지 않아요.";
 
 export const metadata: Metadata = {
   title: TITLE,
