@@ -30,6 +30,7 @@ import calibration from "@/lib/samguk/calibration.json";
 import { analyzePhoto, failText, holdAtLeast, REASON_TEXT } from "@/lib/face/analyzePhoto";
 
 import { portraitThumb } from "@/lib/portraitThumb";
+import { useScrollTopWhen } from "@/hooks/useScrollTopWhen";
 interface AnalysisResult {
   name: string;
   matchReason: string;
@@ -64,6 +65,7 @@ export default function SamgukPage() {
   const [loading, setLoading] = useState(false);
   const [loadingStep, setLoadingStep] = useState(0);
   const [result, setResult] = useState<AnalysisResult | null>(null);
+  useScrollTopWhen(result);
   const [gender, setGender] = useRememberedGender(); // 다른 사진 테스트에서 고른 성별을 미리 고른다
   const [error, setError] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -132,8 +134,6 @@ export default function SamgukPage() {
       const matched = matchCharacter(r.z, gender, calibration.bias);
       setResult(matched);
       track("result_view", { test_name: "samguk", result_id: matched.character.id });
-      // 결과가 나오면 페이지 상단으로 스크롤하여 결과를 바로 볼 수 있게 함
-      window.scrollTo({ top: 0, behavior: "smooth" });
     } catch {
       track("photo_fail", { test_name: "samguk", result_id: "read" });
       setError(REASON_TEXT.read);

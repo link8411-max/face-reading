@@ -26,6 +26,7 @@ import { classifyGuansang, type GuansangResult } from "@/lib/face/guansang";
 import type { Landmark } from "@/lib/face/landmarkFeatures";
 import { GUANSANG_TYPES } from "@/content/guansang";
 import { ogImageUrl, parseShared, shareUrl } from "@/lib/shareLinks";
+import { useScrollTopWhen } from "@/hooks/useScrollTopWhen";
 
 // 결과 상태: 랜드마크는 Task 7의 공개 모션이 쓴다(화면 밖으로 나가지 않는다)
 interface FaceState { guansang: GuansangResult; landmarks: Landmark[]; image: string; zones: { up: number; mid: number; down: number } }
@@ -39,6 +40,7 @@ export default function Face2Page() {
   const [image, setImage] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const [result, setResult] = useState<FaceState | null>(null);
+  useScrollTopWhen(result);
   const [revealed, setRevealed] = useState(false); // 공개 모션이 끝나야 결과 카드를 보인다
   const [error, setError] = useState<string | null>(null);
   const [gender, setGender] = useRememberedGender();

@@ -19,6 +19,7 @@ import type { SamgukCharacter } from "@/lib/samgukDB";
 import { SITE, teamUrl } from "@/lib/shareLinks";
 import { track } from "@/lib/analytics";
 import { withGender, withPhoto } from "@/lib/faceMatch/slot";
+import { useScrollTopWhen } from "@/hooks/useScrollTopWhen";
 
 interface Slot { nickname: string; gender: Gender | null; image: string | null; character: SamgukCharacter | null; error: string | null }
 const empty = (): Slot => ({ nickname: "", gender: null, image: null, character: null, error: null });
@@ -37,6 +38,7 @@ export default function TeamClient() {
   const analyzeStep = useAnalyzeStep(busy, TEAM_STEPS.length);
   const running = useRef(false);
   const [done, setDone] = useState(false);
+  useScrollTopWhen(done);
   const { ref: cardRef, isCapturing, download } = useScreenshot<HTMLElement>();
 
   const set = (i: number, patch: Partial<Slot>) => setSlots((s) => s.map((x, j) => (j === i ? { ...x, ...patch } : x)));
@@ -72,7 +74,6 @@ export default function TeamClient() {
       const t = buildTeam(next.map((s) => ({ character: s.character! })));
       const l = t.members.find((m) => m.role === "군주")!;
       track("result_view", { test_name: "team_samguk", result_id: `${l.character.id}_${next.length}` });
-      window.scrollTo({ top: 0, behavior: "smooth" });
     }
   };
 

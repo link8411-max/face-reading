@@ -23,6 +23,7 @@ import SajuTable from "@/components/saju/SajuTable";
 import ElementBars from "@/components/saju/ElementBars";
 import SeunCard from "@/components/saju/SeunCard";
 import BasisDetails from "@/components/saju/BasisDetails";
+import { useScrollTopWhen } from "@/hooks/useScrollTopWhen";
 
 interface FortuneResult {
   사주정보: {
@@ -61,6 +62,7 @@ export default function FortuneClient() {
   const [loading, setLoading] = useState(false);
   const dateCheck = validateBirthDate(birthDate, new Date(), { lunar: isLunar });
   const [result, setResult] = useState<FortuneResult | null>(null);
+  useScrollTopWhen(result);
 
   const { ref: resultRef, isCapturing, download, share, shareNotice } = useScreenshot(result);
 

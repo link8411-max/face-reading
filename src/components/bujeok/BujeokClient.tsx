@@ -46,6 +46,7 @@ export default function BujeokClient({ initial, high = null }: { initial?: Initi
   const goBack = useBackOrHome()
   const [values, setValues] = useState<FormValues>(() => initialValues(initial))
   const [phase, setPhase] = useState<Phase>('form')
+  useScrollTopWhen(phase === 'done')
   const [spec, setSpec] = useState<BujeokSpec | null>(null)
   const [mode, setMode] = useState<Mode>(initial?.mode === 'gift' ? 'gift' : 'mine')
   const [madeName, setMadeName] = useState<string | null>(null)
@@ -187,3 +188,5 @@ export default function BujeokClient({ initial, high = null }: { initial?: Initi
     </div>
   )
 }
+
+import { useScrollTopWhen } from "@/hooks/useScrollTopWhen";

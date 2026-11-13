@@ -30,6 +30,7 @@ import { useHandedPhoto } from "@/hooks/useHandedPhoto";
 import { useResultShare } from "@/hooks/useResultShare";
 import { faceSlug, ogImageUrl, parseShared, shareUrl, SITE } from "@/lib/shareLinks";
 import { Icon } from "@/components/icons";
+import { useScrollTopWhen } from "@/hooks/useScrollTopWhen";
 
 const firstSentence = (t: string) => (t.match(/^.*?[.!?요다](?=\s|$)/)?.[0] ?? t).trim();
 
@@ -64,6 +65,7 @@ export default function AnimalTypePage() {
   const analyzeStep = useAnalyzeStep(loading, ANALYZE_STEPS.length);
   const steps = [t("analyzing.step1"), t("analyzing.step2"), t("analyzing.step3")];
   const [result, setResult] = useState<AnimalTypeResult | null>(null);
+  useScrollTopWhen(result);
   const [resultG, setResultG] = useState<"f" | "m">("f"); // 결과를 낸 때 고른 성별의 그림
   const [error, setError] = useState<string | null>(null);
   // 성별: 성별별 얼굴 기준값으로 z 점수를 낸다

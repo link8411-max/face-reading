@@ -18,6 +18,7 @@ import { HOUR_SLOTS, isHourSlotKey } from "@/lib/saju/keys";
 import type { SajuResult } from "@/lib/saju/engine";
 import { DAY_MASTER_COPY } from "@/content/saju";
 import { ogImageUrl, parseShared, shareUrl } from "@/lib/shareLinks";
+import { useScrollTopWhen } from "@/hooks/useScrollTopWhen";
 
 const FAIL_TEXT: Record<string, string> = {
   range: "1900년부터 올해까지의 날짜만 계산할 수 있어요. 음력은 2100년까지 볼 수 있어요.",
@@ -34,6 +35,7 @@ export default function SajuClient() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [result, setResult] = useState<SajuResult | null>(null);
+  useScrollTopWhen(result);
   const [birthLine, setBirthLine] = useState("");
 
   const dateCheck = validateBirthDate(birthDate, new Date(), { lunar: isLunar });

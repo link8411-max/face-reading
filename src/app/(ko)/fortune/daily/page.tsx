@@ -20,12 +20,14 @@ import { isGanji } from "@/lib/push/validate";
 import PushToggle from "@/components/fortune/PushToggle";
 import DailyFortuneCard from "@/components/fortune/DailyFortuneCard";
 import { dailyDateLine, dayLabel } from "@/lib/dailyEngine/format";
+import { useScrollTopWhen } from "@/hooks/useScrollTopWhen";
 
 export default function DailyFortunePage() {
   const goBack = useBackOrHome();
   const [birthYear, setBirthYear] = useState("");
   const [isEarlyYear, setIsEarlyYear] = useState(false);
   const [result, setResult] = useState<DailyFortune | null>(null);
+  useScrollTopWhen(result);
   const [today, setToday] = useState<string | null>(null);
 
   const { ref: resultRef, isCapturing, download, share, shareNotice } = useScreenshot(result);

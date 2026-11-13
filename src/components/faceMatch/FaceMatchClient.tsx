@@ -25,6 +25,7 @@ import { faceMatchInviteUrl, faceMatchUrl, josa, SITE } from "@/lib/shareLinks";
 import { animalTypeDB } from "@/lib/animalTypeDB";
 import { track } from "@/lib/analytics";
 import { withGender, withPhoto } from "@/lib/faceMatch/slot";
+import { useScrollTopWhen } from "@/hooks/useScrollTopWhen";
 
 interface Slot { gender: Gender | null; image: string | null; animal: AnimalKey | null; error: string | null }
 const empty: Slot = { gender: null, image: null, animal: null, error: null };
@@ -63,6 +64,7 @@ export default function FaceMatchClient({ invite }: { invite?: { key: AnimalKey;
   const analyzeStep = useAnalyzeStep(busy, FACE_MATCH_STEPS.length);
   const running = useRef(false);
   const [done, setDone] = useState(false);
+  useScrollTopWhen(done);
   const { ref: cardRef, isCapturing, download } = useScreenshot<HTMLElement>();
 
   // 동물상 결과에서 넘어온 경우(?me=cat) 내 칸을 결과로 채운다
@@ -110,7 +112,6 @@ export default function FaceMatchClient({ invite }: { invite?: { key: AnimalKey;
     if (m.animal && o.animal) {
       setDone(true);
       track("result_view", { test_name: "face_match", result_id: `${m.animal}_${o.animal}_${rel}` });
-      window.scrollTo({ top: 0, behavior: "smooth" });
     }
   };
 
