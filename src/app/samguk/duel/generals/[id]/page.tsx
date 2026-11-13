@@ -150,13 +150,13 @@ export default async function GeneralPage({ params }: Props) {
         <section className="mt-8">
           {/* 시작 장수 4명만 바로 시작 링크. 영입 장수는 이 기기 장수록에 있을 때만(RosterStartLink가 브라우저에서 바꾼다) */}
           {g.role === "starter" ? (
-            <Link href={`/samguk/duel?me=${id}`} className="flex h-[52px] items-center justify-center rounded-full bg-ink text-paper font-medium">
+            <Link href={`/samguk/duel?me=${id}`} className="flex h-[52px] items-center justify-center rounded-full bg-accent text-white font-medium">
               이 장수로 시작
             </Link>
           ) : g.role === "recruit" ? (
             <RosterStartLink id={id} />
           ) : (
-            <p className="rounded-[18px] bg-card px-4 py-4 text-center">
+            <p className="rounded-[18px] bg-card border border-line px-4 py-4 text-center">
               보스로 등장 — 웨이브 {wave}
               <span className="block text-xs text-muted mt-1">영입할 수 없는 상대예요. 이기면 다음 웨이브로 나아가요.</span>
             </p>

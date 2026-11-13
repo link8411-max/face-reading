@@ -161,7 +161,7 @@ export default function SajuClient() {
                 type="button"
                 onClick={handleSubmit}
                 disabled={!canSubmit}
-                className="w-full h-[52px] bg-ink rounded-full font-medium text-[15px] disabled:opacity-45 text-paper"
+                className="w-full h-[52px] bg-accent rounded-full font-medium text-[15px] disabled:opacity-45 text-white"
               >
                 {loading ? "사주를 계산하는 중…" : "내 사주 보기"}
               </button>

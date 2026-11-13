@@ -56,7 +56,7 @@ export default function WordsIndexPage() {
           </section>
         ))
       )}
-      <Link href="/exam/meme" className="mt-8 flex h-[52px] items-center justify-center rounded-full bg-ink text-base font-medium text-paper">
+      <Link href="/exam/meme" className="mt-8 flex h-[52px] items-center justify-center rounded-full bg-accent text-base font-medium text-white">
         오늘의 5문제 풀기
       </Link>
     </main>

@@ -33,7 +33,7 @@ export default async function FaceMatchSharedPage({ params, searchParams }: Prop
       <SharedLandingTracker test="face_match" resultId={`${m.a}_${m.b}_${m.rel}`} />
       <p className="text-sm text-muted mb-3">친구가 본 얼굴 궁합</p>
       <FaceMatchCard a={m.a} b={m.b} rel={m.rel} result={m.result} />
-      <Link href="/face-match" className="mt-5 h-[56px] rounded-full flex items-center justify-center bg-ink text-paper text-base font-medium">나도 해보기</Link>
+      <Link href="/face-match" className="mt-5 h-[56px] rounded-full flex items-center justify-center bg-accent text-white text-base font-medium">나도 해보기</Link>
       <p className="mt-3 text-xs text-center text-muted">사진은 내 폰 안에서만 보고 바로 지워요</p>
       <CoupangBanner subId="share-face-match" />
     </main>

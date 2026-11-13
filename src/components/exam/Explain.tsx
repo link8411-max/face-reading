@@ -29,7 +29,7 @@ export default function Explain({ q, correct, timedOut, rate = null, isLast, onN
           </div>
         ))}
       </dl>
-      <button ref={nextRef} type="button" onClick={onNext} className="mt-5 flex h-[52px] w-full items-center justify-center rounded-full bg-ink text-base font-medium text-paper">
+      <button ref={nextRef} type="button" onClick={onNext} className="mt-5 flex h-[52px] w-full items-center justify-center rounded-full bg-accent text-base font-medium text-white">
         {isLast ? '성적표 보기' : '다음 문제'}
       </button>
     </section>

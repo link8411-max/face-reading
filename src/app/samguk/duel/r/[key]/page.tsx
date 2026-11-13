@@ -37,7 +37,7 @@ export default async function DuelSharePage({ params }: Props) {
     <main className="max-w-lg mx-auto px-[22px] pt-8 pb-10">
       <SharedLandingTracker test="duel" resultId={k.starter} />
       <p className="text-sm text-muted">친구가 보낸 일기토 기록</p>
-      <section className="bg-card rounded-[30px] px-6 pt-7 pb-6 mt-3">
+      <section className="bg-card border border-line rounded-[30px] px-6 pt-7 pb-6 mt-3">
         <div className="flex gap-4 items-center">
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img src={d.image} alt={`${d.starterName} 도트 초상화`} className="w-24 h-28 object-cover rounded-2xl border-4 border-gold-game [image-rendering:pixelated] flex-none" />
@@ -47,7 +47,7 @@ export default async function DuelSharePage({ params }: Props) {
           </div>
         </div>
       </section>
-      <Link href="/samguk/duel" className="mt-5 h-[56px] rounded-full flex items-center justify-center bg-ink text-paper text-base font-medium">
+      <Link href="/samguk/duel" className="mt-5 h-[56px] rounded-full flex items-center justify-center bg-accent text-white text-base font-medium">
         나도 일기토 하기
       </Link>
       <CoupangBanner subId="share-duel" />

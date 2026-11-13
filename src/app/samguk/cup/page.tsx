@@ -65,7 +65,7 @@ export default async function CupPickerPage() {
               <li key={board}>
                 <Link
                   href={`/samguk/cup/${board}`}
-                  className="flex min-h-[44px] items-center gap-4 rounded-[26px] bg-card px-5 py-4 transition hover:bg-card-2"
+                  className="flex min-h-[44px] items-center gap-4 rounded-[26px] bg-card border border-line px-5 py-4 transition hover:bg-card-2"
                 >
                   {src ? (
                     // eslint-disable-next-line @next/next/no-img-element

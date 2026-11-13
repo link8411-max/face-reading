@@ -43,7 +43,7 @@ export default function SkitCard({ q, state, timedOut }: { q: Question; state: O
           return (
             <div key={i} className={`ex-rise flex flex-col ${mine ? 'items-end' : 'items-start'}`} style={{ '--d': `${i * BUBBLE_MS}ms` } as React.CSSProperties}>
               {!mine && <span className="mb-1 text-xs text-muted">{l.who}</span>}
-              <p className={`max-w-[85%] rounded-[22px] px-4 py-3 text-[15px] leading-snug break-keep ${mine ? 'bg-ink text-paper' : 'bg-card text-ink'}`}>
+              <p className={`max-w-[85%] rounded-[22px] px-4 py-3 text-[15px] leading-snug break-keep ${mine ? 'bg-ink text-paper' : 'bg-card border border-line text-ink'}`}>
                 {parts.length === 1
                   ? l.text
                   : parts.map((p, k) => (
@@ -60,9 +60,9 @@ export default function SkitCard({ q, state, timedOut }: { q: Question; state: O
           <div className="ex-pop flex flex-col items-start">
             <span className="mb-1 text-xs text-muted">{other}</span>
             {reduced || typed ? (
-              <p className="max-w-[85%] rounded-[22px] bg-card px-4 py-3 text-[15px] leading-snug break-keep">{reaction}</p>
+              <p className="max-w-[85%] rounded-[22px] bg-card border border-line px-4 py-3 text-[15px] leading-snug break-keep">{reaction}</p>
             ) : (
-              <p className="ex-dots flex gap-1 rounded-[22px] bg-card px-4 py-3 text-[15px]" aria-label="입력 중"><span>.</span><span>.</span><span>.</span></p>
+              <p className="ex-dots flex gap-1 rounded-[22px] bg-card border border-line px-4 py-3 text-[15px]" aria-label="입력 중"><span>.</span><span>.</span><span>.</span></p>
             )}
           </div>
         )}

@@ -134,7 +134,7 @@ function CupGameInner({ board, title, cards, notes, top5 }: CupGameProps) {
           <CupCardButton card={right} fact={right.facts[view.factIdx[1]]} state={stateOf(right.id)} onPick={onPick} />
         </div>
         {note && (
-          <p className="mt-3 rounded-[22px] bg-card px-4 py-3 text-[13px] leading-relaxed break-keep">
+          <p className="mt-3 rounded-[22px] bg-card border border-line px-4 py-3 text-[13px] leading-relaxed break-keep">
             <span className="font-bold">이 둘이 만난 장면:</span> {note.note}
             <SourceChip source={note.source} />
           </p>
@@ -147,7 +147,7 @@ function CupGameInner({ board, title, cards, notes, top5 }: CupGameProps) {
         type="button"
         onClick={onNext}
         disabled={view.picked === null}
-        className="mt-3 h-[52px] w-full rounded-full bg-ink px-4 font-medium text-paper disabled:opacity-40"
+        className="mt-3 h-[52px] w-full rounded-full bg-accent px-4 font-medium text-white disabled:opacity-40"
       >
         {isLast ? '결과 보기' : '다음 대결'}
       </button>

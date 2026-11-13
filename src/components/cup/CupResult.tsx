@@ -52,7 +52,7 @@ export default function CupResult({ board, title, champion, path, top5 }: Props)
           type="button"
           onClick={share}
           disabled={busy}
-          className="flex h-[52px] w-full items-center justify-center gap-2 rounded-full bg-ink px-4 font-medium text-paper disabled:opacity-70"
+          className="flex h-[52px] w-full items-center justify-center gap-2 rounded-full bg-accent px-4 font-medium text-white disabled:opacity-70"
         >
           <Icon name="share" size={20} />
           공유하기

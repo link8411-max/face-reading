@@ -36,7 +36,7 @@ export default async function CupSharePage({ params }: Props) {
     <main className="mx-auto max-w-lg px-[22px] pt-8 pb-10">
       <SharedLandingTracker test="cup" resultId={s.board} />
       <p className="text-sm text-muted">친구의 최애 장수</p>
-      <section className="mt-3 rounded-[30px] bg-card px-6 pt-7 pb-6">
+      <section className="mt-3 rounded-[30px] bg-card border border-line px-6 pt-7 pb-6">
         <div className="flex items-center gap-4">
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img src={s.image} alt={`${s.name} 도트 초상화`} className="h-28 w-24 flex-none rounded-2xl border-4 border-gold-game object-cover [image-rendering:pixelated]" />
@@ -46,7 +46,7 @@ export default async function CupSharePage({ params }: Props) {
           </div>
         </div>
       </section>
-      <Link href={`/samguk/cup/${s.board}`} className="mt-5 flex h-[52px] items-center justify-center rounded-full bg-ink text-base font-medium text-paper">
+      <Link href={`/samguk/cup/${s.board}`} className="mt-5 flex h-[52px] items-center justify-center rounded-full bg-accent text-base font-medium text-white">
         나도 해보기
       </Link>
       <Link href={`/samguk/people/${s.id}`} className="mt-2 flex h-[52px] items-center justify-center rounded-full border border-line bg-card-2 text-base font-medium">

@@ -37,7 +37,7 @@ export default function WordBody({ card, sameWhen, sameKind, quiz }: { card: Car
       </nav>
       <h1 className="mt-3 font-serif text-[27px] font-bold leading-[1.3] break-keep">{card.term} 뜻</h1>
       <p className="mt-2 flex flex-wrap items-center gap-2 text-sm text-muted">
-        <span className="rounded-full bg-card px-3 py-1 text-xs">{badge(card.when)}</span>
+        <span className="rounded-full bg-card border border-line px-3 py-1 text-xs">{badge(card.when)}</span>
         <span>{KIND_LABEL[card.kind]}</span>
       </p>
       {card.expansion && <p className="mt-3 text-[17px] font-bold break-keep">{card.term} = {card.expansion}</p>}
@@ -59,7 +59,7 @@ export default function WordBody({ card, sameWhen, sameKind, quiz }: { card: Car
           </div>
         </section>
       )}
-      <Link href="/exam/meme" className="mt-8 flex h-[52px] items-center justify-center rounded-full bg-ink text-base font-medium text-paper">
+      <Link href="/exam/meme" className="mt-8 flex h-[52px] items-center justify-center rounded-full bg-accent text-base font-medium text-white">
         오늘의 5문제 풀기
       </Link>
     </>

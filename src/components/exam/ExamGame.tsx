@@ -190,12 +190,12 @@ export default function ExamGame({ rounds, challenge = null }: { rounds: Round[]
   if (phase === 'start') {
     return (
       <>
-      <section className="ex-rise-lg mt-6 rounded-[30px] bg-card px-6 pt-7 pb-6 text-center">
+      <section className="ex-rise-lg mt-6 rounded-[30px] bg-card border border-line px-6 pt-7 pb-6 text-center">
         <p className="text-sm font-medium text-accent">{viewRound.round}회차 · {roundDateLabel(viewRound.round)}</p>
         {challenge && <p className="ex-emph mt-3 font-serif text-[19px] font-bold break-keep">친구는 {challenge.grade}등급. 이길 수 있어요?</p>}
         <h2 className="mt-3 font-serif text-[26px] font-bold leading-[1.35]">5문제, 2분이면 끝나요</h2>
         <p className="mt-2 text-sm leading-relaxed text-muted break-keep">문제마다 시간이 정해져 있어요. 힌트는 한 판에 한 번 쓸 수 있어요.</p>
-        <button type="button" onClick={begin} className="mt-6 flex h-[52px] w-full items-center justify-center rounded-full bg-ink text-base font-medium text-paper">
+        <button type="button" onClick={begin} className="mt-6 flex h-[52px] w-full items-center justify-center rounded-full bg-accent text-base font-medium text-white">
           시험 시작
         </button>
       </section>
@@ -211,7 +211,7 @@ export default function ExamGame({ rounds, challenge = null }: { rounds: Round[]
   if (phase === 'grading') {
     const marks = result?.report.marks ?? ''
     return (
-      <section className="mt-6 rounded-[30px] bg-card px-6 pt-8 pb-6 text-center" aria-live="polite">
+      <section className="mt-6 rounded-[30px] bg-card border border-line px-6 pt-8 pb-6 text-center" aria-live="polite">
         <h2 className="font-serif text-[22px] font-bold">채점 중이에요</h2>
         <div className="mt-5 flex justify-center gap-2">
           {[0, 1, 2, 3, 4].map((i) => (
@@ -246,7 +246,7 @@ export default function ExamGame({ rounds, challenge = null }: { rounds: Round[]
     <section className="mt-5" aria-label="문제">
       <div className="mb-3 flex items-center justify-between">
         <p className="text-sm font-bold tabular-nums">{idx + 1} / {play.round.questions.length}</p>
-        <span key={idx} className="ex-rise rounded-full bg-card px-3 py-1 text-xs text-muted">{q.badge}</span>
+        <span key={idx} className="ex-rise rounded-full bg-card border border-line px-3 py-1 text-xs text-muted">{q.badge}</span>
       </div>
       {(!answered || timedOut) && <TimerBar key={`${play.round.round}-${idx}`} limitMs={timeLimitMs(q)} delayMs={reduced ? 0 : enterMs(q)} reduced={reduced} timedOut={timedOut} />}
       <div key={idx} className="mt-4">

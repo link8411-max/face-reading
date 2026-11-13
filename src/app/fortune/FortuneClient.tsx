@@ -191,7 +191,7 @@ export default function FortuneClient() {
             <button
               onClick={handleSubmit}
               disabled={loading || !dateCheck.ok}
-              className="w-full h-[52px] bg-ink rounded-full font-medium text-[15px] disabled:opacity-45 text-paper"
+              className="w-full h-[52px] bg-accent rounded-full font-medium text-[15px] disabled:opacity-45 text-white"
             >
               {loading ? "사주 분석 중…" : "운세 보기"}
             </button>
@@ -202,7 +202,7 @@ export default function FortuneClient() {
         {result && (
           <div className="space-y-4 animate-fade-in">
             {/* 캡쳐 영역 시작 */}
-            <div ref={resultRef} className="space-y-3 bg-card rounded-[30px] p-4">
+            <div ref={resultRef} className="space-y-3 bg-card border border-line rounded-[30px] p-4">
             {/* 기본 정보 */}
             <div className="bg-white rounded-[22px] p-5 border border-line">
               <div className="text-center mb-4">
@@ -265,7 +265,7 @@ export default function FortuneClient() {
               <button
                 onClick={() => share(getShareOptions())}
                 disabled={isCapturing}
-                className="h-[52px] rounded-full flex items-center justify-center gap-2 bg-ink text-paper text-[15px] font-medium disabled:opacity-50"
+                className="h-[52px] rounded-full flex items-center justify-center gap-2 bg-accent text-white text-[15px] font-medium disabled:opacity-50"
               >
                 <Icon name="share" size={18} />
                 {isCapturing ? "이미지 만드는 중…" : `${FORTUNE_YEAR.year} 운세 공유하기`}

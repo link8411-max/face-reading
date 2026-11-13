@@ -152,10 +152,10 @@ export default async function PersonPage({ params }: Props) {
         <RelatedVideosRow items={relatedVideos} />
 
         {/* 5. 닮은꼴 배너 */}
-        <section className="mt-5 rounded-[22px] bg-card px-5 py-5 text-center">
+        <section className="mt-5 rounded-[22px] bg-card border border-line px-5 py-5 text-center">
           <p className="font-serif font-bold text-lg break-keep">나도 {c.name}{eulReul(c.name)} 닮았을까?</p>
           <div className="mt-3 flex flex-col gap-2">
-            <Link href="/samguk" className="flex h-[52px] items-center justify-center rounded-full bg-ink text-paper font-medium px-4">
+            <Link href="/samguk" className="flex h-[52px] items-center justify-center rounded-full bg-accent text-white font-medium px-4">
               {pending ? "삼국지 닮은꼴 테스트 하기" : `나도 ${c.name}${eulReul(c.name)} 닮았을까? 사진 한 장으로 확인하기`}
             </Link>
             {duelOk && (

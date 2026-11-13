@@ -133,7 +133,7 @@ export default function VotePoll({ kind, id, target, title, options, share }: Pr
             type="button"
             onClick={() => void doShare()}
             disabled={shareBusy}
-            className="h-[52px] w-full rounded-full bg-ink text-paper font-medium px-4 disabled:opacity-70"
+            className="h-[52px] w-full rounded-full bg-accent text-white font-medium px-4 disabled:opacity-70"
           >
             친구에게 공유하기
           </button>

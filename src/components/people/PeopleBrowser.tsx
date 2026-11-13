@@ -125,7 +125,7 @@ export default function PeopleBrowser({ cards, afterMap }: { cards: HubCard[]; a
               </div>
             </div>
             {today.fact && <p className="mt-3 rounded-2xl bg-card-2 px-3 py-2 text-sm leading-relaxed break-keep"><span className="font-bold">알고 보면</span> {today.fact}</p>}
-            <Link href={`/samguk/people/${today.id}`} prefetch={false} className="mt-3 inline-flex items-center h-11 px-4 rounded-full bg-ink text-paper text-sm font-medium">
+            <Link href={`/samguk/people/${today.id}`} prefetch={false} className="mt-3 inline-flex items-center h-11 px-4 rounded-full bg-accent text-white text-sm font-medium">
               {today.name} 열전 읽기
             </Link>
           </div>

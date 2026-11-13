@@ -117,7 +117,7 @@ export default function FaceMatchClient({ invite }: { invite?: { key: AnimalKey;
   return (
     <div className="flex flex-col gap-4 pb-7 no-screenshot">
       {invite ? (
-        <p className="bg-card rounded-[22px] p-4 text-sm leading-relaxed">
+        <p className="bg-card border border-line rounded-[22px] p-4 text-sm leading-relaxed">
           <b>{invite.rel === "lover" ? "내 사람이 연인 궁합을 보자고 해요." : "친구가 궁합을 보자고 해요."}</b> {josa(OTHER_LABEL[invite.rel], "은", "는")} {animalTypeDB[invite.key].name}이에요. 내 사진을 올리면 바로 궁합이 나와요.
         </p>
       ) : (
@@ -138,7 +138,7 @@ export default function FaceMatchClient({ invite }: { invite?: { key: AnimalKey;
       {inviteUrl && (
         <div className="bg-white border border-line rounded-[22px] p-4 flex flex-col gap-2">
           <p className="text-sm">{OTHER_LABEL[rel!]}도 자기 사진으로 해 보게 할까요?</p>
-          <button type="button" onClick={inviteShare.share} disabled={inviteShare.busy} className="h-12 rounded-full bg-ink text-paper text-sm font-medium flex items-center justify-center gap-1.5 disabled:opacity-50">
+          <button type="button" onClick={inviteShare.share} disabled={inviteShare.busy} className="h-12 rounded-full bg-accent text-white text-sm font-medium flex items-center justify-center gap-1.5 disabled:opacity-50">
             <Icon name="share" size={16} /> {OTHER_LABEL[rel!]}에게 초대 링크 보내기
           </button>
           {inviteShare.notice && <p role="status" className="text-xs text-muted text-center">{inviteShare.notice}</p>}
@@ -154,7 +154,7 @@ export default function FaceMatchClient({ invite }: { invite?: { key: AnimalKey;
           {rel === "crush" ? "그 사람 사진도 내 폰 안에서만 보고 바로 지워요. 어디에도 올라가지 않고, 상대에게 알림도 가지 않아요." : "사진은 내 폰 안에서만 보고 바로 지워요. 어디에도 올라가지 않아요."}
         </span>
       </div>
-      <button type="button" onClick={analyze} disabled={!ready || busy} className="h-[52px] rounded-full bg-ink text-paper text-[15px] font-medium disabled:opacity-45">
+      <button type="button" onClick={analyze} disabled={!ready || busy} className="h-[52px] rounded-full bg-accent text-white text-[15px] font-medium disabled:opacity-45">
         {busy ? "궁합 보는 중…" : !rel ? "어떤 사이인지 먼저 골라 주세요" : "궁합 보기"}
       </button>
     </div>

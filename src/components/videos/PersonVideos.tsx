@@ -57,7 +57,7 @@ export default function PersonVideos({ id, name, videos }: { id: string; name: s
         </div>
       )}
       <div className="flex gap-2">
-        <SubscribeLink slot="people" className="flex h-11 flex-1 items-center justify-center rounded-full bg-ink text-sm text-paper">
+        <SubscribeLink slot="people" className="flex h-11 flex-1 items-center justify-center rounded-full bg-accent text-sm text-white">
           유튜브에서 구독
         </SubscribeLink>
         <Link href="/samguk/videos" className="flex h-11 flex-1 items-center justify-center rounded-full border border-ink text-sm">

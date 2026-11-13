@@ -21,12 +21,12 @@ export default function ResultActions({ from, onShare, onSave, onRetry, busy, no
   return (
     <div className="no-screenshot flex flex-col">
       {lead && (
-        <Link href={lead.href} className="mt-4 h-[52px] rounded-full flex items-center justify-center gap-2 bg-ink text-paper text-[15px] font-medium">
+        <Link href={lead.href} className="mt-4 h-[52px] rounded-full flex items-center justify-center gap-2 bg-accent text-white text-[15px] font-medium">
           <Icon name="users" size={18} />
           {lead.label}
         </Link>
       )}
-      <button type="button" onClick={onShare} disabled={busy} className={`${lead ? "mt-2 bg-white text-ink border border-line" : "mt-4 bg-ink text-paper"} h-[52px] rounded-full flex items-center justify-center gap-2 text-[15px] font-medium disabled:opacity-50`}>
+      <button type="button" onClick={onShare} disabled={busy} className={`${lead ? "mt-2 bg-white text-ink border border-line" : "mt-4 bg-accent text-white"} h-[52px] rounded-full flex items-center justify-center gap-2 text-[15px] font-medium disabled:opacity-50`}>
         <Icon name="share" size={18} />
         {busy ? "공유 준비 중…" : "공유하기"}
       </button>

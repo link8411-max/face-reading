@@ -48,7 +48,7 @@
 **Interfaces:**
 - Produces: CSS 변수 `--font-pretendard`(layout의 `localFont` variable). `--font-sans`와 `--font-serif`가 모두 이것을 가리킨다. `--font-gowun-batang`은 부적 전용으로 남는다.
 
-- [ ] **Step 1: 테스트를 새 글꼴 기준으로 고친다**
+- [x] **Step 1: 테스트를 새 글꼴 기준으로 고친다**
 
 `tests/design.test.tsx` 첫 두 테스트를 이렇게 바꾼다.
 
@@ -94,12 +94,12 @@ test('글꼴은 쓰는 굵기만: Pretendard 가변(400~800) 한 파일, Gowun B
 
 `e2e/design.spec.ts` 첫 테스트의 글꼴 줄을 `expect(s.font).toMatch(/pretendard/i)`로 바꾼다(색 두 줄은 Task 2에서 바꾼다).
 
-- [ ] **Step 2: 실패 확인**
+- [x] **Step 2: 실패 확인**
 
 Run: `npx vitest run tests/design.test.tsx tests/stage4a-review.test.ts`
 Expected: 새로 쓴 글꼴 테스트 3개가 FAIL(`PretendardVariable.woff2` 없음).
 
-- [ ] **Step 3: 원본을 받고 subset 스크립트를 고친다**
+- [x] **Step 3: 원본을 받고 subset 스크립트를 고친다**
 
 원본은 레포 밖 빈 폴더에 받는다(받은 파일은 실행하지 않는다).
 
@@ -117,7 +117,7 @@ cp package/dist/LICENSE.txt <레포>/src/fonts/OFL-Pretendard.txt
 Run: `node scripts/font-subset.mjs /tmp/pretendard-src`
 Expected: `PretendardVariable.woff2 ... → PretendardVariable.woff2 약 430KB`가 찍히고 나머지는 "건너뜀". 결과 파일이 `src/fonts/PretendardVariable.woff2`에 생긴다.
 
-- [ ] **Step 4: layout과 CSS를 바꾼다**
+- [x] **Step 4: layout과 CSS를 바꾼다**
 
 `src/app/layout.tsx`:
 - `notoSans` 선언을 지우고 `const pretendard = localFont({ variable: "--font-pretendard", src: [{ path: "../fonts/PretendardVariable.woff2", weight: "400 800", style: "normal" }], display: "swap" })`.
@@ -131,12 +131,12 @@ Expected: `PretendardVariable.woff2 ... → PretendardVariable.woff2 약 430KB`�
 
 그 뒤 `NotoSansKR-*.woff2`, `OFL-NotoSansCJK.txt`를 지운다.
 
-- [ ] **Step 5: 통과 확인**
+- [x] **Step 5: 통과 확인**
 
 Run: `npx vitest run tests/design.test.tsx tests/stage4a-review.test.ts && npm test`
 Expected: 모두 PASS. `grep -rn "font-noto-sans-kr\|NotoSansKR" src`가 아무것도 내지 않는다.
 
-- [ ] **Step 6: CLAUDE.md 갱신과 커밋**
+- [x] **Step 6: CLAUDE.md 갱신과 커밋**
 
 CLAUDE.md "디자인 시스템"의 글꼴 줄을 "제목·본문 Pretendard 가변(400~800, `font-serif`·`font-sans` 모두), 전통 부적 글씨만 Gowun Batang(미리 받지 않음), 삼국지 카드 Silkscreen"으로 고친다.
 
@@ -160,7 +160,7 @@ git commit -m "디자인 1단계: 글꼴을 Pretendard 가변 글꼴로(부적 �
 - Consumes: Task 1 없음(독립).
 - Produces: Tailwind 클래스 `bg-lime`·`text-lime`(새 토큰). 다른 토큰 이름은 그대로.
 
-- [ ] **Step 1: 테스트를 새 값으로 고친다**
+- [x] **Step 1: 테스트를 새 값으로 고친다**
 
 `tests/design.test.tsx`:
 - `TOKENS`의 뉴트럴 값을 Global Constraints의 값으로 바꾸고 `['lime', '#C6F24E']`를 더한다. 게임·부적 토큰 줄은 그대로.
@@ -182,12 +182,12 @@ test('옛 베이지·테라코타 색이 src에 남아 있지 않다(부적·게
 
 `e2e/design.spec.ts` 첫 테스트: 바탕 `rgb(247, 248, 252)`, 글자 `rgb(26, 27, 37)`. 테스트 이름의 "Noto Sans KR"·"뉴트럴"을 "Pretendard"·"새 색"으로.
 
-- [ ] **Step 2: 실패 확인**
+- [x] **Step 2: 실패 확인**
 
 Run: `npx vitest run tests/design.test.tsx`
 Expected: `뉴트럴 색 토큰`과 `옛 베이지·테라코타 색` 테스트가 FAIL.
 
-- [ ] **Step 3: 토큰과 하드코딩 색을 바꾼다**
+- [x] **Step 3: 토큰과 하드코딩 색을 바꾼다**
 
 `globals.css` `@theme`의 값을 Global Constraints대로 바꾸고 `--color-lime: #C6F24E;`를 더한다. 파일 맨 위 주석을 "시안 B(블루·라임, 2026-11-13)"로 고친다.
 
@@ -206,12 +206,12 @@ Expected: `뉴트럴 색 토큰`과 `옛 베이지·테라코타 색` 테스트�
 
 OG 두 경로는 바탕 `#F7F8FC`, 카드 `#FFFFFF`(테두리 `3px solid #E1E6F5`), 사이트 이름·점수 `#2D55FF`, 큰 글자 `#1A1B25`, 설명 `#5E6070`. 오른쪽 장식 원 두 개는 `#EEF1FA`와 `#C6F24E`.
 
-- [ ] **Step 4: 통과 확인**
+- [x] **Step 4: 통과 확인**
 
 Run: `npm test`
 Expected: PASS. `grep -rniE '#(FBF6F1|2E2A27|9A4F35)' src --exclude-dir=game`가 아무것도 내지 않는다. `src/game/duel/palette.ts`·`config.ts`의 `#6B6259`는 그대로 둔다.
 
-- [ ] **Step 5: 커밋**
+- [x] **Step 5: 커밋**
 
 ```bash
 git add -A src tests/design.test.tsx e2e/design.spec.ts
@@ -230,7 +230,7 @@ git commit -m "디자인 1단계: 색 토큰을 블루·라임으로, 하드코�
 - Consumes: Task 2의 `accent` 토큰.
 - Produces: 주 버튼 규칙 "`bg-accent text-white`", 선택된 칩·토글은 계속 "`bg-ink text-paper`".
 
-- [ ] **Step 1: 주 버튼을 바꾼다**
+- [x] **Step 1: 주 버튼을 바꾼다**
 
 Run: `grep -rn "bg-ink" src --include='*.tsx' | grep "text-paper"`
 
@@ -239,20 +239,20 @@ Run: `grep -rn "bg-ink" src --include='*.tsx' | grep "text-paper"`
 - 선택 상태를 나타내는 칩·탭·토글(조건식 `selected ? 'bg-ink text-paper' : ...` 안에 있는 것, `aria-pressed`·`aria-checked`·`aria-selected`를 가진 것)은 그대로 둔다.
 - `disabled:opacity-*`는 그대로 둔다.
 
-- [ ] **Step 2: 흰 카드에 테두리를 준다**
+- [x] **Step 2: 흰 카드에 테두리를 준다**
 
 `bg-card`를 쓰는 요소 중 `border`가 없는 것에 `border border-line`을 더한다(새 card가 흰색이라 바탕과 구분이 안 된다). 단, `bg-card` 위에 또 `bg-card`가 겹친 안쪽 요소와 결과 캡처 카드(`ResultCard`, `SamgukGameCard`)는 바깥 테두리 하나만 둔다.
 
-- [ ] **Step 3: 전체 확인**
+- [x] **Step 3: 전체 확인**
 
 Run: `npm test && npm run test:e2e`
 Expected: 모두 PASS. 실패하면 Review Focus 2(넘침)부터 본다. 값을 바꿔 테스트를 맞추지 말고, 넘치는 화면의 글자 크기나 간격을 고친다.
 
-- [ ] **Step 4: 눈으로 확인**
+- [x] **Step 4: 눈으로 확인**
 
 `npm run dev -- -p 3311`로 띄우고 390px 폭에서 `/`, `/face-tests`, `/animal`, `/face2/r/earth-mid`, `/bujeok`(먹빛 마감 포함), `/samguk/duel`, `/fortune/daily`를 본다. 결과 화면 하나에서 "이미지 저장"을 눌러 저장 이미지의 바탕이 새 색인지 본다. 스크린숏 7장을 `test-results/stage1/`에 남긴다.
 
-- [ ] **Step 5: CLAUDE.md와 커밋**
+- [x] **Step 5: CLAUDE.md와 커밋**
 
 CLAUDE.md "디자인 시스템 (4b 뉴트럴)" 절 제목을 "디자인 시스템 (블루·라임, 2026-11-13)"으로, 토큰 줄을 새 값으로, "주 버튼 `bg-ink text-paper`"를 "주 버튼 `bg-accent text-white`, 선택된 칩은 `bg-ink text-paper`"로, "옛 민화 색…테스트로 막는다" 줄에 "4b 베이지·테라코타 색도 막는다"를 더한다.
 

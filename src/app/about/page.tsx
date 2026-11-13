@@ -54,7 +54,7 @@ export default function AboutPage() {
             </section>
 
             <div className="text-center mt-12">
-                <Link href="/" className="px-6 py-3 bg-ink text-paper rounded-full">
+                <Link href="/" className="px-6 py-3 bg-accent text-white rounded-full">
                     메인으로 돌아가기
                 </Link>
             </div>

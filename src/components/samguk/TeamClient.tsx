@@ -98,7 +98,7 @@ export default function TeamClient() {
         <Icon name="shield" size={20} className="text-accent flex-none" />
         <span className="text-xs leading-normal text-muted">팀원 사진은 내 폰 안에서만 보고 바로 지워요. 별칭은 저장 이미지에만 나오고 공유 링크에는 들어가지 않아요.</span>
       </div>
-      <button type="button" onClick={analyze} disabled={!ready || busy} className="h-[52px] rounded-full bg-ink text-paper text-[15px] font-medium disabled:opacity-45">
+      <button type="button" onClick={analyze} disabled={!ready || busy} className="h-[52px] rounded-full bg-accent text-white text-[15px] font-medium disabled:opacity-45">
         {busy ? "장수 찾는 중…" : ready ? "우리 팀 결과 보기" : "모든 팀원의 성별과 사진을 골라 주세요"}
       </button>
     </div>

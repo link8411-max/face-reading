@@ -54,7 +54,7 @@ export async function SharePage({ kind, params, searchParams }: { kind: ShareKin
     <main className="max-w-lg mx-auto px-[22px] pt-8 pb-10">
       <SharedLandingTracker kind={kind} resultId={r.key} />
       <p className="text-sm text-muted">친구가 보낸 결과</p>
-      <section className="relative overflow-hidden bg-card rounded-[30px] px-6 pt-7 pb-6 mt-3">
+      <section className="relative overflow-hidden bg-card border border-line rounded-[30px] px-6 pt-7 pb-6 mt-3">
         <span className="absolute -right-3 -top-2 pointer-events-none"><MoonDeco size={130} /></span>
         <h1 className="relative font-serif font-bold text-[26px] leading-[1.4] pr-16 break-keep">친구는 {kind === "saju" ? "친구가 풀어 본 사주예요" : kind === "samguk" ? `${josa(r.name, "을", "를")} 닮았대요` : `${josa(r.name, "이", "가")} 나왔어요`}</h1>
         {scoreLabel && <p className="relative text-accent font-medium mt-2">{scoreLabel}</p>}
@@ -68,7 +68,7 @@ export async function SharePage({ kind, params, searchParams }: { kind: ShareKin
           <p className="text-sm leading-relaxed text-muted">{kind === "saju" && <strong className="block mb-1 font-serif text-base text-ink">{r.name}</strong>}{summaryOf(r)}</p>
         </div>
       </section>
-      <Link href={r.testPath} className="mt-5 h-[56px] rounded-full flex items-center justify-center bg-ink text-paper text-base font-medium">
+      <Link href={r.testPath} className="mt-5 h-[56px] rounded-full flex items-center justify-center bg-accent text-white text-base font-medium">
         나도 해보기
       </Link>
       {kind === "samguk" && getPerson(r.key) && (

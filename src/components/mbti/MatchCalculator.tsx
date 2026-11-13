@@ -67,9 +67,9 @@ export default function MatchCalculator({ initial }: { initial?: { a: MbtiType; 
     return (
       <div className="space-y-4">
         {fromShare && (
-          <div className="bg-card rounded-[22px] p-4 flex items-center justify-between gap-3">
+          <div className="bg-card border border-line rounded-[22px] p-4 flex items-center justify-between gap-3">
             <p className="text-sm font-medium">친구가 보낸 궁합이에요</p>
-            <button type="button" onClick={() => { setFromShare(false); setA(null); setB(null); setShown(false); }} className="h-10 px-4 rounded-full bg-ink text-paper text-sm font-medium flex-none">내 궁합 보기</button>
+            <button type="button" onClick={() => { setFromShare(false); setA(null); setB(null); setShown(false); }} className="h-10 px-4 rounded-full bg-accent text-white text-sm font-medium flex-none">내 궁합 보기</button>
           </div>
         )}
         <section aria-label="궁합 결과" ref={ref} className="bg-white border-2 border-accent/30 rounded-3xl p-5 text-center">
@@ -83,7 +83,7 @@ export default function MatchCalculator({ initial }: { initial?: { a: MbtiType; 
         </section>
         <div className="grid grid-cols-2 gap-2">
           <button type="button" onClick={() => { track("share_click", { test_name: "mbti_match", method: "save_image" }); download(opts); }} disabled={isCapturing} className="py-3 rounded-full bg-white border border-line font-bold">{isCapturing ? "저장 중…" : "결과 저장"}</button>
-          <button type="button" onClick={share} disabled={busy} className="py-3 rounded-full bg-ink text-paper font-bold">공유하기</button>
+          <button type="button" onClick={share} disabled={busy} className="py-3 rounded-full bg-accent text-white font-bold">공유하기</button>
         </div>
         {notice && <p role="status" className="text-xs text-center text-muted">{notice}</p>}
         <GiftNudge from="mbti_match" />
@@ -101,7 +101,7 @@ export default function MatchCalculator({ initial }: { initial?: { a: MbtiType; 
       <TypeGroup label="나의 MBTI" value={a} onChange={setA} />
       <TypeGroup label="상대의 MBTI" value={b} onChange={setB} />
       <button type="button" disabled={!a || !b} onClick={() => { setShown(true); if (a && b) track("result_view", { test_name: "mbti_match", result_id: `${a}_${b}` }); }}
-        className="w-full h-[52px] rounded-full bg-ink text-paper font-medium text-[15px] disabled:opacity-45">
+        className="w-full h-[52px] rounded-full bg-accent text-white font-medium text-[15px] disabled:opacity-45">
         {a && b ? `${a} × ${b} 궁합 보기` : "두 유형을 골라 궁합 보기"}
       </button>
     </div>

@@ -124,7 +124,7 @@ export default function Zodiac2027Hub() {
             ))}
           </div>
         </section>
-        <Link href="/fortune" className="block text-center h-[52px] leading-[52px] bg-ink rounded-full font-medium text-paper">
+        <Link href="/fortune" className="block text-center h-[52px] leading-[52px] bg-accent rounded-full font-medium text-white">
           내 생년월일 사주로 자세히 보기
         </Link>
         <CoupangBanner subId="fortune-2027" />

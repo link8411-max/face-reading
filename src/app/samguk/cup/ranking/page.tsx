@@ -115,10 +115,10 @@ export default async function CupRankingPage() {
             )}
           </>
         ) : (
-          <section className="mt-6 rounded-[22px] bg-card px-5 py-5 text-center">
+          <section className="mt-6 rounded-[22px] bg-card border border-line px-5 py-5 text-center">
             <p className="font-serif text-lg font-bold">아직 우승 기록을 모으는 중이에요</p>
             <p className="mt-1 text-sm text-muted">첫 우승이 나오면 바로 순위를 보여 드려요.</p>
-            <Link href="/samguk/cup" className="mx-auto mt-4 flex h-[52px] items-center justify-center rounded-full bg-ink text-base font-medium text-paper">
+            <Link href="/samguk/cup" className="mx-auto mt-4 flex h-[52px] items-center justify-center rounded-full bg-accent text-base font-medium text-white">
               판 고르기
             </Link>
           </section>

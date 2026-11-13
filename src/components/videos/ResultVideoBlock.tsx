@@ -58,7 +58,7 @@ export default function ResultVideoBlock({
             <a
               href={`/samguk/videos?v=${v.id}`}
               onClick={() => track('video_play', { slot: 'result', result_id: gaVideoId(v.id) })}
-              className="flex h-11 items-center justify-center rounded-full bg-ink text-sm text-paper"
+              className="flex h-11 items-center justify-center rounded-full bg-accent text-sm text-white"
             >
               영상 보기
             </a>

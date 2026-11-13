@@ -37,7 +37,7 @@ export default async function TeamSharedPage({ params }: Props) {
       <SharedLandingTracker test="team_samguk" resultId={`${lord.character.id}_${team.members.length}`} />
       <p className="text-sm text-muted mb-3">친구네 팀 결과</p>
       <TeamCard team={team} />
-      <Link href="/samguk/team" className="mt-5 h-[56px] rounded-full flex items-center justify-center bg-ink text-paper text-base font-medium">우리 팀도 만들어 보기</Link>
+      <Link href="/samguk/team" className="mt-5 h-[56px] rounded-full flex items-center justify-center bg-accent text-white text-base font-medium">우리 팀도 만들어 보기</Link>
       <p className="mt-3 text-xs text-center text-muted">사진은 내 폰 안에서만 보고 바로 지워요</p>
       <CoupangBanner subId="share-team" />
     </main>

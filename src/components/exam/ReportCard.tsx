@@ -109,7 +109,7 @@ export default function ReportCard({ round, report, streak, challenge = null }: 
       </div>
       <div className="no-screenshot mt-4 flex flex-col gap-2">
         {!duel && (
-          <button type="button" onClick={share} disabled={busy} className="flex h-[52px] items-center justify-center gap-2 rounded-full bg-ink text-[15px] font-medium text-paper disabled:opacity-60">
+          <button type="button" onClick={share} disabled={busy} className="flex h-[52px] items-center justify-center gap-2 rounded-full bg-accent text-[15px] font-medium text-white disabled:opacity-60">
             <Icon name="share" size={18} />
             친구에게 도전장 보내기
           </button>

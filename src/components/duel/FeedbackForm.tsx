@@ -75,7 +75,7 @@ export default function FeedbackForm({ wave, starter, cleared, runId, rating: ra
         type="button"
         onClick={submit}
         disabled={rating < 1 || status === "sending"}
-        className="mt-3 h-[52px] w-full rounded-full bg-ink text-paper disabled:opacity-40"
+        className="mt-3 h-[52px] w-full rounded-full bg-accent text-white disabled:opacity-40"
       >
         보내기
       </button>

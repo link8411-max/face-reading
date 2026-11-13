@@ -23,7 +23,7 @@ export default function SeasonCard() {
         <p className="text-xs font-medium text-[#4F5A43]">{season.chip}</p>
         <h2 className="font-serif font-bold text-[17px] leading-[1.4] mt-1.5 whitespace-pre-line">{season.title}</h2>
         <p className="text-[13px] text-muted mt-1 max-[379px]:min-h-[39px]">{season.sub}</p>
-        <Link href={season.cta.href} className="inline-flex items-center mt-3 h-11 px-5 rounded-full bg-ink text-paper text-sm font-medium">
+        <Link href={season.cta.href} className="inline-flex items-center mt-3 h-11 px-5 rounded-full bg-accent text-white text-sm font-medium">
           {season.cta.label}
         </Link>
       </div>

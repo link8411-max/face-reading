@@ -51,7 +51,7 @@ export default function HouseBanner({ high }: { high: WeeklyHigh }) {
           {high.regionName} {high.aptName} {high.amountText}
         </span>
         <span className="mt-0.5 block text-sm text-muted">이전 최고가보다 {high.jumpText}</span>
-        <span className="mt-3 flex h-10 items-center justify-center rounded-full bg-ink text-paper text-sm font-medium">다른 신고가 보기</span>
+        <span className="mt-3 flex h-10 items-center justify-center rounded-full bg-accent text-white text-sm font-medium">다른 신고가 보기</span>
       </a>
     </div>
   )

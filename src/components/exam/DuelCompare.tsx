@@ -25,7 +25,7 @@ export default function DuelCompare({ mine, theirs, onShare, busy }: { mine: Sha
       </div>
       <p className="ex-pop mt-4 text-center font-serif text-[22px] font-bold" style={{ '--d': '600ms' } as React.CSSProperties}>{OUTCOME[duelOutcome(mine, theirs)]}</p>
       {theirs.hint && <p className="mt-1 text-center text-sm text-muted">친구는 힌트를 썼어요</p>}
-      <button type="button" onClick={onShare} disabled={busy} className="mt-4 flex h-[52px] w-full items-center justify-center rounded-full bg-ink text-base font-medium text-paper disabled:opacity-60">
+      <button type="button" onClick={onShare} disabled={busy} className="mt-4 flex h-[52px] w-full items-center justify-center rounded-full bg-accent text-base font-medium text-white disabled:opacity-60">
         나도 도전장 보내기
       </button>
     </section>

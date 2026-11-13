@@ -52,7 +52,7 @@ export default function ZodiacPicker() {
           <p className="text-xs text-muted mt-1">행운의 시간 {fortune.행운.시간} · 행운의 색 {fortune.행운.색}</p>
           <div className="grid grid-cols-2 gap-2 mt-3">
             <Link href="/fortune/daily" className="h-11 grid place-items-center text-[13px] font-medium bg-white border border-line rounded-full">오늘의 운세 자세히</Link>
-            <Link href={`/fortune/2027/${selected}`} className="h-11 grid place-items-center text-[13px] font-medium bg-ink text-paper rounded-full">{FORTUNE_YEAR.year} {z.띠}띠 운세</Link>
+            <Link href={`/fortune/2027/${selected}`} className="h-11 grid place-items-center text-[13px] font-medium bg-accent text-white rounded-full">{FORTUNE_YEAR.year} {z.띠}띠 운세</Link>
           </div>
           <p className="text-xs text-muted mt-2">년생을 넣으면 더 정확해요</p>
         </div>

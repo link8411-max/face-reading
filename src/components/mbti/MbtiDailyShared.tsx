@@ -22,8 +22,8 @@ export default function MbtiDailyShared({ type }: { type: MbtiType }) {
   return (
     <>
       <p className="text-sm text-muted mb-3">친구가 보낸 오늘의 운세</p>
-      {date ? <MbtiDailyCard type={type} date={date} daily={mbtiDaily(type, date)} withMatchLink={false} /> : <div className="h-[420px] rounded-[30px] bg-card" aria-hidden />}
-      <Link href={mine ? `/fortune/mbti?t=${mine.toLowerCase()}` : "/fortune/mbti"} className="mt-5 h-[56px] rounded-full flex items-center justify-center bg-ink text-paper text-base font-medium">내 MBTI로 보기</Link>
+      {date ? <MbtiDailyCard type={type} date={date} daily={mbtiDaily(type, date)} withMatchLink={false} /> : <div className="h-[420px] rounded-[30px] bg-card border border-line" aria-hidden />}
+      <Link href={mine ? `/fortune/mbti?t=${mine.toLowerCase()}` : "/fortune/mbti"} className="mt-5 h-[56px] rounded-full flex items-center justify-center bg-accent text-white text-base font-medium">내 MBTI로 보기</Link>
       <p className="mt-3 text-xs text-center text-muted">생년월일 없이 MBTI만 고르면 돼요</p>
     </>
   );

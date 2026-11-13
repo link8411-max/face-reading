@@ -6,7 +6,7 @@ import type { AnimalKey } from "@/lib/animal/matcher";
 // 얼굴 궁합 결과 카드 (캡처 한 장 완결, 워터마크)
 export default function FaceMatchCard({ a, b, rel, result, captureRef }: { a: AnimalKey; b: AnimalKey; rel: Rel; result: FaceMatchResult; captureRef?: Ref<HTMLElement> }) {
   return (
-    <article ref={captureRef} className="relative overflow-hidden bg-card rounded-[30px] px-[22px] pt-6 pb-5 flex flex-col text-ink">
+    <article ref={captureRef} className="relative overflow-hidden bg-card border border-line rounded-[30px] px-[22px] pt-6 pb-5 flex flex-col text-ink">
       <p className="text-xs font-medium text-accent">{REL_NAME[rel]} 궁합</p>
       <p className="font-serif font-bold text-[22px] mt-2 break-keep">
         {animalTypeDB[a].name} <span className="text-muted font-normal">×</span> {animalTypeDB[b].name}

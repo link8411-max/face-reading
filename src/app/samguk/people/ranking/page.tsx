@@ -137,7 +137,7 @@ export default async function PeopleRankingPage() {
           </>
         ) : (
           <section className="mt-6">
-            <div className="rounded-[22px] bg-card px-5 py-5 text-center">
+            <div className="rounded-[22px] bg-card border border-line px-5 py-5 text-center">
               <p className="font-serif font-bold text-lg">응원을 모으는 중</p>
               <p className="mt-1 text-sm text-muted">첫 응원이 모이면 바로 순위를 보여 드려요. 좋아하는 장수의 열전에서 응원해 주세요.</p>
             </div>

@@ -76,7 +76,7 @@ export default function MbtiArticle({ type }: { type: MbtiType }) {
         </div>
         <p className="text-sm mt-3"><b>친구로 잘 맞는 유형</b> · {bestMatches(type, "friend").join(", ")} — {compatSummary(type, bestMatches(type, "friend")[0]).lines[0]}</p>
         <p className="text-sm mt-1"><b>함께 일하기 좋은 유형</b> · {bestMatches(type, "work").join(", ")} — {compatSummary(type, bestMatches(type, "work")[0]).lines[2]}</p>
-        <Link href={`/mbti/match?a=${type}`} className="block text-center mt-4 h-[52px] leading-[52px] rounded-full bg-ink text-paper font-medium">궁합 계산기로 자세히 보기</Link>
+        <Link href={`/mbti/match?a=${type}`} className="block text-center mt-4 h-[52px] leading-[52px] rounded-full bg-accent text-white font-medium">궁합 계산기로 자세히 보기</Link>
       </section>
 
       <section className={card}>

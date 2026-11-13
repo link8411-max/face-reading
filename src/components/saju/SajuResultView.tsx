@@ -33,7 +33,7 @@ export default function SajuResultView({ result, captureRef, actions, after, bir
         </div>
       )}
 
-      <section ref={captureRef} className="bg-card rounded-[30px] p-4 space-y-3">
+      <section ref={captureRef} className="bg-card border border-line rounded-[30px] p-4 space-y-3">
         {birthLine && <p className="no-screenshot text-center text-sm text-muted">{birthLine}</p>}
         <div className="bg-white rounded-[22px] border border-line p-4">
           <SajuTable pillars={result.pillars} />

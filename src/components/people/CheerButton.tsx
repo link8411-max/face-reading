@@ -44,14 +44,14 @@ export default function CheerButton({ id, name }: { id: string; name: string }) 
   }
 
   return (
-    <div className="rounded-[22px] bg-card px-5 py-5 text-center">
+    <div className="rounded-[22px] bg-card border border-line px-5 py-5 text-center">
       <h2 className="font-serif font-bold text-lg break-keep">{name}에게 힘을 보태 주세요</h2>
       <button
         type="button"
         onClick={onClick}
         disabled={busy || done !== null}
         aria-live="polite"
-        className="mt-3 h-[52px] w-full rounded-full bg-ink text-paper font-medium px-4 disabled:opacity-70"
+        className="mt-3 h-[52px] w-full rounded-full bg-accent text-white font-medium px-4 disabled:opacity-70"
       >
         {done ? LABEL[done] : '응원하기'}
       </button>

@@ -174,7 +174,7 @@ export default function DailyFortunePage() {
             <button
               onClick={handleSubmit}
               disabled={!yearCheck.ok}
-              className="disabled:opacity-45 w-full h-[52px] bg-ink rounded-full font-medium text-[15px] text-paper"
+              className="disabled:opacity-45 w-full h-[52px] bg-accent rounded-full font-medium text-[15px] text-white"
             >
               운세 보기
             </button>
@@ -185,13 +185,13 @@ export default function DailyFortunePage() {
         {result && (
           <div className="space-y-4 animate-fade-in">
             {/* 캡쳐 영역 시작 */}
-            <div ref={resultRef} className="space-y-3 bg-card rounded-[30px] p-4">
+            <div ref={resultRef} className="space-y-3 bg-card border border-line rounded-[30px] p-4">
             <DailyFortuneCard fortune={result} birthYearLabel={fromGz ? null : `${birthYear}년생${isEarlyYear ? " (입춘 전)" : ""}`} />
             </div>
             {/* 캡쳐 영역 끝 */}
 
             <div className="no-screenshot flex flex-col">
-              <button onClick={() => share(getShareOptions())} disabled={isCapturing} className="h-[52px] rounded-full flex items-center justify-center gap-2 bg-ink text-paper text-[15px] font-medium disabled:opacity-50">
+              <button onClick={() => share(getShareOptions())} disabled={isCapturing} className="h-[52px] rounded-full flex items-center justify-center gap-2 bg-accent text-white text-[15px] font-medium disabled:opacity-50">
                 <Icon name="share" size={18} />
                 {isCapturing ? "이미지 만드는 중…" : "오늘 운세 공유하기"}
               </button>

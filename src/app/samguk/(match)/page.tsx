@@ -213,7 +213,7 @@ export default function SamgukPage() {
                 <span className="font-bold text-accent">닮은 점</span> {result.matchReason}
               </p>
 
-              <section aria-label="나를 지켜줄 장수" className="mt-3 bg-card rounded-[24px] p-4 flex gap-3.5 items-center">
+              <section aria-label="나를 지켜줄 장수" className="mt-3 bg-card border border-line rounded-[24px] p-4 flex gap-3.5 items-center">
                 {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img src={`/images/samguk/${guardian.character.name}.jpg`} alt={`${guardian.character.name} 도트 초상화`} className="w-16 h-[76px] object-cover rounded-xl [image-rendering:pixelated] flex-none" />
                 <div className="flex-1">
