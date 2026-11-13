@@ -23,7 +23,7 @@ vi.mock('next/navigation', () => ({ useRouter: () => ({ push: () => {}, replace:
 const imgs = (html: string) => html.match(/<img [^>]*>/g) ?? []
 const noop = () => {}
 
-test('CastHero: 캐릭터 3:4 그림(alt·크기·eager·높은 우선순위)과 말풍선, 16:10 칸', () => {
+test('CastHero: 캐릭터 3:4 그림(alt·크기·eager·높은 우선순위)과 말풍선, 4:3 칸(얼굴이 말풍선에 가리지 않게)', () => {
   const html = renderToStaticMarkup(<CastHero cast="haetae" lineKey="say.face2.start" />)
   const big = imgs(html).find((i) => i.includes('/images/cast/haetae.webp')) ?? ''
   expect(big).toContain('alt="해태 캐릭터"')
@@ -31,7 +31,7 @@ test('CastHero: 캐릭터 3:4 그림(alt·크기·eager·높은 우선순위)과
   expect(big).toContain('height="960"')
   expect(big).toContain('fetchPriority="high"')
   expect(big).not.toContain('loading="lazy"')
-  expect(html).toContain('aspect-[16/10]')
+  expect(html).toContain('aspect-[4/3]')
   expect(html).toContain(UI['say.face2.start'])
 })
 
