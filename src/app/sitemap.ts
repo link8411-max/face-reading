@@ -23,6 +23,8 @@ export const SITEMAP_ROUTES = [
     '/fortune/daily',
     '/samguk',
     '/animal',
+    '/all',
+    '/today',
     '/face-tests',
     '/unse',
     '/about',
@@ -49,7 +51,7 @@ export const SITEMAP_ROUTES = [
 
 // 페이지 내용을 바꾸면 해당 라우트 날짜도 갱신할 것 (new Date()를 쓰면 매 요청마다 바뀌어 검색엔진이 무시함)
 export const LAST_MODIFIED: Record<string, string> = {
-    '': '2026-11-07',
+    '': '2026-11-13',
     '/face2': '2026-11-07',
     '/fortune': '2026-11-11',
     '/saju': '2026-11-11',
@@ -57,7 +59,9 @@ export const LAST_MODIFIED: Record<string, string> = {
     '/fortune/daily': '2026-11-05',
     '/samguk': '2026-11-07',
     '/animal': '2026-11-07',
-    '/face-tests': '2026-11-07',
+    '/all': '2026-11-13',
+    '/today': '2026-11-13',
+    '/face-tests': '2026-11-13',
     '/unse': '2026-11-11',
     '/about': '2026-10-26',
     '/privacy': '2026-11-04',

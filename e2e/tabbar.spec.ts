@@ -1,7 +1,7 @@
 import { test, expect } from '@playwright/test'
 import { existsSync } from 'node:fs'
 
-const CASES: [string, string][] = [['/', '홈'], ['/face2', '관상'], ['/samguk', '관상'], ['/fortune', '사주·운세'], ['/fortune/daily', '사주·운세'], ['/fortune/2027/sheep', '사주·운세'], ['/about', '홈'], ['/bujeok', '부적'], ['/bujeok/box', '부적']]
+const CASES: [string, string][] = [['/', '홈'], ['/face2', '전체'], ['/samguk', '전체'], ['/fortune', '전체'], ['/fortune/daily', '전체'], ['/fortune/2027/sheep', '전체'], ['/about', '전체'], ['/bujeok', '전체'], ['/bujeok/box', '전체'], ['/all', '전체'], ['/today', '오늘'], ['/face-tests', '전체']]
 
 for (const [path, label] of CASES) {
   test(`${path}: 하단 탭바가 있고 "${label}" 탭이 현재 탭`, async ({ page }) => {
@@ -12,10 +12,10 @@ for (const [path, label] of CASES) {
   })
 }
 
-test('탭을 눌러 묶음 페이지로 이동', async ({ page }) => {
+test('탭을 눌러 전체·오늘 페이지로 이동', async ({ page }) => {
   await page.goto('/')
   const bar = page.getByRole('navigation', { name: '하단 메뉴' })
-  for (const [label, url] of [['관상', /\/face-tests$/], ['사주·운세', /\/unse$/], ['부적', /\/bujeok$/], ['궁합', /\/mbti$/], ['홈', /3200\/$/]] as const) {
+  for (const [label, url] of [['전체', /\/all$/], ['오늘', /\/today$/], ['홈', /3200\/$/]] as const) {
     await bar.getByRole('link', { name: label }).click()
     await expect(page).toHaveURL(url)
   }
@@ -39,7 +39,7 @@ test('삼국지 결과 저장 이미지에 탭바가 섞이지 않는다(no-scre
 })
 
 for (const width of [320, 390]) {
-  test(`${width}px: 탭 5개가 한 줄에 들어가고 글자가 잘리지 않는다`, async ({ page }) => {
+  test(`${width}px: 탭 3개가 한 줄에 들어가고 글자가 잘리지 않는다`, async ({ page }) => {
     await page.setViewportSize({ width, height: 800 })
     await page.goto('/')
     const bar = page.getByRole('navigation', { name: '하단 메뉴' })
@@ -60,7 +60,7 @@ for (const width of [320, 390]) {
         }),
       }
     })
-    expect(m.items).toHaveLength(5)
+    expect(m.items).toHaveLength(3)
     expect(new Set(m.items.map((i) => i.top)).size).toBe(1) // 한 줄
     expect(m.scrollW).toBeLessThanOrEqual(m.navW + 1)
     expect(m.docOverflow).toBe(false)

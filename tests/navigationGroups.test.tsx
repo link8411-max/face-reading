@@ -42,6 +42,6 @@ test('푸터에 나가는 삼국지는 닮은꼴·열전뿐', () => {
 test('오늘의 MBTI 운세는 사주·운세 묶음에만, /fortune/mbti는 운세 탭', () => {
   expect(cat('mbti').items.map((i) => i.href)).toEqual(['/face-match', '/mbti/match', '/mbti'])
   expect(cat('unse').items.map((i) => i.href)).toContain('/fortune/mbti')
-  expect(tabForPath('/fortune/mbti')).toBe('unse')
-  expect(tabForPath('/fortune/mbti/r/infp')).toBe('unse')
+  expect(tabForPath('/fortune/mbti')).toBe('all')
+  expect(tabForPath('/fortune/mbti/r/infp')).toBe('all')
 })

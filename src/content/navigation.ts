@@ -1,28 +1,31 @@
 // 사이트 메뉴(하단 탭)와 묶음별 항목 — 홈, 허브 페이지, 하단 탭바, 푸터가 모두 이 데이터를 쓴다.
 import type { IconName } from '@/components/icons'
+import { CAST, castForHref } from '@/content/cast'
 
-export type TabKey = 'home' | 'face' | 'unse' | 'bujeok' | 'mbti'
+export type TabKey = 'home' | 'all' | 'today'
 
 export const TABS: { key: TabKey; label: string; href: string; icon: IconName }[] = [
   { key: 'home', label: '홈', href: '/', icon: 'home' },
-  { key: 'face', label: '관상', href: '/face-tests', icon: 'face' },
-  { key: 'unse', label: '사주·운세', href: '/unse', icon: 'moon' },
-  { key: 'bujeok', label: '부적', href: '/bujeok', icon: 'spark' },
-  { key: 'mbti', label: '궁합', href: '/mbti', icon: 'rings' },
+  { key: 'all', label: '전체', href: '/all', icon: 'grid' },
+  { key: 'today', label: '오늘', href: '/today', icon: 'sun' },
 ]
+
+export type Tag = 'face' | 'fortune' | 'match' | 'play'
 
 export interface CategoryItem {
   title: string
   desc: string
   href: string
-  thumb: { image?: string; icon?: IconName; bg?: string }
+  thumb: { image?: string; icon?: IconName; bg?: string; alt?: string }
+  tags: Tag[] // 홈 칩·전체 거르기
+  daily?: true // 날마다 바뀌는 항목(오늘 탭)
   chip?: string
   group?: string // 묶음 안 소제목 (연속된 같은 group 앞에 한 번 그린다)
   footer?: false // false면 푸터 목록에서 뺀다(허브·홈 탭에는 그대로)
 }
 
 export interface Category {
-  key: Exclude<TabKey, 'home' | 'bujeok'>
+  key: 'face' | 'unse' | 'mbti'
   title: string
   tabLabel: string
   href: string
@@ -30,8 +33,11 @@ export interface Category {
   items: CategoryItem[]
 }
 
+type RawItem = Omit<CategoryItem, 'tags' | 'daily'>
+type RawCategory = Omit<Category, 'items'> & { items: RawItem[] }
+
 // 순서가 곧 노출 순서다(허브·홈 묶음 탭·푸터). 설계: docs/superpowers/specs/2026-11-07-site-revamp-design.md 2절
-export const CATEGORIES: Category[] = [
+const RAW_CATEGORIES: RawCategory[] = [
   {
     key: 'face',
     title: '관상·얼굴 테스트',
@@ -78,8 +84,37 @@ export const CATEGORIES: Category[] = [
   },
 ]
 
-// 푸터에만 놓는 링크: 묶음(홈 탭·허브)과 하단 탭 순서는 건드리지 않는다. 홈에서는 '친구랑 같이 해봐요' 카드가 맡는다.
+// 항목별 태그·매일 표시. 홈 칩, 전체, 오늘이 모두 여기서 나온다.
+const META: Record<string, { tags: Tag[]; daily?: true }> = {
+  '/face2': { tags: ['face'] }, '/animal': { tags: ['face'] }, '/samguk': { tags: ['face'] }, '/samguk/team': { tags: ['face'] },
+  '/samguk/cup': { tags: ['play'] }, '/samguk/people': { tags: ['play'] }, '/samguk/videos': { tags: ['play'] }, '/samguk/duel': { tags: ['play'] },
+  '/saju': { tags: ['fortune'] }, '/fortune': { tags: ['fortune'] }, '/fortune/2027': { tags: ['fortune'] },
+  '/fortune/daily': { tags: ['fortune'], daily: true }, '/fortune/mbti': { tags: ['fortune'], daily: true }, '/bujeok': { tags: ['fortune'] },
+  '/face-match': { tags: ['match'] }, '/mbti/match': { tags: ['match'] }, '/mbti': { tags: ['match'] },
+  '/exam/meme': { tags: ['play'], daily: true },
+}
+
+// 사진이 없는 항목은 맡은 캐릭터 얼굴을 썸네일로 쓴다(삼국지 항목은 초상화 그대로).
+function withMeta(item: RawItem): CategoryItem {
+  const key = item.thumb.image ? null : castForHref(item.href)
+  const thumb = key ? { image: CAST[key].face, bg: CAST[key].bg, alt: `${CAST[key].name} 캐릭터` } : item.thumb
+  const m = META[item.href]
+  if (!m) throw new Error(`navigation META missing: ${item.href}`)
+  return { ...item, thumb, tags: m.tags, ...(m.daily ? { daily: true as const } : {}) }
+}
+
+export const CATEGORIES: Category[] = RAW_CATEGORIES.map((c) => ({ ...c, items: c.items.map(withMeta) }))
+
+// 푸터에만 놓는 링크// 푸터에만 놓는 링크: 묶음(홈 탭·허브)과 하단 탭 순서는 건드리지 않는다. 홈에서는 '친구랑 같이 해봐요' 카드가 맡는다.
 export const FOOTER_EXTRA: { title: string; href: string }[] = [{ title: '밈 능력고사', href: '/exam/meme' }]
+
+const EXTRA_DESC: Record<string, string> = { '/exam/meme': '매일 자정에 열리는 5문제, 내 등급은?' }
+
+/** 모든 테스트(묶음 순서 + 푸터에만 있던 항목). 전체 탭·홈 카드·오늘 탭의 원본. */
+export const ALL_ITEMS: CategoryItem[] = [
+  ...CATEGORIES.flatMap((c) => c.items),
+  ...FOOTER_EXTRA.map((e) => withMeta({ title: e.title, desc: EXTRA_DESC[e.href] ?? '', href: e.href, thumb: { icon: 'spark' }, chip: '매일 5문제' })),
+]
 
 // 결과 화면 아래 "이어서 보면 좋아요": 같은 줄기 1개 + 다른 줄기 1개 (설계 4절).
 // samePhoto: 같은 사진으로 이어지는 칸 — 사진 결과에서는 NextTests(사진 넘기기)가 이미 보여 주므로 NextSteps는 뺀다.
@@ -114,9 +149,7 @@ export const NEXT_BY_TEST: Record<NextFrom, [NextStep, NextStep]> = {
 export const DAILY_EXAM_STEP: NextStep = { href: '/exam/meme', title: '오늘의 밈 능력고사', desc: '매일 자정에 열리는 5문제, 내 등급은?', test: 'exam', icon: 'spark' }
 
 export function tabForPath(pathname: string): TabKey {
-  if (pathname.startsWith('/bujeok')) return 'bujeok'
-  if (pathname === '/face-tests' || ['/face2', '/animal', '/samguk'].some((p) => pathname.startsWith(p))) return 'face'
-  if (pathname === '/unse' || pathname.startsWith('/fortune') || pathname.startsWith('/saju')) return 'unse'
-  if (pathname.startsWith('/mbti') || pathname.startsWith('/face-match')) return 'mbti'
-  return 'home'
+  if (pathname === '/') return 'home'
+  if (pathname === '/today') return 'today'
+  return 'all'
 }

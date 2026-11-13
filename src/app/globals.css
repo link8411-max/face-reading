@@ -427,3 +427,13 @@ body:has(.bj-dark) nav[aria-label='하단 메뉴'] { background-color: #1C1712; 
 
 @media (prefers-reduced-motion: reduce) {
   }
+
+/* 하단 탭 아이콘: 현재 탭이 바뀔 때 한 번 튄다 */
+@keyframes tab-pop {
+  from { transform: scale(0.6); }
+}
+@media (prefers-reduced-motion: no-preference) {
+  .tab-pop { animation: tab-pop 0.4s cubic-bezier(0.3, 1.7, 0.5, 1) both; }
+}
+.tab-indicator { transition: left 0.36s cubic-bezier(0.3, 1.4, 0.5, 1); }
+@media (prefers-reduced-motion: reduce) { .tab-indicator { transition: none; } }

@@ -97,7 +97,7 @@ test('테스트 주소에 맞는 캐릭터', () => {
 - `/today`: h1 "오늘", 저승사자 얼굴과 한 줄 "오늘 바뀌는 것들이에요", daily 항목 카드, 그 아래 홈에서 옮긴 `ZodiacPicker`(띠 바로 고르기)와 `SeasonPicks slot="today"`. metadata·canonical `/today`.
 - BottomTabBar: `grid-cols-3`, 활성 탭 위에 3px 막대(`bg-accent`)가 `left: calc(index * 33.333%)`로 `transition: left .36s cubic-bezier(.3,1.4,.5,1)` 미끄러진다. 활성 아이콘은 `tab-pop` 키프레임(0.6배→1배, 0.4초) 한 번.
 
-- [ ] **Step 1: 테스트를 먼저 고친다/쓴다**
+- [x] **Step 1: 테스트를 먼저 고친다/쓴다**
 
 `tests/navigation.test.ts`:
 ```ts
@@ -115,10 +115,10 @@ test('매일 바뀌는 항목은 셋', () => { expect(ALL_ITEMS.filter((i) => i.
 ```
 `e2e/tabbar.spec.ts`: 5칸을 3칸으로(라벨 홈·전체·오늘), 경로별 현재 탭 표를 새 규칙으로, 320px 한 줄 테스트는 `toHaveLength(3)`. 기존 "탭을 눌러 묶음 페이지로 이동"은 "전체 탭 → /all"로.
 
-- [ ] **Step 2: 실패 확인** — `npx vitest run tests/navigation.test.ts` → FAIL
-- [ ] **Step 3: 구현** (위 규칙대로. 홈은 이 작업에서 손대지 않는다. 홈에 있던 ZodiacPicker는 Task 3에서 뺀다 — 이 작업에서는 /today에 하나 더 둔다)
-- [ ] **Step 4: 통과 확인** — `npm test` → PASS
-- [ ] **Step 5: 커밋** — `"메뉴: 하단 탭을 홈·전체·오늘 셋으로, /all·/today 페이지, 항목 태그와 캐릭터 썸네일"`
+- [x] **Step 2: 실패 확인** — `npx vitest run tests/navigation.test.ts` → FAIL
+- [x] **Step 3: 구현** (위 규칙대로. 홈은 이 작업에서 손대지 않는다. 홈에 있던 ZodiacPicker는 Task 3에서 뺀다 — 이 작업에서는 /today에 하나 더 둔다)
+- [x] **Step 4: 통과 확인** — `npm test` → PASS
+- [x] **Step 5: 커밋** — `"메뉴: 하단 탭을 홈·전체·오늘 셋으로, /all·/today 페이지, 항목 태그와 캐릭터 썸네일"`
 
 ---
 
