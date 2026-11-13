@@ -444,6 +444,12 @@ GA: `test_name=bujeok`, `result_view`·`shared_landing`의 `result_id`는 `<화�
 - 키 파일 `public/bdd5889660e497f527dd0a32a46b7f0f.txt`(공개값, 규격상 노출). 스크립트 `scripts/indexnow.mjs`의 `KEY`와 같아야 한다.
 - 배포가 끝난 뒤: `node scripts/indexnow.mjs`(사이트맵 전체) 또는 `node scripts/indexnow.mjs /경로 /경로`(바꾼 페이지만), 미리 보기는 `--dry-run`. 200·202면 접수, 403은 키 파일 확인 실패.
 
+### 색인 점검·요청 (2026-11-13 실제로 해 본 방법)
+- 서치 콘솔(속성 `sc-domain:unse-ai.com`)·네이버 서치어드바이저는 사용자의 Aside 브라우저에 로그인돼 있다. 색인 보고서는 '최종 업데이트' 날짜까지의 데이터라 그 뒤 배포한 페이지는 없다.
+- 새 페이지를 배포하면: ① `node scripts/indexnow.mjs` ② 서치 콘솔 URL 검사 → "색인 생성 요청"(중요한 페이지만, 하루 할당량 있음) ③ 네이버 '웹 페이지 수집' 요청(하루 50건, 24시간 이동 창).
+- 서치 콘솔 URL 검사는 `/inspect?id=` 주소로 바로 열면 404다. 개요 화면 위쪽 검색(`aria-label="검색"`)에 주소를 쳐서 연다. 네이버 수집 입력칸은 `https://unse-ai.com`으로 시작하는 전체 주소를 키보드로 쳐야 접수된다(값만 넣으면 무시).
+- '발견됨 - 현재 색인 안 됨'은 구글이 아직 크롤링하지 않은 것이고, 이 크기의 사이트는 크롤링 예산 문제가 아니다(구글 크롤링 예산 문서). robots.txt로 막아도 남은 크롤링이 다른 페이지로 가지 않는다. 앞당기는 방법은 위 ②·③과 외부 링크뿐이다.
+
 ### 새 페이지 추가 시 SEO 체크리스트
 1. `layout.tsx` 생성 (메타데이터 + JSON-LD)
 2. `src/app/sitemap.ts`의 `SITEMAP_ROUTES`와 `LAST_MODIFIED`에 추가
