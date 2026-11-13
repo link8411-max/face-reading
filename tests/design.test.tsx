@@ -4,22 +4,28 @@ import { Icon, ICON_NAMES, SmileFace } from '@/components/icons'
 
 const css = readFileSync('src/app/globals.css', 'utf8')
 
-test('한글 글꼴: 제목 Gowun Batang, 본문 Noto Sans KR — 자체 호스팅(next/font/local)', () => {
+test('글꼴: 본문·제목 Pretendard 가변 글꼴, 부적용 Gowun Batang — 자체 호스팅(next/font/local)', () => {
   const layout = readFileSync('src/app/layout.tsx', 'utf8')
   expect(layout).toContain('next/font/local')
-  expect(layout).not.toContain('next/font/google') // Vercel 빌드가 Google Fonts 다운로드에 기대지 않게
-  expect(layout).toContain('GowunBatang-Regular.woff2')
-  expect(layout).toContain('NotoSansKR-Regular.woff2')
+  expect(layout).not.toContain('next/font/google')
+  expect(layout).toContain('PretendardVariable.woff2')
+  expect(layout).toContain('GowunBatang-Regular.woff2') // 전통 부적 글씨
   expect(layout).toContain('Silkscreen-Regular.woff2')
-  expect(layout).not.toMatch(/Noto.?Serif/)
+  expect(layout).not.toContain('NotoSansKR')
   expect(layout).not.toContain('Geist')
 })
 
 test('자체 호스팅 글꼴 파일과 OFL 라이선스가 src/fonts에 있다', () => {
-  for (const f of ['NotoSansKR-Regular', 'NotoSansKR-Bold', 'GowunBatang-Regular', 'GowunBatang-Bold', 'Silkscreen-Regular']) {
+  for (const f of ['PretendardVariable', 'GowunBatang-Regular', 'GowunBatang-Bold', 'Silkscreen-Regular']) {
     expect(existsSync(`src/fonts/${f}.woff2`), f).toBe(true)
   }
-  for (const f of ['OFL-NotoSansCJK', 'OFL-GowunBatang', 'OFL-Silkscreen']) expect(existsSync(`src/fonts/${f}.txt`), f).toBe(true)
+  for (const f of ['OFL-Pretendard', 'OFL-GowunBatang', 'OFL-Silkscreen']) expect(existsSync(`src/fonts/${f}.txt`), f).toBe(true)
+  expect(existsSync('src/fonts/NotoSansKR-Regular.woff2')).toBe(false)
+})
+
+test('본문·제목 글꼴 변수는 둘 다 Pretendard', () => {
+  expect(css).toMatch(/--font-sans:\s*var\(--font-pretendard\)/)
+  expect(css).toMatch(/--font-serif:\s*var\(--font-pretendard\)/)
 })
 
 const TOKENS: [string, string][] = [

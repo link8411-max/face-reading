@@ -1,13 +1,13 @@
-// 사이트 글꼴(Noto Sans KR·Gowun Batang·Silkscreen)을 쓰는 글자만 남긴 woff2로 만들어 src/fonts/에 둔다(한 번 돌려 결과를 커밋).
+// 사이트 글꼴(Pretendard·Gowun Batang·Silkscreen)을 쓰는 글자만 남긴 woff2로 만들어 src/fonts/에 둔다(한 번 돌려 결과를 커밋).
 //   node scripts/font-subset.mjs <원본 글꼴 폴더>
 // 원본(커밋하지 않음):
-//   Noto Sans KR  https://github.com/notofonts/noto-cjk  Sans/OTF/Korean/NotoSansCJKkr-{Regular,Bold}.otf
+//   Pretendard    npm pretendard@1.3.9  dist/web/variable/woff2/PretendardVariable.woff2 (가변 400~800, 굵기 축 유지)
 //   Gowun Batang  https://github.com/google/fonts  ofl/gowunbatang/GowunBatang-{Regular,Bold}.ttf
 //   Silkscreen    https://github.com/google/fonts  ofl/silkscreen/Silkscreen-Regular.ttf
 // 남기는 글자(한글 글꼴): KS X 1001 완성형 2350자 + ASCII + Latin-1 + 일반 문장부호·화폐·화살표·도형·CJK 기호·호환 자모·전각 ASCII
 //   + src/ 코드에 실제로 나오는 그 밖의 글자(2350 밖 한글 포함). Silkscreen은 ASCII + Latin-1만.
 // 라이선스: src/fonts/OFL-*.txt (SIL OFL 1.1). 글꼴은 next/font/local(src/app/layout.tsx)로 읽는다.
-import { readFileSync, readdirSync, statSync, writeFileSync } from 'node:fs';
+import { existsSync, readFileSync, readdirSync, statSync, writeFileSync } from 'node:fs';
 import { join } from 'node:path';
 import subsetFont from 'subset-font';
 
@@ -46,14 +46,14 @@ const korean = [...new Set([...ksx1001Hangul(), ...latin, ...symbols, ...sourceC
 console.log('한글 글꼴 글자 수', [...korean].length, '/ 라틴 글자 수', [...latin].length);
 
 const JOBS = [
-  ['NotoSansCJKkr-Regular.otf', 'NotoSansKR-Regular.woff2', korean],
-  ['NotoSansCJKkr-Bold.otf', 'NotoSansKR-Bold.woff2', korean],
+  ['PretendardVariable.woff2', 'PretendardVariable.woff2', korean],
   ['GowunBatang-Regular.ttf', 'GowunBatang-Regular.woff2', korean],
   ['GowunBatang-Bold.ttf', 'GowunBatang-Bold.woff2', korean],
   ['Silkscreen-Regular.ttf', 'Silkscreen-Regular.woff2', latin],
 ];
 let total = 0;
 for (const [from, to, text] of JOBS) {
+  if (!existsSync(join(SRC, from))) { console.log(`없어서 건너뜀: ${from}`); continue; }
   const input = readFileSync(join(SRC, from));
   const buf = await subsetFont(input, text, { targetFormat: 'woff2' });
   writeFileSync(join(OUT, to), buf);

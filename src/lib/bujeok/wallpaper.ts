@@ -87,12 +87,12 @@ function buildStage(svg: SVGSVGElement, style: BujeokStyle, finish: Finish, fram
   clone.style.cssText = `position:absolute;left:${px(L.x)};top:${px(L.y)};width:${px(L.w)};height:${px(L.h)};display:block;`
   const mark = document.createElement('div')
   mark.textContent = WATERMARK
-  mark.style.cssText = `position:absolute;left:0;right:0;top:${px(frame.markTop ?? 0)};text-align:center;font-family:var(--font-noto-sans-kr),sans-serif;font-size:${px(frame.markSize)};letter-spacing:.04em;color:${bgFor(style, finish).mark};opacity:.8;`
+  mark.style.cssText = `position:absolute;left:0;right:0;top:${px(frame.markTop ?? 0)};text-align:center;font-family:var(--font-pretendard),sans-serif;font-size:${px(frame.markSize)};letter-spacing:.04em;color:${bgFor(style, finish).mark};opacity:.8;`
   stage.append(clone)
   if (frame.caption) {
     const c = frame.caption
     const box = document.createElement('div')
-    box.style.cssText = `position:absolute;left:${px(c.left)};top:${px(c.top)};width:${px(c.width)};text-align:center;font-family:var(--font-noto-sans-kr),sans-serif;color:${bgFor(style, finish).mark};word-break:keep-all;overflow-wrap:anywhere;`
+    box.style.cssText = `position:absolute;left:${px(c.left)};top:${px(c.top)};width:${px(c.width)};text-align:center;font-family:var(--font-pretendard),sans-serif;color:${bgFor(style, finish).mark};word-break:keep-all;overflow-wrap:anywhere;`
     for (const l of c.lines) {
       const row = document.createElement('div')
       row.textContent = l.text

@@ -65,7 +65,7 @@ export class BootScene extends Phaser.Scene {
   }
 
   create(): void {
-    fonts.kr = resolveFont('--font-noto-sans-kr', FONT_KR);
+    fonts.kr = resolveFont('--font-pretendard', FONT_KR);
     fonts.num = resolveFont('--font-silkscreen', FONT_NUM);
     makeTextures(this);
     // 부팅이 끝나면 React가 마지막으로 부른 장면으로 간다(그 뒤의 장면 바꾸기는 game.ts의 컨트롤러 몫)

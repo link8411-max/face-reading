@@ -30,8 +30,8 @@
 }
 
 @theme inline {
-  --font-sans: var(--font-noto-sans-kr);
-  --font-serif: var(--font-gowun-batang);
+  --font-sans: var(--font-pretendard);
+  --font-serif: var(--font-pretendard);
   --font-pixel: var(--font-silkscreen);
 }
 

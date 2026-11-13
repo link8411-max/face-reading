@@ -9,16 +9,15 @@ import { CATEGORIES, FOOTER_EXTRA } from "@/content/navigation";
 import "./globals.css";
 
 // 글꼴은 자체 호스팅(src/fonts, SIL OFL). Google Fonts를 빌드 때 내려받지 않으므로 Vercel 빌드가 네트워크에 기대지 않는다.
-// 한글 글꼴은 scripts/font-subset.mjs로 KS X 1001 완성형 2350자 + 라틴·기호만 남긴 woff2. 쓰는 굵기(400·700)만 싣는다.
-const notoSans = localFont({
-  variable: "--font-noto-sans-kr",
-  src: [
-    { path: "../fonts/NotoSansKR-Regular.woff2", weight: "400", style: "normal" },
-    { path: "../fonts/NotoSansKR-Bold.woff2", weight: "700", style: "normal" },
-  ],
+// 제목·본문은 Pretendard 가변 글꼴 한 파일(400~800). scripts/font-subset.mjs로 KS X 1001 완성형 2350자 + 라틴·기호 + 코드에 나오는 글자만 남겼다.
+// Gowun Batang은 전통 부적 그림 글씨 전용이라 미리 받지 않는다. 삼국지 카드는 Silkscreen.
+const pretendard = localFont({
+  variable: "--font-pretendard",
+  src: [{ path: "../fonts/PretendardVariable.woff2", weight: "400 800", style: "normal" }],
   display: "swap",
 });
 
+// 전통 부적 그림 글씨 전용 (부적을 열 때만 받는다)
 const gowunBatang = localFont({
   variable: "--font-gowun-batang",
   src: [
@@ -26,6 +25,7 @@ const gowunBatang = localFont({
     { path: "../fonts/GowunBatang-Bold.woff2", weight: "700", style: "normal" },
   ],
   display: "swap",
+  preload: false,
 });
 
 // 삼국지 결과 카드의 픽셀 글씨 (영문·숫자만)
@@ -152,7 +152,7 @@ export default function RootLayout({
         />
       </head>
       <body
-        className={`${notoSans.variable} ${gowunBatang.variable} ${silkscreen.variable} ${bujeokBrush.variable} font-sans antialiased bg-paper text-ink`}
+        className={`${pretendard.variable} ${gowunBatang.variable} ${silkscreen.variable} ${bujeokBrush.variable} font-sans antialiased bg-paper text-ink`}
       >
         {/* 하단 탭바(h-16)에 내용이 가리지 않도록 아래 여백. 탭바를 숨기는 일기토 화면은 duel.css가 app-shell 여백을 줄인다 */}
         <div className="app-shell flex flex-col min-h-screen pb-[calc(4rem+env(safe-area-inset-bottom))]">

@@ -8,7 +8,7 @@ import GoldDefs from './GoldDefs'
 import type { KitProps } from './types'
 
 const INK = PAL.cuteInk
-const ROUND = { fontFamily: 'var(--font-noto-sans-kr), sans-serif', paintOrder: 'stroke' as const }
+const ROUND = { fontFamily: 'var(--font-pretendard), sans-serif', paintOrder: 'stroke' as const }
 
 const DECO: Record<ElKey, string> = {
   wood: 'M0 -11 Q10 -2 0 11 Q-10 -2 0 -11Z',
