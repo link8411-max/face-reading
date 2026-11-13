@@ -49,3 +49,15 @@ test('유형 페이지 → 궁합 계산기 → 결과에서 유형 페이지로
   await page.getByRole('link', { name: /궁합 계산기/ }).first().click()
   await expect(page).toHaveURL(/\/mbti\/match/)
 })
+
+test('16유형 페이지: 유형 그림이 실제로 불러와지고 가로로 넘치지 않는다', async ({ page }) => {
+  const errors = trackErrors(page)
+  for (const s of SLUGS) {
+    await page.goto(`/mbti/${s}`)
+    const img = page.locator(`img[src="/images/mbti/${s}.webp"]`)
+    await expect(img, s).toBeVisible()
+    await expect.poll(() => img.evaluate((i: HTMLImageElement) => i.complete && i.naturalWidth), s).toBe(720)
+    expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth), s).toBe(true)
+  }
+  expect(errors).toEqual([])
+})

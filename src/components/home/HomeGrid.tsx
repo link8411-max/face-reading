@@ -22,7 +22,7 @@ export const HOME_DEFAULT = ["/face2", "/animal", "/face-match", "/fortune/daily
 
 // 캐릭터 얼굴 썸네일(/images/cast/<키>-face.webp)이 있는 항목은 큰 캐릭터 카드로 그린다
 function castOf(item: CategoryItem): CastKey | null {
-  const m = item.thumb.alt && item.thumb.image?.match(/\/images\/cast\/([a-z]+)-face\.webp$/);
+  const m = item.thumb.alt && item.thumb.image?.match(/\/images\/cast\/([A-Za-z]+)-face\.webp$/);
   return m && m[1] in CAST ? (m[1] as CastKey) : null;
 }
 

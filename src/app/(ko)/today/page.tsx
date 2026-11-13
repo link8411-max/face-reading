@@ -19,7 +19,7 @@ export const metadata: Metadata = {
 const DAILY = ALL_ITEMS.filter((i) => i.daily).map((i) => ({ ...i, group: undefined }));
 
 export default function Page() {
-  const saja = CAST.saja;
+  const saja = CAST.sajaF;
   return (
     <div className="max-w-lg mx-auto px-4 pt-6 pb-6 space-y-6">
       <h1 className="font-serif text-[28px] font-extrabold tracking-tight">오늘</h1>

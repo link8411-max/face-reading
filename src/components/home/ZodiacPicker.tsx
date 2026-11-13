@@ -7,6 +7,7 @@ import { dailyDateLine, dayLabel } from "@/lib/dailyEngine/format";
 import { kstDate } from "@/lib/kst";
 import { ZODIAC_SLUGS, zodiac2027, type ZodiacSlug } from "@/content/fortune2027Zodiac";
 import { FORTUNE_YEAR } from "@/lib/fortuneYear";
+import { zodiacArt } from "@/lib/art";
 
 // 메인에서 띠를 바로 골라 오늘의 운세를 보는 영역. 날짜는 브라우저에서 마운트 뒤에 계산한다(서버와 불일치 방지).
 export default function ZodiacPicker() {
@@ -43,10 +44,14 @@ export default function ZodiacPicker() {
       <div aria-live="polite">
       {z && fortune && (
         <div className="mt-3.5 rounded-[22px] bg-card-2 p-4 text-[13px] leading-relaxed">
-          <p className="flex items-baseline justify-between gap-2">
-            <b>{z.띠}띠 오늘의 한마디</b>
-            <span className="text-xs text-accent-ink font-medium">운세 {fortune.별점}/5</span>
-          </p>
+          <div className="flex items-center gap-3">
+            {/* 성별 입력이 없어 여(f) 그림으로 고정 */}
+            <img src={zodiacArt(selected!, "f").face} alt={`${z.띠}띠 캐릭터`} width={56} height={56} className="flex-none w-14 h-14 rounded-full object-cover border-2 border-line bg-card" />
+            <p className="flex-1 flex items-baseline justify-between gap-2">
+              <b>{z.띠}띠 오늘의 한마디</b>
+              <span className="text-xs text-accent-ink font-medium">운세 {fortune.별점}/5</span>
+            </p>
+          </div>
           <p className="mt-1">{fortune.한마디}</p>
           <p className="text-xs text-muted mt-1">{fortune.근거}</p>
           <p className="text-xs text-muted mt-1">행운의 시간 {fortune.행운.시간} · 행운의 색 {fortune.행운.색}</p>

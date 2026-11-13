@@ -3,8 +3,11 @@ import sharp from 'sharp'
 import { CAST } from '@/content/cast'
 import { ANIMAL_KEYS } from '@/lib/animal/matcher'
 import { animalArt } from '@/lib/animal/art'
+import { mbtiArt, zodiacArt } from '@/lib/art'
+import { MBTI_TYPES } from '@/lib/mbti/compat'
+import { ZODIAC_SLUGS } from '@/content/fortune2027Zodiac'
 
-// 캐릭터 여섯 명과 동물상 13종 × 여·남 그림
+// 캐릭터 아홉 명, 동물상 13종 × 여·남, MBTI 16유형, 띠 12 × 여·남 그림
 const KEYS = Object.keys(CAST) as (keyof typeof CAST)[]
 
 test.each(KEYS)('%s: 큰 그림 720×960, 얼굴 240×240, 미리보기 512×512', async (key) => {
@@ -39,4 +42,23 @@ test('animalArt 경로 규칙', () => {
 
 test('예전 동물상 그림(<키>.jpg)이 남아 있지 않다', () => {
   for (const k of ANIMAL_KEYS) expect(existsSync(`public/images/animal/${k}.jpg`), k).toBe(false)
+})
+
+async function checkArt(a: { src: string; face: string }) {
+  for (const p of [a.src, a.face]) expect(existsSync(`public${p}`), p).toBe(true)
+  const big = await sharp(`public${a.src}`).metadata()
+  expect([big.width, big.height]).toEqual([720, 960])
+  const face = await sharp(`public${a.face}`).metadata()
+  expect([face.width, face.height]).toEqual([240, 240])
+  expect(statSync(`public${a.src}`).size).toBeLessThanOrEqual(160 * 1024)
+  expect(statSync(`public${a.face}`).size).toBeLessThanOrEqual(30 * 1024)
+}
+
+test.each(MBTI_TYPES)('MBTI %s: 큰 그림 720×960, 얼굴 240×240', async (t) => {
+  await checkArt(mbtiArt(t))
+})
+
+const ZODIAC_ART = ZODIAC_SLUGS.flatMap((z) => (['f', 'm'] as const).map((g) => [z, g] as const))
+test.each(ZODIAC_ART)('띠 %s-%s: 큰 그림 720×960, 얼굴 240×240', async (z, g) => {
+  await checkArt(zodiacArt(z, g))
 })

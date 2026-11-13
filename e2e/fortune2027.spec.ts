@@ -53,3 +53,31 @@ test('음력 윤달 입력: 없는 날짜는 안내, 있는 날짜는 양력 변
   await page.getByRole('button', { name: /운세 보기/ }).click()
   await expect(page.getByText('양력 1990년 5월 15일로 계산했어요')).toBeVisible()
 })
+
+test('띠 페이지: 남녀 그림 두 장과 박수무당 말풍선이 보이고 가로로 넘치지 않는다', async ({ page }) => {
+  const errors = trackErrors(page)
+  for (const s of SLUGS) {
+    await page.goto(`/fortune/2027/${s}`)
+    for (const g of ['f', 'm']) {
+      const img = page.locator(`img[src="/images/zodiac/${s}-${g}.webp"]`)
+      await expect(img, `${s}-${g}`).toBeVisible()
+      await expect.poll(() => img.evaluate((i: HTMLImageElement) => i.complete && i.naturalWidth), `${s}-${g}`).toBe(720)
+    }
+    await expect(page.locator('[data-cast-say="say.zodiac.intro"]')).toBeVisible()
+    expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth), s).toBe(true)
+  }
+  expect(errors).toEqual([])
+})
+
+test('띠 허브: 띠마다 얼굴이 있고 저승사자 선배가 말한다', async ({ page }) => {
+  const errors = trackErrors(page)
+  await page.goto('/fortune/2027')
+  await expect(page.locator('[data-cast-say="say.zodiac2027.hub"]')).toBeVisible()
+  for (const s of SLUGS) {
+    const img = page.locator(`a[href="/fortune/2027/${s}"] img[src="/images/zodiac/${s}-f-face.webp"]`)
+    await img.scrollIntoViewIfNeeded()
+    await expect.poll(() => img.evaluate((i: HTMLImageElement) => i.complete && i.naturalWidth), s).toBe(240)
+  }
+  expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBe(true)
+  expect(errors).toEqual([])
+})

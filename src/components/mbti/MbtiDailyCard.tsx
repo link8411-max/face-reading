@@ -3,6 +3,7 @@ import Link from "next/link";
 import type { MbtiType } from "@/lib/mbti/compat";
 import type { MbtiDaily } from "@/lib/mbti/daily";
 import { mbtiProfiles } from "@/content/mbtiTypes";
+import { mbtiArt } from "@/lib/art";
 
 const WEEK = ["일", "월", "화", "수", "목", "금", "토"];
 
@@ -17,11 +18,7 @@ export default function MbtiDailyCard({ type, date, daily, captureRef, withMatch
   const rows = [["일", daily.work], ["연애", daily.love], ["관계", daily.relation]] as const;
   return (
     <article ref={captureRef} className="relative overflow-hidden bg-card border border-line rounded-[30px] px-[22px] pt-6 pb-5 flex flex-col text-ink">
-      <svg width="120" height="120" viewBox="0 0 120 120" fill="none" aria-hidden="true" className="absolute -right-2.5 -top-1.5">
-        <circle cx="74" cy="46" r="32" fill="#F7F8FC" />
-        <circle cx="90" cy="36" r="29" fill="#EEF1FA" />
-        <path d="M26 26l2 5 5 2-5 2-2 5-2-5-5-2 5-2z" fill="#2D55FF" />
-      </svg>
+      <img src={mbtiArt(type).face} alt={`${type} 캐릭터`} width={64} height={64} className="absolute right-[22px] top-5 w-16 h-16 rounded-full object-cover border-2 border-line bg-card-2" />
       <p className="relative text-xs font-medium text-accent-ink">{dateLabel(date)} · 오늘의 MBTI 운세</p>
       <h2 className="relative font-serif font-bold text-[25px] leading-[1.4] mt-2 pr-16">
         {type} <span className="text-base font-medium text-muted">{mbtiProfiles[type].nickname}</span>

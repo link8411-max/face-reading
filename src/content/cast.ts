@@ -1,5 +1,5 @@
-// 캐릭터 여섯: 테스트 얼굴·결과 카드·분석 화면·미리보기 이미지가 모두 여기서 읽는다.
-export type CastKey = 'haetae' | 'saja' | 'gumiho' | 'mudang' | 'tiger' | 'dokkaebi'
+// 캐릭터(여섯 + 새 멤버 셋): 테스트 얼굴·결과 카드·분석 화면·미리보기 이미지가 모두 여기서 읽는다.
+export type CastKey = 'haetae' | 'saja' | 'gumiho' | 'mudang' | 'tiger' | 'dokkaebi' | 'sajaF' | 'sajaElder' | 'baksu'
 
 export interface CastInfo {
   name: string
@@ -25,6 +25,10 @@ export const CAST: Record<CastKey, CastInfo> = {
   mudang: make('mudang', '무당', 'Mudang', '#2A1418', '부적을 맡아요'),
   tiger: make('tiger', '백호', 'Baekho', '#1B2436', '동물상을 맡아요'),
   dokkaebi: make('dokkaebi', '도깨비', 'Dokkaebi', '#10261F', '게임과 시험을 맡아요'),
+  // 새 멤버(2026-11-14): 오늘의 운세·띠별 운세 담당
+  sajaF: make('sajaF', '저승사자 막내', 'Little Reaper', '#161B38', '오늘의 운세를 맡아요'),
+  sajaElder: make('sajaElder', '저승사자 선배', 'Elder Reaper', '#1A2030', '신년운세를 맡아요'),
+  baksu: make('baksu', '박수무당', 'Baksu Shaman', '#12224A', '띠별 풀이를 맡아요'),
 }
 
 const under = (p: string, base: string) => p === base || p.startsWith(base + '/')
@@ -35,6 +39,9 @@ export function castForHref(href: string): CastKey | null {
   if (p === '/face2' || p === '/face-tests') return 'haetae'
   if (p === '/animal') return 'tiger'
   if (p === '/face-match' || under(p, '/mbti')) return 'gumiho'
+  if (p === '/fortune/mbti') return 'gumiho'
+  if (p === '/fortune/daily' || p === '/today') return 'sajaF'
+  if (p === '/fortune' || under(p, '/fortune/2027')) return 'sajaElder'
   if (p === '/saju' || p === '/unse' || under(p, '/fortune')) return 'saja'
   if (under(p, '/bujeok')) return 'mudang'
   if (under(p, '/exam') || under(p, '/samguk/cup') || under(p, '/samguk/duel')) return 'dokkaebi'

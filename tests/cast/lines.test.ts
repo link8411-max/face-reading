@@ -22,9 +22,9 @@ test('영어 대사는 80자 이하', () => {
   for (const k of KEYS) expect(en(k).length, k).toBeLessThanOrEqual(80)
 })
 
-test('해태·무당은 해요체, 나머지 넷은 반말(요로 끝나지 않는다)', () => {
+test('해태·무당·박수무당은 해요체, 나머지는 반말(요로 끝나지 않는다)', () => {
   for (const k of KEYS) {
-    const polite = CAST_LINES[k] === 'haetae' || CAST_LINES[k] === 'mudang'
+    const polite = ['haetae', 'mudang', 'baksu'].includes(CAST_LINES[k])
     // 한 말풍선 안의 모든 문장 끝을 본다
     const sentences = ko(k).split(/(?<=[.?!])\s*/).filter(Boolean)
     for (const s of sentences) {
@@ -35,7 +35,7 @@ test('해태·무당은 해요체, 나머지 넷은 반말(요로 끝나지 않�
 })
 
 test('저승사자 대사에 죽음·데려간다·수명이 없다', () => {
-  for (const k of KEYS.filter((x) => CAST_LINES[x] === 'saja')) {
+  for (const k of KEYS.filter((x) => ['saja', 'sajaF', 'sajaElder'].includes(CAST_LINES[x]))) {
     for (const w of ['죽', '데려', '수명']) expect(ko(k), k).not.toContain(w)
   }
 })
@@ -49,6 +49,6 @@ test('효험 단정과 이모지가 없다(한국어·영어)', () => {
   }
 })
 
-test('캐릭터 여섯이 모두 말할 줄이 있다', () => {
-  expect(new Set(Object.values(CAST_LINES))).toEqual(new Set(['haetae', 'saja', 'gumiho', 'mudang', 'tiger', 'dokkaebi']))
+test('캐릭터 아홉이 모두 말할 줄이 있다', () => {
+  expect(new Set(Object.values(CAST_LINES))).toEqual(new Set(['haetae', 'saja', 'gumiho', 'mudang', 'tiger', 'dokkaebi', 'sajaF', 'sajaElder', 'baksu']))
 })

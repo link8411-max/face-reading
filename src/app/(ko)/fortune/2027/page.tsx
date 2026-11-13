@@ -1,5 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import CastSay from "@/components/cast/CastSay";
+import { zodiacArt } from "@/lib/art";
 import CoupangBanner from "@/components/CoupangBanner";
 import ContentCta from "@/components/ContentCta";
 import { ZODIAC_SLUGS, zodiac2027, birthYears } from "@/content/fortune2027Zodiac";
@@ -46,6 +48,7 @@ export default function Zodiac2027Hub() {
           <h1 className="font-serif text-3xl font-bold">{FORTUNE_YEAR.year} 띠별 운세</h1>
           <p className="text-sm text-muted">{FORTUNE_YEAR.간지}년({FORTUNE_YEAR.한자}) · {FORTUNE_YEAR.특징}</p>
         </header>
+        <CastSay cast="sajaElder" lineKey="say.zodiac2027.hub" />
         <section>
           <h2 className={h2}>{FORTUNE_YEAR.year}년 {FORTUNE_YEAR.간지}년이란?</h2>
           <p className="leading-relaxed">
@@ -59,9 +62,12 @@ export default function Zodiac2027Hub() {
           {ZODIAC_SLUGS.map((s) => {
             const z = zodiac2027[s];
             return (
-              <Link key={s} href={`/fortune/2027/${s}`} className="bg-card rounded-[22px] border border-line p-4 hover:border-accent/50">
-                <div className="font-serif font-bold text-lg">{z.띠}띠</div>
-                <div className="text-xs text-muted">{birthYears(s).slice(-3).join(" · ")}년생</div>
+              <Link key={s} href={`/fortune/2027/${s}`} className="bg-card rounded-[22px] border border-line p-3 flex items-center gap-3 hover:border-accent/50">
+                <img src={zodiacArt(s, "f").face} alt={`${z.띠}띠 캐릭터`} width={48} height={48} loading="lazy" decoding="async" className="flex-none w-12 h-12 rounded-full object-cover bg-card-2" />
+                <span className="min-w-0">
+                  <span className="block font-serif font-bold text-lg">{z.띠}띠</span>
+                  <span className="block text-xs text-muted">{birthYears(s).slice(-3).join(" · ")}년생</span>
+                </span>
               </Link>
             );
           })}

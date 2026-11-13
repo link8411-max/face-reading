@@ -5,6 +5,8 @@ import { birthYears, SAMJAE_2027, zodiac2027, zodiacOgPath, zodiacUrl, ZODIAC_SL
 import { FORTUNE_YEAR } from "@/lib/fortuneYear";
 import CoupangBanner from "@/components/CoupangBanner";
 import ContentCta from "@/components/ContentCta";
+import CastSay from "@/components/cast/CastSay";
+import { zodiacArt } from "@/lib/art";
 import ArticleShare from "@/components/share/ArticleShare";
 
 const card = "bg-card rounded-[22px] border border-line p-5";
@@ -53,11 +55,28 @@ export default function Zodiac2027Article({ slug }: { slug: ZodiacSlug }) {
           <Link href="/" className="hover:text-accent-ink">홈</Link> › <Link href="/fortune/2027" className="hover:text-accent-ink">{FORTUNE_YEAR.year} 띠별 운세</Link> › {z.띠}띠
         </nav>
 
+        <div className="grid grid-cols-2 gap-3">
+          {(["f", "m"] as const).map((g, i) => (
+            <img
+              key={g}
+              src={zodiacArt(slug, g).src}
+              alt={`${z.띠}띠 ${g === "f" ? "여성" : "남성"} 캐릭터`}
+              width={720}
+              height={960}
+              fetchPriority={i === 0 ? "high" : undefined}
+              decoding="async"
+              className="block w-full h-auto aspect-[3/4] object-cover rounded-[22px] border border-line bg-card"
+            />
+          ))}
+        </div>
+
         <header className="text-center space-y-2">
           <h1 className="font-serif text-3xl font-bold">{FORTUNE_YEAR.year}년 {z.띠}띠 운세</h1>
           <p className="text-sm text-muted">{FORTUNE_YEAR.간지}년({FORTUNE_YEAR.한자}) · {FORTUNE_YEAR.특징}</p>
           <p className="font-medium">{z.한줄}</p>
         </header>
+
+        <CastSay cast="baksu" lineKey="say.zodiac.intro" />
 
         <section className={card}>
           <h2 className={h2}>{z.띠}띠 출생연도</h2>

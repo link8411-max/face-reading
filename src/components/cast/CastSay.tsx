@@ -12,6 +12,9 @@ const RING: Record<CastKey, string> = {
   mudang: '#C8372D',
   tiger: '#A7B4C6',
   dokkaebi: '#3FAE8A',
+  sajaF: '#7C93FF',
+  sajaElder: '#8A94B8',
+  baksu: '#E2B04A',
 }
 
 export default function CastSay({ cast, lineKey, size = 'md', locale = 'ko' }: { cast?: CastKey; lineKey: LineKey; size?: 'sm' | 'md'; locale?: Locale }) {
