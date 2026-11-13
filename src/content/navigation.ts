@@ -105,7 +105,7 @@ function withMeta(item: RawItem): CategoryItem {
 
 export const CATEGORIES: Category[] = RAW_CATEGORIES.map((c) => ({ ...c, items: c.items.map(withMeta) }))
 
-// 푸터에만 놓는 링크// 푸터에만 놓는 링크: 묶음(홈 탭·허브)과 하단 탭 순서는 건드리지 않는다. 홈에서는 '친구랑 같이 해봐요' 카드가 맡는다.
+// 푸터에만 놓는 링크
 export const FOOTER_EXTRA: { title: string; href: string }[] = [{ title: '밈 능력고사', href: '/exam/meme' }]
 
 const EXTRA_DESC: Record<string, string> = { '/exam/meme': '매일 5문제, 내 등급은?' }

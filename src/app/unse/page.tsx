@@ -10,7 +10,7 @@ export const metadata: Metadata = {
   title: `${category.title} 모음 | 운명을 읽다`,
   description: category.intro,
   alternates: { canonical: url },
-  openGraph: { title: `${category.title} 모음 | 운명을 읽다`, description: category.intro, url, type: "website", locale: "ko_KR", siteName: "운명을 읽다" },
+  openGraph: { title: `${category.title} 모음 | 운명을 읽다`, description: category.intro, url, type: "website", locale: "ko_KR", siteName: "운명을 읽다", images: [{ url: `/api/og?title=${encodeURIComponent(category.title)}&cast=saja`, width: 1200, height: 630 }] },
 };
 
 export default function Page() {

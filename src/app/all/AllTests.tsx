@@ -12,7 +12,7 @@ export default function AllTests({ items }: { items: CategoryItem[] }) {
   const none = needle !== "" && items.every(miss);
   return (
     <div>
-      <label className="flex items-center gap-2 bg-card border border-line rounded-full px-4 h-12 mb-4">
+      <label className="flex items-center gap-2 bg-card border border-line rounded-full px-4 h-12 mb-4 focus-within:ring-2 focus-within:ring-accent">
         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" aria-hidden="true" className="text-muted flex-none"><circle cx="11" cy="11" r="7" /><path d="M20 20l-3.5-3.5" /></svg>
         <span className="sr-only">테스트 검색</span>
         <input

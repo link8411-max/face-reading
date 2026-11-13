@@ -11,7 +11,7 @@ export const metadata: Metadata = {
   title,
   description,
   alternates: { canonical: url },
-  openGraph: { title, description, url, type: "website", locale: "ko_KR", siteName: "운명을 읽다" },
+  openGraph: { title, description, url, type: "website", locale: "ko_KR", siteName: "운명을 읽다", images: [{ url: `/api/og?title=${encodeURIComponent("전체 테스트")}&cast=haetae`, width: 1200, height: 630 }] },
 };
 
 // 묶음 소제목 없이 한 줄로 늘어놓는다(검색으로 거르기 쉽게)

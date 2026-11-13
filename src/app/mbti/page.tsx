@@ -9,7 +9,7 @@ export const metadata: Metadata = {
   title: "MBTI 궁합·16유형 풀이 | 운명을 읽다",
   description: "MBTI 16유형별 성격, 잘 맞는 궁합, 연애 스타일, 여행지와 직업, 이달의 운세까지. 궁합 계산기로 두 유형의 궁합 점수도 확인해 보세요.",
   alternates: { canonical: "https://unse-ai.com/mbti" },
-  openGraph: { title: "MBTI 궁합·16유형 풀이 | 운명을 읽다", description: "16유형 풀이와 궁합 계산기", url: "https://unse-ai.com/mbti", type: "website", locale: "ko_KR", siteName: "운명을 읽다" },
+  openGraph: { title: "MBTI 궁합·16유형 풀이 | 운명을 읽다", description: "16유형 풀이와 궁합 계산기", url: "https://unse-ai.com/mbti", type: "website", locale: "ko_KR", siteName: "운명을 읽다", images: [{ url: `/api/og?title=${encodeURIComponent("MBTI 궁합")}&cast=gumiho`, width: 1200, height: 630 }] },
 };
 
 const GROUPS: { title: string; types: MbtiType[]; color: string }[] = [

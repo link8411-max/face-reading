@@ -441,7 +441,7 @@ body:has(.bj-dark) nav[aria-label='하단 메뉴'] { background-color: #1C1712; 
 /* ===== 움직임(4단계): 전부 한 번 재생하고 멈춘다. 멈춘 모습이 완성본(기본 스타일)이다.
    처음부터 완전히 투명하게 시작하지 않는다(opacity .3부터). 분석 중 화면(scan-beam·peek-cast)만 반복한다. ===== */
 @keyframes reveal-circle {
-  from { clip-path: circle(0% at 50% 40%); }
+  from { clip-path: circle(30% at 50% 40%); }
   to { clip-path: circle(125% at 50% 40%); }
 }
 @keyframes reveal-pop {
@@ -467,7 +467,7 @@ body:has(.bj-dark) nav[aria-label='하단 메뉴'] { background-color: #1C1712; 
 .peek-cast { transform-origin: 50% 90%; animation: peek-cast 0.8s ease-in-out infinite alternate; }
 
 /* 결과 캡처 중에는 움직임을 끄고 완성된 모습을 찍는다(lib/capture.ts가 문서에 붙였다 뗀다) */
-.no-motion *, .no-motion *::before, .no-motion *::after { animation: none !important; transition: none !important; }
+.motion-settled, .motion-settled *, .motion-settled *::before, .motion-settled *::after { animation: none !important; transition: none !important; }
 
 @media (prefers-reduced-motion: reduce) {
   .reveal-card, .reveal-pop, .rise, .scan-beam, .peek-cast, .tab-pop { animation: none !important; }

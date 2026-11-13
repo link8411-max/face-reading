@@ -13,7 +13,7 @@ export const metadata: Metadata = {
   title,
   description,
   alternates: { canonical: url },
-  openGraph: { title, description, url, type: "website", locale: "ko_KR", siteName: "운명을 읽다" },
+  openGraph: { title, description, url, type: "website", locale: "ko_KR", siteName: "운명을 읽다", images: [{ url: `/api/og?title=${encodeURIComponent("오늘")}&cast=saja`, width: 1200, height: 630 }] },
 };
 
 const DAILY = ALL_ITEMS.filter((i) => i.daily).map((i) => ({ ...i, group: undefined }));
