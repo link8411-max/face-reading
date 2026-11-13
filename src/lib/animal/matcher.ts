@@ -5,7 +5,7 @@ import { animalTypeDB, type AnimalType } from '@/lib/animalTypeDB'
 import { animalProfiles } from './profiles'
 import type { CharacterProfile } from '@/lib/samguk/profiles'
 
-export const ANIMAL_KEYS = ['dog', 'cat', 'fox', 'bear', 'rabbit', 'deer', 'tiger', 'eagle'] as const
+export const ANIMAL_KEYS = ['dog', 'cat', 'fox', 'bear', 'rabbit', 'deer', 'tiger', 'eagle', 'desertfox', 'dino', 'wolf', 'squirrel', 'hamster'] as const
 export type AnimalKey = (typeof ANIMAL_KEYS)[number]
 
 export interface AnimalTypeResult {

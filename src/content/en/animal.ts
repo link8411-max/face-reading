@@ -146,6 +146,96 @@ export const animalTypeDB: Record<string, AnimalType> = {
     },
     celebrities: ['Kim Soo-hyun', 'Lee Young-ae', 'Hyun Bin', 'Son Ye-jin'],
   },
+
+  desertfox: {
+    name: 'Desert Fox Face',
+    emoji: '🦊',
+    title: 'The bright-eyed, curious Desert Fox Face',
+    description: 'Big, round eyes, softly lifted outer corners and a small, slim jawline are the hallmarks. Even when you are quiet, your eyes speak first. A compact, neat face shape gives even strangers a curious, approachable impression.',
+    personality: {
+      positive: ['Curious', 'Delicate', 'Perceptive', 'Careful', 'Warm'],
+      negative: ['Shy with new people', 'Worrier', 'Sensitive', 'Timid'],
+    },
+    charm: 'A curious air built from big, clear eyes and a small, neat face line',
+    loveStyle: 'It takes time to open up, but once you do, you look after your partner with great care. You remember even the small anniversaries.',
+    compatibility: {
+      best: ['Bear Face', 'Dino Face'],
+      worst: ['Tiger Face', 'Wolf Face'],
+    },
+    celebrities: [],
+  },
+
+  dino: {
+    name: 'Dino Face',
+    emoji: '🦖',
+    title: 'The deadpan-but-adorable Dino Face',
+    description: 'A wide, open smile line, a longer face shape and a generous nose are the hallmarks. You can look unbothered at rest, but the moment you smile big, the whole mood lights up. Bold, easy features make a face people remember.',
+    personality: {
+      positive: ['Easygoing', 'Funny', 'Unpretentious', 'Straightforward', 'Reliable'],
+      negative: ['Seems blunt', 'Easily bothered by chores', 'Bad at saying it out loud', 'Slow-paced'],
+    },
+    charm: 'A surprise smile behind a deadpan look, and bold, open features',
+    loveStyle: 'You show care through actions more than words. Even if you are clumsy at saying it, you turn playful with someone who shares your sense of humor.',
+    compatibility: {
+      best: ['Desert Fox Face', 'Squirrel Face'],
+      worst: ['Eagle Face', 'Cat Face'],
+    },
+    celebrities: [],
+  },
+
+  wolf: {
+    name: 'Wolf Face',
+    emoji: '🐺',
+    title: 'The cool-looking, loyal Wolf Face',
+    description: 'Upturned outer eye corners, brows set close to the eyes and a straight nose bridge are the hallmarks. At first you may seem cool and quiet, but once someone is yours, you stand by them to the end. A deep, steady gaze builds your charisma.',
+    personality: {
+      positive: ['Loyal', 'Thoughtful', 'Charismatic', 'Responsible', 'Devoted'],
+      negative: ['Shy with new people', 'Few words', 'Guarded', 'Stubborn'],
+    },
+    charm: 'A charisma that comes from a calm gaze, and steady loyalty',
+    loveStyle: 'You say little, but your heart stays constant. You become a dependable shelter for a partner and do your best to keep every promise.',
+    compatibility: {
+      best: ['Rabbit Face', 'Eagle Face'],
+      worst: ['Desert Fox Face', 'Squirrel Face'],
+    },
+    celebrities: [],
+  },
+
+  squirrel: {
+    name: 'Squirrel Face',
+    emoji: '🐿️',
+    title: 'The lively, quick-moving Squirrel Face',
+    description: 'Round eyes, a short, compact face line and a small, full mouth are the hallmarks. Your expressions are rich and you move fast, so the mood perks up around you. Neat, small features give a friendly, cute impression.',
+    personality: {
+      positive: ['Hardworking', 'Witty', 'Active', 'Thrifty', 'Sociable'],
+      negative: ['Easily distracted', 'Hasty', 'Chatty', 'Worrier'],
+    },
+    charm: 'Round eyes full of expression and neat, small features',
+    loveStyle: 'You show feelings through small gifts and little notes. A cute partner who plans a date course thriftily and carefully.',
+    compatibility: {
+      best: ['Dino Face', 'Bear Face'],
+      worst: ['Wolf Face', 'Tiger Face'],
+    },
+    celebrities: [],
+  },
+
+  hamster: {
+    name: 'Hamster Face',
+    emoji: '🐹',
+    title: 'The soft, endearing Hamster Face',
+    description: 'A round face shape, a short chin tip and small, close-set features are the hallmarks. Your rounded face line softens the mood for whoever looks at you. Small, gentle eyes make you easy to approach without any guard up.',
+    personality: {
+      positive: ['Gentle', 'Diligent', 'Cozy', 'Considerate', 'Persistent'],
+      negative: ['Timid', 'Shy with new people', 'Indecisive', 'Easily scared'],
+    },
+    charm: 'The coziness of a rounded face line and small, gentle eyes',
+    loveStyle: 'A cozy partner who quietly looks after you. You like getting close slowly, and once you give your heart, you keep it for a long time.',
+    compatibility: {
+      best: ['Puppy Face', 'Deer Face'],
+      worst: ['Eagle Face', 'Fox Face'],
+    },
+    celebrities: [],
+  },
 };
 
 export const animalTypeList = Object.keys(animalTypeDB);

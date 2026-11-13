@@ -231,14 +231,16 @@ export default function AnimalTypePage() {
                     <p className="font-medium mt-0.5">{d!.compatibility.worst.join(", ")}</p>
                   </div>
                 </section>
-                <section>
-                  <h3 className="font-serif font-bold text-base mb-2">{t("animal.celebs")}</h3>
-                  <div className="flex flex-wrap gap-1.5">
-                    {d!.celebrities.map((c) => (
-                      <span key={c} className="px-3 py-1.5 bg-card-2 rounded-full text-[13px]">{c}</span>
-                    ))}
-                  </div>
-                </section>
+                {d!.celebrities.length > 0 && (
+                  <section>
+                    <h3 className="font-serif font-bold text-base mb-2">{t("animal.celebs")}</h3>
+                    <div className="flex flex-wrap gap-1.5">
+                      {d!.celebrities.map((c) => (
+                        <span key={c} className="px-3 py-1.5 bg-card-2 rounded-full text-[13px]">{c}</span>
+                      ))}
+                    </div>
+                  </section>
+                )}
               </div>
             </details>
 

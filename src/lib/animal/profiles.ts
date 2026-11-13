@@ -1,6 +1,6 @@
 import type { CharacterProfile } from '@/lib/samguk/profiles'
 
-// 동물상 8종의 얼굴 프로필 (z 단위, 삼국지 프로필과 같은 의미: 0 = 같은 성별 평균, ±1 = 흔한 차이)
+// 동물상 13종의 얼굴 프로필 (z 단위, 삼국지 프로필과 같은 의미: 0 = 같은 성별 평균, ±1 = 흔한 차이)
 // 근거: 널리 쓰이는 동물상 통념(강아지상 = 둥글고 순한 눈, 고양이상 = 올라간 눈꼬리 등)을 MediaPipe로 재는 비율 특징으로 옮겼다.
 export const animalProfiles: Record<string, CharacterProfile> = {
   // 강아지: 둥글고 큰 눈, 순하게 내려간 눈꼬리, 동그란 얼굴, 웃는 입꼬리
@@ -19,4 +19,14 @@ export const animalProfiles: Record<string, CharacterProfile> = {
   tiger: { z: { browGap: -1.1, browTilt: 1.0, jawWidth: 0.7, eyeAspect: -0.6 }, weight: {} },
   // 독수리: 길게 뻗은 콧대, 좁고 오똑한 코, 강렬한 눈썹, 좁은 미간
   eagle: { z: { noseLength: 1.2, noseWidth: -0.8, browGap: -0.6, eyeSpacing: -0.6 }, weight: {} },
+  // 사막여우: 크고 동그란 눈, 살짝 올라간 눈꼬리, 아주 좁은 턱
+  desertfox: { z: { eyeAspect: 0.9, eyeWidth: 0.7, eyeTilt: 0.6, jawWidth: -1.1 }, weight: { jawWidth: 1.5 } },
+  // 공룡: 큰 입, 긴 얼굴, 넉넉한 코, 무심한 입꼬리
+  dino: { z: { mouthWidth: 1.1, faceAspect: 0.7, noseWidth: 0.6, mouthCornerLift: -0.5 }, weight: { mouthWidth: 1.5 } },
+  // 늑대: 올라간 눈꼬리, 눈에 붙은 눈썹, 긴 콧대, 가는 눈
+  wolf: { z: { eyeTilt: 1.0, browGap: -0.8, noseLength: 0.8, eyeAspect: -0.7 }, weight: {} },
+  // 다람쥐: 동그란 눈, 짧은 얼굴, 작은 입, 도톰한 입술
+  squirrel: { z: { eyeAspect: 0.8, faceAspect: -0.8, mouthWidth: -0.9, lipFullness: 0.7 }, weight: {} },
+  // 햄스터: 둥근 얼굴, 짧은 턱 끝, 작은 코와 입, 작은 눈
+  hamster: { z: { faceAspect: -1.1, chinLength: -0.7, noseWidth: -0.5, eyeWidth: -0.5 }, weight: {} },
 }
