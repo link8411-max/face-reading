@@ -36,3 +36,12 @@ test('이마가 불확실하면 안내, balanced면 칩 3개', () => {
   expect(html).toContain(BALANCED_CHIP)
   expect(html.match(/rounded-full px-3 py-1\.5/g)).toHaveLength(3)
 })
+
+test('결과 카드는 유형 큰 그림(hero)이 위에: 고른 성별 그림, 없으면 여자', () => {
+  const m = renderToStaticMarkup(<GuansangResultView result={base} g="m" />)
+  expect(m).toContain('src="/images/face/earth-mid-m.webp"')
+  expect(m).toContain('width="720"')
+  expect(m).toContain('height="960"')
+  expect(m).toContain(`alt="${GUANSANG_TYPES['earth-mid'].nickname} 결과 그림"`)
+  expect(render(base)).toContain('src="/images/face/earth-mid-f.webp"')
+})

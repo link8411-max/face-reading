@@ -3,7 +3,8 @@ import sharp from 'sharp'
 import { CAST } from '@/content/cast'
 import { ANIMAL_KEYS } from '@/lib/animal/matcher'
 import { animalArt } from '@/lib/animal/art'
-import { mbtiArt, zodiacArt } from '@/lib/art'
+import { faceArt, mbtiArt, zodiacArt } from '@/lib/art'
+import { GUANSANG_TYPE_KEYS } from '@/lib/face/guansangKeys'
 import { MBTI_TYPES } from '@/lib/mbti/compat'
 import { ZODIAC_SLUGS } from '@/content/fortune2027Zodiac'
 
@@ -61,4 +62,14 @@ test.each(MBTI_TYPES)('MBTI %s: 큰 그림 720×960, 얼굴 240×240', async (t)
 const ZODIAC_ART = ZODIAC_SLUGS.flatMap((z) => (['f', 'm'] as const).map((g) => [z, g] as const))
 test.each(ZODIAC_ART)('띠 %s-%s: 큰 그림 720×960, 얼굴 240×240', async (z, g) => {
   await checkArt(zodiacArt(z, g))
+})
+
+const FACE_ART = GUANSANG_TYPE_KEYS.flatMap((k) => (['f', 'm'] as const).map((g) => [k, g] as const))
+test.each(FACE_ART)('관상 %s-%s: 큰 그림 720×960, 얼굴 240×240', async (k, g) => {
+  await checkArt(faceArt(k, g))
+})
+
+test('faceArt 경로 규칙', () => {
+  expect(faceArt('earth-mid', 'm')).toEqual({ src: '/images/face/earth-mid-m.webp', face: '/images/face/earth-mid-m-face.webp' })
+  expect(FACE_ART).toHaveLength(30)
 })

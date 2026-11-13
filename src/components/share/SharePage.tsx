@@ -4,6 +4,8 @@ import { redirect } from "next/navigation";
 import { josa, ogImageUrl, parseShared, SITE, TEST_NAME, type ShareKind, type SharedResult } from "@/lib/shareLinks";
 import { animalTypeDB } from "@/lib/animalTypeDB";
 import { animalArt } from "@/lib/animal/art";
+import { faceArt } from "@/lib/art";
+import type { GuansangTypeKey } from "@/lib/face/guansangKeys";
 import type { AnimalKey } from "@/lib/animal/matcher";
 import { samgukCharacters } from "@/lib/samgukDB";
 import { DAY_MASTER_COPY } from "@/content/saju";
@@ -54,7 +56,8 @@ export async function SharePage({ kind, params, searchParams }: { kind: ShareKin
   const samguk = kind === "samguk" ? { video: videosForPerson(await getChannelVideos(), r.key).own[0] ?? null, faces: relatedFaces(r.key) } : null;
   const scoreLabel = r.score !== null ? `닮음 ${r.score}%` : null;
   // 동물상은 링크의 g(f|m)에 맞는 큰 그림이 카드 위에 나온다(g가 없으면 f)
-  const hero = kind === "animal" ? animalArt(r.key as AnimalKey, r.g ?? "f").src : null;
+  // 관상도 같은 방식(링크의 g에 맞는 유형 그림)
+  const hero = kind === "animal" ? animalArt(r.key as AnimalKey, r.g ?? "f").src : kind === "face" ? faceArt(r.key as GuansangTypeKey, r.g ?? "f").src : null;
   return (
     <main className="max-w-lg mx-auto px-[22px] pt-8 pb-10">
       <SharedLandingTracker kind={kind} resultId={r.key} />

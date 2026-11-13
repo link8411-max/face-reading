@@ -23,6 +23,8 @@ test('내 사주 풀이: 아래로 내려 두고 결과를 보면 맨 위', asyn
   await page.getByPlaceholder('1990').fill('1992')
   await page.getByPlaceholder('5', { exact: true }).fill('7')
   await page.getByPlaceholder('15').fill('23')
+  await page.getByRole('button', { name: '다음으로' }).click()
+  await page.getByRole('button', { name: '다음으로' }).click()
   await page.getByRole('radio', { name: '여자', exact: true }).click()
   await page.evaluate(() => window.scrollTo(0, document.body.scrollHeight))
   await page.getByRole('button', { name: /내 사주 보기/ }).click()

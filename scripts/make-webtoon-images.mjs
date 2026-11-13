@@ -19,6 +19,7 @@ const OUT = join(ROOT, 'public/images/cast');
 const OUT_ANIMAL = join(ROOT, 'public/images/animal');
 const OUT_MBTI = join(ROOT, 'public/images/mbti');
 const OUT_ZODIAC = join(ROOT, 'public/images/zodiac');
+const OUT_FACE = join(ROOT, 'public/images/face');
 const crops = JSON.parse(readFileSync(join(dirname(fileURLToPath(import.meta.url)), 'webtoon-crops.json'), 'utf8'));
 const DEFAULT_CROP = { cx: 0.5, cy: 0.22, size: 0.42 };
 
@@ -45,17 +46,21 @@ const ANIMALS = ['dog', 'cat', 'fox', 'bear', 'rabbit', 'deer', 'tiger', 'eagle'
 const MBTIS = ['enfj', 'enfp', 'entj', 'entp', 'esfj', 'esfp', 'estj', 'estp', 'infj', 'infp', 'intj', 'intp', 'isfj', 'isfp', 'istj', 'istp'];
 // 띠 12 × 여·남: public/images/zodiac/<slug>-<f|m>.webp·-face.webp (원본 zodiac-<slug>-<f|m>)
 const ZODIACS = ['rat', 'ox', 'tiger', 'rabbit', 'dragon', 'snake', 'horse', 'sheep', 'monkey', 'rooster', 'dog', 'pig'];
+// 관상 15유형 × 여·남: public/images/face/<유형키>-<f|m>.webp·-face.webp (원본 face-<유형키>-<f|m>)
+const FACES = ['wood', 'fire', 'earth', 'metal', 'water'].flatMap((s) => ['up', 'mid', 'down'].map((z) => `${s}-${z}`));
 const JOBS = [
   ...Object.entries(FILES).map(([key, name]) => ({ out: OUT, key, name, og: true })),
   ...ANIMALS.flatMap((a) => ['f', 'm'].map((g) => ({ out: OUT_ANIMAL, key: `${a}-${g}`, name: `${a}-${g}`, og: false }))),
   ...MBTIS.map((m) => ({ out: OUT_MBTI, key: m, name: `mbti-${m}`, og: false })),
   ...ZODIACS.flatMap((z) => ['f', 'm'].map((g) => ({ out: OUT_ZODIAC, key: `${z}-${g}`, name: `zodiac-${z}-${g}`, og: false }))),
+  ...FACES.flatMap((k) => ['f', 'm'].map((g) => ({ out: OUT_FACE, key: `${k}-${g}`, name: `face-${k}-${g}`, og: false }))),
 ];
 
 mkdirSync(OUT, { recursive: true });
 mkdirSync(OUT_MBTI, { recursive: true });
 mkdirSync(OUT_ZODIAC, { recursive: true });
 mkdirSync(OUT_ANIMAL, { recursive: true });
+mkdirSync(OUT_FACE, { recursive: true });
 for (const { out, key, name, og } of JOBS) {
   const file = find(name);
   const meta = await sharp(file).metadata();

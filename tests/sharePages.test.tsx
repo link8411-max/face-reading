@@ -59,6 +59,7 @@ test('결과 링크 og:url에 점수가 있다(utm은 없음)', async () => {
 
 import { renderToStaticMarkup } from 'react-dom/server'
 import { SharePage } from '@/components/share/SharePage'
+import { EnSharePage } from '@/components/share/EnSharePage'
 
 test('동물상 공유 착지: g에 맞는 큰 그림, 없거나 이상한 g면 여자 그림', async () => {
   const html = async (g?: string) => renderToStaticMarkup(await SharePage({ kind: 'animal', params: Promise.resolve({ key: 'cat' }), searchParams: Promise.resolve({ s: '88', ...(g ? { g } : {}) }) }))
@@ -67,4 +68,15 @@ test('동물상 공유 착지: g에 맞는 큰 그림, 없거나 이상한 g면 
   expect(await html()).toContain('src="/images/animal/cat-f.webp"')
   expect(await html('zzz')).toContain('src="/images/animal/cat-f.webp"')
   expect(await html('m')).toContain('width="720"')
+})
+
+test('관상 공유 착지: g에 맞는 유형 큰 그림, 없거나 이상한 g면 여자 그림, 영어판도 같다', async () => {
+  const html = async (g?: string) => renderToStaticMarkup(await SharePage({ kind: 'face', params: Promise.resolve({ key: 'earth-mid' }), searchParams: Promise.resolve(g ? { g } : {}) }))
+  expect(await html('m')).toContain('src="/images/face/earth-mid-m.webp"')
+  expect(await html('f')).toContain('src="/images/face/earth-mid-f.webp"')
+  expect(await html()).toContain('src="/images/face/earth-mid-f.webp"')
+  expect(await html('zzz')).toContain('src="/images/face/earth-mid-f.webp"')
+  expect(await html('m')).toContain('height="960"')
+  const en = renderToStaticMarkup(await EnSharePage({ kind: 'face', keyP: Promise.resolve('wood-up'), searchParams: Promise.resolve({ g: 'm' }) }))
+  expect(en).toContain('src="/images/face/wood-up-m.webp"')
 })

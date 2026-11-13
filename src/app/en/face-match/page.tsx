@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import FaceMatchClient from "@/components/faceMatch/FaceMatchClient";
+import CastHero from "@/components/cast/CastHero";
 import LanguageSwitch from "@/components/i18n/LanguageSwitch";
 import PageGuide from "@/components/PageGuide";
 import { EnCopyProvider } from "@/lib/i18n/copy";
@@ -21,14 +22,20 @@ export default function FaceMatchPage() {
           <h1 className="text-sm font-medium text-center">{t("en", "fm.title")}</h1>
           <div className="absolute right-[-8px] top-1"><LanguageSwitch /></div>
         </header>
-        <h2 className="mt-4 font-serif font-bold text-[27px] leading-[1.4] break-keep">
-          {lines[0]}
-          <br />
-          {lines[1]}
-        </h2>
-        <p className="mt-2.5 mb-5 text-sm text-muted leading-relaxed">{t("en", "fm.desc")}</p>
         <EnCopyProvider copy={{ animals: EN_ANIMALS }}>
-          <FaceMatchClient />
+          <FaceMatchClient
+            top={<CastHero cast="gumiho" lineKey="say.faceMatch.start" locale="en" />}
+            head={
+              <>
+                <h2 className="mt-4 font-serif font-bold text-[27px] leading-[1.4] break-keep">
+                  {lines[0]}
+                  <br />
+                  {lines[1]}
+                </h2>
+                <p className="mt-2.5 mb-5 text-sm text-muted leading-relaxed">{t("en", "fm.desc")}</p>
+              </>
+            }
+          />
         </EnCopyProvider>
       </main>
       <PageGuide route="/face-match" locale="en" />

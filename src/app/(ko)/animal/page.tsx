@@ -9,7 +9,8 @@ import TestHeader from "@/components/test/TestHeader";
 import TestStart from "@/components/test/TestStart";
 import Link from "next/link";
 import { useScreenshot } from "@/hooks/useScreenshot";
-import { matchAnimal, type AnimalTypeResult } from "@/lib/animal/matcher";
+import { ANIMAL_KEYS, matchAnimal, type AnimalTypeResult } from "@/lib/animal/matcher";
+import ResultPreview from "@/components/test/ResultPreview";
 import { animalArt, artGender } from "@/lib/animal/art";
 import animalCalibration from "@/lib/animal/calibration.json";
 import { analyzePhoto, failText, holdAtLeast, reasonText } from "@/lib/face/analyzePhoto";
@@ -142,7 +143,7 @@ export default function AnimalTypePage() {
     <div className="min-h-screen bg-paper text-ink">
 
       <main className="mx-auto px-[22px] max-w-lg">
-        <TestHeader title={t("animal.title")} onBack={() => (result ? resetAll() : goBack())} backLabel={result ? t("btn.tryAgain") : t("btn.back")} />
+        <TestHeader title={t("animal.title")} onBack={() => (result ? resetAll() : goBack())} backLabel={result ? t("btn.tryAgain") : t("btn.back")} cast={result ? undefined : { cast: "tiger", line: "say.animal.start" }} />
 
         {!result && (
           <TestStart
@@ -159,6 +160,12 @@ export default function AnimalTypePage() {
             loading={loading}
             error={error}
             imageRef={imageRef}
+            preview={
+              <ResultPreview
+                title={t("preview.title")}
+                items={ANIMAL_KEYS.map((k) => ({ key: k, src: animalArt(k, artGender(gender)).src, name: (enAnimals?.[k] ?? animalTypeDB[k]).name }))}
+              />
+            }
           />
         )}
         {loading && <AnalyzingOverlay cast="tiger" photo={image ?? undefined} steps={steps} step={analyzeStep} />}

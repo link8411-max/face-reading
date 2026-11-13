@@ -66,7 +66,11 @@ test('공유 주소: 유형 키와 점수, 유입 구분용 utm만 담는다', (
 test('동물상 공유 주소에 그림 성별 g(f|m)를 담고, 파서는 f|m만 받는다', () => {
   expect(shareUrl('animal', 'cat', 88, 'ko', { g: 'm' })).toBe('https://unse-ai.com/animal/r/cat?s=88&g=m&utm_source=share&utm_medium=friend_link&utm_campaign=animal')
   expect(shareUrl('animal', 'cat', 88)).not.toContain('g=')
-  expect(shareUrl('face', 'earth-mid', undefined, 'ko', { g: 'm' })).not.toContain('g=')
+  // 관상도 그림 성별 g를 담는다(점수 s는 없음)
+  expect(shareUrl('face', 'earth-mid', undefined, 'ko', { g: 'm' })).toBe('https://unse-ai.com/face2/r/earth-mid?g=m&utm_source=share&utm_medium=friend_link&utm_campaign=face')
+  expect(shareUrl('face', 'earth-mid')).not.toContain('g=')
+  expect(shareUrl('face', 'earth-mid', undefined, 'ko', { g: 'x' as never })).not.toContain('g=')
+  expect(shareUrl('saju', 'gyeong', undefined, 'ko', { g: 'm' })).not.toContain('g=')
   expect(parseShared('animal', 'cat', '88', 'm')!.g).toBe('m')
   expect(parseShared('animal', 'cat', '88', 'f')!.g).toBe('f')
   for (const bad of ['x', '../etc', 'M', '', undefined, ['m', 'f']]) expect(parseShared('animal', 'cat', '88', bad)!.g, String(bad)).toBeUndefined()

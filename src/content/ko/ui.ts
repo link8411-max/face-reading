@@ -229,6 +229,8 @@ export const UI: Record<UiKey, string> = {
   'home.askWho': '누구에게 물어볼까?',
   'home.heroAria': '오늘의 추천',
 
+  'preview.title': '이 중에 너는?',
+
   // 캐릭터 대사(CastSay)
   'say.saju.start': '명부에 네 이름이 아직 없더라. 태어난 날부터 알려줘.',
   'say.saju.ask1': '언제 태어났어? 양력인지 음력인지도 알려줘.',
@@ -240,6 +242,9 @@ export const UI: Record<UiKey, string> = {
   'say.fortune.start': '올해 네 흐름을 명부에서 찾아 줄게. 태어난 날을 알려줘.',
   'say.fortune.analyzing': '잠깐, 올해 칸을 넘겨 보는 중이야.',
   'say.fortune.reveal': '찾았다. 올해 네 흐름은 이렇게 적혀 있어.',
+  'say.today.start': '오늘 하루를 먼저 살짝 들여다볼까? 태어난 해만 알려줘!',
+  'say.fortuneYear.start': '올해 네 흐름을 차분히 짚어 줄게. 태어난 날을 알려줘.',
+  'say.mbti.hub': '네 유형부터 눌러 봐. 누구랑 잘 맞는지 알려줄게.',
   'say.today.reveal': '오늘 네 띠 칸을 찾았어! 이렇게 적혀 있어.',
   'say.zodiac2027.hub': '열두 띠를 한 칸씩 차분히 적어 두었어. 네 띠부터 찾아봐.',
   'say.zodiac.intro': '올해 이 띠의 흐름을 방울 소리에 담아 풀어 드릴게요.',

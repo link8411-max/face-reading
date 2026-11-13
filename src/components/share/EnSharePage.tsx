@@ -9,6 +9,7 @@ import { LANDING, SHARE_PHRASE } from "@/content/en/share";
 import { t } from "@/lib/i18n/dict";
 import { ogImageUrl, parseShared, SITE } from "@/lib/shareLinks";
 import { animalArt } from "@/lib/animal/art";
+import { faceArt } from "@/lib/art";
 import type { AnimalKey } from "@/lib/animal/matcher";
 import type { GuansangTypeKey } from "@/lib/face/guansangKeys";
 
@@ -51,7 +52,7 @@ export async function EnSharePage({ kind, keyP, searchParams }: { kind: EnKind; 
   const sp = await searchParams;
   const e = enResult(kind, await keyP, sp.s, sp.g);
   if (!e) redirect(TEST_PATH[kind]);
-  const hero = kind === "animal" ? animalArt(e.r.key as AnimalKey, e.r.g ?? "f").src : null;
+  const hero = kind === "animal" ? animalArt(e.r.key as AnimalKey, e.r.g ?? "f").src : kind === "face" ? faceArt(e.r.key as GuansangTypeKey, e.r.g ?? "f").src : null;
   return (
     <main className="max-w-lg mx-auto px-[22px] pt-8 pb-10">
       <SharedLandingTracker kind={kind} resultId={e.r.key} />

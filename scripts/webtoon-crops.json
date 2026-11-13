@@ -258,5 +258,155 @@
     "cx": 0.47,
     "cy": 0.23,
     "size": 0.36
+  },
+  "face-earth-down-f": {
+    "cx": 0.608,
+    "cy": 0.37,
+    "size": 0.3
+  },
+  "face-earth-down-m": {
+    "cx": 0.521,
+    "cy": 0.322,
+    "size": 0.38
+  },
+  "face-earth-mid-f": {
+    "cx": 0.481,
+    "cy": 0.265,
+    "size": 0.45
+  },
+  "face-earth-mid-m": {
+    "cx": 0.577,
+    "cy": 0.248,
+    "size": 0.38
+  },
+  "face-earth-up-f": {
+    "cx": 0.467,
+    "cy": 0.272,
+    "size": 0.43
+  },
+  "face-earth-up-m": {
+    "cx": 0.5,
+    "cy": 0.265,
+    "size": 0.44
+  },
+  "face-fire-down-f": {
+    "cx": 0.485,
+    "cy": 0.265,
+    "size": 0.45
+  },
+  "face-fire-down-m": {
+    "cx": 0.508,
+    "cy": 0.275,
+    "size": 0.35
+  },
+  "face-fire-mid-f": {
+    "cx": 0.497,
+    "cy": 0.254,
+    "size": 0.37
+  },
+  "face-fire-mid-m": {
+    "cx": 0.513,
+    "cy": 0.275,
+    "size": 0.41
+  },
+  "face-fire-up-f": {
+    "cx": 0.494,
+    "cy": 0.305,
+    "size": 0.45
+  },
+  "face-fire-up-m": {
+    "cx": 0.486,
+    "cy": 0.271,
+    "size": 0.35
+  },
+  "face-metal-down-f": {
+    "cx": 0.482,
+    "cy": 0.275,
+    "size": 0.39
+  },
+  "face-metal-down-m": {
+    "cx": 0.509,
+    "cy": 0.269,
+    "size": 0.31
+  },
+  "face-metal-mid-f": {
+    "cx": 0.47,
+    "cy": 0.279,
+    "size": 0.41
+  },
+  "face-metal-mid-m": {
+    "cx": 0.477,
+    "cy": 0.27,
+    "size": 0.44
+  },
+  "face-metal-up-f": {
+    "cx": 0.504,
+    "cy": 0.254,
+    "size": 0.36
+  },
+  "face-metal-up-m": {
+    "cx": 0.466,
+    "cy": 0.27,
+    "size": 0.44
+  },
+  "face-water-down-f": {
+    "cx": 0.479,
+    "cy": 0.212,
+    "size": 0.3
+  },
+  "face-water-down-m": {
+    "cx": 0.489,
+    "cy": 0.242,
+    "size": 0.35
+  },
+  "face-water-mid-f": {
+    "cx": 0.487,
+    "cy": 0.287,
+    "size": 0.42
+  },
+  "face-water-mid-m": {
+    "cx": 0.485,
+    "cy": 0.268,
+    "size": 0.35
+  },
+  "face-water-up-f": {
+    "cx": 0.477,
+    "cy": 0.276,
+    "size": 0.37
+  },
+  "face-water-up-m": {
+    "cx": 0.472,
+    "cy": 0.26,
+    "size": 0.34
+  },
+  "face-wood-down-f": {
+    "cx": 0.493,
+    "cy": 0.279,
+    "size": 0.38
+  },
+  "face-wood-down-m": {
+    "cx": 0.502,
+    "cy": 0.277,
+    "size": 0.39
+  },
+  "face-wood-mid-f": {
+    "cx": 0.568,
+    "cy": 0.273,
+    "size": 0.4
+  },
+  "face-wood-mid-m": {
+    "cx": 0.511,
+    "cy": 0.246,
+    "size": 0.3
+  },
+  "face-wood-up-f": {
+    "cx": 0.476,
+    "cy": 0.274,
+    "size": 0.45
+  },
+  "face-wood-up-m": {
+    "cx": 0.477,
+    "cy": 0.27,
+    "size": 0.45
   }
 }

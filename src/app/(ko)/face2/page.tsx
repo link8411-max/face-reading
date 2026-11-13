@@ -27,9 +27,13 @@ import type { Landmark } from "@/lib/face/landmarkFeatures";
 import { GUANSANG_TYPES } from "@/content/guansang";
 import { ogImageUrl, parseShared, shareUrl } from "@/lib/shareLinks";
 import { useScrollTopWhen } from "@/hooks/useScrollTopWhen";
+import { artGender, type ArtGender } from "@/lib/animal/art";
+import { faceArt } from "@/lib/art";
+import { GUANSANG_TYPE_KEYS } from "@/lib/face/guansangKeys";
+import ResultPreview from "@/components/test/ResultPreview";
 
 // 결과 상태: 랜드마크는 Task 7의 공개 모션이 쓴다(화면 밖으로 나가지 않는다)
-interface FaceState { guansang: GuansangResult; landmarks: Landmark[]; image: string; zones: { up: number; mid: number; down: number } }
+interface FaceState { guansang: GuansangResult; landmarks: Landmark[]; image: string; zones: { up: number; mid: number; down: number }; g: ArtGender }
 
 export default function Face2Page() {
   const goBack = useBackOrHome();
@@ -53,7 +57,7 @@ export default function Face2Page() {
   const type = result?.guansang.type;
   const { ref: resultRef, isCapturing, download } = useScreenshot<HTMLElement>();
   const { busy, notice, share: shareCard } = useResultShare(
-    type ? { testName: "face", title: t("face.shareTitle"), text: en && enG ? SHARE_PHRASE.face(enG.types[type].nickname) : parseShared("face", type)!.phrase, url: shareUrl("face", type, undefined, locale), imageUrl: ogImageUrl("face", type, undefined, undefined, locale) } : null,
+    type ? { testName: "face", title: t("face.shareTitle"), text: en && enG ? SHARE_PHRASE.face(enG.types[type].nickname) : parseShared("face", type)!.phrase, url: shareUrl("face", type, undefined, locale, { g: result?.g }), imageUrl: ogImageUrl("face", type, undefined, undefined, locale) } : null,
   );
 
   const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -87,7 +91,7 @@ export default function Face2Page() {
       }
       const guansang = classifyGuansang({ z: r.z, g: r.g, zones: r.zones });
       setRevealed(false);
-      setResult({ guansang, landmarks: r.landmarks, image, zones: r.zones });
+      setResult({ guansang, landmarks: r.landmarks, image, zones: r.zones, g: artGender(gender) });
       track("result_view", { test_name: "face", result_id: guansang.type });
     } catch (err) {
       console.error("Analysis error:", err);
@@ -112,7 +116,7 @@ export default function Face2Page() {
   return (
     <div className="min-h-screen bg-paper text-ink">
       <main className="mx-auto px-[22px] max-w-lg">
-        <TestHeader title={t("face.title")} onBack={() => (result ? resetAll() : goBack())} backLabel={result ? t("btn.tryAgain") : t("btn.back")} />
+        <TestHeader title={t("face.title")} onBack={() => (result ? resetAll() : goBack())} backLabel={result ? t("btn.tryAgain") : t("btn.back")} cast={result ? undefined : { cast: "haetae", line: "say.face2.start" }} />
 
         {!result && (
           <TestStart
@@ -129,6 +133,12 @@ export default function Face2Page() {
             loading={loading}
             error={error}
             imageRef={imageRef}
+            preview={
+              <ResultPreview
+                title={t("preview.title")}
+                items={GUANSANG_TYPE_KEYS.map((k) => ({ key: k, src: faceArt(k, artGender(gender)).src, name: (enG?.types ?? GUANSANG_TYPES)[k].nickname }))}
+              />
+            }
           />
         )}
 
@@ -147,6 +157,7 @@ export default function Face2Page() {
           <>
             <GuansangResultView
               result={result.guansang}
+              g={result.g}
               captureRef={resultRef}
               actions={
                 <ResultActions

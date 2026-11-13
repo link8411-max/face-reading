@@ -13,6 +13,7 @@ import type { Round } from '@/lib/exam/types'
 import Explain from './Explain'
 import { enterMs, useReducedMotion } from './motion'
 import QuestionCard, { type OptionState } from './QuestionCard'
+import CastHero from '@/components/cast/CastHero'
 import ReportCard from './ReportCard'
 import SkitCard from './SkitCard'
 import TimerBar from './TimerBar'
@@ -184,13 +185,20 @@ export default function ExamGame({ rounds, challenge = null }: { rounds: Round[]
   }, [phase, result, play])
 
   if (phase === 'boot' || !viewRound) {
-    return <div className="mt-6 min-h-[240px]" aria-busy="true" />
+    // 시작 화면과 같은 자리에 캐릭터를 먼저 그려 서버 HTML에도 있고, 시작 화면으로 바뀔 때 흔들리지 않는다
+    return (
+      <>
+        <div className="mt-5"><CastHero cast="dokkaebi" lineKey="say.exam.start" /></div>
+        <div className="mt-4 min-h-[240px]" aria-busy="true" />
+      </>
+    )
   }
 
   if (phase === 'start') {
     return (
       <>
-      <section className="ex-rise-lg mt-6 rounded-[30px] bg-card border border-line px-6 pt-7 pb-6 text-center">
+      <div className="mt-5"><CastHero cast="dokkaebi" lineKey="say.exam.start" /></div>
+      <section className="ex-rise-lg mt-4 rounded-[30px] bg-card border border-line px-6 pt-7 pb-6 text-center">
         <p className="text-sm font-medium text-accent-ink">{viewRound.round}회차 · {roundDateLabel(viewRound.round)}</p>
         {challenge && <p className="ex-emph mt-3 font-serif text-[19px] font-bold break-keep">친구는 {challenge.grade}등급. 이길 수 있어요?</p>}
         <h2 className="mt-3 font-serif text-[26px] font-bold leading-[1.35]">5문제, 2분이면 끝나요</h2>

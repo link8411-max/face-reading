@@ -236,6 +236,8 @@ export const UI = {
   'home.askWho': 'Who should you ask?',
   'home.heroAria': 'Featured',
 
+  'preview.title': 'Which one are you?',
+
   // character lines (CastSay)
   'say.saju.start': 'Your name isn\'t in my ledger yet. Tell me when you were born.',
   'say.saju.ask1': 'When were you born? Solar or lunar, tell me which.',
@@ -247,6 +249,9 @@ export const UI = {
   'say.fortune.start': 'I\'ll find your year in the ledger. Tell me when you were born.',
   'say.fortune.analyzing': 'Hold on, I\'m turning to this year\'s page.',
   'say.fortune.reveal': 'Found it. Here\'s how your year is written.',
+  'say.today.start': 'Want a quick peek at your day? Just tell me your birth year!',
+  'say.fortuneYear.start': 'I\'ll walk through your year calmly. Tell me when you were born.',
+  'say.mbti.hub': 'Tap your type first. I\'ll tell you who you click with.',
   'say.today.reveal': 'Found your sign\'s page for today! Here\'s what it says.',
   'say.zodiac2027.hub': 'I wrote all twelve signs down, one by one. Find yours first.',
   'say.zodiac.intro': 'I\'ll ring the bell and read this sign\'s year for you.',

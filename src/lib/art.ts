@@ -3,6 +3,7 @@
 import type { MbtiType } from '@/lib/mbti/compat'
 import type { ZodiacSlug } from '@/content/fortune2027Zodiac'
 import type { ArtGender } from '@/lib/animal/art'
+import type { GuansangTypeKey } from '@/lib/face/guansangKeys'
 
 export type { ArtGender }
 
@@ -13,4 +14,9 @@ export function mbtiArt(type: MbtiType): { src: string; face: string } {
 
 export function zodiacArt(slug: ZodiacSlug, g: ArtGender): { src: string; face: string } {
   return { src: `/images/zodiac/${slug}-${g}.webp`, face: `/images/zodiac/${slug}-${g}-face.webp` }
+}
+
+// 관상 15유형 × 여·남 그림(원본 face-<유형키>-<f|m>)
+export function faceArt(key: GuansangTypeKey, g: ArtGender): { src: string; face: string } {
+  return { src: `/images/face/${key}-${g}.webp`, face: `/images/face/${key}-${g}-face.webp` }
 }

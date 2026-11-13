@@ -5,6 +5,7 @@ import { useLocale, useT } from "@/lib/i18n/LocaleProvider";
 import CastSay from "@/components/cast/CastSay";
 import { useEnCopy } from "@/lib/i18n/copy";
 import ResultCard from "@/components/result/ResultCard";
+import { faceArt, type ArtGender } from "@/lib/art";
 import {
   BALANCED_CHIP, DISCLAIMER, FOREHEAD_NOTE, GUANSANG_TYPES, LABEL_COPY, PALACE_COPY, SCHOOL_NOTE, SHAPE_COPY, ZONE_COPY, evidenceText,
 } from "@/content/guansang";
@@ -12,8 +13,9 @@ import type { GuansangResult } from "@/lib/face/guansang";
 
 // 관상 2판 결과 화면 본문. 공유·저장·다시하기 버튼(ResultActions)과 다음 테스트는 페이지가 이 앞뒤에 붙인다.
 // 순서: 카드(캡처) → 전통 용어 → 왜 이 상인가요 → [children: 버튼] → 조심할 점 → 잘 맞는 상 → 안내 → after(쿠팡 배너·다음 테스트는 페이지가 붙인다)
-export default function GuansangResultView({ result, captureRef, actions, after }: {
+export default function GuansangResultView({ result, captureRef, actions, after, g = "f" }: {
   result: GuansangResult;
+  g?: ArtGender; // 결과를 낸 때 고른 성별의 큰 그림
   captureRef?: Ref<HTMLElement>;
   actions?: React.ReactNode;
   after?: React.ReactNode;
@@ -38,7 +40,7 @@ export default function GuansangResultView({ result, captureRef, actions, after 
   return (
     <div className="pb-6 animate-fade-in">
       <div className="mb-3"><CastSay cast="haetae" lineKey="say.face2.reveal" size="sm" locale={locale} /></div>
-      <ResultCard captureRef={captureRef} cast="haetae" eyebrow={tr("face.eyebrow")} title={t.nickname} summary={t.oneLiner} chips={chips} reasons={reasons} />
+      <ResultCard captureRef={captureRef} hero={{ src: faceArt(result.type, g).src, alt: en ? `${t.nickname} result illustration` : `${t.nickname} 결과 그림` }} eyebrow={tr("face.eyebrow")} title={t.nickname} summary={t.oneLiner} chips={chips} reasons={reasons} />
       <p className="mt-3 text-center text-[11px] text-muted leading-relaxed">
         {SHAPES[result.shape].traditional} · {ZONES[result.zone].traditional} · {en?.schoolNote ?? SCHOOL_NOTE}
       </p>

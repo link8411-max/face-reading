@@ -128,7 +128,7 @@ export default function FortuneClient() {
   return (
     <div className="min-h-screen bg-paper text-ink">
       <main className="mx-auto px-[22px] max-w-lg pb-6">
-        <TestHeader title={`${FORTUNE_YEAR.year} 신년 운세`} onBack={() => (result ? resetAll() : goBack())} backLabel={result ? "다시하기" : "돌아가기"} />
+        <TestHeader title={`${FORTUNE_YEAR.year} 신년 운세`} onBack={() => (result ? resetAll() : goBack())} backLabel={result ? "다시하기" : "돌아가기"} cast={result ? undefined : { cast: "sajaElder", line: "say.fortuneYear.start" }} />
         {!result && (
           <div className="mt-2.5 mb-6">
             <h2 className="font-serif font-bold text-[27px] leading-[1.4] break-keep">생년월일로 보는<br />{FORTUNE_YEAR.year} 내 운세</h2>

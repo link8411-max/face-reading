@@ -32,7 +32,7 @@ export function clampScore(s: unknown): number | null {
   return Number.isFinite(n) ? Math.max(50, Math.min(99, Math.round(n))) : null
 }
 
-// 동물상 공유 링크의 그림 성별. f|m만 받고 그 밖의 값은 버린다(착지는 f로 보인다)
+// 동물상·관상 공유 링크의 그림 성별. f|m만 받고 그 밖의 값은 버린다(착지는 f로 보인다)
 export type ArtG = 'f' | 'm'
 export const parseG = (g: unknown): ArtG | undefined => (g === 'f' || g === 'm' ? g : undefined)
 
@@ -44,7 +44,7 @@ export interface SharedResult {
   phrase: string // 1인칭 공유 문구
   testPath: string
   image?: string // 삼국지 도트 초상화
-  g?: ArtG // 동물상: 링크에 담긴 그림 성별(없으면 착지가 f로 보여 준다)
+  g?: ArtG // 동물상·관상: 링크에 담긴 그림 성별(없으면 착지가 f로 보여 준다)
 }
 
 export function parseShared(kind: ShareKind, key: string, s?: unknown, g?: unknown): SharedResult | null {
@@ -55,7 +55,7 @@ export function parseShared(kind: ShareKind, key: string, s?: unknown, g?: unkno
     const k = Object.hasOwn(LEGACY_FACE_KEYS, key) ? LEGACY_FACE_KEYS[key] : key
     if (!isGuansangTypeKey(k)) return null
     const name = FACE_TYPES[k]
-    return { ...base, key: k, score: null, name, phrase: `나는 ${josa(name, '이래', '래')}. 너 관상도 봐줄까?` }
+    return { ...base, key: k, score: null, name, g: parseG(g), phrase: `나는 ${josa(name, '이래', '래')}. 너 관상도 봐줄까?` }
   }
   if (kind === 'saju') {
     // 공유 링크에는 일간 10키만 담는다 (생년월일·사주 글자 없음)
@@ -78,7 +78,7 @@ export function parseShared(kind: ShareKind, key: string, s?: unknown, g?: unkno
 
 export function shareUrl(kind: ShareKind, key: string, score?: number, locale: Locale = 'ko', extra?: { g?: ArtG }): string {
   const s = kind === 'face' || kind === 'saju' || score === undefined ? null : clampScore(score)
-  const g = kind === 'animal' ? parseG(extra?.g) : undefined
+  const g = kind === 'animal' || kind === 'face' ? parseG(extra?.g) : undefined
   return `${SITE}${localePath(locale, TEST_PATH[kind])}/r/${encodeURIComponent(key)}?${s !== null ? `s=${s}&` : ''}${g ? `g=${g}&` : ''}${UTM(kind)}`
 }
 

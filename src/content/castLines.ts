@@ -16,7 +16,9 @@ export const CAST_LINES = {
   'say.fortune.analyzing': 'saja',
   'say.fortune.reveal': 'saja',
   // 오늘의 운세 (저승사자 막내), 신년운세 허브 (저승사자 선배), 띠별 풀이 (박수무당)
+  'say.today.start': 'sajaF',
   'say.today.reveal': 'sajaF',
+  'say.fortuneYear.start': 'sajaElder',
   'say.zodiac2027.hub': 'sajaElder',
   'say.zodiac.intro': 'baksu',
   // 관상 (해태)
@@ -29,6 +31,8 @@ export const CAST_LINES = {
   'say.animal.start': 'tiger',
   'say.animal.analyzing': 'tiger',
   'say.animal.reveal': 'tiger',
+  // MBTI 허브 (구미호)
+  'say.mbti.hub': 'gumiho',
   // 얼굴 궁합 (구미호)
   'say.faceMatch.start': 'gumiho',
   'say.faceMatch.ask': 'gumiho',

@@ -26,6 +26,7 @@ import { animalTypeDB } from "@/lib/animalTypeDB";
 import { track } from "@/lib/analytics";
 import { withGender, withPhoto } from "@/lib/faceMatch/slot";
 import { useScrollTopWhen } from "@/hooks/useScrollTopWhen";
+import type { ReactNode } from "react";
 
 interface Slot { gender: Gender | null; image: string | null; animal: AnimalKey | null; error: string | null }
 const empty: Slot = { gender: null, image: null, animal: null, error: null };
@@ -38,7 +39,8 @@ const OTHER_LABEL: Record<Rel, string> = { friend: "친구", lover: "내 사람"
 // - invite: 초대 링크로 들어온 사람. 상대(초대한 친구) 칸은 결과로 채워져 있고, 내 사진만 올린다
 const cap = (s: string) => s.charAt(0).toUpperCase() + s.slice(1);
 
-export default function FaceMatchClient({ invite }: { invite?: { key: AnimalKey; rel: "friend" | "lover" } }) {
+// top: 시작 화면에서만 보이는 캐릭터 그림(결과가 나오면 사라진다), head: 그 아래 제목·설명(결과 화면에도 남는다). 둘 다 서버에서 그려 HTML에 들어간다.
+export default function FaceMatchClient({ invite, top, head }: { invite?: { key: AnimalKey; rel: "friend" | "lover" }; top?: ReactNode; head?: ReactNode }) {
   const t = useT();
   const locale = useLocale();
   const en = locale === "en";
@@ -123,6 +125,8 @@ export default function FaceMatchClient({ invite }: { invite?: { key: AnimalKey;
 
   if (result && rel && me.animal && other.animal) {
     return (
+      <>
+      {head}
       <div className="pb-6 animate-fade-in">
         <FaceMatchCard captureRef={cardRef} a={me.animal} b={other.animal} rel={rel} result={result} />
         <ResultActions from="face_match" onShare={resultShare.share} onSave={() => { track("share_click", { test_name: "face_match", method: "save_image" }); download({ fileName: `${t("fm.file")}_${relName[rel]}` }); }} onRetry={retry} busy={resultShare.busy || isCapturing} notice={resultShare.notice} />
@@ -133,11 +137,15 @@ export default function FaceMatchClient({ invite }: { invite?: { key: AnimalKey;
           <Icon name="chevron" size={18} className="text-muted" />
         </Link>
       </div>
+      </>
     );
   }
 
   const otherLabel = rel ? (en ? cap(otherLabelOf(rel)) : OTHER_LABEL[rel]) : (en ? cap(t("fm.otherDefault")) : "상대");
   return (
+    <>
+    {top}
+    {head}
     <div className="flex flex-col gap-4 pb-7 no-screenshot">
       {invite ? (
         <p className="bg-card border border-line rounded-[22px] p-4 text-sm leading-relaxed">
@@ -182,5 +190,6 @@ export default function FaceMatchClient({ invite }: { invite?: { key: AnimalKey;
         {busy ? t("fm.going") : !rel ? t("fm.needRel") : t("fm.go")}
       </button>
     </div>
+    </>
   );
 }

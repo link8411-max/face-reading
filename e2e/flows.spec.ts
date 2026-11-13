@@ -20,6 +20,37 @@ test('신년운세: 입력 → 결과 → 다시하기는 같은 페이지 입�
   expect(errors).toEqual([])
 })
 
+test('내 사주 풀이: 세 단계(생년월일 → 시간 → 성별)로 입력 → 결과 → 다시하기', async ({ page }) => {
+  const errors = trackErrors(page)
+  await page.goto('/saju')
+  await expect(page.getByRole('progressbar', { name: '질문 1 / 3' })).toBeVisible()
+  const next = page.getByRole('button', { name: '다음으로' })
+  await expect(next).toBeDisabled() // 날짜가 없으면 못 넘어간다
+  await page.getByPlaceholder('1990').fill('1992')
+  await page.getByPlaceholder('5', { exact: true }).fill('7')
+  await page.getByPlaceholder('15', { exact: true }).fill('23')
+  await next.click()
+  await expect(page.getByRole('progressbar', { name: '질문 2 / 3' })).toBeVisible()
+  await expect(page.getByLabel('태어난 시간')).toBeVisible()
+  // 뒤로 가기는 이전 단계, 입력은 남아 있다
+  await page.getByRole('button', { name: '이전 단계' }).click()
+  await expect(page.getByRole('progressbar', { name: '질문 1 / 3' })).toBeVisible()
+  await expect(page.getByPlaceholder('1990')).toHaveValue('1992')
+  await next.click()
+  await page.getByLabel('태어난 시간').selectOption({ index: 3 })
+  await next.click()
+  await expect(page.getByRole('progressbar', { name: '질문 3 / 3' })).toBeVisible()
+  const submit = page.getByRole('button', { name: /내 사주 보기/ })
+  await expect(submit).toBeDisabled() // 성별을 골라야 한다
+  await page.getByRole('radio', { name: '여자', exact: true }).click()
+  await submit.click()
+  await expect(page.getByRole('button', { name: /공유하기/ }).first()).toBeVisible({ timeout: 15000 })
+  await page.getByRole('button', { name: /다시하기/ }).first().click()
+  await expect(page.getByRole('progressbar', { name: '질문 1 / 3' })).toBeVisible()
+  await expect(page.getByPlaceholder('1990')).toHaveValue('')
+  expect(errors).toEqual([])
+})
+
 test('오늘의 운세: 입력 → 결과 → 다시하기', async ({ page }) => {
   const errors = trackErrors(page)
   await page.goto('/fortune/daily')
@@ -183,3 +214,32 @@ test('한 번 고른 성별은 다음 사진 테스트에서 미리 골라져 �
   await page.goto('/face2')
   await expect(page.getByRole('radio', { name: '여자' })).toHaveAttribute('aria-checked', 'true')
 })
+
+// ===== 시작 화면의 캐릭터와 "나올 수 있는 결과" 미리 보기 (밤 개편 4차) =====
+for (const [path, dir, n] of [['/animal', 'animal', 13], ['/face2', 'face', 15]] as const) {
+  test(`${path} 시작 화면: 성별을 바꾸면 미리 보기 그림이 그 성별 그림으로, 사진을 고르면 숨는다`, async ({ page }) => {
+    await page.goto(path)
+    const imgs = page.locator('[data-result-preview] img')
+    await expect(imgs).toHaveCount(n)
+    expect(await imgs.evaluateAll((l) => l.every((i) => (i as HTMLImageElement).src.includes('-f.webp')))).toBe(true)
+    await page.getByRole('radio', { name: '남자', exact: true }).click()
+    await expect.poll(() => imgs.evaluateAll((l) => l.every((i) => (i as HTMLImageElement).src.includes('-m.webp')))).toBe(true)
+    expect(await imgs.first().getAttribute('src')).toContain(`/images/${dir}/`)
+    await page.getByRole('radio', { name: '여자', exact: true }).click()
+    await expect.poll(() => imgs.evaluateAll((l) => l.every((i) => (i as HTMLImageElement).src.includes('-f.webp')))).toBe(true)
+    await page.locator('input[type=file]').setInputFiles({ name: 'blank.png', mimeType: 'image/png', buffer: await blankPng(page) })
+    await expect(page.locator('[data-result-preview]')).toHaveCount(0)
+  })
+}
+
+for (const width of [320, 390]) {
+  test(`시작 화면에 가로 넘침이 없다 (${width}px)`, async ({ page }) => {
+    await page.setViewportSize({ width, height: 800 })
+    for (const p of ['/face2', '/animal', '/saju', '/face-match', '/fortune', '/fortune/daily', '/exam/meme', '/mbti']) {
+      await page.goto(p)
+      await page.waitForTimeout(300)
+      const over = await page.evaluate(() => document.documentElement.scrollWidth - document.documentElement.clientWidth)
+      expect(over, `${p} ${width}px`).toBeLessThanOrEqual(0)
+    }
+  })
+}

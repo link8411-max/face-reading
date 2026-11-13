@@ -4,7 +4,8 @@ import type { ChangeEvent, RefObject } from "react";
 import { useEffect, useRef } from "react";
 import { usePathname } from "next/navigation";
 import MoreTests from "@/components/MoreTests";
-import { Icon, SmileFace } from "@/components/icons";
+import type { ReactNode } from "react";
+import { Icon } from "@/components/icons";
 import GenderPills, { type Gender } from "@/components/test/GenderPills";
 import { useLocale, useT } from "@/lib/i18n/LocaleProvider";
 import { t as tr } from "@/lib/i18n/dict";
@@ -34,7 +35,7 @@ function ErrorNote({ text }: { text: string }) {
 // 사진 테스트 공통 시작 화면 (디자인 시안 TestStart): 성별 → 사진 → 안내 → 분석 버튼
 // 성별을 분석에 쓰지 않는 테스트(관상)는 needsGender={false}로 성별을 묻지 않는다
 export default function TestStart({
-  heading, desc, tips, analyzeLabel, image, gender, onGender, onFile, onAnalyze, onReset, loading, error, preparing = false, imageRef, needsGender = true,
+  heading, desc, tips, analyzeLabel, image, gender, onGender, onFile, onAnalyze, onReset, loading, error, preparing = false, imageRef, needsGender = true, preview,
 }: {
   heading: string;
   desc: string;
@@ -44,6 +45,7 @@ export default function TestStart({
   gender?: Gender | null;
   onGender?: (g: Gender) => void;
   needsGender?: boolean;
+  preview?: ReactNode; // "나올 수 있는 결과" 미리 보기 줄(ResultPreview). 성별 고르기 아래·사진 칸 위, 사진을 고르면 숨긴다
   onFile: (e: ChangeEvent<HTMLInputElement>) => void;
   onAnalyze: () => void;
   onReset: () => void;
@@ -71,6 +73,8 @@ export default function TestStart({
         </fieldset>
       )}
 
+      {!image && preview}
+
       <button
         type="button"
         onClick={() => fileRef.current?.click()}
@@ -81,7 +85,7 @@ export default function TestStart({
           <img ref={imageRef} src={image} alt={t("start.chosenAlt")} crossOrigin="anonymous" className="max-h-64 rounded-[22px] object-contain" />
         ) : (
           <>
-            <SmileFace />
+            <Icon name="camera" size={44} className="text-accent-ink" />
             <span className="text-[15px] font-bold">{t("btn.choosePhoto")}</span>
             <span className="text-xs text-muted">{t("start.photoHint")}</span>
           </>

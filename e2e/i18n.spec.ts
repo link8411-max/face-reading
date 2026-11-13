@@ -184,7 +184,7 @@ test('영어 관상: 사진 → 공개 모션 건너뛰기 → 영어 결과 →
   await expect(page.getByRole('heading', { name: 'Why this type?' })).toBeVisible()
   expect(await visibleHangul(page), '결과 화면의 한글').toBe('')
   await page.getByRole('button', { name: 'Share', exact: true }).click()
-  await expect.poll(async () => (await shared(page))?.url ?? '').toMatch(/\/en\/face2\/r\/(wood|fire|earth|metal|water)-(up|mid|down)\?utm_source=share/)
+  await expect.poll(async () => (await shared(page))?.url ?? '').toMatch(/\/en\/face2\/r\/(wood|fire|earth|metal|water)-(up|mid|down)\?g=[fm]&utm_source=share/)
   expect(errors).toEqual([])
 })
 
