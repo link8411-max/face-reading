@@ -47,11 +47,11 @@
   - `counterpart(path: string, to: Locale): string | null` — 다른 언어판 주소(쿼리 유지), 없으면 null. 예: `('/face2','en')`→`'/en/face2'`, `('/en/animal/r/cat?s=88','ko')`→`'/animal/r/cat?s=88'`, `('/saju','en')`→null.
   - `languageAlternates(path: string): Record<string, string> | undefined` — Next metadata `alternates.languages`용 `{ ko, en, 'x-default' }`(x-default=ko), 짝이 없으면 undefined.
 
-- [ ] **Step 1: 실패하는 테스트** (`counterpart` 위 예 4개, `languageAlternates('/face2')`가 `{ ko:'https://unse-ai.com/face2', en:'https://unse-ai.com/en/face2', 'x-default':'https://unse-ai.com/face2' }`, `t('en','tab.home')==='Home'`, ko/en ui 키 집합이 같음)
-- [ ] **Step 2: 실패 확인** — `npx vitest run tests/i18n` → FAIL
-- [ ] **Step 3: 구현**
-- [ ] **Step 4: 통과 확인** — `npm test`
-- [ ] **Step 5: 커밋** — `"영어판 바탕: 언어 context, ko/en 화면 문구 사전, 언어 짝 주소"`
+- [x] **Step 1: 실패하는 테스트** (`counterpart` 위 예 4개, `languageAlternates('/face2')`가 `{ ko:'https://unse-ai.com/face2', en:'https://unse-ai.com/en/face2', 'x-default':'https://unse-ai.com/face2' }`, `t('en','tab.home')==='Home'`, ko/en ui 키 집합이 같음)
+- [x] **Step 2: 실패 확인** — `npx vitest run tests/i18n` → FAIL
+- [x] **Step 3: 구현**
+- [x] **Step 4: 통과 확인** — `npm test`
+- [x] **Step 5: 커밋** — `"영어판 바탕: 언어 context, ko/en 화면 문구 사전, 언어 짝 주소"`
 
 ---
 
