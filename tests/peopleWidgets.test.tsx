@@ -7,7 +7,7 @@ import { pairKey, kstDay } from '@/lib/people/keys'
 import { pairKey as pairKeyFromVotes, kstDay as kstDayFromVotes } from '@/lib/people/votes'
 import { track } from '@/lib/analytics'
 import { readFileSync } from 'node:fs'
-import Page from '@/app/samguk/people/[id]/page'
+import Page from '@/app/(ko)/samguk/people/[id]/page'
 
 describe('ratioView', () => {
   test('합이 10 미만이면 숨긴다', () => {
@@ -85,7 +85,7 @@ test('관우 페이지에 응원·투표 위젯이 들어간다', async () => {
 })
 
 test('개인정보처리방침에 응원·투표 저장 안내: GA 항목 밖의 별도 항목, pv 쿠키·localStorage 안내', () => {
-  const src = readFileSync('src/app/privacy/page.tsx', 'utf8')
+  const src = readFileSync('src/app/(ko)/privacy/page.tsx', 'utf8')
   const line = '삼국지 인물열전의 응원·투표는 고른 항목과 날짜, 그리고 기기·접속 정보를 되돌릴 수 없게 바꾼 값(해시)만 저장합니다. IP 주소와 쿠키 값 자체는 저장하지 않습니다.'
   expect(src).toContain(line)
   const gaStart = src.indexOf('5. 방문 통계 분석')

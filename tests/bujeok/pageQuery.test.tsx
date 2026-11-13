@@ -4,7 +4,7 @@ vi.mock('@/lib/zipsise/highs', () => ({ fetchWeeklyHigh: async () => null }))
 vi.mock('@/components/PageGuide', () => ({ default: () => null }))
 vi.mock('@/components/bujeok/BujeokClient', () => ({ default: () => null }))
 
-import BujeokPage from '@/app/bujeok/page'
+import BujeokPage from '@/app/(ko)/bujeok/page'
 import BujeokClient from '@/components/bujeok/BujeokClient'
 
 type El = { type: unknown; props: { initial?: unknown; children?: unknown } }
@@ -41,7 +41,7 @@ test('허용 목록 밖 값은 무시한다', async () => {
 
 // ---- 삼재 막이 부적으로 잇는 링크 ----
 import { renderToStaticMarkup } from 'react-dom/server'
-import Zodiac2027Hub from '@/app/fortune/2027/page'
+import Zodiac2027Hub from '@/app/(ko)/fortune/2027/page'
 import Zodiac2027Article from '@/components/Zodiac2027Article'
 import { SAMJAE_2027, ZODIAC_SLUGS } from '@/content/fortune2027Zodiac'
 

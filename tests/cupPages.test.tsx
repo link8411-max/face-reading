@@ -26,10 +26,10 @@ vi.mock('next/navigation', () => ({
   },
 }))
 
-import CupPicker, { generateMetadata as pickerMeta } from '@/app/samguk/cup/page'
-import CupRanking, { generateMetadata as rankingMeta, revalidate as rankingRevalidate } from '@/app/samguk/cup/ranking/page'
-import CupSharePage, { generateMetadata as shareMeta } from '@/app/samguk/cup/r/[board]/[id]/page'
-import { revalidate as pickerRevalidate } from '@/app/samguk/cup/page'
+import CupPicker, { generateMetadata as pickerMeta } from '@/app/(ko)/samguk/cup/page'
+import CupRanking, { generateMetadata as rankingMeta, revalidate as rankingRevalidate } from '@/app/(ko)/samguk/cup/ranking/page'
+import CupSharePage, { generateMetadata as shareMeta } from '@/app/(ko)/samguk/cup/r/[board]/[id]/page'
+import { revalidate as pickerRevalidate } from '@/app/(ko)/samguk/cup/page'
 
 test('판 고르기·순위 메타: 제목 48자 이하, canonical, 1시간 재검증', async () => {
   const p = await pickerMeta()

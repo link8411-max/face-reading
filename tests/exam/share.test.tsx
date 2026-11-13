@@ -5,7 +5,7 @@ import { afterEach, beforeEach, expect, test, vi } from 'vitest'
 vi.mock('@/lib/analytics', () => ({ track: vi.fn() }))
 vi.mock('@/components/CoupangBanner', () => ({ default: ({ subId }: { subId: string }) => <div data-testid="coupang" data-sub={subId} /> }))
 
-import ExamSharePage, { generateMetadata } from '@/app/exam/meme/r/[code]/page'
+import ExamSharePage, { generateMetadata } from '@/app/(ko)/exam/meme/r/[code]/page'
 import ExamGame from '@/components/exam/ExamGame'
 import { ogQueryOk } from '@/lib/ogQuery'
 import frozen from '@/content/exam/meme-rounds.json'

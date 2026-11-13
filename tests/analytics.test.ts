@@ -1,3 +1,4 @@
+import { koLayoutSource } from './helpers/koLayoutSource'
 import { readFileSync } from 'node:fs'
 import { track, GA_ID } from '@/lib/analytics'
 import { LAST_MODIFIED } from '@/app/sitemap'
@@ -41,25 +42,25 @@ test('gtag가 없으면(광고 차단·서버) 아무 일도 하지 않는다', 
 })
 
 test('레이아웃은 gtag를 afterInteractive로 한 번 불러온다', () => {
-  const src = readFileSync('src/app/layout.tsx', 'utf8')
+  const src = koLayoutSource()
   expect(src).toContain('googletagmanager.com/gtag/js?id=${GA_ID}')
   expect(src).toContain('strategy="afterInteractive"')
 })
 
 test('개인정보처리방침에 GA 수집 항목과 사진·생년월일 미수집을 밝힌다', () => {
-  const src = readFileSync('src/app/privacy/page.tsx', 'utf8')
+  const src = readFileSync('src/app/(ko)/privacy/page.tsx', 'utf8')
   expect(src).toContain('Google 애널리틱스')
   expect(src).toMatch(/사진[^<]*생년월일[^<]*수집하지 않/)
 })
 
 test('개인정보처리방침에 일기토 플레이 기록 수집 항목을 밝힌다', () => {
-  const src = readFileSync('src/app/privacy/page.tsx', 'utf8')
+  const src = readFileSync('src/app/(ko)/privacy/page.tsx', 'utf8')
   expect(src).toMatch(/일기토[^<]*플레이 기록[^<]*시작 장수[^<]*도달 단계[^<]*기기 종류/)
   expect(src).toContain('IP 주소는 저장하지 않습니다')
 })
 
 test('개인정보처리방침에 일기토 피드백(별점·한 줄 의견·시작 장수·도달 단계·기기 종류)을 밝힌다', () => {
-  const src = readFileSync('src/app/privacy/page.tsx', 'utf8')
+  const src = readFileSync('src/app/(ko)/privacy/page.tsx', 'utf8')
   expect(src).toMatch(/일기토 피드백[^<]*별점[^<]*한 줄 의견[^<]*시작 장수[^<]*도달 단계[^<]*기기 종류/)
   // 개정한 날을 사이트맵 lastModified에도
   expect(src).toContain('개정일자: 2026년 11월 4일')

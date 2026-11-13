@@ -33,8 +33,8 @@ test('사진 결과에서는 같은 사진 칸을 빼고(NextTests가 맡음) �
 })
 
 test.each([
-  'src/app/saju/SajuClient.tsx', 'src/app/fortune/FortuneClient.tsx', 'src/components/Zodiac2027Article.tsx', 'src/app/fortune/daily/page.tsx',
-  'src/app/face2/page.tsx', 'src/app/animal/page.tsx', 'src/app/samguk/(match)/page.tsx', 'src/components/mbti/MbtiArticle.tsx', 'src/app/mbti/match/page.tsx',
+  'src/app/(ko)/saju/SajuClient.tsx', 'src/app/(ko)/fortune/FortuneClient.tsx', 'src/components/Zodiac2027Article.tsx', 'src/app/(ko)/fortune/daily/page.tsx',
+  'src/app/(ko)/face2/page.tsx', 'src/app/(ko)/animal/page.tsx', 'src/app/(ko)/samguk/(match)/page.tsx', 'src/components/mbti/MbtiArticle.tsx', 'src/app/(ko)/mbti/match/page.tsx',
 ])('%s 결과에 NextSteps가 붙어 있다', (f) => {
   expect(readFileSync(f, 'utf8')).toContain('<NextSteps')
 })
@@ -47,7 +47,7 @@ test('사주·신년운세 결과는 부적으로 잇는다', () => {
   expect(step.test).toBe('bujeok')
 })
 
-test.each(['src/app/saju/SajuClient.tsx', 'src/app/fortune/FortuneClient.tsx'])('%s는 NextSteps에 입력한 생년월일(birth)을 넘긴다', (f) => {
+test.each(['src/app/(ko)/saju/SajuClient.tsx', 'src/app/(ko)/fortune/FortuneClient.tsx'])('%s는 NextSteps에 입력한 생년월일(birth)을 넘긴다', (f) => {
   expect(readFileSync(f, 'utf8')).toMatch(/<NextSteps from="(saju|fortune)" birth=\{/)
 })
 

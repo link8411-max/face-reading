@@ -10,7 +10,7 @@ let current: Video[] = fixture
 vi.mock('@/lib/videos/fetch', () => ({ getChannelVideos: async () => current }))
 
 import VideoStrip from '@/components/videos/VideoStrip'
-import Hub from '@/app/samguk/people/page'
+import Hub from '@/app/(ko)/samguk/people/page'
 
 function many(n: number): Video[] {
   return Array.from({ length: n }, (_, i) => ({ ...fixture[0], id: `AAAAAAAAA${String(i).padStart(2, '0')}`, title: `영상 ${i}` }))

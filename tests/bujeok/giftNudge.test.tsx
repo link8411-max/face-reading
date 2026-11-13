@@ -59,16 +59,16 @@ test('ArticleShare(띠 글): 공유하기 아래 GiftNudge 한 번', () => {
 
 // 결과 화면(공유 버튼이 있는 화면)마다 GiftNudge가 정확히 하나: ResultActions(from=…) 한 번 또는 <GiftNudge from=…> 한 번
 const VIEWS: Record<string, string> = {
-  samguk: 'src/app/samguk/(match)/page.tsx',
-  face: 'src/app/face2/page.tsx',
-  animal: 'src/app/animal/page.tsx',
+  samguk: 'src/app/(ko)/samguk/(match)/page.tsx',
+  face: 'src/app/(ko)/face2/page.tsx',
+  animal: 'src/app/(ko)/animal/page.tsx',
   face_match: 'src/components/faceMatch/FaceMatchClient.tsx',
   team_samguk: 'src/components/samguk/TeamClient.tsx',
   mbti_match: 'src/components/mbti/MatchCalculator.tsx',
   mbti_daily: 'src/components/mbti/MbtiDailyClient.tsx',
-  saju: 'src/app/saju/SajuClient.tsx',
-  fortune: 'src/app/fortune/FortuneClient.tsx',
-  daily: 'src/app/fortune/daily/page.tsx',
+  saju: 'src/app/(ko)/saju/SajuClient.tsx',
+  fortune: 'src/app/(ko)/fortune/FortuneClient.tsx',
+  daily: 'src/app/(ko)/fortune/daily/page.tsx',
   zodiac: 'src/components/Zodiac2027Article.tsx',
   exam: 'src/components/exam/ReportCard.tsx',
 }

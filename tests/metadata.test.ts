@@ -1,5 +1,5 @@
 import { readFileSync } from 'node:fs'
-import { metadata } from '@/app/face2/layout'
+import { metadata } from '@/app/(ko)/face2/layout'
 
 test('/face2 title에 주력 키워드가 있다', () => {
   const title = String(metadata.title)
@@ -8,27 +8,27 @@ test('/face2 title에 주력 키워드가 있다', () => {
 })
 
 test('/face2 H1이 AI 관상 테스트다 (TestHeader가 title을 h1로 렌더)', () => {
-  expect(readFileSync('src/app/face2/page.tsx', 'utf8')).toContain('<TestHeader title="AI 관상 테스트"')
+  expect(readFileSync('src/app/(ko)/face2/page.tsx', 'utf8')).toContain('<TestHeader title="AI 관상 테스트"')
   expect(readFileSync('src/components/test/TestHeader.tsx', 'utf8')).toMatch(/<h1[^>]*>\{title\}<\/h1>/)
 })
 
 test('루트 layout에는 FAQPage가 없고 홈에만 있다', () => {
-  expect(readFileSync('src/app/layout.tsx', 'utf8')).not.toContain('FAQPage')
-  expect(readFileSync('src/app/page.tsx', 'utf8')).toContain('FAQPage')
+  expect(readFileSync('src/app/(ko)/layout.tsx', 'utf8')).not.toContain('FAQPage')
+  expect(readFileSync('src/app/(ko)/page.tsx', 'utf8')).toContain('FAQPage')
 })
 
 test('삼국지 footer에 옛 이름이 없다', () => {
-  expect(readFileSync('src/app/samguk/(match)/page.tsx', 'utf8')).not.toContain('Samguk Persona')
+  expect(readFileSync('src/app/(ko)/samguk/(match)/page.tsx', 'utf8')).not.toContain('Samguk Persona')
 })
 
 test('/fortune 가이드는 하위 라우트(/fortune/daily)에 중첩되지 않게 layout이 아닌 page에서 렌더한다', () => {
-  expect(readFileSync('src/app/fortune/layout.tsx', 'utf8')).not.toContain('PageGuide')
-  expect(readFileSync('src/app/fortune/page.tsx', 'utf8')).toContain('<PageGuide route="/fortune" />')
+  expect(readFileSync('src/app/(ko)/fortune/layout.tsx', 'utf8')).not.toContain('PageGuide')
+  expect(readFileSync('src/app/(ko)/fortune/page.tsx', 'utf8')).toContain('<PageGuide route="/fortune" />')
 })
 
 test('/bujeok 가이드·구조화 데이터는 선물 착지(/bujeok/r)에 중첩되지 않게 layout이 아닌 page에서 렌더한다', () => {
-  const layout = readFileSync('src/app/bujeok/layout.tsx', 'utf8')
+  const layout = readFileSync('src/app/(ko)/bujeok/layout.tsx', 'utf8')
   expect(layout).not.toContain('PageGuide')
   expect(layout).not.toContain('application/ld+json')
-  expect(readFileSync('src/app/bujeok/page.tsx', 'utf8')).toContain('<PageGuide route="/bujeok" />')
+  expect(readFileSync('src/app/(ko)/bujeok/page.tsx', 'utf8')).toContain('<PageGuide route="/bujeok" />')
 })

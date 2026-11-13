@@ -51,5 +51,5 @@ test('동물상 8종마다 결과 카드 일러스트가 있고 가볍다', () =
     expect(existsSync(f), f).toBe(true)
     expect(statSync(f).size / 1024, f).toBeLessThan(40)
   }
-  expect(readFileSync('src/app/animal/page.tsx', 'utf8')).toContain('/images/animal/${r.type}.jpg')
+  expect(readFileSync('src/app/(ko)/animal/page.tsx', 'utf8')).toContain('/images/animal/${r.type}.jpg')
 })

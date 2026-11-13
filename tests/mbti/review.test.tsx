@@ -1,6 +1,6 @@
 import { renderToStaticMarkup } from 'react-dom/server'
 import { monthlyFor, seoulMonth } from '@/content/mbtiTypes'
-import { revalidate } from '@/app/mbti/[type]/page'
+import { revalidate } from '@/app/(ko)/mbti/[type]/page'
 import Zodiac2027Article from '@/components/Zodiac2027Article'
 
 // 리뷰 Important 1: 이달의 운세는 한국 시간 기준 달로 판단하고, 정적 페이지는 하루마다 다시 만든다

@@ -1,3 +1,4 @@
+import { koLayoutSource } from '../helpers/koLayoutSource'
 import { describe, it, expect } from 'vitest';
 import { readFileSync, existsSync } from 'node:fs';
 import { join } from 'node:path';
@@ -35,6 +36,6 @@ describe('manifest / layout', () => {
     expect(m.icons?.[0]).toMatchObject({ src: '/icons/icon-192.png', sizes: '192x192', type: 'image/png' });
   });
   it('layout uses apple-touch-icon-180.png', () => {
-    expect(readFileSync(join(root, 'src/app/layout.tsx'), 'utf8')).toContain('apple-touch-icon-180.png');
+    expect(koLayoutSource()).toContain('apple-touch-icon-180.png');
   });
 });

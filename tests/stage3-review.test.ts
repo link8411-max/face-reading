@@ -1,6 +1,6 @@
 import { readFileSync } from 'node:fs'
-import { metadata as hubMeta } from '@/app/fortune/2027/page'
-import { generateMetadata } from '@/app/fortune/2027/[zodiac]/page'
+import { metadata as hubMeta } from '@/app/(ko)/fortune/2027/page'
+import { generateMetadata } from '@/app/(ko)/fortune/2027/[zodiac]/page'
 import { zodiac2027, ZODIAC_SLUGS } from '@/content/fortune2027Zodiac'
 import { 띠이모지, 월주계산 } from '@/lib/saju'
 import { computeFortune } from '@/lib/fortuneService'
@@ -19,7 +19,7 @@ test('허브와 띠 페이지 OG가 자기 주소·이미지를 가진다', asyn
 })
 
 test('/fortune 메타 설명이 음력 지원과 맞다', () => {
-  expect(readFileSync('src/app/fortune/layout.tsx', 'utf8')).not.toContain('양력 생년월일로')
+  expect(readFileSync('src/app/(ko)/fortune/layout.tsx', 'utf8')).not.toContain('양력 생년월일로')
 })
 
 test('분기 문구에 다른 분기의 달이 나오지 않는다', () => {
@@ -47,7 +47,7 @@ test('API: 잘못된 양력 날짜·형식은 친절한 오류, 음력 미래 �
 })
 
 test('다시하기는 윤달 체크도 초기화한다', () => {
-  const src = readFileSync('src/app/fortune/FortuneClient.tsx', 'utf8')
+  const src = readFileSync('src/app/(ko)/fortune/FortuneClient.tsx', 'utf8')
   const reset = src.slice(src.indexOf('const resetAll'), src.indexOf('};', src.indexOf('const resetAll')))
   expect(reset).toContain('setIsLeapMonth(false)')
 })

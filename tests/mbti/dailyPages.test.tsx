@@ -1,4 +1,4 @@
-import { generateMetadata } from '@/app/fortune/mbti/r/[type]/page'
+import { generateMetadata } from '@/app/(ko)/fortune/mbti/r/[type]/page'
 import { readFileSync } from 'node:fs'
 import { SITEMAP_ROUTES } from '@/app/sitemap'
 

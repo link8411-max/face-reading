@@ -1,3 +1,4 @@
+import { koLayoutSource } from '../helpers/koLayoutSource'
 import { describe, it, expect } from 'vitest';
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
@@ -67,7 +68,7 @@ describe('needsAbandonConfirm (새로 출진 전에 한 번 더 묻기)', () => 
     expect(showFeedbackForm(false, 3)).toBe(true);
   });
   it('탭바를 숨기는 일기토 화면만 루트 아래 여백을 줄인다(app-shell + .duel-cloth)', () => {
-    const layout = readFileSync(join(__dirname, '../../src/app/layout.tsx'), 'utf8');
+    const layout = koLayoutSource();
     expect(layout).toMatch(/className="app-shell [^"]*pb-\[calc\(4rem\+env\(safe-area-inset-bottom\)\)\]/);
     const css = readFileSync(join(__dirname, '../../src/components/duel/duel.css'), 'utf8');
     expect(css).toMatch(/\.app-shell:has\(\.duel-cloth\)\s*\{\s*padding-bottom: env\(safe-area-inset-bottom\);/);

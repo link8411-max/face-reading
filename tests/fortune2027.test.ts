@@ -32,7 +32,7 @@ test('운세 결과에 2026·병오가 없고 같은 입력이면 같은 결과'
 })
 
 test('신년운세 화면·메타·홈·소개에 2026·병오가 남아 있지 않다', () => {
-  const files = [...walk('src/app/fortune'), 'src/app/layout.tsx', 'src/app/page.tsx', 'src/app/about/page.tsx', 'src/lib/fortuneDB.ts', 'src/lib/saju.ts', 'src/content/pageGuides.ts']
+  const files = [...walk('src/app/(ko)/fortune'), 'src/app/(ko)/layout.tsx', 'src/app/(ko)/page.tsx', 'src/app/(ko)/about/page.tsx', 'src/lib/fortuneDB.ts', 'src/lib/saju.ts', 'src/content/pageGuides.ts']
   for (const f of files) {
     const t = readFileSync(f, 'utf8').replace(/'20\d\d-\d\d-\d\d'/g, '').replace(/© 2026/g, '')
     expect(t, f).not.toMatch(/2026|병오/)

@@ -11,7 +11,7 @@ let currentLong: Video[] = []
 
 vi.mock('@/lib/videos/fetch', () => ({ getChannelVideos: async () => current, getLongVideos: async () => currentLong }))
 
-import Page from '@/app/samguk/videos/page'
+import Page from '@/app/(ko)/samguk/videos/page'
 
 async function render(): Promise<string> {
   return renderToStaticMarkup(await Page())

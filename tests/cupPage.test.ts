@@ -1,4 +1,4 @@
-import { dynamicParams, generateMetadata, generateStaticParams, revalidate } from '@/app/samguk/cup/[board]/page'
+import { dynamicParams, generateMetadata, generateStaticParams, revalidate } from '@/app/(ko)/samguk/cup/[board]/page'
 import { BOARD_KEYS } from '@/lib/cup/boards'
 
 test('판 페이지: 정적 4개, 목록 밖은 404, 1시간 재검증', () => {

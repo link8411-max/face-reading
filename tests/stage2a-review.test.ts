@@ -26,7 +26,7 @@ test('MediaPipe 패키지 버전이 CDN WASM 버전과 정확히 같다', () => 
 })
 
 test('홈 FAQ가 기준점 개수를 부풀리지 않는다', () => {
-  expect(readFileSync('src/app/page.tsx', 'utf8')).not.toContain('수백 개')
+  expect(readFileSync('src/app/(ko)/page.tsx', 'utf8')).not.toContain('수백 개')
 })
 
 test('사용자와 공유하는 특징이 없으면 닮은 이유가 특정 특징을 단정하지 않는다', () => {

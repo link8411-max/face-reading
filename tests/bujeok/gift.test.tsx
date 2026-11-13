@@ -15,8 +15,8 @@ vi.mock('@/lib/share', () => ({ shareResult: (...a: unknown[]) => shareResult(..
 
 import BujeokClient from '@/components/bujeok/BujeokClient'
 import GiftLanding from '@/components/bujeok/GiftLanding'
-import BujeokPage from '@/app/bujeok/page'
-import GiftPage, { generateMetadata } from '@/app/bujeok/r/[code]/page'
+import BujeokPage from '@/app/(ko)/bujeok/page'
+import GiftPage, { generateMetadata } from '@/app/(ko)/bujeok/r/[code]/page'
 import { breakStorageAccess, installStorage, restoreStorage } from '../exam/storageStub'
 import { loadBox } from '@/lib/bujeok/box'
 import { kakaoFeed } from '@/lib/kakao'

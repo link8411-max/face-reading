@@ -1,5 +1,5 @@
 import { renderToStaticMarkup } from 'react-dom/server'
-import Zodiac2027Hub from '@/app/fortune/2027/page'
+import Zodiac2027Hub from '@/app/(ko)/fortune/2027/page'
 import { SAMJAE_2027, ZODIAC_SLUGS, zodiac2027 } from '@/content/fortune2027Zodiac'
 import { hubFaqs, samjaeParagraph } from '@/content/fortune2027Hub'
 import { LAST_MODIFIED } from '@/app/sitemap'

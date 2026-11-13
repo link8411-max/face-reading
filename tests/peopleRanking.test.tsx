@@ -9,7 +9,7 @@ vi.mock('@/lib/people/store', () => ({
   },
 }))
 
-import Ranking from '@/app/samguk/people/ranking/page'
+import Ranking from '@/app/(ko)/samguk/people/ranking/page'
 
 test('응원이 충분하면 전체·세력별 순위를 서버 HTML에 적는다', async () => {
   rows.fail = false

@@ -1,6 +1,6 @@
 import { describe, it, expect, afterEach } from 'vitest';
 import { renderToStaticMarkup } from 'react-dom/server';
-import GeneralPage from '@/app/samguk/duel/generals/[id]/page';
+import GeneralPage from '@/app/(ko)/samguk/duel/generals/[id]/page';
 import RosterStartLink, { rosterHas } from '@/components/duel/RosterStartLink';
 import { SAVE_KEY, defaultSave } from '@/lib/duel/save';
 

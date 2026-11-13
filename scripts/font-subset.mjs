@@ -6,7 +6,7 @@
 //   Silkscreen    https://github.com/google/fonts  ofl/silkscreen/Silkscreen-Regular.ttf
 // 남기는 글자(한글 글꼴): KS X 1001 완성형 2350자 + ASCII + Latin-1 + 일반 문장부호·화폐·화살표·도형·CJK 기호·호환 자모·전각 ASCII
 //   + src/ 코드에 실제로 나오는 그 밖의 글자(2350 밖 한글 포함). Silkscreen은 ASCII + Latin-1만.
-// 라이선스: src/fonts/OFL-*.txt (SIL OFL 1.1). 글꼴은 next/font/local(src/app/layout.tsx)로 읽는다.
+// 라이선스: src/fonts/OFL-*.txt (SIL OFL 1.1). 글꼴은 next/font/local(src/app/(ko)/layout.tsx)로 읽는다.
 import { existsSync, readFileSync, readdirSync, statSync, writeFileSync } from 'node:fs';
 import { join } from 'node:path';
 import subsetFont from 'subset-font';

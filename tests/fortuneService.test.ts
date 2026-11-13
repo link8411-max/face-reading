@@ -35,11 +35,11 @@ test('음력은 일자를 30일까지 받는다', () => {
 test('오늘의 운세 띠는 입춘 기준: 입춘 전 출생이면 전년도 띠', () => {
   expect(띠찾기(1990, 1, 15)).toBe('뱀')
   expect(띠찾기(1990, 3, 1)).toBe('말')
-  const daily = readFileSync('src/app/fortune/daily/page.tsx', 'utf8')
+  const daily = readFileSync('src/app/(ko)/fortune/daily/page.tsx', 'utf8')
   expect(daily).toContain('입춘')
   expect(daily).not.toContain('음력 설 전')
 })
 
 test('신년운세 화면에 "사주명리학은 음력 기준" 같은 잘못된 안내가 없다', () => {
-  expect(readFileSync('src/app/fortune/FortuneClient.tsx', 'utf8')).not.toContain('음력 기준입니다')
+  expect(readFileSync('src/app/(ko)/fortune/FortuneClient.tsx', 'utf8')).not.toContain('음력 기준입니다')
 })

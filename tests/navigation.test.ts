@@ -1,3 +1,4 @@
+import { koLayoutSource } from './helpers/koLayoutSource'
 import { TABS, ALL_ITEMS, CATEGORIES, FOOTER_EXTRA, tabForPath } from '@/content/navigation'
 import { SITEMAP_ROUTES } from '@/app/sitemap'
 
@@ -50,7 +51,7 @@ test('밈 능력고사는 푸터에만 항목이 있다: 묶음(홈 탭·허브)
   expect(TABS).toHaveLength(3)
   expect((SITEMAP_ROUTES as readonly string[]).includes('/exam/meme')).toBe(true)
   const { readFileSync } = require('node:fs')
-  const layout = readFileSync('src/app/layout.tsx', 'utf8')
+  const layout = koLayoutSource()
   expect(layout.match(/FOOTER_EXTRA\.map/g)).toHaveLength(1)
 })
 

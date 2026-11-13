@@ -47,7 +47,7 @@ test('특징 묘사에 외모를 깎아내리는 말이 없다', () => {
 })
 
 test('동물상 페이지는 face-api를 쓰지 않고 MediaPipe·성별 기준을 쓴다', () => {
-  const src = readFileSync('src/app/animal/page.tsx', 'utf8')
+  const src = readFileSync('src/app/(ko)/animal/page.tsx', 'utf8')
   expect(src).not.toContain('faceDetection')
   expect(src).toContain('analyzePhoto(image, gender)')
   const shared = readFileSync('src/lib/face/analyzePhoto.ts', 'utf8')

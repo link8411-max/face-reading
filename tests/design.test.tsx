@@ -1,3 +1,4 @@
+import { koLayoutSource } from './helpers/koLayoutSource'
 import { existsSync, readFileSync } from 'node:fs'
 import { renderToStaticMarkup } from 'react-dom/server'
 import { Icon, ICON_NAMES, SmileFace } from '@/components/icons'
@@ -5,7 +6,7 @@ import { Icon, ICON_NAMES, SmileFace } from '@/components/icons'
 const css = readFileSync('src/app/globals.css', 'utf8')
 
 test('글꼴: 본문·제목 Pretendard 가변 글꼴, 부적용 Gowun Batang — 자체 호스팅(next/font/local)', () => {
-  const layout = readFileSync('src/app/layout.tsx', 'utf8')
+  const layout = koLayoutSource()
   expect(layout).toContain('next/font/local')
   expect(layout).not.toContain('next/font/google')
   expect(layout).toContain('PretendardVariable.woff2')
@@ -103,7 +104,7 @@ test('포인트색 작은 글씨가 카드 위에서도 대비 4.5 이상 (리�
 
 test('먹빛 부적 화면의 주 버튼은 금색 규칙(.bj-dark .bg-ink.text-paper)을 쓴다 — bg-accent는 먹빛에서 연살구라 흰 글씨가 안 보인다', () => {
   const { execSync } = require('node:child_process')
-  const hits = execSync("grep -rln 'bg-accent text-white' src/components/bujeok src/app/bujeok || true", { encoding: 'utf8' }).trim()
+  const hits = execSync("grep -rln 'bg-accent text-white' src/components/bujeok src/app/\\(ko\\)/bujeok || true", { encoding: 'utf8' }).trim()
   expect(hits).toBe('')
   expect(css).toMatch(/\.bj-dark \.bg-ink\.text-paper \{/)
 })

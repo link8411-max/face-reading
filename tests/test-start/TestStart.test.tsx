@@ -47,7 +47,7 @@ test('성별이 필요 없는 테스트(관상): 성별 pill 없음, 사진만 �
 
 import { readFileSync } from 'node:fs'
 test('관상 2판 페이지는 성별을 묻고(기억값·추정으로 미리 채움) 분석에 쓴다', () => {
-  const src = readFileSync('src/app/face2/page.tsx', 'utf8')
+  const src = readFileSync('src/app/(ko)/face2/page.tsx', 'utf8')
   expect(src).not.toContain('needsGender={false}')
   expect(src).toContain('useRememberedGender')
   expect(src).toContain('useGenderGuess')

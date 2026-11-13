@@ -1,4 +1,5 @@
 // 0a67370..b06ec44 리뷰 반영 (2026-10-27)
+import { koLayoutSource } from './helpers/koLayoutSource'
 import { readFileSync } from 'node:fs'
 import { isSafeValue, isProdHost } from '@/lib/analytics'
 import { ZODIAC_SLUGS } from '@/content/fortune2027Zodiac'
@@ -6,7 +7,7 @@ import { ogQueryOk, OG_CACHE_CONTROL } from '@/lib/ogQuery'
 import { captureFilter } from '@/lib/capture'
 
 test('시즌 카드 slot은 GA 값 필터를 통과한다 (띠별: zodiac_rat 형식)', () => {
-  const files = ['src/app/today/page.tsx', 'src/app/fortune/daily/page.tsx', 'src/components/Zodiac2027Article.tsx', 'src/app/fortune/FortuneClient.tsx']
+  const files = ['src/app/(ko)/today/page.tsx', 'src/app/(ko)/fortune/daily/page.tsx', 'src/components/Zodiac2027Article.tsx', 'src/app/(ko)/fortune/FortuneClient.tsx']
   const slots: string[] = []
   for (const f of files) {
     for (const m of readFileSync(f, 'utf8').matchAll(/<SeasonPicks slot=(?:"([^"]+)"|\{`([^`]+)`\})/g)) {
@@ -22,7 +23,7 @@ test('GA는 운영 주소(unse-ai.com)에서만 보낸다: 미리보기 배포·
   expect(isProdHost('unse-ai.com')).toBe(true)
   expect(isProdHost('www.unse-ai.com')).toBe(true)
   for (const h of ['localhost', '127.0.0.1', '[::1]', 'face-reading-git-x.vercel.app', 'unse-ai.com.evil.io', 'notunse-ai.com']) expect(isProdHost(h), h).toBe(false)
-  const layout = readFileSync('src/app/layout.tsx', 'utf8')
+  const layout = koLayoutSource()
   expect(layout).not.toContain('localhost|127')
   expect(layout).toContain('PROD_HOST_SOURCE')
 })
@@ -54,7 +55,7 @@ test('결과 이미지 캡처는 no-screenshot 요소(생년월일 등)와 ifram
   expect(captureFilter(el('IFRAME'))).toBe(false)
   expect(captureFilter(el('P', ['no-screenshot']))).toBe(false)
   expect(captureFilter({ nodeName: '#text' } as Node)).toBe(true)
-  const fortune = readFileSync('src/app/fortune/FortuneClient.tsx', 'utf8')
+  const fortune = readFileSync('src/app/(ko)/fortune/FortuneClient.tsx', 'utf8')
   expect(fortune).toMatch(/className="[^"]*no-screenshot[^"]*">\s*\{birthDate\.year\}년/)
 })
 

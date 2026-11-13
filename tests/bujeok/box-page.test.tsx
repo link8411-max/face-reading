@@ -6,7 +6,7 @@ import { breakStorageAccess, installStorage, restoreStorage } from '../exam/stor
 vi.mock('next/navigation', () => ({ useRouter: () => ({ push: vi.fn() }) }))
 
 import BujeokBox from '@/components/bujeok/BujeokBox'
-import BoxPage, { metadata } from '@/app/bujeok/box/page'
+import BoxPage, { metadata } from '@/app/(ko)/bujeok/box/page'
 import { SITEMAP_ROUTES } from '@/app/sitemap'
 import { addToBox, loadBox } from '@/lib/bujeok/box'
 

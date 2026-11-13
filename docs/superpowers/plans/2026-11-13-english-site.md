@@ -66,11 +66,11 @@
 - Consumes: Task 1 `LocaleProvider`, `t`.
 - Produces: `SiteShell({ locale, children })`. 두 루트 레이아웃은 `<html lang={LOCALE_HTML_LANG[locale]}>` + `<body ...><LocaleProvider locale><SiteShell locale>`만 다르다. 한국어 레이아웃의 metadata는 지금 그대로(이동만), 영어 레이아웃은 영어 사이트 제목·설명(`src/content/en/pageGuides.ts`의 '/' 요약)과 `openGraph.locale: 'en_US'`.
 
-- [ ] **Step 1: 이동 전 서버 HTML 기록** — `npm run build && npm start -- -p 3220`(백그라운드)로 띄우고, `src/app/sitemap.ts`의 모든 주소에 대해 `<title>`, `<link rel="canonical">`, `<html lang>`를 뽑아 `test-results/i18n/before.json`에 저장(스크립트는 임시 폴더). 서버를 끈다.
-- [ ] **Step 2: 테스트** — `tests/i18n/layouts.test.ts`: `src/app/layout.tsx`가 없고 `src/app/(ko)/layout.tsx`·`src/app/en/layout.tsx`가 있고 둘 다 `SiteShell`을 쓴다. `e2e/i18n.spec.ts`: `/`의 `html[lang]`이 `ko`, `/en/face2`가 `en`(이 테스트는 Task 4 뒤에 통과해도 된다 — `test.fixme` 말고 Task 4에서 마저 단다).
-- [ ] **Step 3: 이동** — `git mv`. 옮긴 뒤 상대 경로 import(`../fonts/...` 등)만 고친다. `layout.tsx`의 body 안쪽을 `SiteShell`로 뽑는다(한국어 출력은 글자 하나 다르지 않게).
-- [ ] **Step 4: 이동 후 비교** — Step 1과 같은 방법으로 `after.json`을 만들고 두 파일이 같은지 비교(다르면 고친다). `npm test && npm run test:e2e` 통과.
-- [ ] **Step 5: 커밋** — `"영어판: 루트 레이아웃을 한국어(ko 그룹)·영어(en)로 나눔(한국어 주소·HTML 변화 없음)"`
+- [x] **Step 1: 이동 전 서버 HTML 기록** — `npm run build && npm start -- -p 3220`(백그라운드)로 띄우고, `src/app/sitemap.ts`의 모든 주소에 대해 `<title>`, `<link rel="canonical">`, `<html lang>`를 뽑아 `test-results/i18n/before.json`에 저장(스크립트는 임시 폴더). 서버를 끈다.
+- [x] **Step 2: 테스트** — `tests/i18n/layouts.test.ts`: `src/app/layout.tsx`가 없고 `src/app/(ko)/layout.tsx`·`src/app/en/layout.tsx`가 있고 둘 다 `SiteShell`을 쓴다. `e2e/i18n.spec.ts`: `/`의 `html[lang]`이 `ko`, `/en/face2`가 `en`(이 테스트는 Task 4 뒤에 통과해도 된다 — `test.fixme` 말고 Task 4에서 마저 단다).
+- [x] **Step 3: 이동** — `git mv`. 옮긴 뒤 상대 경로 import(`../fonts/...` 등)만 고친다. `layout.tsx`의 body 안쪽을 `SiteShell`로 뽑는다(한국어 출력은 글자 하나 다르지 않게).
+- [x] **Step 4: 이동 후 비교** — Step 1과 같은 방법으로 `after.json`을 만들고 두 파일이 같은지 비교(다르면 고친다). `npm test && npm run test:e2e` 통과.
+- [x] **Step 5: 커밋** — `"영어판: 루트 레이아웃을 한국어(ko 그룹)·영어(en)로 나눔(한국어 주소·HTML 변화 없음)"`
 
 ---
 

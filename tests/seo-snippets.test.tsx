@@ -6,23 +6,23 @@ import type { Metadata } from 'next'
 // 루트 레이아웃의 next/font는 테스트 환경에서 동작하지 않으므로 가짜로 바꾼다
 vi.mock('next/font/local', () => ({ default: () => ({ variable: '', className: '' }) }))
 import { renderToStaticMarkup } from 'react-dom/server'
-import { metadata as root } from '@/app/layout'
-import { metadata as face2 } from '@/app/face2/layout'
-import { metadata as animal } from '@/app/animal/layout'
-import { metadata as samguk } from '@/app/samguk/layout'
-import { metadata as duel } from '@/app/samguk/duel/layout'
-import { metadata as bujeok } from '@/app/bujeok/layout'
-import { metadata as examMeme } from '@/app/exam/meme/layout'
-import { generateMetadata as duelGeneralMeta } from '@/app/samguk/duel/generals/[id]/page'
+import { metadata as root } from '@/app/(ko)/layout'
+import { metadata as face2 } from '@/app/(ko)/face2/layout'
+import { metadata as animal } from '@/app/(ko)/animal/layout'
+import { metadata as samguk } from '@/app/(ko)/samguk/layout'
+import { metadata as duel } from '@/app/(ko)/samguk/duel/layout'
+import { metadata as bujeok } from '@/app/(ko)/bujeok/layout'
+import { metadata as examMeme } from '@/app/(ko)/exam/meme/layout'
+import { generateMetadata as duelGeneralMeta } from '@/app/(ko)/samguk/duel/generals/[id]/page'
 import { DUEL_GENERALS } from '@/lib/duel/generals'
-import { metadata as fortune } from '@/app/fortune/layout'
-import { metadata as mbtiDaily } from '@/app/fortune/mbti/layout'
-import { generateMetadata as personMeta } from '@/app/samguk/people/[id]/page'
-import { generateMetadata as peopleHubMeta } from '@/app/samguk/people/page'
-import { generateMetadata as peopleRankingMeta } from '@/app/samguk/people/ranking/page'
+import { metadata as fortune } from '@/app/(ko)/fortune/layout'
+import { metadata as mbtiDaily } from '@/app/(ko)/fortune/mbti/layout'
+import { generateMetadata as personMeta } from '@/app/(ko)/samguk/people/[id]/page'
+import { generateMetadata as peopleHubMeta } from '@/app/(ko)/samguk/people/page'
+import { generateMetadata as peopleRankingMeta } from '@/app/(ko)/samguk/people/ranking/page'
 import { PEOPLE_IDS } from '@/content/samgukPeople'
-import { generateMetadata as zodiacMeta } from '@/app/fortune/2027/[zodiac]/page'
-import { generateMetadata as mbtiMeta } from '@/app/mbti/[type]/page'
+import { generateMetadata as zodiacMeta } from '@/app/(ko)/fortune/2027/[zodiac]/page'
+import { generateMetadata as mbtiMeta } from '@/app/(ko)/mbti/[type]/page'
 import Zodiac2027Article from '@/components/Zodiac2027Article'
 import { ZODIAC_SLUGS, SAMJAE_2027 } from '@/content/fortune2027Zodiac'
 import { MBTI_TYPES, bestMatches } from '@/lib/mbti/compat'
@@ -111,7 +111,7 @@ test('오늘의 MBTI 운세: 제목 앞에 핵심어, 설명에 가입 없이·M
 })
 
 test('삼국지 장수 수 문구는 실제 장수 수와 같다 (옛 52명이 남지 않음)', () => {
-  for (const f of ['src/app/samguk/layout.tsx', 'src/app/samguk/(match)/page.tsx', 'src/content/navigation.ts']) {
+  for (const f of ['src/app/(ko)/samguk/layout.tsx', 'src/app/(ko)/samguk/(match)/page.tsx', 'src/content/navigation.ts']) {
     const src = readFileSync(f, 'utf8')
     expect(src, f).not.toContain('52명')
     expect(src, f).not.toContain('간신')

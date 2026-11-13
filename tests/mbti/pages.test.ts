@@ -1,6 +1,6 @@
 import { SITEMAP_ROUTES } from '@/app/sitemap'
-import { metadata as hubMeta } from '@/app/mbti/page'
-import { generateMetadata, generateStaticParams } from '@/app/mbti/[type]/page'
+import { metadata as hubMeta } from '@/app/(ko)/mbti/page'
+import { generateMetadata, generateStaticParams } from '@/app/(ko)/mbti/[type]/page'
 import { MBTI_SLUGS } from '@/content/mbtiTypes'
 
 test('사이트맵: /mbti, /mbti/match, 16유형', () => {

@@ -1,6 +1,6 @@
 import { readFileSync } from 'node:fs'
 import { pageGuides, faqJsonLd } from '@/content/pageGuides'
-import { metadata } from '@/app/bujeok/layout'
+import { metadata } from '@/app/(ko)/bujeok/layout'
 import { BANNED_PHRASES, EXEMPT_IN_HANJA_MEANING } from '@/lib/bujeok/bannedPhrases'
 import { WISH_TEXT } from '@/content/bujeok'
 import { WISHES } from '@/lib/bujeok/keys'
@@ -62,7 +62,7 @@ test('layout 메타데이터도 지금의 카드를 설명한다', () => {
 })
 
 test('화면 문구 어디에도 "붓으로 그려"가 남아 있지 않다', () => {
-  for (const f of ['src/components/bujeok/BujeokDone.tsx', 'src/components/bujeok/BujeokForm.tsx', 'src/components/bujeok/GiftLanding.tsx', 'src/app/bujeok/layout.tsx']) {
+  for (const f of ['src/components/bujeok/BujeokDone.tsx', 'src/components/bujeok/BujeokForm.tsx', 'src/components/bujeok/GiftLanding.tsx', 'src/app/(ko)/bujeok/layout.tsx']) {
     expect(readFileSync(f, 'utf8'), f).not.toMatch(/붓으로|그려 드려요/)
   }
 })

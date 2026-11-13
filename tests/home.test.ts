@@ -9,7 +9,7 @@ test('시즌 카드: 평소는 내 사주 풀이, 12~1월 신년운세 값은 �
 })
 
 test('홈 순서: 머리 → 칩·대표 카드·카드 2열(HomeGrid) → 오늘 줄 → 쿠팡 → FAQ', () => {
-  const src = readFileSync('src/app/page.tsx', 'utf8')
+  const src = readFileSync('src/app/(ko)/page.tsx', 'utf8')
   const order = ['<h1', '<HomeGrid', '<TodayRow', '<CoupangBanner', 'HOME_FAQS.map((f)'].map((s) => src.indexOf(s))
   expect(order.every((i) => i > 0)).toBe(true)
   expect([...order].sort((a, b) => a - b)).toEqual(order)
@@ -18,7 +18,7 @@ test('홈 순서: 머리 → 칩·대표 카드·카드 2열(HomeGrid) → 오�
 })
 
 test('홈은 서버 페이지이고 시즌 설정·FAQ 데이터를 쓴다', () => {
-  const src = readFileSync('src/app/page.tsx', 'utf8')
+  const src = readFileSync('src/app/(ko)/page.tsx', 'utf8')
   expect(src).not.toMatch(/^"use client"/)
   for (const k of ['FaceHero', 'SeasonCard', 'HomeGrid', 'TodayRow', 'HOME_FAQS']) expect(src).toContain(k)
 })
@@ -32,7 +32,7 @@ test('칩: 전체는 기본 8개, 태그 칩은 그 태그 항목 전부', async
 })
 
 test('홈에 근거 없는 참여자 수·순위 숫자가 없다', () => {
-  const all = ['src/app/page.tsx', 'src/components/home/FaceHero.tsx', 'src/components/home/SeasonCard.tsx', 'src/components/home/ZodiacPicker.tsx', 'src/components/home/HomeGrid.tsx', 'src/components/home/TodayRow.tsx', 'src/components/MoreTests.tsx', 'src/content/season.ts'].map((f) => readFileSync(f, 'utf8')).join('\n')
+  const all = ['src/app/(ko)/page.tsx', 'src/components/home/FaceHero.tsx', 'src/components/home/SeasonCard.tsx', 'src/components/home/ZodiacPicker.tsx', 'src/components/home/HomeGrid.tsx', 'src/components/home/TodayRow.tsx', 'src/components/MoreTests.tsx', 'src/content/season.ts'].map((f) => readFileSync(f, 'utf8')).join('\n')
   expect(all).not.toMatch(/\d[\d,]*명\s*(확인|참여|이용)|인기\s*순위|HOT/)
 })
 
@@ -49,7 +49,7 @@ test('띠 고르기는 날짜를 마운트 뒤에 계산한다(서버·브라우
   expect(src).not.toMatch(/^const .*new Date\(\)/m)
 })
 
-const HOME_FILES = ['src/app/page.tsx', 'src/components/home/FaceHero.tsx', 'src/components/home/SeasonCard.tsx', 'src/components/home/ZodiacPicker.tsx', 'src/components/home/HomeGrid.tsx', 'src/components/home/TodayRow.tsx', 'src/components/MoreTests.tsx', 'src/content/season.ts']
+const HOME_FILES = ['src/app/(ko)/page.tsx', 'src/components/home/FaceHero.tsx', 'src/components/home/SeasonCard.tsx', 'src/components/home/ZodiacPicker.tsx', 'src/components/home/HomeGrid.tsx', 'src/components/home/TodayRow.tsx', 'src/components/MoreTests.tsx', 'src/content/season.ts']
 
 test('홈 화면 파일에 이모지가 없다 (선 아이콘·텍스트 칩)', () => {
   for (const f of HOME_FILES) expect(readFileSync(f, 'utf8'), f).not.toMatch(/\p{Extended_Pictographic}/u)

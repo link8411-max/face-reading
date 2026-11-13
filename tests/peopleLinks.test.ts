@@ -21,14 +21,14 @@ describe('열전 사이트맵', () => {
 
 describe('열전 연결 소스', () => {
   it('닮은꼴 결과에 열전 링크와 응원 앵커', () => {
-    const src = read('src/app/samguk/(match)/page.tsx')
+    const src = read('src/app/(ko)/samguk/(match)/page.tsx')
     expect(src).toContain('/samguk/people/')
     expect(src).toContain('#cheer')
     expect(src).toContain('열전 보기')
     expect(src).toContain('내가 닮은 장수 응원하기')
   })
   it('닮은꼴 결과(클라이언트)는 열전 본문 등록부를 불러오지 않고 id 목록만 쓴다', () => {
-    const src = read('src/app/samguk/(match)/page.tsx')
+    const src = read('src/app/(ko)/samguk/(match)/page.tsx')
     const imports = [...src.matchAll(/from\s+["']([^"']*samgukPeople[^"']*)["']/g)].map((m) => m[1])
     expect(imports).toEqual(['@/content/samgukPeople/ids'])
   })
@@ -36,7 +36,7 @@ describe('열전 연결 소스', () => {
     expect(read('src/components/share/SharePage.tsx')).toContain('/samguk/people/')
   })
   it('일기토 장수 페이지에 인물열전 보기', () => {
-    expect(read('src/app/samguk/duel/generals/[id]/page.tsx')).toContain('인물열전 보기')
+    expect(read('src/app/(ko)/samguk/duel/generals/[id]/page.tsx')).toContain('인물열전 보기')
   })
   it('메뉴에 삼국지 인물열전', () => {
     const nav = read('src/content/navigation.ts')

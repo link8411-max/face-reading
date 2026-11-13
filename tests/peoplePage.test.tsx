@@ -1,6 +1,6 @@
 import { renderToStaticMarkup } from 'react-dom/server'
 vi.mock('@/lib/videos/fetch', () => ({ getChannelVideos: async () => [] }))
-import Page, { generateMetadata, generateStaticParams } from '@/app/samguk/people/[id]/page'
+import Page, { generateMetadata, generateStaticParams } from '@/app/(ko)/samguk/people/[id]/page'
 import { portraitSrc, personTitle, yearLabel } from '@/lib/people/portrait'
 import { PEOPLE, PEOPLE_IDS } from '@/content/samgukPeople'
 import { relationsOf } from '@/lib/people/relations'

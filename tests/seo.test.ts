@@ -22,7 +22,7 @@ test('사이트맵에 소개·개인정보처리방침이 있다', () => {
 })
 
 test('구조화 데이터 기능 목록에 실제 테스트가 모두 있다', () => {
-  const layout = readFileSync('src/app/layout.tsx', 'utf8')
+  const layout = readFileSync('src/app/(ko)/layout.tsx', 'utf8')
   const featureList = layout.slice(layout.indexOf('"featureList"'), layout.indexOf(']', layout.indexOf('"featureList"')))
   for (const name of ['관상', '동물상', '삼국지 닮은꼴', '신년운세', '오늘의 운세']) expect(featureList, name).toContain(name)
 })

@@ -11,7 +11,7 @@ let current: Video[] = fixture
 
 vi.mock('@/lib/videos/fetch', () => ({ getChannelVideos: async () => current }))
 
-import Page from '@/app/samguk/people/[id]/page'
+import Page from '@/app/(ko)/samguk/people/[id]/page'
 
 async function render(id: string): Promise<string> {
   return renderToStaticMarkup(await Page({ params: Promise.resolve({ id }) }))

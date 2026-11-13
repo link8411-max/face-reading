@@ -1,6 +1,6 @@
 import { shareMetadata } from '@/components/share/SharePage'
 import { SITEMAP_ROUTES } from '@/app/sitemap'
-import { generateMetadata as duelShareMeta } from '@/app/samguk/duel/r/[key]/page'
+import { generateMetadata as duelShareMeta } from '@/app/(ko)/samguk/duel/r/[key]/page'
 
 const run = (kind: 'animal' | 'samguk' | 'face', key: string, s?: string) =>
   shareMetadata(kind, Promise.resolve({ key }), Promise.resolve(s ? { s } : {}))
@@ -34,8 +34,8 @@ test('결과 공유 페이지는 사이트맵에 없다', () => {
   expect((SITEMAP_ROUTES as readonly string[]).some((r) => r.includes('/r/'))).toBe(false)
 })
 
-import * as matchPage from '@/app/mbti/match/page'
-import { generateMetadata as mbtiShareMeta } from '@/app/mbti/r/[pair]/page'
+import * as matchPage from '@/app/(ko)/mbti/match/page'
+import { generateMetadata as mbtiShareMeta } from '@/app/(ko)/mbti/r/[pair]/page'
 
 test('계산기(/mbti/match)는 정적 메타 그대로 (공유 링크 때문에 동적 페이지가 되지 않는다)', () => {
   expect('generateMetadata' in matchPage).toBe(false)

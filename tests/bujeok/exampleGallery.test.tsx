@@ -17,7 +17,7 @@ test('서버 HTML에 소원 11개의 금박 예시 img(alt·크기·lazy)와 만
 })
 
 test('/bujeok 서버 페이지가 예시 갤러리를 가이드 글 위에 그린다', async () => {
-  const src = (await import('node:fs')).readFileSync('src/app/bujeok/page.tsx', 'utf8')
+  const src = (await import('node:fs')).readFileSync('src/app/(ko)/bujeok/page.tsx', 'utf8')
   expect(src.indexOf('<ExampleGallery />')).toBeGreaterThan(src.indexOf('<BujeokClient'))
   expect(src.indexOf('<ExampleGallery />')).toBeLessThan(src.indexOf('<PageGuide'))
 })

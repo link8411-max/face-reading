@@ -1,8 +1,9 @@
+import { koLayoutSource } from './helpers/koLayoutSource'
 import { readFileSync } from 'node:fs'
 import { CATEGORIES } from '@/content/navigation'
 
 test('글꼴은 쓰는 굵기만: Pretendard 가변(400~800) 한 파일, Gowun Batang 400·700(미리 받지 않음), 부적 붓 글꼴 500 하나', () => {
-  const layout = readFileSync('src/app/layout.tsx', 'utf8')
+  const layout = koLayoutSource()
   expect(layout).toMatch(/PretendardVariable\.woff2", weight: "400 800"/)
   expect(layout).toMatch(/GowunBatang-Regular\.woff2", weight: "400"/)
   expect(layout).toMatch(/GowunBatang-Bold\.woff2", weight: "700"/)
@@ -33,5 +34,5 @@ test('홈 클라이언트 번들에 운세 DB 전체를 싣지 않는다(일간�
 })
 
 test('푸터 묶음 제목은 h4가 아니다(제목 단계 건너뜀 방지)', () => {
-  expect(readFileSync('src/app/layout.tsx', 'utf8')).not.toContain('<h4')
+  expect(koLayoutSource()).not.toContain('<h4')
 })

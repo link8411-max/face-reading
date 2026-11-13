@@ -22,20 +22,20 @@ test('고객 관심 기반 추천 배너 + 페이지별 subId + 수수료 고지
 })
 
 test.each([
-  ['src/app/page.tsx', 'home'], ['src/app/face2/page.tsx', 'face'], ['src/app/animal/page.tsx', 'animal'],
-  ['src/app/samguk/(match)/page.tsx', 'samguk'], ['src/app/fortune/FortuneClient.tsx', 'fortune'], ['src/app/fortune/daily/page.tsx', 'daily'],
-  ['src/app/samguk/cup/page.tsx', 'cup-hub'],
-  ['src/app/mbti/page.tsx', 'mbti-hub'], ['src/components/mbti/MbtiDailyClient.tsx', 'mbti-daily'],
-  ['src/app/fortune/2027/page.tsx', 'fortune-2027'], ['src/app/face-tests/page.tsx', 'face-tests'], ['src/app/unse/page.tsx', 'unse'],
-  ['src/app/samguk/cup/ranking/page.tsx', 'cup-ranking'], ['src/app/mbti/r/[pair]/page.tsx', 'share-mbti'],
-  ['src/app/samguk/cup/r/[board]/[id]/page.tsx', 'share-cup'], ['src/app/samguk/duel/r/[key]/page.tsx', 'share-duel'],
-  ['src/app/face-match/r/[pair]/page.tsx', 'share-face-match'], ['src/app/fortune/mbti/r/[type]/page.tsx', 'share-mbti-daily'], ['src/app/samguk/(match)/team/r/[ids]/page.tsx', 'share-team'],
+  ['src/app/(ko)/page.tsx', 'home'], ['src/app/(ko)/face2/page.tsx', 'face'], ['src/app/(ko)/animal/page.tsx', 'animal'],
+  ['src/app/(ko)/samguk/(match)/page.tsx', 'samguk'], ['src/app/(ko)/fortune/FortuneClient.tsx', 'fortune'], ['src/app/(ko)/fortune/daily/page.tsx', 'daily'],
+  ['src/app/(ko)/samguk/cup/page.tsx', 'cup-hub'],
+  ['src/app/(ko)/mbti/page.tsx', 'mbti-hub'], ['src/components/mbti/MbtiDailyClient.tsx', 'mbti-daily'],
+  ['src/app/(ko)/fortune/2027/page.tsx', 'fortune-2027'], ['src/app/(ko)/face-tests/page.tsx', 'face-tests'], ['src/app/(ko)/unse/page.tsx', 'unse'],
+  ['src/app/(ko)/samguk/cup/ranking/page.tsx', 'cup-ranking'], ['src/app/(ko)/mbti/r/[pair]/page.tsx', 'share-mbti'],
+  ['src/app/(ko)/samguk/cup/r/[board]/[id]/page.tsx', 'share-cup'], ['src/app/(ko)/samguk/duel/r/[key]/page.tsx', 'share-duel'],
+  ['src/app/(ko)/face-match/r/[pair]/page.tsx', 'share-face-match'], ['src/app/(ko)/fortune/mbti/r/[type]/page.tsx', 'share-mbti-daily'], ['src/app/(ko)/samguk/(match)/team/r/[ids]/page.tsx', 'share-team'],
 ])('%s 에 배너가 있다', (file, subId) => {
   expect(readFileSync(file, 'utf8')).toContain(`<CoupangBanner subId="${subId}"`)
 })
 
 test.each([
-  ['src/app/samguk/duel/generals/[id]/page.tsx', 'subId={`duel-${id}`}'],
+  ['src/app/(ko)/samguk/duel/generals/[id]/page.tsx', 'subId={`duel-${id}`}'],
   ['src/components/share/SharePage.tsx', 'subId={`share-${kind}`}'],
 ])('%s 에 배너가 있다 (%s)', (file, text) => {
   expect(readFileSync(file, 'utf8')).toContain(text)
@@ -77,7 +77,7 @@ test('대체 링크: 시즌 중엔 시즌 링크 뒤에 홈, 시즌 밖엔 홈�
   expect(fallbackLinks('face', new Date('2026-12-15T03:00:00Z')).map((l) => l.key)).toEqual(['home'])
 })
 
-test.each(['src/app/samguk/(match)/page.tsx', 'src/app/face2/page.tsx', 'src/app/animal/page.tsx'])(
+test.each(['src/app/(ko)/samguk/(match)/page.tsx', 'src/app/(ko)/face2/page.tsx', 'src/app/(ko)/animal/page.tsx'])(
   '%s: 배너는 공유·저장 버튼 바로 아래, 다음 테스트 위',
   (file) => {
     const src = readFileSync(file, 'utf8')

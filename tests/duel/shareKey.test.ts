@@ -4,7 +4,7 @@ import { duelOgImageUrl, duelShared, duelShareUrl } from '@/lib/duel/share';
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { ogQueryOk } from '@/lib/ogQuery';
-import { generateMetadata as duelShareMeta } from '@/app/samguk/duel/r/[key]/page';
+import { generateMetadata as duelShareMeta } from '@/app/(ko)/samguk/duel/r/[key]/page';
 import type { RunRecord } from '@/lib/duel/types';
 
 const lost: RunRecord = {

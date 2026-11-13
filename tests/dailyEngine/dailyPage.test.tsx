@@ -22,7 +22,7 @@ test('결과 카드: 년주·일진·별점·근거·영역·행운이 있고 �
 })
 
 test('페이지: 요일표를 쓰지 않고, 쿼리 연도는 지우며, 공유 URL·GA에 연도가 없다', () => {
-  const src = readFileSync('src/app/fortune/daily/page.tsx', 'utf8')
+  const src = readFileSync('src/app/(ko)/fortune/daily/page.tsx', 'utf8')
   expect(src).not.toContain('일간운세')
   expect(src).toContain('@/lib/dailyEngine')
   expect(src).toContain('history.replaceState')
@@ -38,7 +38,7 @@ test('페이지: 요일표를 쓰지 않고, 쿼리 연도는 지우며, 공유 
 })
 
 test('페이지: gz 쿼리로 년주 모드, 잘못된 gz는 무시, gz도 주소에서 지운다', () => {
-  const src = readFileSync('src/app/fortune/daily/page.tsx', 'utf8')
+  const src = readFileSync('src/app/(ko)/fortune/daily/page.tsx', 'utf8')
   expect(src).toContain('q.get("gz")')
   expect(src).toContain('q.delete("gz")')
   expect(src).toContain("kind: '년주'")
