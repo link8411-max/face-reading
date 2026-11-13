@@ -7,8 +7,8 @@ import type { ZVector } from '@/lib/face/featureStats'
 const zero = () => Object.fromEntries(FEATURE_KEYS.map((k) => [k, 0])) as ZVector
 const profileZ = (key: string) => ({ ...zero(), ...animalProfiles[key].z }) as ZVector
 
-test('동물상 8종 모두 프로필이 있고 animalTypeDB 키와 같다', () => {
-  expect([...ANIMAL_KEYS].sort()).toEqual(['bear', 'cat', 'deer', 'dog', 'eagle', 'fox', 'rabbit', 'tiger'])
+test('동물상 13종 모두 프로필이 있고 animalTypeDB 키와 같다', () => {
+  expect([...ANIMAL_KEYS].sort()).toEqual(['bear', 'cat', 'deer', 'desertfox', 'dino', 'dog', 'eagle', 'fox', 'hamster', 'rabbit', 'squirrel', 'tiger', 'wolf'])
   for (const k of ANIMAL_KEYS) expect(animalProfiles[k], k).toBeDefined()
 })
 
@@ -67,6 +67,11 @@ const OPPOSITE: Record<string, (d: ReturnType<typeof describeFace>) => boolean> 
   deer: (d) => /가늘고/.test(d.눈) || /동그란 편/.test(d.얼굴형),
   tiger: (d) => /동그란 눈/.test(d.눈) || /갸름한/.test(d.턱),
   eagle: (d) => /복스러운/.test(d.코),
+  desertfox: (d) => /가늘고/.test(d.눈) || /내려간/.test(d.눈) || /다부진/.test(d.턱),
+  dino: (d) => /동그란 편/.test(d.얼굴형) || /오똑/.test(d.코),
+  wolf: (d) => /내려간/.test(d.눈) || /동그란 눈/.test(d.눈),
+  squirrel: (d) => /가늘고/.test(d.눈) || /갸름하고/.test(d.얼굴형),
+  hamster: (d) => /갸름하고/.test(d.얼굴형) || /복스러운/.test(d.코),
 }
 
 test.each(['여', '남'] as const)('%s: 매칭된 동물상의 대표 인상과 반대되는 특징 문장이 없다', (g) => {

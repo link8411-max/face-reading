@@ -5,7 +5,7 @@ import calibration from '@/lib/animal/calibration.json'
 const N = 8000
 const uniform = N / ANIMAL_KEYS.length
 
-test.each(['남', '여'] as const)('%s: 동물상 8종이 모두 나오고 균등의 3배를 넘지 않는다', (g) => {
+test.each(['남', '여'] as const)('%s: 동물상 13종이 모두 나오고 균등의 3배를 넘지 않는다', (g) => {
   for (const seed of [calibration.seed, 777]) {
     const counts = simulateAnimal(N, g, calibration.bias, seed)
     for (const k of ANIMAL_KEYS) {

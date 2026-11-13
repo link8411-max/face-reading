@@ -104,7 +104,7 @@ export const UI: Record<UiKey, string> = {
   // animal page
   'animal.title': '동물상 테스트',
   'animal.heading': '나는 어떤 동물을\n닮았을까?',
-  'animal.desc': '사진 한 장으로 보는 동물상 테스트예요. 눈매와 얼굴형으로 강아지상, 고양이상, 여우상 등 8가지 중 가장 닮은 동물을 찾아요.',
+  'animal.desc': '사진 한 장으로 보는 동물상 테스트예요. 눈매와 얼굴형으로 강아지상, 고양이상, 여우상 등 13가지 중 가장 닮은 동물을 찾아요.',
   'animal.tip1': '정면 사진이 좋아요',
   'animal.tip2': '밝은 곳에서',
   'animal.analyze': '동물상 찾기',
@@ -194,7 +194,7 @@ export const UI: Record<UiKey, string> = {
   'item.face2.title': '내 관상 풀이',
   'item.face2.desc': '오행 얼굴형과 삼정으로 읽는 15가지 관상',
   'item.animal.title': '동물상 테스트',
-  'item.animal.desc': '강아지상? 고양이상? 8가지 중 하나',
+  'item.animal.desc': '강아지상? 고양이상? 13가지 중 하나',
   'item.faceMatch.title': '얼굴 궁합',
   'item.faceMatch.desc': '두 얼굴로 보는 친구·연인·짝사랑 궁합',
   'all.search': '테스트 검색',

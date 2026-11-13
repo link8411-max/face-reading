@@ -46,7 +46,7 @@ const RAW_CATEGORIES: RawCategory[] = [
     intro: '사진 한 장으로 읽는 15가지 관상이에요. 오행 얼굴형과 삼정으로 풀이하고, 닮은 동물상과 삼국지 영웅도 찾아 드려요. 사진은 브라우저 안에서만 분석되고 서버로 전송되지 않아요.',
     items: [
       { group: '관상·동물상', title: '내 관상 풀이', desc: '오행 얼굴형과 삼정으로 읽는 15가지 관상', href: '/face2', thumb: { icon: 'face', bg: '#E6EDFF' }, chip: '15가지 유형' },
-      { group: '관상·동물상', title: '동물상 테스트', desc: '강아지상? 고양이상? 8가지 중 하나', href: '/animal', thumb: { icon: 'cat', bg: '#E6EDFF' }, chip: '친구랑 비교' },
+      { group: '관상·동물상', title: '동물상 테스트', desc: '강아지상? 고양이상? 13가지 중 하나', href: '/animal', thumb: { icon: 'cat', bg: '#E6EDFF' }, chip: '친구랑 비교' },
       { group: '삼국지로 보는 얼굴', title: '나는 삼국지 속 누구?', desc: '111명 영웅 중 닮은 장수와 회사생활 스탯', href: '/samguk', thumb: { image: '/images/samguk/관우.jpg' }, chip: '111명 영웅' },
       { group: '삼국지로 보는 얼굴', title: '우리 팀 삼국지', desc: '팀원 얼굴로 보는 세력과 역할', href: '/samguk/team', thumb: { icon: 'users', bg: '#ECE8FF' }, chip: '2~6명', footer: false },
       { group: '삼국지로 보는 얼굴', title: '삼국지 장수 월드컵', desc: '이야기를 읽고 고르는 장수 토너먼트', href: '/samguk/cup', thumb: { image: '/images/samguk/관우.jpg' }, chip: '월드컵', footer: false },
@@ -126,7 +126,7 @@ const STEP = {
   saju: { href: '/saju', title: '내 사주 풀이', desc: '타고난 성향과 10년 흐름을 쉬운 말로', test: 'saju', icon: 'moon' },
   fortune: { href: '/fortune', title: '2027 신년운세', desc: '내 사주로 보는 정미년 한 해', test: 'fortune', icon: 'spark' },
   face: { href: '/face2', title: '내 관상 풀이', desc: '사진 한 장으로 읽는 15가지 관상', test: 'face', icon: 'face' },
-  animal: { href: '/animal', title: '동물상 테스트', desc: '같은 사진으로 보는 8가지 동물상', test: 'animal', icon: 'cat', samePhoto: true },
+  animal: { href: '/animal', title: '동물상 테스트', desc: '같은 사진으로 보는 13가지 동물상', test: 'animal', icon: 'cat', samePhoto: true },
   faceSame: { href: '/face2', title: '내 관상 풀이', desc: '같은 사진으로 읽는 15가지 관상', test: 'face', icon: 'face', samePhoto: true },
   faceMatch: { href: '/face-match', title: '얼굴 궁합', desc: '친구·연인과 두 얼굴로 보는 궁합', test: 'face_match', icon: 'heart' },
   bujeok: { href: '/bujeok', title: '내 사주로 부적 만들기', desc: '부족한 기운을 채워 주는 부적, 잠금화면에 쏙', test: 'bujeok', icon: 'spark' },
