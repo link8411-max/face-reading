@@ -6,6 +6,7 @@ import { characterById } from "@/lib/people/characters";
 import { portraitSrc } from "@/lib/people/portrait";
 import { readCupSummary, storeConfig } from "@/lib/people/store";
 
+import { portraitThumb } from "@/lib/portraitThumb";
 const SITE = "https://unse-ai.com";
 const URL = `${SITE}/samguk/cup`;
 const TITLE = "삼국지 장수 월드컵 | 최강 무장·책사·여인 16강 – 운명을 읽다";
@@ -69,7 +70,7 @@ export default async function CupPickerPage() {
                 >
                   {src ? (
                     // eslint-disable-next-line @next/next/no-img-element
-                    <img src={src} alt={`${characterById(first)?.name ?? ""} 도트 초상화`} width={64} height={76} className="h-[76px] w-16 flex-none rounded-2xl border-4 border-gold-game object-cover [image-rendering:pixelated]" />
+                    <img src={portraitThumb(src)} loading="lazy" decoding="async" alt={`${characterById(first)?.name ?? ""} 도트 초상화`} width={64} height={76} className="h-[76px] w-16 flex-none rounded-2xl border-4 border-gold-game object-cover [image-rendering:pixelated]" />
                   ) : null}
                   <div className="min-w-0">
                     <h2 className="font-serif text-lg font-bold break-keep">{title}</h2>

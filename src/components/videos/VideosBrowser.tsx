@@ -6,6 +6,7 @@ import VideoFeed from './VideoFeed'
 import { isVideoId, videoBadge } from '@/lib/videos/format'
 import type { Video } from '@/lib/videos/types'
 
+import { portraitThumb } from "@/lib/portraitThumb";
 export type Faces = Record<string, { name: string; portrait: string | null; hasPage: boolean }>
 
 function Face({ face, size, className = '' }: { face: Faces[string] | undefined; size: number; className?: string }) {
@@ -13,7 +14,7 @@ function Face({ face, size, className = '' }: { face: Faces[string] | undefined;
   const box = { width: size, height: size }
   return face.portrait ? (
     // eslint-disable-next-line @next/next/no-img-element
-    <img src={face.portrait} alt="" style={box} loading="lazy" className={`rounded-full object-cover [image-rendering:pixelated] ${className}`} />
+    <img src={portraitThumb(face.portrait)} alt="" style={box} loading="lazy" decoding="async" className={`rounded-full object-cover [image-rendering:pixelated] ${className}`} />
   ) : (
     <span style={box} className={`flex items-center justify-center rounded-full border border-dashed border-line bg-white text-[11px] text-muted ${className}`}>
       {face.name.charAt(0)}

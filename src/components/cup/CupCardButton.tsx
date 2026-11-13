@@ -2,6 +2,7 @@
 
 import type { CupCard } from '@/lib/cup/types'
 
+import { portraitThumb } from "@/lib/portraitThumb";
 interface Props {
   card: CupCard
   fact: string | undefined
@@ -23,7 +24,7 @@ export default function CupCardButton({ card, fact, state, onPick }: Props) {
       className={`flex min-h-[44px] w-full min-w-0 flex-col rounded-[22px] border bg-white p-2.5 text-left transition-opacity ${ring} ${dim}`}
     >
       {/* eslint-disable-next-line @next/next/no-img-element */}
-      <img src={card.portrait} alt="" width={160} height={200} className="aspect-[4/5] w-full rounded-2xl border border-line object-cover" />
+      <img src={portraitThumb(card.portrait)} alt="" width={160} height={200} decoding="async" className="aspect-[4/5] w-full rounded-2xl border border-line object-cover" />
       <span className="mt-2 block font-serif text-lg font-bold leading-tight break-keep">{card.name}</span>
       <span className="mt-1 block text-[13px] leading-snug text-muted break-keep">{card.line}</span>
       {fact && (

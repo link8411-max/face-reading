@@ -2,6 +2,7 @@ import Link from 'next/link'
 import { eulReul } from '@/lib/people/portrait'
 import type { SgGroup, SgTile } from '@/lib/videos/forPerson'
 
+import { portraitThumb } from "@/lib/portraitThumb";
 const BORDER: Record<string, string> = { 라이벌: 'border-blush', 원수: 'border-accent' }
 
 function Tile({ t }: { t: SgTile }) {
@@ -9,7 +10,7 @@ function Tile({ t }: { t: SgTile }) {
     <span className="relative block h-16 w-16 overflow-hidden rounded-[14px] border-2 border-ink bg-navy-game">
       {t.portrait ? (
         // eslint-disable-next-line @next/next/no-img-element
-        <img src={t.portrait} alt="" loading="lazy" className="h-full w-full object-cover [image-rendering:pixelated]" />
+        <img src={portraitThumb(t.portrait)} alt="" loading="lazy" decoding="async" className="h-full w-full object-cover [image-rendering:pixelated]" />
       ) : null}
     </span>
   )
@@ -56,7 +57,7 @@ export default function Sanggwando({ id, name, groups, portrait }: { id: string;
         <span className="block h-14 w-14 shrink-0 overflow-hidden rounded-xl border-2 border-gold-game bg-navy-game">
           {portrait && (
             // eslint-disable-next-line @next/next/no-img-element
-            <img src={portrait} alt="" className="h-full w-full object-cover [image-rendering:pixelated]" />
+            <img src={portraitThumb(portrait)} alt="" loading="lazy" decoding="async" className="h-full w-full object-cover [image-rendering:pixelated]" />
           )}
         </span>
         <span className="flex flex-col gap-0.5 text-paper">

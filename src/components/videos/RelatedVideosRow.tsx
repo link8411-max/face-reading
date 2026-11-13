@@ -4,6 +4,7 @@ import { portraitSrc } from '@/lib/people/portrait'
 import { isVideoId } from '@/lib/videos/format'
 import type { RelatedVideo } from '@/lib/videos/forPerson'
 
+import { portraitThumb } from "@/lib/portraitThumb";
 /** 열전 둘째 줄: 관계 인물이 나오는 영상. 비면 null. */
 export default function RelatedVideosRow({ items }: { items: RelatedVideo[] }) {
   const list = items.filter((i) => isVideoId(i.video.id))
@@ -22,7 +23,7 @@ export default function RelatedVideosRow({ items }: { items: RelatedVideo[] }) {
                 <span className="absolute bottom-2 left-2 flex items-center gap-1 rounded-full bg-paper/95 py-0.5 pl-0.5 pr-2 text-[11px] text-ink">
                   {face ? (
                     // eslint-disable-next-line @next/next/no-img-element
-                    <img src={face} alt="" width={20} height={20} className="h-5 w-5 rounded-full object-cover [image-rendering:pixelated]" />
+                    <img src={portraitThumb(face)} alt="" width={20} height={20} loading="lazy" decoding="async" className="h-5 w-5 rounded-full object-cover [image-rendering:pixelated]" />
                   ) : (
                     <span className="flex h-5 w-5 items-center justify-center rounded-full border border-dashed border-line text-[10px]">{i.personName.charAt(0)}</span>
                   )}

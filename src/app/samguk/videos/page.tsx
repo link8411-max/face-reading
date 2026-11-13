@@ -9,6 +9,7 @@ import { getChannelVideos, getLongVideos } from "@/lib/videos/fetch";
 import { isVideoId } from "@/lib/videos/format";
 import { itemListJsonLd } from "@/lib/videos/jsonld";
 
+import { portraitThumb } from "@/lib/portraitThumb";
 export const revalidate = 3600;
 
 export default async function VideosPage() {
@@ -46,7 +47,7 @@ export default async function VideosPage() {
           <span className="flex" aria-hidden="true">
             {trio.map((src, i) => (
               // eslint-disable-next-line @next/next/no-img-element
-              <img key={src} src={src} alt="" width={40} height={40} className={`h-10 w-10 rounded-xl border-2 border-gold-game object-cover [image-rendering:pixelated] ${i > 0 ? "-ml-2.5" : ""}`} />
+              <img key={src} src={portraitThumb(src)} decoding="async" alt="" width={40} height={40} className={`h-10 w-10 rounded-xl border-2 border-gold-game object-cover [image-rendering:pixelated] ${i > 0 ? "-ml-2.5" : ""}`} />
             ))}
           </span>
           <span className="flex flex-col gap-0.5">

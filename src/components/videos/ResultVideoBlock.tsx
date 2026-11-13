@@ -7,6 +7,7 @@ import { PEOPLE_ID_LIST } from '@/content/samgukPeople/ids'
 import type { SgTile } from '@/lib/videos/forPerson'
 import type { Video } from '@/lib/videos/types'
 
+import { portraitThumb } from "@/lib/portraitThumb";
 const PEOPLE_WITH_PAGE = new Set<string>(PEOPLE_ID_LIST)
 
 function Mini({ t }: { t: SgTile }) {
@@ -16,7 +17,7 @@ function Mini({ t }: { t: SgTile }) {
       <span className={`block h-[52px] w-[52px] overflow-hidden rounded-xl border-2 bg-navy-game ${border}`}>
         {t.portrait ? (
           // eslint-disable-next-line @next/next/no-img-element
-          <img src={t.portrait} alt={t.name} loading="lazy" className="h-full w-full object-cover [image-rendering:pixelated]" />
+          <img src={portraitThumb(t.portrait)} alt={t.name} loading="lazy" decoding="async" className="h-full w-full object-cover [image-rendering:pixelated]" />
         ) : null}
       </span>
       <b className="text-xs">{t.name}</b>

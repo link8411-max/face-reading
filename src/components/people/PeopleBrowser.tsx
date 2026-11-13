@@ -6,13 +6,14 @@ import ThreeKingdomsMap from "@/components/people/ThreeKingdomsMap";
 import { FILTER_LABEL, matchedCount, todayCard, visibleIds, FIRST_PAGE, type HubCard, type HubFilter } from "@/lib/people/hubFilter";
 import { kstDate, onDayMaybeChanged } from "@/lib/kst";
 
+import { portraitThumb } from "@/lib/portraitThumb";
 const FILTERS: HubFilter[] = ["all", "위", "촉", "오", "기타"];
 const FACTION_NAME: Record<HubFilter, string> = { all: "전체", 위: "위나라", 촉: "촉나라", 오: "오나라", 기타: "군웅" };
 
 function Portrait({ card, className, width, height }: { card: HubCard; className: string; width: number; height: number }) {
   if (card.portrait) {
     // eslint-disable-next-line @next/next/no-img-element
-    return <img src={card.portrait} alt={`${card.name} 초상`} width={width} height={height} loading="lazy" className={`${className} object-cover`} />;
+    return <img src={portraitThumb(card.portrait)} alt={`${card.name} 초상`} width={width} height={height} loading="lazy" decoding="async" className={`${className} object-cover`} />;
   }
   return <div className={`${className} border border-dashed border-line bg-card-2 grid place-items-center text-xs text-muted text-center px-2`}>초상화 추가 예정</div>;
 }

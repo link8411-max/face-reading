@@ -6,6 +6,7 @@ import { portraitSrc } from '@/lib/people/portrait'
 import { isVideoId } from '@/lib/videos/format'
 import type { Video } from '@/lib/videos/types'
 
+import { portraitThumb } from "@/lib/portraitThumb";
 const PEOPLE_WITH_PAGE = new Set<string>(PEOPLE_ID_LIST)
 
 /** 열전 첫 줄: 이 인물이 나오는 영상 중 첫 편을 큰 카드로. 비면 null. */
@@ -47,7 +48,7 @@ export default function PersonVideos({ id, name, videos }: { id: string; name: s
             >
               {o.portrait ? (
                 // eslint-disable-next-line @next/next/no-img-element
-                <img src={o.portrait} alt="" width={24} height={24} loading="lazy" className="h-6 w-6 rounded-full object-cover [image-rendering:pixelated]" />
+                <img src={portraitThumb(o.portrait)} alt="" width={24} height={24} loading="lazy" decoding="async" className="h-6 w-6 rounded-full object-cover [image-rendering:pixelated]" />
               ) : (
                 <span className="flex h-6 w-6 items-center justify-center rounded-full border border-dashed border-line text-[11px] text-muted">{o.name.charAt(0)}</span>
               )}

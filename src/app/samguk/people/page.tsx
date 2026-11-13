@@ -15,6 +15,7 @@ import { getChannelVideos } from "@/lib/videos/fetch";
 import { portraitSrc } from "@/lib/people/portrait";
 import { factionGroups } from "@/lib/people/relations";
 
+import { portraitThumb } from "@/lib/portraitThumb";
 const SITE = "https://unse-ai.com";
 const URL = `${SITE}/samguk/people`;
 const TITLE = "삼국지 인물 관계도 | 위·촉·오 인물 소개 – 운명을 읽다";
@@ -103,7 +104,7 @@ export default async function PeopleHubPage() {
                           <Link href={`/samguk/people/${id}`} prefetch={false} className="flex items-center gap-3 rounded-2xl border border-line bg-paper px-3 py-2 hover:border-accent/50 transition">
                             {src ? (
                               // eslint-disable-next-line @next/next/no-img-element
-                              <img src={src} alt={`${c?.name ?? id} 초상`} width={40} height={50} loading="lazy" className="w-10 h-[50px] object-cover rounded-lg border border-line flex-none" />
+                              <img src={portraitThumb(src)} alt={`${c?.name ?? id} 초상`} width={40} height={50} loading="lazy" decoding="async" className="w-10 h-[50px] object-cover rounded-lg border border-line flex-none" />
                             ) : (
                               <span className="w-10 h-[50px] rounded-lg border border-dashed border-line bg-card-2 flex-none" aria-hidden="true" />
                             )}

@@ -275,11 +275,11 @@ git commit -m "디자인 1단계: 주 버튼을 파랑으로, 흰 카드에 테�
 **Interfaces:**
 - Produces: `portraitThumb(src: string): string` — `/images/samguk/<이름>.jpg`이면 `/images/samguk/thumb/<이름>.webp`를, 그 밖의 경로는 그대로 돌려준다. 이름은 한글 그대로(인코딩된 경로가 와도 처리: `decodeURI` 후 비교, 돌려줄 때는 받은 형태와 같은 인코딩).
 
-- [ ] **Step 1: 바뀌기 전 무게를 잰다** (설계 5.7의 "Lighthouse LCP·CLS" 대신, 이 작업이 바꾸는 것인 초상화 전송량을 잰다. Lighthouse는 배포 뒤 PageSpeed Insights로 사용자와 같이 본다)
+- [x] **Step 1: 바뀌기 전 무게를 잰다** (설계 5.7의 "Lighthouse LCP·CLS" 대신, 이 작업이 바꾸는 것인 초상화 전송량을 잰다. Lighthouse는 배포 뒤 PageSpeed Insights로 사용자와 같이 본다)
 
 Playwright로 `npm run build && npm start -- -p 3200`을 띄운 뒤 `/samguk/people`, `/samguk/cup`, `/face-tests`를 열고 응답 중 `/images/samguk/` 파일의 전송 바이트 합을 각각 기록한다(스크립트는 `scripts/`가 아니라 임시 폴더에 둔다). 숫자를 이 작업의 커밋 메시지에 적는다.
 
-- [ ] **Step 2: 실패하는 테스트를 쓴다**
+- [x] **Step 2: 실패하는 테스트를 쓴다**
 
 ```ts
 import { existsSync, readdirSync } from 'node:fs'
@@ -303,7 +303,7 @@ test('모든 초상화에 작은 판이 있다', () => {
 
 Run: `npx vitest run tests/portraitThumb.test.ts` → Expected: FAIL(모듈 없음).
 
-- [ ] **Step 3: 스크립트와 함수를 만든다**
+- [x] **Step 3: 스크립트와 함수를 만든다**
 
 `scripts/make-portrait-thumbs.mjs`: `public/images/samguk/*.jpg`(하위 폴더 제외)를 `sharp`로 256×256 webp(quality 78)로 만들어 `public/images/samguk/thumb/`에 쓴다. 이미 있고 원본보다 새로우면 건너뛴다. 머리말에 "초상화를 바꾸거나 더하면 다시 돌린다"를 적는다.
 
@@ -311,17 +311,17 @@ Run: `node scripts/make-portrait-thumbs.mjs` → 115개 안팎이 생기고 각 
 
 `src/lib/portraitThumb.ts`에 위 Interfaces의 함수를 쓴다(정규식 `^/images/samguk/([^/]+)\.jpg$`를 디코드한 경로에 적용).
 
-- [ ] **Step 4: 작은 자리에서 쓴다**
+- [x] **Step 4: 작은 자리에서 쓴다**
 
 초상화를 보여 주는 `<img>` 중 화면 가로 200px 이하로 그리는 곳(목록 카드, 월드컵 카드, 팀 카드, 관계도 얼굴, 홈·허브 썸네일, 영상 옆 얼굴 등)은 `src={portraitThumb(...)}`로 바꾸고 `width`·`height`·`loading="lazy"`·`decoding="async"`를 단다(첫 화면 맨 위 그림 하나는 `loading`을 빼고 `fetchPriority="high"`). 크게 보여 주는 곳(열전 머리 그림, 공유 착지 큰 그림, OG 라우트, 결과 카드 캡처 그림)은 원본을 쓴다.
 
 CLAUDE.md "장수 추가·초상화 교체" 절에 "그림을 넣으면 `node scripts/make-portrait-thumbs.mjs`도 돌린다"를 더한다.
 
-- [ ] **Step 5: 통과 확인과 무게 비교**
+- [x] **Step 5: 통과 확인과 무게 비교**
 
 Run: `npm test` → PASS. Step 1과 같은 방법으로 세 페이지의 초상화 전송 바이트를 다시 잰다. Expected: 각 페이지 절반 이하.
 
-- [ ] **Step 6: 커밋**
+- [x] **Step 6: 커밋**
 
 ```bash
 git add -A scripts/make-portrait-thumbs.mjs public/images/samguk/thumb src/lib/portraitThumb.ts tests/portraitThumb.test.ts src CLAUDE.md

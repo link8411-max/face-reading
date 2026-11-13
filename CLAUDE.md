@@ -250,7 +250,7 @@ public/
 - 재측정: 개발 서버(`npx next dev -p 3311`)를 띄우고 `node scripts/measure-face-stats.mjs` → 출력값을 붙여 넣는다. 성별 라벨은 `scripts/dev-face-genders.json`, 정면 사진만 쓴다. 표본이 작아 t 기반 축소 추정.
 - 시뮬레이션은 성별 분포에서 특징값을 뽑아 실제 경로(`toZ(f, gender)`)로 매칭한다 (`src/lib/face/sampleFeatures.ts`).
 
-**장수 추가·초상화 교체**: 그림은 `public/images/samguk/<한글이름>.jpg`(화풍·생성 지침 `docs/portrait-prompts.md`, Antigravity로 생성). 데이터는 `samgukDB.ts`(`allSamgukCharacters`)와 `vibes.ts`. 그림이 아직 없는 장수는 `PENDING_PORTRAIT_IDS`에 두면 결과·공유·팀에서 빠진다(그림이 들어왔는데 남아 있으면 테스트 실패). 그림을 넣으면 개발 서버(3311)를 띄우고 `node scripts/measure-portraits.mjs` → calibrate-samguk. 얼굴 인식이 안 되는 그림은 `profiles.ts` handProfiles에 글 묘사 프로필을 쓴다. 장수 수 문구(삼국지 제목·소개·메뉴)는 실제 수와 같아야 한다(테스트).
+**장수 추가·초상화 교체**: 그림은 `public/images/samguk/<한글이름>.jpg`(화풍·생성 지침 `docs/portrait-prompts.md`, Antigravity로 생성). 데이터는 `samgukDB.ts`(`allSamgukCharacters`)와 `vibes.ts`. 그림이 아직 없는 장수는 `PENDING_PORTRAIT_IDS`에 두면 결과·공유·팀에서 빠진다(그림이 들어왔는데 남아 있으면 테스트 실패). 그림을 넣으면 `node scripts/make-portrait-thumbs.mjs`(작은 판 `public/images/samguk/thumb/*.webp`, 목록·카드는 `lib/portraitThumb.ts`로 이것을 쓴다)도 돌리고, 개발 서버(3311)를 띄우고 `node scripts/measure-portraits.mjs` → calibrate-samguk. 얼굴 인식이 안 되는 그림은 `profiles.ts` handProfiles에 글 묘사 프로필을 쓴다. 장수 수 문구(삼국지 제목·소개·메뉴)는 실제 수와 같아야 한다(테스트).
 
 **프로필이나 기준값을 바꾸면** `npx tsx --tsconfig tsconfig.json scripts/calibrate-samguk.ts`와 `scripts/calibrate-animal.ts`로 bias를 다시 만들고 `npm test`(분포 테스트: 전원 1회 이상, 균등의 3배 이하, 성별별)를 통과시킬 것.
 

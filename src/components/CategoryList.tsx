@@ -2,6 +2,7 @@ import { Fragment } from "react";
 import Link from "next/link";
 import type { CategoryItem } from "@/content/navigation";
 import { Icon } from "@/components/icons";
+import { portraitThumb } from "@/lib/portraitThumb";
 
 // 묶음 항목 목록 (썸네일 + 제목 + 설명 + 칩) — 홈 묶음 탭과 허브 페이지 공용. group이 바뀌는 곳에 소제목을 그린다
 export default function CategoryList({ items }: { items: CategoryItem[] }) {
@@ -17,7 +18,7 @@ export default function CategoryList({ items }: { items: CategoryItem[] }) {
             <span
               aria-hidden
               className="w-16 h-16 flex-none rounded-2xl grid place-items-center text-ink bg-cover bg-top"
-              style={item.thumb.image ? { backgroundImage: `url(${item.thumb.image})` } : { background: item.thumb.bg }}
+              style={item.thumb.image ? { backgroundImage: `url(${portraitThumb(item.thumb.image)})` } : { background: item.thumb.bg }}
             >
               {item.thumb.image || !item.thumb.icon ? null : <Icon name={item.thumb.icon} size={28} />}
             </span>

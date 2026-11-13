@@ -10,6 +10,7 @@ import { videoBadge } from '@/lib/videos/format'
 import type { Video } from '@/lib/videos/types'
 import type { Faces } from './VideosBrowser'
 
+import { portraitThumb } from "@/lib/portraitThumb";
 export default function VideoFeed({
   videos, startIndex, faces, onClose,
 }: { videos: Video[]; startIndex: number; faces: Faces; onClose: () => void }) {
@@ -91,7 +92,7 @@ export default function VideoFeed({
                       <>
                         {f.portrait ? (
                           // eslint-disable-next-line @next/next/no-img-element
-                          <img src={f.portrait} alt="" width={24} height={24} className="h-6 w-6 rounded-full object-cover [image-rendering:pixelated]" />
+                          <img src={portraitThumb(f.portrait)} alt="" width={24} height={24} loading="lazy" decoding="async" className="h-6 w-6 rounded-full object-cover [image-rendering:pixelated]" />
                         ) : (
                           <span className="flex h-6 w-6 items-center justify-center rounded-full border border-dashed border-paper/50 text-[11px]">{f.name.charAt(0)}</span>
                         )}
