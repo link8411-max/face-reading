@@ -1,8 +1,47 @@
 {
-  "haetae": { "cx": 0.5, "cy": 0.2, "size": 0.4 },
-  "saja": { "cx": 0.5, "cy": 0.29, "size": 0.4 },
-  "gumiho": { "cx": 0.46, "cy": 0.21, "size": 0.4 },
-  "mudang": { "cx": 0.53, "cy": 0.22, "size": 0.4 },
-  "baekho": { "cx": 0.51, "cy": 0.21, "size": 0.4 },
-  "dokkaebi": { "cx": 0.51, "cy": 0.2, "size": 0.4 }
+  "haetae": {
+    "cx": 0.5,
+    "cy": 0.2,
+    "size": 0.4
+  },
+  "saja": {
+    "cx": 0.5,
+    "cy": 0.29,
+    "size": 0.4
+  },
+  "gumiho": {
+    "cx": 0.46,
+    "cy": 0.21,
+    "size": 0.4
+  },
+  "mudang": {
+    "cx": 0.53,
+    "cy": 0.22,
+    "size": 0.4
+  },
+  "baekho": {
+    "cx": 0.51,
+    "cy": 0.21,
+    "size": 0.4
+  },
+  "dokkaebi": {
+    "cx": 0.51,
+    "cy": 0.2,
+    "size": 0.4
+  },
+  "desertfox-f": {
+    "cx": 0.58,
+    "cy": 0.36,
+    "size": 0.36
+  },
+  "hamster-f": {
+    "cx": 0.61,
+    "cy": 0.33,
+    "size": 0.36
+  },
+  "hamster-m": {
+    "cx": 0.5,
+    "cy": 0.35,
+    "size": 0.36
+  }
 }

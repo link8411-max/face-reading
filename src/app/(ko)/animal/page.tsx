@@ -10,6 +10,7 @@ import TestStart from "@/components/test/TestStart";
 import Link from "next/link";
 import { useScreenshot } from "@/hooks/useScreenshot";
 import { matchAnimal, type AnimalTypeResult } from "@/lib/animal/matcher";
+import { animalArt, artGender } from "@/lib/animal/art";
 import animalCalibration from "@/lib/animal/calibration.json";
 import { analyzePhoto, failText, holdAtLeast, reasonText } from "@/lib/face/analyzePhoto";
 import { animalTypeDB, type AnimalType } from "@/lib/animalTypeDB";
@@ -35,14 +36,14 @@ type T = (k: UiKey) => string;
 
 // 결과 카드: 동물상은 숫자 특성이 없어서 막대 대신 성격 칩 3개를 쓴다
 // en: 영어판이면 영어 동물상 데이터(서버가 내려 줌). 얼굴 특징 묘사(눈·얼굴형)는 한국어로만 계산되므로 영어판 카드에서는 뺀다.
-function cardProps(r: AnimalTypeResult, t: T, en?: Record<string, AnimalType>): ResultCardProps {
+function cardProps(r: AnimalTypeResult, t: T, en?: Record<string, AnimalType>, g: 'f' | 'm' = 'f'): ResultCardProps {
   const data = en?.[r.type] ?? r.data;
   return {
     eyebrow: en ? `${data.name} · ${r.matchScore}% ${t("animal.match")}` : `${data.name} · 닮음 ${r.matchScore}%`,
     title: data.title,
     summary: en ? data.description.split(". ")[0].replace(/\.?$/, ".") : firstSentence(data.description),
     chips: data.personality.positive.slice(0, 3),
-    art: <img src={`/images/animal/${r.type}.jpg`} alt={en ? `${data.name} ${t("fm.photoAlt")}` : `${data.name} 그림`} width={104} height={104} className="w-[104px] h-[104px] rounded-full object-cover" />,
+    art: <img src={animalArt(r.type, g).face} alt={en ? `${data.name} ${t("fm.photoAlt")}` : `${data.name} 그림`} width={104} height={104} className="w-[104px] h-[104px] rounded-full object-cover" />,
     reasons: [
       { label: t("animal.charm"), text: data.charm },
       ...(en ? [] : [{ label: t("animal.face"), text: `${r.features.눈} · 얼굴형 ${r.features.얼굴형}` }]),
@@ -160,7 +161,7 @@ export default function AnimalTypePage() {
         {/* Result Section */}
         {result && (
           <div className="pb-6 animate-fade-in">
-            <ResultCard captureRef={resultRef} cast="tiger" {...cardProps(result, t, en ? enAnimals : undefined)} />
+            <ResultCard captureRef={resultRef} cast="tiger" {...cardProps(result, t, en ? enAnimals : undefined, artGender(gender))} />
             <ResultActions
               from="animal"
               onShare={shareCard}

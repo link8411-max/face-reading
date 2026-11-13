@@ -16,6 +16,7 @@ if (si < 0 || !args[si + 1]) {
 const SRC = args[si + 1];
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..');
 const OUT = join(ROOT, 'public/images/cast');
+const OUT_ANIMAL = join(ROOT, 'public/images/animal');
 const crops = JSON.parse(readFileSync(join(dirname(fileURLToPath(import.meta.url)), 'webtoon-crops.json'), 'utf8'));
 const DEFAULT_CROP = { cx: 0.5, cy: 0.22, size: 0.42 };
 
@@ -32,8 +33,16 @@ function find(name) {
   throw new Error(`원본 없음: ${name}`);
 }
 
+// 동물상 13종 × 여(f)·남(m): public/images/animal/<키>-<f|m>.webp(큰 그림)·-face.webp(얼굴 240)
+const ANIMALS = ['dog', 'cat', 'fox', 'bear', 'rabbit', 'deer', 'tiger', 'eagle', 'desertfox', 'dino', 'wolf', 'squirrel', 'hamster'];
+const JOBS = [
+  ...Object.entries(FILES).map(([key, name]) => ({ out: OUT, key, name, og: true })),
+  ...ANIMALS.flatMap((a) => ['f', 'm'].map((g) => ({ out: OUT_ANIMAL, key: `${a}-${g}`, name: `${a}-${g}`, og: false }))),
+];
+
 mkdirSync(OUT, { recursive: true });
-for (const [key, name] of Object.entries(FILES)) {
+mkdirSync(OUT_ANIMAL, { recursive: true });
+for (const { out, key, name, og } of JOBS) {
   const file = find(name);
   const meta = await sharp(file).metadata();
   const { width: w, height: h } = meta;
@@ -41,14 +50,14 @@ for (const [key, name] of Object.entries(FILES)) {
   let cw = w, ch = Math.round((w * 4) / 3), left = 0, top = 0;
   if (ch > h) { ch = h; cw = Math.round((h * 3) / 4); left = w - cw; }
   const big = sharp(file).extract({ left, top, width: cw, height: ch }).resize(720, 960);
-  await big.clone().webp({ quality: 74 }).toFile(join(OUT, `${key}.webp`));
+  await big.clone().webp({ quality: 74 }).toFile(join(out, `${key}.webp`));
 
   const c = { ...DEFAULT_CROP, ...(crops[name] ?? crops[key] ?? {}) };
   const side = Math.round(w * c.size);
   const fl = Math.max(0, Math.min(w - side, Math.round(w * c.cx - side / 2)));
   const ft = Math.max(0, Math.min(h - side, Math.round(h * c.cy - side / 2)));
   const face = sharp(file).extract({ left: fl, top: ft, width: side, height: side });
-  await face.clone().resize(240, 240).webp({ quality: 80 }).toFile(join(OUT, `${key}-face.webp`));
-  await face.clone().resize(512, 512).png({ compressionLevel: 9, palette: true }).toFile(join(OUT, `${key}-og.png`));
+  await face.clone().resize(240, 240).webp({ quality: 80 }).toFile(join(out, `${key}-face.webp`));
+  if (og) await face.clone().resize(512, 512).png({ compressionLevel: 9, palette: true }).toFile(join(out, `${key}-og.png`));
   console.log(key, '<-', file);
 }
