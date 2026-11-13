@@ -6,12 +6,12 @@ import { FINISHES, STYLES, WISHES } from '@/lib/bujeok/keys'
 const has = (list: readonly string[], v: string | null) => v !== null && list.includes(v)
 
 const PARAMS: Record<string, string[]> = {
-  animal: ['key', 's'],
+  animal: ['key', 's', 'lang'],
   samguk: ['key', 's'],
-  face: ['key'],
+  face: ['key', 'lang'],
   saju: ['key'],
   mbti: ['a', 'b'],
-  'face-match': ['a', 'b', 'rel'],
+  'face-match': ['a', 'b', 'rel', 'lang'],
   invite: ['key', 'rel'],
   team: ['ids'],
   'mbti-daily': ['type'],
@@ -33,6 +33,8 @@ export function ogQueryOk(q: URLSearchParams): boolean {
   if (q.get('kind') === 'bujeok' && !(has(STYLES, q.get('style')) && has(WISHES, q.get('wish')) && has(FINISHES, q.get('finish')))) return false
   // 밈 능력고사: 등급 1~9, 맞힌 수 0~5(앞자리 0 금지), 둘 다 있어야 한다
   if (q.get('kind') === 'exam' && !(/^[1-9]$/.test(q.get('grade') ?? '') && /^[0-5]$/.test(q.get('correct') ?? ''))) return false
+  // 영어 미리보기: lang은 en 하나만 받는다(그 밖의 값은 새로 그리게 만드는 요청이므로 거절)
+  if (q.has('lang') && q.get('lang') !== 'en') return false
   const s = q.get('s')
   // 공유 링크가 만드는 점수는 50~99 두 자리 정수뿐
   return s === null || /^[5-9]\d$/.test(s)

@@ -7,12 +7,16 @@ import rounds from '@/content/exam/meme-rounds.json'
 import { releasedWordRoutes } from '@/lib/exam/words'
 import { kstDate } from '@/lib/kst'
 import type { Round } from '@/lib/exam/types'
+import { EN_PATHS, languageAlternates } from '@/lib/i18n/alternates'
 
 const DUEL_GENERAL_ROUTES = DUEL_GENERALS.filter((g) => g.role !== 'mob').map((g) => `/samguk/duel/generals/${g.id}`)
 
 const PEOPLE_ROUTES = PEOPLE_IDS.map((id) => `/samguk/people/${id}`)
 
 const baseUrl = 'https://unse-ai.com'
+
+// 영어판 주소: 결과 공유 착지(끝이 /로 끝나는 접두어)는 사이트맵에 넣지 않는다
+const EN_SITEMAP_ROUTES = EN_PATHS.filter((p) => !p.endsWith('/') || p === '/').map((p) => (p === '/' ? '/en' : `/en${p}`))
 
 export const SITEMAP_ROUTES = [
     '',
@@ -47,18 +51,20 @@ export const SITEMAP_ROUTES = [
     '/exam/meme',
     '/exam/meme/words',
     '/bujeok',
+    // 영어판 (언어 짝은 sitemap()에서 alternates.languages로 붙는다)
+    ...EN_SITEMAP_ROUTES,
 ]
 
 // 페이지 내용을 바꾸면 해당 라우트 날짜도 갱신할 것 (new Date()를 쓰면 매 요청마다 바뀌어 검색엔진이 무시함)
 export const LAST_MODIFIED: Record<string, string> = {
     '': '2026-11-13',
-    '/face2': '2026-11-07',
+    '/face2': '2026-11-13',
     '/fortune': '2026-11-11',
     '/saju': '2026-11-11',
     '/fortune/mbti': '2026-10-27',
     '/fortune/daily': '2026-11-05',
     '/samguk': '2026-11-07',
-    '/animal': '2026-11-07',
+    '/animal': '2026-11-13',
     '/all': '2026-11-13',
     '/today': '2026-11-13',
     '/face-tests': '2026-11-13',
@@ -69,7 +75,7 @@ export const LAST_MODIFIED: Record<string, string> = {
     ...Object.fromEntries(ZODIAC_SLUGS.map((s) => [`/fortune/2027/${s}`, '2026-11-07'])),
     '/mbti': '2026-11-07',
     '/mbti/match': '2026-11-07',
-    '/face-match': '2026-10-27',
+    '/face-match': '2026-11-13',
     '/samguk/team': '2026-10-27',
     '/samguk/duel': '2026-10-28',
     ...Object.fromEntries(DUEL_GENERAL_ROUTES.map((r) => [r, '2026-10-28'])),
@@ -83,6 +89,7 @@ export const LAST_MODIFIED: Record<string, string> = {
     '/exam/meme/words': '2026-11-12',
     '/bujeok': '2026-11-12',
     ...Object.fromEntries(MBTI_SLUGS.map((s) => [`/mbti/${s}`, '2026-11-07'])),
+    ...Object.fromEntries(EN_SITEMAP_ROUTES.map((r) => [r, '2026-11-13'])),
 }
 
 type ChangeFrequency = MetadataRoute.Sitemap[number]['changeFrequency']
@@ -92,10 +99,15 @@ export const revalidate = 21600
 
 export default function sitemap(): MetadataRoute.Sitemap {
     const words = releasedWordRoutes(kstDate(new Date()), rounds.rounds as unknown as Round[]).map(([route, day]) => ({ url: `${baseUrl}${route}`, lastModified: day, changeFrequency: 'monthly' as ChangeFrequency, priority: 0.6 }))
-    return [...SITEMAP_ROUTES.map((route) => ({
+    return [...SITEMAP_ROUTES.map((route) => {
+        const koPath = route === '/en' ? '/' : route.startsWith('/en/') ? route.slice(3) : route === '' ? '/' : route
+        const languages = languageAlternates(koPath)
+        return {
         url: `${baseUrl}${route}`,
         lastModified: LAST_MODIFIED[route],
         changeFrequency: (route === '/fortune/daily' || route === '/fortune/mbti' ? 'daily' : route === '/about' || route === '/privacy' ? 'yearly' : 'weekly') as ChangeFrequency,
         priority: route === '' ? 1 : route === '/about' || route === '/privacy' ? 0.3 : 0.8,
-    })), ...words]
+        ...(languages ? { alternates: { languages } } : {}),
+        }
+    }), ...words]
 }

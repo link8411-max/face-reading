@@ -18,6 +18,12 @@ import { GRADE_NAME } from '@/lib/exam/score';
 import { WISH_TEXT } from '@/content/bujeok';
 import { FOIL, PAL } from '@/lib/bujeok/palette';
 import type { BujeokStyle, Finish, Wish } from '@/lib/bujeok/keys';
+import { animalTypeDB as enAnimals } from '@/content/en/animal';
+import { GUANSANG_TYPES as enFace } from '@/content/en/guansang';
+import { REL_NAME as EN_REL_NAME } from '@/content/en/faceMatch';
+import { SHARE_PHRASE } from '@/content/en/share';
+import { faceMatch } from '@/lib/faceMatch/compat';
+import { t } from '@/lib/i18n/dict';
 
 export const runtime = 'edge';
 
@@ -32,6 +38,8 @@ export async function GET(request: NextRequest) {
     // ogQueryOk가 화풍·소원·기운·마감을 허용 목록으로 확인했다. 이름은 받지 않는다.
     return bujeokImage(q.get('style') as BujeokStyle, q.get('wish') as Wish, q.get('finish') as Finish);
   }
+  // 영어 미리보기(ogQueryOk가 animal·face·face-match에만 lang=en을 허용한다)
+  const en = q.get('lang') === 'en';
   let big = '', score = '', phrase = '', label = '';
   let image: ArrayBuffer | undefined;
   let portraitMissing = false; // 초상화를 못 받았으면 잠깐만 캐시해 다음 요청에 다시 그린다
@@ -52,7 +60,12 @@ export async function GET(request: NextRequest) {
   } else if (kind === 'face-match') {
     const m = parseFaceMatch(`${q.get('a') ?? ''}-${q.get('b') ?? ''}`, q.get('rel') ?? '');
     if (!m) return new Response('bad request', { status: 400 });
-    big = `${m.aName} × ${m.bName}`; score = m.result.headline; phrase = m.phrase; label = `얼굴 궁합 · ${REL_NAME[m.rel]}`;
+    if (en) {
+      const r = faceMatch(m.a, m.b, m.rel, { animals: enAnimals });
+      big = `${enAnimals[m.a].name} × ${enAnimals[m.b].name}`; score = r.headline; phrase = SHARE_PHRASE.faceMatch(m.rel, EN_REL_NAME[m.rel], m.score); label = `${t('en', 'fm.title')} · ${EN_REL_NAME[m.rel]}`;
+    } else {
+      big = `${m.aName} × ${m.bName}`; score = m.result.headline; phrase = m.phrase; label = `얼굴 궁합 · ${REL_NAME[m.rel]}`;
+    }
   } else if (kind === 'team') {
     const p = parseTeam(q.get('ids') ?? '');
     if (!p) return new Response('bad request', { status: 400 });
@@ -70,8 +83,14 @@ export async function GET(request: NextRequest) {
   } else if ((KINDS as string[]).includes(kind)) {
     const r = parseShared(kind as ShareKind, q.get('key') ?? '', q.get('s') ?? undefined);
     if (!r) return new Response('bad request', { status: 400 });
-    big = r.name; score = r.score !== null ? `닮음 ${r.score}%` : ''; phrase = r.phrase;
-    label = kind === 'animal' ? '동물상 테스트' : kind === 'samguk' ? '나는 삼국지 속 누구?' : kind === 'saju' ? '내 사주 풀이' : 'AI 관상 테스트';
+    if (en && kind === 'animal') {
+      big = enAnimals[r.key].name; score = `${r.score}% ${t('en', 'animal.match')}`; phrase = SHARE_PHRASE.animal(big, r.score!); label = t('en', 'animal.title');
+    } else if (en && kind === 'face') {
+      big = enFace[r.key as keyof typeof enFace].nickname; phrase = SHARE_PHRASE.face(big); label = t('en', 'face.title');
+    } else {
+      big = r.name; score = r.score !== null ? `닮음 ${r.score}%` : ''; phrase = r.phrase;
+      label = kind === 'animal' ? '동물상 테스트' : kind === 'samguk' ? '나는 삼국지 속 누구?' : kind === 'saju' ? '내 사주 풀이' : 'AI 관상 테스트';
+    }
     if (r.image) await loadPortrait(r.image);
   } else if (kind === 'duel') {
     const key = q.get('key') ?? '';
@@ -104,7 +123,7 @@ export async function GET(request: NextRequest) {
       <div style={{ width: '100%', height: '100%', display: 'flex', backgroundColor: '#F7F8FC', padding: '48px' }}>
         <div style={{ position: 'relative', flex: 1, display: 'flex', alignItems: 'center', backgroundColor: '#FFFFFF', border: '3px solid #E1E6F5', borderRadius: '48px', padding: '56px 72px', overflow: 'hidden' }}>
           <div style={{ display: 'flex', flexDirection: 'column', flex: 1, maxWidth: castImg ? '520px' : '100%' }}>
-            <div style={{ display: 'flex', fontSize: '30px', color: '#2D55FF', fontWeight: 700 }}>운명을 읽다 · {label}</div>
+            <div style={{ display: 'flex', fontSize: '30px', color: '#2D55FF', fontWeight: 700 }}>{en ? t('en', 'brand.name') : '운명을 읽다'} · {label}</div>
             <div style={{ display: 'flex', fontSize: bigSize, fontWeight: 700, color: '#1A1B25', marginTop: '20px', lineHeight: 1.1 }}>{big}</div>
             {score ? <div style={{ display: 'flex', fontSize: '52px', fontWeight: 700, color: '#2D55FF', marginTop: '16px' }}>{score}</div> : null}
             <div style={{ display: 'flex', fontSize: '34px', color: '#5E6070', marginTop: '28px', maxWidth: image ? '640px' : castImg ? '520px' : '900px', wordBreak: 'keep-all' }}>{phrase}</div>

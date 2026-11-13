@@ -213,3 +213,51 @@ test('영어 시작 화면: 얼굴 없는 사진도 영어 안내를 보여 준�
   await expect(page.getByText(/No face found/)).toBeVisible({ timeout: 30000 })
   expect(await visibleHangul(page)).toBe('')
 })
+
+// ===== 영어 공유 착지·미리보기 이미지·사이트맵 =====
+for (const [p, h1] of [['/en/animal/r/cat?s=88', /88% Cat Face/], ['/en/face2/r/earth-mid', /Someone got/], ['/en/face-match/r/cat-dog?rel=lover', /Face match result/]] as const) {
+  test(`${p}: 영어 착지, noindex, 영어 테스트로 가는 버튼`, async ({ page }) => {
+    await page.goto(p)
+    await expect(page.locator('html')).toHaveAttribute('lang', 'en')
+    await expect(page.locator('meta[name="robots"]')).toHaveAttribute('content', /noindex/)
+    const path = p.split('?')[0]
+    const test = path.includes('animal') ? '/en/animal' : path.includes('face2') ? '/en/face2' : '/en/face-match'
+    await expect(page.locator('link[rel="canonical"]')).toHaveAttribute('href', `https://unse-ai.com${test}`)
+    await expect(page.locator('meta[property="og:image"]')).toHaveAttribute('content', /lang=en/)
+    expect(await page.title()).not.toMatch(HANGUL)
+    if (!p.includes('face-match')) await expect(page.getByRole('heading', { level: 1 })).toHaveText(h1)
+    await expect(page.getByRole('link', { name: 'Try it yourself' })).toHaveAttribute('href', test)
+    expect((await page.evaluate(() => document.body.innerText)).match(HANGUL)?.join('') ?? '').toBe('')
+  })
+}
+
+test('영어 결과 착지는 잘못된 키면 영어 테스트 시작 화면으로 간다', async ({ page }) => {
+  await page.goto('/en/animal/r/nope?s=88')
+  await expect(page).toHaveURL(/\/en\/animal$/)
+  await page.goto('/en/face-match/r/cat-dog?rel=bad')
+  await expect(page).toHaveURL(/\/en\/face-match$/)
+})
+
+test('영어 미리보기 이미지는 lang=en만 그리고 그 밖은 400', async ({ request }) => {
+  for (const u of ['kind=animal&key=cat&s=88&lang=en', 'kind=face&key=earth-mid&lang=en', 'kind=face-match&a=cat&b=dog&rel=lover&lang=en']) {
+    const r = await request.get(`/api/og/result?${u}`)
+    expect(r.status(), u).toBe(200)
+    expect(r.headers()['content-type'], u).toContain('image/png')
+  }
+  expect((await request.get('/api/og/result?kind=animal&key=cat&s=88&lang=ja')).status()).toBe(400)
+  expect((await request.get('/api/og/result?kind=samguk&key=guanyu&s=88&lang=en')).status()).toBe(400)
+  expect((await request.get('/api/og/result?kind=animal&key=cat&s=88')).status()).toBe(200)
+})
+
+test('사이트맵에 영어 주소와 언어 짝이 있다', async ({ request }) => {
+  const xml = await (await request.get('/sitemap.xml')).text()
+  for (const u of ['/en', '/en/all', '/en/face2', '/en/animal', '/en/face-match']) expect(xml).toContain(`<loc>https://unse-ai.com${u}</loc>`)
+  expect(xml).not.toMatch(/<loc>https:\/\/unse-ai\.com\/en\/[a-z0-9-]+\/r\//)
+  expect(xml).toMatch(/hreflang="en" href="https:\/\/unse-ai\.com\/en\/face2"/)
+  expect(xml).toMatch(/hreflang="ko" href="https:\/\/unse-ai\.com\/face2"/)
+})
+
+test('lang=en 쿠키가 있어도 영어 착지는 그대로 열린다', async ({ request }) => {
+  const r = await request.get('/en/animal/r/cat?s=88', { maxRedirects: 0, headers: { cookie: 'lang=en' } })
+  expect(r.status()).toBe(200)
+})

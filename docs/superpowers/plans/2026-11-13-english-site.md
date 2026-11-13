@@ -129,9 +129,9 @@
 - Modify: `src/lib/shareLinks.ts`(locale 인자: en이면 `/en` 접두어), `src/components/share/SharePage.tsx`(문구 분기), `src/app/api/og/result/route.tsx`·`src/lib/ogQuery.ts`(`lang=en` 허용 목록 값 하나 추가 → 영어 문구), `src/app/sitemap.ts`(영어 주소 5개 + `alternates.languages`, `LAST_MODIFIED` 갱신)
 - Test: `tests/i18n/share.test.ts`
 
-- [ ] **Step 1: 테스트** — `shareLinks`가 en에서 `/en/animal/r/cat?s=88&utm_source=share&utm_medium=friend_link`를 만든다; ogQuery가 `lang`은 `en`만 허용하고 그 밖은 버린다; 사이트맵에 `https://unse-ai.com/en/face2`가 있고 그 항목의 `alternates.languages.ko`가 `https://unse-ai.com/face2`; 영어 착지 페이지가 noindex다.
-- [ ] **Step 2: 실패 확인 → Step 3: 구현 → Step 4: `npm test` 통과**
-- [ ] **Step 5: 커밋** — `"영어판: 영어 결과 공유 착지·영어 미리보기 이미지·사이트맵 언어 짝"`
+- [x] **Step 1: 테스트** — `shareLinks`가 en에서 `/en/animal/r/cat?s=88&utm_source=share&utm_medium=friend_link`를 만든다; ogQuery가 `lang`은 `en`만 허용하고 그 밖은 버린다; 사이트맵에 `https://unse-ai.com/en/face2`가 있고 그 항목의 `alternates.languages.ko`가 `https://unse-ai.com/face2`; 영어 착지 페이지가 noindex다.
+- [x] **Step 2: 실패 확인 → Step 3: 구현 → Step 4: `npm test` 통과**
+- [x] **Step 5: 커밋** — `"영어판: 영어 결과 공유 착지·영어 미리보기 이미지·사이트맵 언어 짝"`
 
 ---
 
