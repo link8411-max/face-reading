@@ -1,5 +1,6 @@
 "use client";
 
+import AnalyzingOverlay, { useAnalyzeStep } from "@/components/test/AnalyzingOverlay";
 import { useEffect, useMemo, useRef, useState } from "react";
 import Link from "next/link";
 import CoupangBanner from "@/components/CoupangBanner";
@@ -29,6 +30,8 @@ const OTHER_LABEL: Record<Rel, string> = { friend: "친구", lover: "내 사람"
 // - 한 폰: 두 칸 모두 사진
 // - ?me=cat: 내 동물상 결과로 시작(사진 다시 안 받음), 그 사람 사진을 올리거나 친구에게 초대 링크를 보낸다
 // - invite: 초대 링크로 들어온 사람. 상대(초대한 친구) 칸은 결과로 채워져 있고, 내 사진만 올린다
+const FACE_MATCH_STEPS = ["두 얼굴 살피는 중", "동물상 맞춰 보는 중", "궁합 계산하는 중"];
+
 export default function FaceMatchClient({ invite }: { invite?: { key: AnimalKey; rel: "friend" | "lover" } }) {
   const [rel, setRel] = useState<Rel | null>(invite?.rel ?? null);
   const [me, setMe] = useState<Slot>(empty);
@@ -44,6 +47,7 @@ export default function FaceMatchClient({ invite }: { invite?: { key: AnimalKey;
     import("@/lib/face/mediapipe").then((m) => m.prepareLandmarker()).catch(() => {});
   }, []);
   const [busy, setBusy] = useState(false);
+  const analyzeStep = useAnalyzeStep(busy, FACE_MATCH_STEPS.length);
   const running = useRef(false);
   const [done, setDone] = useState(false);
   const { ref: cardRef, isCapturing, download } = useScreenshot<HTMLElement>();
@@ -158,6 +162,7 @@ export default function FaceMatchClient({ invite }: { invite?: { key: AnimalKey;
           {rel === "crush" ? "그 사람 사진도 내 폰 안에서만 보고 바로 지워요. 어디에도 올라가지 않고, 상대에게 알림도 가지 않아요." : "사진은 내 폰 안에서만 보고 바로 지워요. 어디에도 올라가지 않아요."}
         </span>
       </div>
+      {busy && <AnalyzingOverlay cast="gumiho" steps={FACE_MATCH_STEPS} step={analyzeStep} />}
       <button type="button" onClick={analyze} disabled={!ready || busy} className="h-[52px] rounded-full bg-accent text-white text-[15px] font-medium disabled:opacity-45">
         {busy ? "궁합 보는 중…" : !rel ? "어떤 사이인지 먼저 골라 주세요" : "궁합 보기"}
       </button>

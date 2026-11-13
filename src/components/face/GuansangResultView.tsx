@@ -23,7 +23,7 @@ export default function GuansangResultView({ result, captureRef, actions, after 
 
   return (
     <div className="pb-6 animate-fade-in">
-      <ResultCard captureRef={captureRef} eyebrow="AI 관상" title={t.nickname} summary={t.oneLiner} chips={chips} reasons={reasons} />
+      <ResultCard captureRef={captureRef} cast="haetae" eyebrow="AI 관상" title={t.nickname} summary={t.oneLiner} chips={chips} reasons={reasons} />
       <p className="mt-3 text-center text-[11px] text-muted leading-relaxed">
         {SHAPE_COPY[result.shape].traditional} · {ZONE_COPY[result.zone].traditional} · {SCHOOL_NOTE}
       </p>

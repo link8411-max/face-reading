@@ -16,6 +16,7 @@ import { animalTypeDB } from "@/lib/animalTypeDB";
 import ResultCard, { type ResultCardProps } from "@/components/result/ResultCard";
 import ResultActions from "@/components/result/ResultActions";
 import NextTests from "@/components/result/NextTests";
+import AnalyzingOverlay, { ANALYZE_STEPS, useAnalyzeStep } from "@/components/test/AnalyzingOverlay";
 import MoreTests from "@/components/MoreTests";
 import NextSteps from "@/components/result/NextSteps";
 import { useHandedPhoto } from "@/hooks/useHandedPhoto";
@@ -45,6 +46,7 @@ export default function AnimalTypePage() {
   const goBack = useBackOrHome();
   const [image, setImage] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
+  const analyzeStep = useAnalyzeStep(loading, ANALYZE_STEPS.length);
   const [result, setResult] = useState<AnimalTypeResult | null>(null);
   const [error, setError] = useState<string | null>(null);
   // 성별: 성별별 얼굴 기준값으로 z 점수를 낸다
@@ -138,11 +140,12 @@ export default function AnimalTypePage() {
             imageRef={imageRef}
           />
         )}
+        {loading && <AnalyzingOverlay cast="tiger" photo={image ?? undefined} steps={ANALYZE_STEPS} step={analyzeStep} />}
 
         {/* Result Section */}
         {result && (
           <div className="pb-6 animate-fade-in">
-            <ResultCard captureRef={resultRef} {...cardProps(result)} />
+            <ResultCard captureRef={resultRef} cast="tiger" {...cardProps(result)} />
             <ResultActions
               from="animal"
               onShare={shareCard}

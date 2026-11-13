@@ -3,7 +3,7 @@
 import { useRef, useState, useCallback, useEffect } from "react";
 import { saveImage } from "@/lib/saveImage";
 import { shareResult, SHARE_NOTICE } from "@/lib/share";
-import { captureFilter } from "@/lib/capture";
+import { captureFilter, withNoMotion } from "@/lib/capture";
 import { isKakaoInApp, loadKakao, shareKakao, type KakaoShareMeta } from "@/lib/kakao";
 import { track, type TestName } from "@/lib/analytics";
 
@@ -42,11 +42,11 @@ export function useScreenshot<T extends HTMLElement = HTMLDivElement>(prepareFor
         setTimeout(() => reject(new Error("캡쳐 시간 초과")), 15000)
       );
 
-      const capturePromise = domToBlob(ref.current, {
+      const capturePromise = withNoMotion(() => domToBlob(ref.current!, {
         // 배경색을 주지 않는다: 캡처 대상(결과 카드)이 자기 배경을 가지고 있고, 지정하면 카드 배경을 덮어쓴다
         scale: isMobile ? 1.5 : 2, // 모바일은 낮은 해상도
         filter: captureFilter, // 쿠팡 배너 iframe·no-screenshot(생년월일 등) 제외
-      });
+      }));
 
       const blob = await Promise.race([capturePromise, timeoutPromise]);
       return blob;

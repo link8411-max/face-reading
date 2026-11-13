@@ -1,5 +1,6 @@
 "use client";
 
+import AnalyzingOverlay, { useAnalyzeStep } from "@/components/test/AnalyzingOverlay";
 import { useEffect, useMemo, useRef, useState } from "react";
 import Link from "next/link";
 import CoupangBanner from "@/components/CoupangBanner";
@@ -24,6 +25,8 @@ const empty = (): Slot => ({ nickname: "", gender: null, image: null, character:
 const MAX = 6;
 
 // 우리 팀 삼국지: 2~6명 사진 → 팀원별 닮은 장수 → 역할·팀의 기운·회사생활 STATUS. 사진은 폰 안에서만 분석한다.
+const TEAM_STEPS = ["팀원 얼굴 살피는 중", "어울리는 장수 찾는 중", "역할 나누는 중"];
+
 export default function TeamClient() {
   const [slots, setSlots] = useState<Slot[]>([empty(), empty()]);
   // 시작 화면에서 얼굴 인식 모델을 미리 받아 둔다(분석 버튼을 누를 때 기다리지 않게)
@@ -31,6 +34,7 @@ export default function TeamClient() {
     import("@/lib/face/mediapipe").then((m) => m.prepareLandmarker()).catch(() => {});
   }, []);
   const [busy, setBusy] = useState(false);
+  const analyzeStep = useAnalyzeStep(busy, TEAM_STEPS.length);
   const running = useRef(false);
   const [done, setDone] = useState(false);
   const { ref: cardRef, isCapturing, download } = useScreenshot<HTMLElement>();
@@ -102,6 +106,7 @@ export default function TeamClient() {
         <Icon name="shield" size={20} className="text-accent flex-none" />
         <span className="text-xs leading-normal text-muted">팀원 사진은 내 폰 안에서만 보고 바로 지워요. 별칭은 저장 이미지에만 나오고 공유 링크에는 들어가지 않아요.</span>
       </div>
+      {busy && <AnalyzingOverlay cast="tiger" steps={TEAM_STEPS} step={analyzeStep} />}
       <button type="button" onClick={analyze} disabled={!ready || busy} className="h-[52px] rounded-full bg-accent text-white text-[15px] font-medium disabled:opacity-45">
         {busy ? "장수 찾는 중…" : ready ? "우리 팀 결과 보기" : "모든 팀원의 성별과 사진을 골라 주세요"}
       </button>

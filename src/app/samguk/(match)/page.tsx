@@ -12,6 +12,7 @@ import ResultActions from "@/components/result/ResultActions";
 import { duelCta } from "@/lib/duel/cta";
 import ResultVideos from "@/components/videos/ResultVideos";
 import NextTests from "@/components/result/NextTests";
+import AnalyzingOverlay from "@/components/test/AnalyzingOverlay";
 import MoreTests from "@/components/MoreTests";
 import NextSteps from "@/components/result/NextSteps";
 import { useHandedPhoto } from "@/hooks/useHandedPhoto";
@@ -176,24 +177,8 @@ export default function SamgukPage() {
           />
         )}
 
-        {/* 분석 중 화면 */}
-        {loading && (
-          <div className="fixed inset-0 z-[100] grid place-items-center bg-paper/95 backdrop-blur-sm" role="status" aria-live="polite">
-            <div className="max-w-xs w-full px-6 flex flex-col items-center text-center">
-              <div className="relative w-40 h-40 rounded-full overflow-hidden border-4 border-card">
-                {image && (
-                  // eslint-disable-next-line @next/next/no-img-element
-                  <img src={image} alt="" className="w-full h-full object-cover opacity-70" />
-                )}
-                <div className="absolute left-0 right-0 h-1 bg-accent/70 animate-[scan_2s_ease-in-out_infinite]" />
-              </div>
-              <p className="mt-6 font-serif font-bold text-lg min-h-[3.5em] break-keep">{loadingMessages[loadingStep]}</p>
-              <div className="w-full h-1.5 bg-card rounded-full overflow-hidden mt-2">
-                <div className="h-full bg-ink transition-all duration-500" style={{ width: `${((loadingStep + 1) / loadingMessages.length) * 100}%` }} />
-              </div>
-            </div>
-          </div>
-        )}
+        {/* 분석 중 화면(공용: 살펴보는 줄·캐릭터·단계 문구) */}
+        {loading && <AnalyzingOverlay cast="tiger" photo={image ?? undefined} steps={loadingMessages} step={loadingStep} />}
 
         <style jsx>{`
           @keyframes scan { 0%, 100% { top: 0%; opacity: 0; } 5% { opacity: 1; } 95% { opacity: 1; } 100% { top: 100%; opacity: 0; } }

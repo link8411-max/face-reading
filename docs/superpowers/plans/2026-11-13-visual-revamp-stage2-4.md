@@ -202,7 +202,7 @@ test('검색으로 테스트 시작 화면에 들어와도 다른 테스트로 �
   - `.no-motion *, .no-motion *::before, .no-motion *::after { animation: none !important; transition: none !important; }`
   - `lib/capture.ts`: 캡처 함수가 시작할 때 `document.documentElement.classList.add('no-motion')`, 두 프레임 기다린 뒤 캡처, 끝나면(실패해도) 지운다.
 
-- [ ] **Step 1: 실패하는 테스트**
+- [x] **Step 1: 실패하는 테스트**
 
 ```tsx
 import { readFileSync } from 'node:fs'
@@ -232,10 +232,10 @@ test('무한 반복 움직임은 분석 중 화면 것뿐', () => {
 ```
 (마지막 테스트의 허용 목록은 globals.css에 원래 있던 무한 움직임 이름을 확인해 맞춘다. 새로 더하는 무한 움직임은 `scan`·`peek` 둘뿐.)
 
-- [ ] **Step 2: 실패 확인** — `npx vitest run tests/motion.test.tsx` → FAIL
-- [ ] **Step 3: 구현** (단계 문구는 페이지에 이미 있는 것을 쓴다. 삼국지의 `loadingMessages`처럼. 없으면 "얼굴형 살피는 중 / 이목구비 비율 재는 중 / 결과 정리하는 중")
-- [ ] **Step 4: 통과 확인** — `npm test` → PASS
-- [ ] **Step 5: 커밋** — `"분석 중 화면에 캐릭터, 결과 카드 공개 움직임, 캡처는 움직임을 끄고"`
+- [x] **Step 2: 실패 확인** — `npx vitest run tests/motion.test.tsx` → FAIL
+- [x] **Step 3: 구현** (단계 문구는 페이지에 이미 있는 것을 쓴다. 삼국지의 `loadingMessages`처럼. 없으면 "얼굴형 살피는 중 / 이목구비 비율 재는 중 / 결과 정리하는 중")
+- [x] **Step 4: 통과 확인** — `npm test` → PASS
+- [x] **Step 5: 커밋** — `"분석 중 화면에 캐릭터, 결과 카드 공개 움직임, 캡처는 움직임을 끄고"`
 
 ---
 
