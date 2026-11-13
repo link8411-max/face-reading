@@ -2,6 +2,7 @@ import { Analytics } from "@vercel/analytics/react";
 import Script from "next/script";
 import Link from "next/link";
 import type { ReactNode } from "react";
+import LanguageBanner from "@/components/i18n/LanguageBanner";
 import BottomTabBar from "@/components/BottomTabBar";
 import { GA_ID, PROD_HOST_SOURCE } from "@/lib/analytics";
 import { CATEGORIES, FOOTER_EXTRA } from "@/content/navigation";
@@ -15,6 +16,7 @@ export default function SiteShell({ locale, children }: { locale: Locale; childr
     <>
       {/* 하단 탭바(h-16)에 내용이 가리지 않도록 아래 여백. 탭바를 숨기는 일기토 화면은 duel.css가 app-shell 여백을 줄인다 */}
       <div className="app-shell flex flex-col min-h-screen pb-[calc(4rem+env(safe-area-inset-bottom))]">
+        {locale === "ko" && <LanguageBanner />}
         <main className="flex-grow">
           {children}
         </main>

@@ -40,6 +40,7 @@ export const UI: Record<UiKey, string> = {
   'lang.readInEnglish': 'Read in English',
   'lang.koreanOnly': '이 페이지는 한국어만 있어요',
   'lang.switch': '언어',
+  'lang.dismiss': '닫기',
 
   'result.watermark': '운명을 읽다 · unse-ai.com',
   'result.disclaimer': '재미로 보는 결과예요',

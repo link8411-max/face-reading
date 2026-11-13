@@ -46,6 +46,7 @@ export const UI = {
   'lang.readInEnglish': 'Read in English',
   'lang.koreanOnly': 'This page is only in Korean',
   'lang.switch': 'Language',
+  'lang.dismiss': 'Close',
 
   // result card
   'result.watermark': 'Read your fate · unse-ai.com',

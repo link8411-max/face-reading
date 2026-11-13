@@ -90,9 +90,9 @@
   - `proxy.ts`: `request.headers.get('x-vercel-ip-country')`, `accept-language`, 쿠키 `lang`·`lang_suggest`로 `decide`를 부르고, `redirect`면 307, `setSuggest`면 응답에 `lang_suggest=en`(1년, `SameSite=Lax`, path `/`) 쿠키. `matcher`는 `/api`, `/_next`, `/images`, `/icons`, `/models`, 파일 확장자가 있는 경로를 뺀다.
   - `LanguageBanner`: 한국어 페이지에서 `lang_suggest=en` 쿠키가 있고 `lang` 쿠키가 없고 `counterpart(path,'en')`가 있으면 위쪽에 얇은 띠 "View this page in English"(누르면 `lang=en` 쿠키를 쓰고 이동) + 닫기(누르면 `lang=ko`를 써서 다시 안 뜸). 서버 HTML에는 없다(마운트 뒤에만).
 
-- [ ] **Step 1: 실패하는 테스트** (`decide` 표: 쿠키 없음+US+en → `{setSuggest:true}`이고 redirect 없음; 쿠키 없음+KR → `{}`; 쿠키 없음+US+ko-KR 브라우저 → `{}`; `lang=en` + `/face2` → redirect `/en/face2`; `lang=en` + `/saju` → `{}`; `lang=ko` + `/en/animal` → redirect `/animal`; 쿠키 없음 + `/en/face2` → `{}`)
-- [ ] **Step 2: 실패 확인 → Step 3: 구현 → Step 4: `npm test` 통과**
-- [ ] **Step 5: 커밋** — `"영어판: 언어 감지(국가·브라우저 언어는 안내 띠만, 고른 언어만 이동), 영어로 보기 띠"`
+- [x] **Step 1: 실패하는 테스트** (`decide` 표: 쿠키 없음+US+en → `{setSuggest:true}`이고 redirect 없음; 쿠키 없음+KR → `{}`; 쿠키 없음+US+ko-KR 브라우저 → `{}`; `lang=en` + `/face2` → redirect `/en/face2`; `lang=en` + `/saju` → `{}`; `lang=ko` + `/en/animal` → redirect `/animal`; 쿠키 없음 + `/en/face2` → `{}`)
+- [x] **Step 2: 실패 확인 → Step 3: 구현 → Step 4: `npm test` 통과**
+- [x] **Step 5: 커밋** — `"영어판: 언어 감지(국가·브라우저 언어는 안내 띠만, 고른 언어만 이동), 영어로 보기 띠"`
 
 ---
 
