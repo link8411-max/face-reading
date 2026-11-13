@@ -283,8 +283,8 @@ test('일반 미리보기의 cast 매개변수는 허용 목록만', async () =>
 - Modify: `CLAUDE.md`(메뉴·메인 절, 디자인 시스템 절: 3탭, 홈 순서, cast, 움직임 규칙, no-motion)
 - Modify: `docs/superpowers/specs/2026-11-13-visual-revamp-design.md` 8절에 "2~4단계 반영" 한 줄
 
-- [ ] **Step 1: 진입·누름 클래스를 단다**(카드·버튼. 처음 6개까지만 지연)
+- [x] **Step 1: 진입·누름 클래스를 단다**(카드·버튼. 처음 6개까지만 지연)
 - [ ] **Step 2: 전체 확인** — `npm test && npm run test:e2e` → 기존 무관 실패 `buttons.spec.ts` 하나만 남는다
 - [ ] **Step 3: 스크린숏** — 390px에서 `/`(첫 화면과 전체), `/all`, `/today`, `/animal`(시작 화면 맨 아래 포함), `/face2/r/earth-mid`, `/fortune/daily?year=1990` 결과, 분석 중 화면 1장(`/animal`에서 `public/dev-faces`가 없으면 생략하고 이유를 적는다) → `test-results/stage2/`
-- [ ] **Step 4: CLAUDE.md·설계 문서 갱신 후 커밋** — `"움직임(진입·누름)과 문서 갱신"`
+- [x] **Step 4: CLAUDE.md·설계 문서 갱신 후 커밋** — `"움직임(진입·누름)과 문서 갱신"`
 - [ ] **Step 5: 보고** — 커밋 목록, 테스트 결과, 홈 높이(px), 스크린숏 경로, 계획과 달라진 점. push 금지.

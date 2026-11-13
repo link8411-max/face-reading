@@ -103,7 +103,7 @@ export async function GET(request: NextRequest) {
     (
       <div style={{ width: '100%', height: '100%', display: 'flex', backgroundColor: '#F7F8FC', padding: '48px' }}>
         <div style={{ position: 'relative', flex: 1, display: 'flex', alignItems: 'center', backgroundColor: '#FFFFFF', border: '3px solid #E1E6F5', borderRadius: '48px', padding: '56px 72px', overflow: 'hidden' }}>
-          <div style={{ display: 'flex', flexDirection: 'column', flex: 1, maxWidth: castImg ? '600px' : undefined }}>
+          <div style={{ display: 'flex', flexDirection: 'column', flex: 1, maxWidth: castImg ? '600px' : '100%' }}>
             <div style={{ display: 'flex', fontSize: '30px', color: '#2D55FF', fontWeight: 700 }}>운명을 읽다 · {label}</div>
             <div style={{ display: 'flex', fontSize: bigSize, fontWeight: 700, color: '#1A1B25', marginTop: '20px', lineHeight: 1.1 }}>{big}</div>
             {score ? <div style={{ display: 'flex', fontSize: '52px', fontWeight: 700, color: '#2D55FF', marginTop: '16px' }}>{score}</div> : null}

@@ -17,3 +17,6 @@ test('일반 미리보기의 cast 매개변수는 허용 목록만', async () =>
 test('두 미리보기 경로는 그림을 못 받아도 그릴 수 있다(받은 경우에만 그림을 쓴다)', () => {
   for (const f of ['src/app/api/og/route.tsx', 'src/app/api/og/result/route.tsx']) expect(readFileSync(f, 'utf8'), f).toContain('loadCastImage')
 })
+test('미리보기 스타일에 undefined 값이 없다(satori가 undefined.trim()으로 터진다)', () => {
+  for (const f of ['src/app/api/og/route.tsx', 'src/app/api/og/result/route.tsx']) expect(readFileSync(f, 'utf8'), f).not.toMatch(/\w+: [^,{}]*\? [^,{}]* : undefined/)
+})

@@ -105,7 +105,7 @@ export default function TestStart({
         type="button"
         onClick={onAnalyze}
         disabled={!ready}
-        className="mt-3 h-[52px] rounded-full bg-accent text-white text-[15px] font-medium disabled:opacity-45"
+        className="press mt-3 h-[52px] rounded-full bg-accent text-white text-[15px] font-medium disabled:opacity-45"
       >
         {label}
       </button>

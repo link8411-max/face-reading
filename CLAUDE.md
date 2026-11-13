@@ -45,6 +45,16 @@ npm run test:e2e     # E2E (next build 후 3200 포트): 전 페이지 로딩·�
 ### 아이콘·이모지
 - 이모지는 제목·버튼·링크·메뉴에 쓰지 않는다(E2E `chrome-emoji.spec.ts`). 아이콘은 `src/components/icons.tsx`의 `Icon`(선 굵기 1.6) 한 세트, 얼굴 그림은 `SmileFace`, 장식은 `MoonDeco`.
 
+### 캐릭터(2026-11-13, 개편 3단계)
+- 여섯: 해태(관상·홈 대표)·저승사자(사주·운세)·구미호(궁합·MBTI)·무당(부적)·백호(동물상)·도깨비(밈 능력고사·게임). 데이터와 주소 매핑은 `src/content/cast.ts`(`CAST`, `castForHref`). 그림은 `public/images/cast/<키>.webp`(640px)·`<키>-face.webp`(240px)·`<키>-og.png`(512px, 미리보기 이미지용). 이름·배경색: Haetae `#E7A93A`, Jeoseung Saja `#1E2752`, Gumiho `#E8704A`, Mudang `#C8372D`, Baekho `#A7B4C6`, Dokkaebi `#1F6B55`. 제미나이로 만든 그림이라 AI 표시를 지우지 않는다. 캐릭터 그림에는 `alt`("해태 캐릭터")와 크기를 넣는다.
+- 쓰는 곳: 홈 대표 카드·2열 카드·목록 썸네일, 분석 중 화면(`AnalyzingOverlay`), 결과 카드(`ResultCard cast=`: 관상 해태, 동물상은 동물 그림을 art로 두고 cast는 백호), 미리보기 이미지(`/api/og/result`는 `lib/ogCast.ts` `castForKind`: face 해태·animal 백호·saju 저승사자·mbti/mbti-daily/face-match/invite 구미호·exam 도깨비, 삼국지·부적·월드컵·일기토는 그대로. `/api/og?cast=`는 허용 목록만, 없으면 해태. 그림을 1.5초 안에 못 받으면 그림 없이 그린다), PWA·푸시 아이콘과 favicon(`scripts/make-push-icons.mjs`가 해태 얼굴에서 만든다). 삼국지 결과는 장수 초상화가 주인공이라 캐릭터를 넣지 않는다. 부적·일기토 화면 안쪽은 건드리지 않는다.
+
+### 움직임(개편 4단계) 규칙
+- CSS만 쓴다(`globals.css`). 전부 한 번 재생하고 멈추며(`animation-fill-mode: both`) 시작은 완전한 투명이 아니라 opacity .3부터다. 분석 중 화면의 `scan-beam`·`peek-cast`만 반복한다(테스트가 막는다). `prefers-reduced-motion: reduce`이면 전부 끈다.
+- 클래스: `.reveal-card`(결과 카드 원형 열림 .7초)·`.reveal-pop`(`--d` 지연 튀어나옴)·`.rise`(`--i`×60ms 지연으로 올라옴, 처음 6개까지만)·`.press`(눌림 0.96)·`.tab-pop`·`.tab-indicator`.
+- **결과 캡처는 움직임이 끝난 모습**: `lib/capture.ts` `withNoMotion`이 캡처 동안 `<html>`에 `no-motion`을 붙이고(두 프레임 기다림) 끝나면(실패해도) 뗀다. `.no-motion *`는 animation·transition을 끈다. `useScreenshot`의 캡처(미리 만드는 공유 이미지 포함)는 모두 이 안에서 찍는다. 움직임 때문에 새 결과 화면을 캡처하게 만들면 같은 훅을 쓸 것.
+- 분석 중 화면: `components/test/AnalyzingOverlay`(캐릭터·살펴보는 줄·단계 문구, 진행률 막대 없음, `useAnalyzeStep`). 동물상·삼국지·얼굴 궁합·우리 팀이 쓴다. 관상은 `RevealMotion`이 맡는다.
+
 ### 공통 구성요소
 - 테스트 시작: `components/test/TestHeader`(h1 = 페이지 이름), `TestStart`(성별 pill 필수 → 큰 사진 영역 → 안내 → 분석 버튼. 사진·성별 없으면 버튼 비활성). 관상 2판도 성별로 보정하므로 묻되, 사진을 고르면 추정해 미리 골라 둔다(아래 관상 2판 절). 고른 내 성별은 이 기기에만 기억해(`lib/genderMemory.ts`, `useRememberedGender`) 동물상·삼국지·얼굴 궁합 "나" 칸에 미리 고른다
 - 결과: `components/result/ResultCard`(캡처 한 장 완결, 워터마크 "운명을 읽다 · unse-ai.com"), `ResultActions`(1순위 공유하기, 이미지 저장, 다시하기)
@@ -129,8 +139,11 @@ public/
 ## 메뉴·메인 (4a)
 - 메뉴와 묶음은 `src/content/navigation.ts` 한 곳에서 정의한다(TABS, CATEGORIES, tabForPath). 홈 묶음 탭·허브(`/face-tests`, `/unse`)·하단 탭바·푸터가 모두 이걸 쓴다. 새 테스트를 추가하면 CATEGORIES에 항목을 넣는다.
 - 하단 탭바 `BottomTabBar`(모든 페이지, no-screenshot). 본문은 탭바 높이만큼 아래 여백이 있다.
-- 메인 순서(2026-11-07 개편 1단계, 설계 `docs/superpowers/specs/2026-11-07-site-revamp-design.md`): 관상 히어로(`FaceHero`, "내 관상 보러 가기") → 시즌 카드(`SeasonCard`, `src/content/season.ts`: 기본 카드 `SEASON`=평소 /saju, 12/1~1월 /fortune 신년운세로 교체 — 교체값은 파일 주석. **날짜로 바뀌는 카드**는 `seasonFor(now)`가 한국 시간으로 고른다: 지금~2026-11-20은 수능 합격 부적 카드(칩 `수능 D-n`·당일 `수능 D-DAY`·11/20 `수능 수고했어요`, CTA `/bujeok?mode=gift&wish=pass`), 11/21부터 `SEASON`. 홈이 정적이라 서버 HTML은 항상 `SEASON`이고 마운트 뒤 클라이언트에서 바꾸며 `onDayMaybeChanged`로 자정 넘김도 갱신한다. 360px 미만에서는 부제 두 줄 높이를 잡아 카드가 바뀌어도 아래가 밀리지 않는다(e2e 확인)) → 띠 칩(`ZodiacPicker`) → 친구랑 같이 해봐요(`PlayTogether`: 동물상·얼굴 궁합·MBTI 궁합·삼국지, 관상은 히어로와 겹쳐 뺌) → 쿠팡 배너 → 시즌 추천 → 묶음 탭 → FAQ. 홈 FAQ는 `src/content/homeFaq.ts`(화면·구조화 데이터 공용).
-- 하단 탭(다섯, 2026-11-11): 홈 / 관상(`/face-tests`) / 사주·운세(`/unse`) / 부적(`/bujeok`, 아이콘 `spark`) / 궁합(`/mbti`). `tabForPath`는 `/bujeok`과 그 아래 전부(`/bujeok/r/…`·`/bujeok/box`)에 `bujeok`을 돌려준다(사주·운세 탭이 아님). 부적은 /unse 허브 목록에도 그대로 있다. 5칸이 320px에서 한 줄에 들어가는지는 `e2e/tabbar.spec.ts`가 잰다(`whitespace-nowrap`).
+- **하단 탭은 셋(2026-11-13 개편 2단계)**: 홈 `/` / 전체 `/all` / 오늘 `/today`. `tabForPath`는 `/`→home, `/today`→today, 그 밖 전부→all(허브·테스트·부적 포함). 활성 탭 위 3px 막대(`bg-accent`)가 `left: calc(index*33.333%)`로 미끄러지고 활성 아이콘이 `tab-pop`으로 한 번 튄다. 3칸이 320px에서 한 줄에 들어가는지는 `e2e/tabbar.spec.ts`가 잰다.
+- `navigation.ts`의 모든 항목은 `tags`(face·fortune·match·play)와 선택 `daily`를 가진다(`META`). `ALL_ITEMS`(= CATEGORIES 항목 + FOOTER_EXTRA의 밈 능력고사)가 홈 카드·전체·오늘·`MoreTests`의 원본이다. 사진이 없는 항목의 썸네일은 `castForHref`로 맡은 캐릭터 얼굴(삼국지 항목은 초상화). 매일 바뀌는 항목은 오늘의 운세·오늘의 MBTI 운세·밈 능력고사 셋(테스트로 고정).
+- **홈 순서**(2026-11-13): 머리(h1) → 칩 줄(전체·얼굴·운세·궁합·게임, 클라이언트에서 카드만 거르기, 서버 HTML에는 모든 카드가 있고 `hidden`으로만 가림) → 대표 카드 `FaceHero`(해태) → 시즌 띠 `SeasonCard`(64px 한 줄, 내용·링크는 `season.ts` 그대로) → 카드 2열 `HomeGrid`(처음 8개: 관상·동물상·얼굴 궁합·오늘의 운세·부적·밈 능력고사·삼국지·사주) → 오늘 줄 `TodayRow` → 쿠팡 배너 → FAQ(`<details>` 하나). 390px 본문 높이 2,600px 이하를 E2E가 잰다. 띠 바로 고르기(`ZodiacPicker`)와 시즌 추천(`SeasonPicks`)은 `/today`로 옮겼다. `PlayTogether`·`CategoryTabs`는 없앴다.
+- `/all`(검색창 거르기, 서버 HTML에 전체 목록)·`/today`는 각자 제목·설명·canonical을 갖고 사이트맵에 있다. 허브 3곳(`/face-tests`·`/unse`·`/mbti`)은 소개 글 원본으로 남는다.
+- **다른 테스트 둘러보기**(`components/MoreTests`, `no-screenshot`): 사진 테스트 시작 화면(`TestStart` 맨 아래)과 관상·동물상·삼국지 결과의 `NextSteps` 아래. 검색으로 바로 들어온 사람이 탭바 말고도 다른 테스트로 가게 한다(현재 주소를 뺀 `ALL_ITEMS` 앞 4개 + "전체 보기").
 - 허브 순서: 관상·얼굴 테스트 = [관상·동물상] 내 관상 풀이 → 동물상, [삼국지로 보는 얼굴] 닮은꼴 → 우리 팀 → 월드컵 → 열전 → 영상 → 일기토. 사주·운세 = 내 사주 풀이 → 신년운세 → 띠별 → 오늘의 운세, [MBTI] 오늘의 MBTI 운세. 궁합·MBTI = 얼굴 궁합 → MBTI 궁합 계산기 → MBTI 유형별 풀이(오늘의 MBTI 운세는 사주·운세에만).
 - 푸터는 같은 데이터를 쓰되 `footer: false` 항목은 뺀다(삼국지는 닮은꼴·열전만 푸터에).
 - 결과 사이 연결: `NEXT_BY_TEST`(navigation.ts, 같은 줄기 1 + 다른 줄기 1) → `components/result/NextSteps`("이어서 보면 좋아요"). 사주·신년운세·띠별 글·오늘의 운세·관상·동물상·삼국지·MBTI 유형·MBTI 궁합 계산기에 붙어 있다. 사진 결과에서는 같은 사진 칸을 `NextTests`가 맡으므로 NextSteps는 다른 줄기만 보인다(`withPhoto`). GA `next_test_click(test_name=간 곳)`. 생년월일 넘기기는 사주·신년운세 결과의 부적 카드 하나뿐이다(`handOffBirth`, 메모리로만 전달; 나머지는 링크만). `NEXT_BY_TEST`의 saju·fortune은 이제 서로 대신 부적으로 이어진다.
@@ -155,7 +168,7 @@ public/
 ## 오늘의 운세 (일진 엔진)
 - 계산: 내 년주(60갑자) × 오늘 일진의 천간 합·충·생극 + 지지 육합·삼합·형·충 → 별점·한마디·근거·영역 4(재물·연애·일·건강)·행운 색/시간/방향. 결정적 순수 함수.
 - 파일: `src/lib/dailyEngine/{relations,index,format}.ts`, 문장 `src/content/dailyFortuneText.ts`(조사는 `lib/josa.ts`), 설계 `docs/superpowers/specs/2026-11-05-daily-fortune-engine-design.md`.
-- 날짜는 `kstDate` 기준이고 브라우저에서는 마운트 뒤 계산(정적 HTML의 어제 방지). 띠 모드(홈 `ZodiacPicker`)는 일간 오행 × 띠 오행으로 계산한다.
+- 날짜는 `kstDate` 기준이고 브라우저에서는 마운트 뒤 계산(정적 HTML의 어제 방지). 띠 모드(오늘 탭 `ZodiacPicker`)는 일간 오행 × 띠 오행으로 계산한다.
 - `/fortune/daily?year=1990&early=1` 딥링크는 읽은 뒤 `year`/`early`만 주소에서 지운다(utm은 유지).
 - 생년은 GA·공유·저장 이미지에 넣지 않는다. 캡처 제목은 "경오년 말띠".
 - 테스트 `npx vitest run tests/dailyEngine`(60×60 분포 고정). 홈 번들에 `fortuneDB`·`DailyFortuneCard`를 넣지 않는다(stage4a 테스트).
@@ -212,7 +225,7 @@ public/
   - 결과 공유 `/face-match/r/[a]-[b]?rel=`. 궁합 탭(`tabForPath`) 소속.
 - **우리 팀 삼국지** `/samguk/team`: 2~6명, 역할(군주→책사→선봉장→살림꾼, 한 사람 한 역할, 동점은 먼저 올린 사람), 팀의 기운(기타 최다=군웅할거, 위·촉·오 동수 최다=천하삼분), 팀 funStats 평균(`lib/samguk/team.ts`).
   - 별칭은 화면·저장 이미지에만, 공유 링크 `/samguk/team/r/[id-id-…]`와 GA에는 넣지 않는다.
-- 진입점: 동물상 결과 "친구 얼굴이랑 궁합"(`ResultActions` companion), 삼국지 결과 "우리 팀 삼국지 만들기"(lead), 홈 "친구랑 같이 해봐요" 4번째 칸, 궁합 허브.
+- 진입점: 동물상 결과 "친구 얼굴이랑 궁합"(`ResultActions` companion), 삼국지 결과 "우리 팀 삼국지 만들기"(lead), 홈 카드 2열·전체 탭, 궁합 허브.
 
 ## 시즌 추천 (쿠팡 파트너스)
 - `src/content/coupangSeasons.ts`에 시즌(시작·끝 날짜 KST, 링크)을 넣으면 `SeasonPicks` 카드가 기간에만 보이고 끝나면 숨는다. 지금은 2027학년도 수능(2026-11-19) 합격 선물, 11/20까지.
@@ -512,7 +525,7 @@ GA: `test_name=bujeok`, `result_view`·`shared_landing`의 `result_id`는 `<화�
 - 설계: `docs/superpowers/specs/2026-11-11-meme-exam-design.md`, 계획: `docs/superpowers/plans/2026-11-12-meme-exam.md`. 또래 비교·상위 %·응시자 수는 다음 계획(문제별 정답률은 아래 서버 집계 줄).
 - 구조: 말 카드 `src/content/exam/meme-cards.json`(원본) → 얼린 회차 `src/content/exam/meme-rounds.json`(**뒤에 덧붙이기만**, 대결 링크가 옛 회차를 가리킨다) → 화면 `src/components/exam/ExamGame`(시작→문제→해설→채점→성적표 상태 기계). 순수 함수는 `src/lib/exam/`: `rounds.ts`(회차 만들기·뱃지·`EXAM_EPOCH`·오늘 회차 고르기), `score.ts`(점수·등급·별명), `link.ts`(대결 링크 `/exam/meme/r/<회차>-<OX 5글자>-<점수>-<등급>[h]`), `memory.ts`(기기 저장: 오늘 성적표·연속 응시, 저장소를 못 써도 던지지 않음).
 - 회차 늘리기: 새 말을 승인하면 카드 한 장을 쓰고 `npx tsx --tsconfig tsconfig.json scripts/exam/make-rounds.ts --add=14`(`--print`는 저장 없이 출력). 이미 있는 회차는 다시 만들지 않는다. 오늘 회차 번호가 얼린 회차 수를 넘으면 마지막 회차를 다시 연다(그때부터 날마다 같은 문제이므로 **출시 전·후로 회차를 넉넉히 미리 만들어 둔다**). `EXAM_EPOCH`(1회차 날짜, 지금 2026-11-16)는 실제 출시 날에 맞춰 한 번만 고친다.
-- 페이지: `/exam`(→ `/exam/meme` 리디렉션), `/exam/meme`, `/exam/meme/r/[code]`(공유 착지: noindex·canonical `/exam/meme`·사이트맵 제외, 잘못된 코드는 일반 시작 화면). 미리보기 `/api/og/result?kind=exam&grade=&correct=`. 홈 '친구랑 같이 해봐요' 카드와 푸터(`FOOTER_EXTRA`)에서 들어온다.
+- 페이지: `/exam`(→ `/exam/meme` 리디렉션), `/exam/meme`, `/exam/meme/r/[code]`(공유 착지: noindex·canonical `/exam/meme`·사이트맵 제외, 잘못된 코드는 일반 시작 화면). 미리보기 `/api/og/result?kind=exam&grade=&correct=`. 홈 카드·오늘 줄·전체·오늘 탭과 푸터(`FOOTER_EXTRA`)에서 들어온다.
 - 서버 집계(2026-11-11): 판이 끝나면 `POST /api/exam/play`(회차·정오 5칸·점수·등급만) → Supabase `exam_plays`(`docs/exam-plays.sql`). 기기 판별은 서명 쿠키 `xd`(Path `/api/exam`), IP당 10분 30건(`lib/exam/serverRound.ts`). 판을 시작할 때 `GET /api/exam/rates?round=`로 문제별 집계를 읽어, 응시 30명(`MIN_SOLVERS`, `lib/exam/stats.ts`) 이상인 문제만 해설에 `푼 사람의 N%가 맞혔어요`. 환경변수는 열전과 같고 없거나 실패하면 숫자 칸만 숨는다.
 - GA: `exam_start(result_id=meme)`, `exam_end(result_id=meme_g<등급>)`, 공유 `share_click(test_name=exam)`, 착지 `shared_landing`. 문제별 정오·태어난 해는 보내지 않는다.
 - 규칙: 해설은 카드의 `meaning`·`usage`·`origin`을 그대로 보여 준다(화면에서 문장을 짓지 않는다). 등급 표는 출시 뒤 바꾸지 않는다. 진행 중인 판은 시작한 회차로 끝난다(자정을 넘겨도). 문제마다 제한 시간이 다르다(`timeLimitMs`: 5초 + 읽을 글자×0.11초, 10~25초), 힌트는 한 판에 한 번(오답 둘 흐림, 그 문제 가산점 0). 테스트 `npx vitest run tests/exam`, E2E `e2e/exam.spec.ts`.
