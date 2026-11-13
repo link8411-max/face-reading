@@ -41,7 +41,8 @@ export function castForHref(href: string): CastKey | null {
   if (p === '/face-match' || under(p, '/mbti')) return 'gumiho'
   if (p === '/fortune/mbti') return 'gumiho'
   if (p === '/fortune/daily' || p === '/today') return 'sajaF'
-  if (p === '/fortune' || under(p, '/fortune/2027')) return 'sajaElder'
+  if (p === '/fortune') return 'sajaElder'
+  if (under(p, '/fortune/2027')) return 'baksu' // 띠별: 신년운세(선배)와 같은 그림이 홈 운세 칩에 두 번 나오지 않게
   if (p === '/saju' || p === '/unse' || under(p, '/fortune')) return 'saja'
   if (under(p, '/bujeok')) return 'mudang'
   if (under(p, '/exam') || under(p, '/samguk/cup') || under(p, '/samguk/duel')) return 'dokkaebi'
