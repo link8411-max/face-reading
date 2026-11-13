@@ -48,7 +48,7 @@
   - `CAST: Record<CastKey, { name: string; en: string; bg: string; role: string; img: string; face: string; og: string }>` (role은 "관상을 맡아요" 같은 한 줄, 영어판은 뒤 단계)
   - `castForHref(href: string): CastKey | null` — `/face2`→haetae, `/animal`→tiger, `/face-match`→gumiho, `/saju`·`/fortune`(하위 전부)·`/unse`→saja, `/bujeok`→mudang, `/exam`(하위)·`/samguk/cup`·`/samguk/duel`→dokkaebi, `/mbti`(하위)→gumiho, `/face-tests`→haetae. 그 밖(삼국지 닮은꼴·열전 등)은 null.
 
-- [ ] **Step 1: 실패하는 테스트**
+- [x] **Step 1: 실패하는 테스트**
 
 ```ts
 import { existsSync } from 'node:fs'
@@ -66,10 +66,10 @@ test('테스트 주소에 맞는 캐릭터', () => {
 })
 ```
 
-- [ ] **Step 2: 실패 확인** — `npx vitest run tests/cast.test.ts` → FAIL(모듈 없음)
-- [ ] **Step 3: `src/content/cast.ts` 작성** (값은 Global Constraints. 경로는 `/images/cast/<key>.webp` 형식. 쿼리·해시는 떼고 비교)
-- [ ] **Step 4: 통과 확인** — `npm test` → PASS
-- [ ] **Step 5: 커밋** — `git add src/content/cast.ts tests/cast.test.ts public/images/cast && git commit -m "캐릭터 여섯 데이터와 그림(해태·저승사자·구미호·무당·백호·도깨비)"`
+- [x] **Step 2: 실패 확인** — `npx vitest run tests/cast.test.ts` → FAIL(모듈 없음)
+- [x] **Step 3: `src/content/cast.ts` 작성** (값은 Global Constraints. 경로는 `/images/cast/<key>.webp` 형식. 쿼리·해시는 떼고 비교)
+- [x] **Step 4: 통과 확인** — `npm test` → PASS
+- [x] **Step 5: 커밋** — `git add src/content/cast.ts tests/cast.test.ts public/images/cast && git commit -m "캐릭터 여섯 데이터와 그림(해태·저승사자·구미호·무당·백호·도깨비)"`
 
 ---
 
