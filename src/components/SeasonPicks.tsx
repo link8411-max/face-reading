@@ -20,7 +20,7 @@ export default function SeasonPicks({ slot }: { slot: string }) {
 export function SeasonPicksView({ season, headline, slot }: { season: CoupangSeason; headline: string; slot: string }) {
   return (
     <section aria-label={season.title} className="no-screenshot bg-card-2 rounded-[22px] p-4">
-      <p className="text-xs font-medium text-accent">{headline}</p>
+      <p className="text-xs font-medium text-accent-ink">{headline}</p>
       <h2 className="font-serif font-bold text-[17px] mt-1">{season.title}</h2>
       <div className="flex flex-wrap gap-2 mt-3">
         {season.links.map((l) => (
@@ -30,7 +30,7 @@ export function SeasonPicksView({ season, headline, slot }: { season: CoupangSea
             target="_blank"
             rel="sponsored noopener"
             onClick={() => track("coupang_click", { slot, keyword: l.key })}
-            className="h-10 px-4 rounded-full bg-white border border-line text-sm grid place-items-center"
+            className="h-10 px-4 rounded-full bg-card border border-line text-sm grid place-items-center"
           >
             {l.label}
           </a>

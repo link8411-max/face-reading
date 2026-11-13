@@ -31,7 +31,7 @@ export default function RelatedVideosRow({ items }: { items: RelatedVideo[] }) {
                 </span>
               </span>
               <span className="text-[13px] font-bold leading-snug text-ink">{i.video.title}</span>
-              <VideoBadgeText video={i.video} className="text-[11px] text-muted" newClassName="text-[11px] font-bold text-accent" />
+              <VideoBadgeText video={i.video} className="text-[11px] text-muted" newClassName="text-[11px] font-bold text-accent-ink" />
             </Link>
           )
         })}

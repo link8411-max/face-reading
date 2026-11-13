@@ -37,9 +37,9 @@ export default function PageGuide({ route, locale = "ko" }: { route: GuideRoute 
             <h3 className="font-serif font-bold text-lg mb-3">{s.heading}</h3>
             <ul className="grid grid-cols-1 sm:grid-cols-2 gap-2">
               {s.items.map((it) => (
-                <li key={it.title} className="bg-white rounded-[18px] border border-line px-4 py-3">
+                <li key={it.title} className="bg-card rounded-[18px] border border-line px-4 py-3">
                   {it.href ? (
-                    <Link href={it.href} className="font-bold hover:text-accent">{it.title}</Link>
+                    <Link href={it.href} className="font-bold hover:text-accent-ink">{it.title}</Link>
                   ) : (
                     <p className="font-bold">{it.title}</p>
                   )}
@@ -51,7 +51,7 @@ export default function PageGuide({ route, locale = "ko" }: { route: GuideRoute 
         ))}
 
         {/* 본문은 접어 두되 HTML에는 남겨 검색엔진이 읽게 한다 */}
-        <details className="group bg-white rounded-[22px] border border-line px-5 py-4">
+        <details className="group bg-card rounded-[22px] border border-line px-5 py-4">
           <summary className="font-bold cursor-pointer list-none flex justify-between items-center">
             {t(locale, "guide.more")}
             <span className="transition group-open:rotate-180" aria-hidden>▾</span>
@@ -73,7 +73,7 @@ export default function PageGuide({ route, locale = "ko" }: { route: GuideRoute 
           <h3 className="font-serif font-bold text-lg mb-3">{t(locale, "guide.faq")}</h3>
           <div className="space-y-2">
             {guide.faqs.map((f) => (
-              <details key={f.q} className="bg-white rounded-[18px] border border-line px-4 py-3">
+              <details key={f.q} className="bg-card rounded-[18px] border border-line px-4 py-3">
                 <summary className="font-medium cursor-pointer">{f.q}</summary>
                 <p className="mt-2 leading-relaxed">{f.a}</p>
               </details>
@@ -88,7 +88,7 @@ export default function PageGuide({ route, locale = "ko" }: { route: GuideRoute 
               <Link
                 key={r}
                 href={localePath(locale, r)}
-                className="bg-white rounded-full border border-line px-5 py-3 font-medium hover:border-accent/50 transition"
+                className="bg-card rounded-full border border-line px-5 py-3 font-medium hover:border-accent/50 transition"
               >
                 {labelOf(r)}
               </Link>

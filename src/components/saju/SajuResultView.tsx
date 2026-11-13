@@ -35,46 +35,46 @@ export default function SajuResultView({ result, captureRef, actions, after, bir
 
       <section ref={captureRef} className="bg-card border border-line rounded-[30px] p-4 space-y-3">
         {birthLine && <p className="no-screenshot text-center text-sm text-muted">{birthLine}</p>}
-        <div className="bg-white rounded-[22px] border border-line p-4">
+        <div className="bg-card rounded-[22px] border border-line p-4">
           <SajuTable pillars={result.pillars} />
         </div>
 
-        <div className="bg-white rounded-[22px] border border-line px-5 py-4">
+        <div className="bg-card rounded-[22px] border border-line px-5 py-4">
           <h2 className="font-serif font-bold text-[24px] leading-snug break-keep">{dm.title}</h2>
           <p className="mt-2 text-sm leading-relaxed">{dm.text}</p>
           <p className="mt-1.5 text-[11px] text-muted">{dm.basis}</p>
         </div>
 
-        <div className="bg-white rounded-[22px] border border-line px-5 py-4">
+        <div className="bg-card rounded-[22px] border border-line px-5 py-4">
           <h3 className="font-serif font-bold text-base mb-3">연애·일·돈·사람으로 보면</h3>
           <AreaLines tenGods={result.tenGods} />
         </div>
 
-        <div className="bg-white rounded-[22px] border border-line px-5 py-4">
+        <div className="bg-card rounded-[22px] border border-line px-5 py-4">
           <h3 className="font-serif font-bold text-base mb-3">다섯 기운</h3>
           <ElementBars elements={result.elements} />
         </div>
 
-        <div className="bg-white rounded-[22px] border border-line px-5 py-4">
+        <div className="bg-card rounded-[22px] border border-line px-5 py-4">
           <h3 className="font-serif font-bold text-base mb-3">{result.tenGods.tied ? TEN_GOD_TIED.heading : "내 사주에서 제일 센 것 두 가지"}</h3>
           <TenGodSummary tenGods={result.tenGods} />
         </div>
 
         {result.daeun.length > 0 && (
-          <div className="bg-white rounded-[22px] border border-line px-4 py-4">
+          <div className="bg-card rounded-[22px] border border-line px-4 py-4">
             <h3 className="font-serif font-bold text-base mb-3 px-1">지금 10년의 흐름</h3>
             <DaeunTimeline daeun={result.daeun} dayStem={result.dayMaster.stem} />
           </div>
         )}
 
-        <div className="bg-white rounded-[22px] border border-line px-5 py-4">
+        <div className="bg-card rounded-[22px] border border-line px-5 py-4">
           <SeunCard seun={result.seun} dayBranch={result.pillars.day.branch} />
         </div>
 
         <div className="no-screenshot bg-card-2 rounded-[22px] px-5 py-4">
           <h3 className="font-serif font-bold text-base">조심할 점 하나</h3>
           <p className="mt-2 text-sm leading-relaxed">{caution.situation}</p>
-          <p className="mt-1.5 text-sm leading-relaxed text-accent">{caution.action}</p>
+          <p className="mt-1.5 text-sm leading-relaxed text-accent-ink">{caution.action}</p>
           <p className="mt-2 text-[11px] text-muted">{caution.basis}</p>
         </div>
 

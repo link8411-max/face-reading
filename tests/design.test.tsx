@@ -30,8 +30,8 @@ test('본문·제목 글꼴 변수는 둘 다 Pretendard', () => {
 })
 
 const TOKENS: [string, string][] = [
-  ['paper', '#F7F8FC'], ['card', '#FFFFFF'], ['card-2', '#EEF1FA'], ['line', '#E1E6F5'],
-  ['ink', '#1A1B25'], ['muted', '#5E6070'], ['accent', '#2D55FF'], ['lime', '#C6F24E'], ['blush', '#E9BCA8'],
+  ['paper', '#0B1026'], ['card', '#141A36'], ['card-2', '#1B2246'], ['line', '#2A3360'],
+  ['ink', '#EEF0FA'], ['muted', '#A3A9C6'], ['accent', '#3E5BFF'], ['accent-ink', '#9DB2FF'], ['lime', '#C6F24E'], ['blush', '#E9BCA8'],
   ['navy-game', '#23263A'], ['gold-game', '#E8B547'],
   ['bujeok-paper', '#E6C35C'], ['bujeok-jusa', '#B3261E'], ['bujeok-cute-paper', '#FFFAF2'], ['bujeok-cute-ink', '#5B4037'],
 ]
@@ -48,8 +48,22 @@ const lum = (hex: string) => {
 const contrast = (a: string, b: string) => { const [x, y] = [lum(a), lum(b)].sort((m, n) => n - m); return (x + 0.05) / (y + 0.05) }
 const hex = (n: string) => TOKENS.find(([k]) => k === n)![1]
 
-test.each([['muted', 'card'], ['ink', 'card'], ['paper', 'ink'], ['accent', 'paper'], ['muted', 'paper'], ['accent', 'card-2'], ['muted', 'card-2']])('%s on %s 대비 4.5 이상', (fg, bg) => {
+test.each([['ink', 'paper'], ['ink', 'card'], ['muted', 'paper'], ['muted', 'card'], ['muted', 'card-2'], ['accent-ink', 'paper'], ['accent-ink', 'card'], ['accent-ink', 'card-2'], ['paper', 'lime']])('%s on %s 대비 4.5 이상', (fg, bg) => {
   expect(contrast(hex(fg), hex(bg))).toBeGreaterThanOrEqual(4.5)
+})
+
+test('흰 상자를 박아 두지 않는다(어두운 화면)', () => {
+  const { execSync } = require('node:child_process')
+  // 부적 그림 조각(parts), 부적 팔레트, 미리보기 이미지(api/og)는 제외
+  const hits = execSync("grep -rlE 'bg-white([^/]|$)|text-black|#fff\\b|#ffffff' src/components src/app || true", { encoding: 'utf8' }).trim().split('\n').filter(Boolean)
+    .filter((f: string) => !/bujeok\/parts|api\/og/.test(f))
+  expect(hits).toEqual([])
+})
+
+test('포인트 글자는 text-accent-ink (text-accent는 어두운 바탕에서 대비 부족)', () => {
+  const { execSync } = require('node:child_process')
+  const hits = execSync("grep -rnE '(^|[^a-z-])text-accent([^-a-z]|$)' src || true", { encoding: 'utf8' }).trim()
+  expect(hits).toBe('')
 })
 
 test('주 버튼 흰 글씨가 포인트색 위에서 대비 4.5 이상', () => {
@@ -97,9 +111,9 @@ test('임시 별칭 토큰(vermilion·gold·navy·paper-2)이 없다', () => {
   expect(files.filter((f) => re.test(read(f, 'utf8')))).toEqual([])
 })
 
-test('포인트색 작은 글씨가 카드 위에서도 대비 4.5 이상 (리뷰)', () => {
-  expect(contrast(hex('accent'), hex('card'))).toBeGreaterThanOrEqual(4.5)
-  expect(contrast(hex('accent'), hex('card-2'))).toBeGreaterThanOrEqual(4.5)
+test('포인트 글자색(accent-ink)이 카드 위에서도 대비 4.5 이상 (리뷰)', () => {
+  expect(contrast(hex('accent-ink'), hex('card'))).toBeGreaterThanOrEqual(4.5)
+  expect(contrast(hex('accent-ink'), hex('card-2'))).toBeGreaterThanOrEqual(4.5)
 })
 
 test('먹빛 부적 화면의 주 버튼은 금색 규칙(.bj-dark .bg-ink.text-paper)을 쓴다 — bg-accent는 먹빛에서 연살구라 흰 글씨가 안 보인다', () => {

@@ -17,11 +17,11 @@ export default function FaceMatchCard({ a, b, rel, result, captureRef }: { a: An
   const animal = (k: AnimalKey) => (en && names ? names[k].name : animalTypeDB[k].name);
   return (
     <article ref={captureRef} className="relative overflow-hidden bg-card border border-line rounded-[30px] px-[22px] pt-6 pb-5 flex flex-col text-ink">
-      <p className="text-xs font-medium text-accent">{relName[rel]} {t("fm.cardSuffix")}</p>
+      <p className="text-xs font-medium text-accent-ink">{relName[rel]} {t("fm.cardSuffix")}</p>
       <p className="font-serif font-bold text-[22px] mt-2 break-keep">
         {animal(a)} <span className="text-muted font-normal">×</span> {animal(b)}
       </p>
-      <h2 className="font-serif font-bold text-[30px] leading-[1.3] mt-3 text-accent break-keep">{result.headline}</h2>
+      <h2 className="font-serif font-bold text-[30px] leading-[1.3] mt-3 text-accent-ink break-keep">{result.headline}</h2>
       <p className="self-start mt-2 text-sm font-medium px-3 py-1 rounded-full bg-card-2">{result.label}</p>
       <div className="bg-card-2 rounded-[18px] mt-4 px-4 py-3.5 flex flex-col gap-2 text-[13px] leading-relaxed">
         {result.lines.map((l) => <p key={l}>{l}</p>)}

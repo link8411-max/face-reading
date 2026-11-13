@@ -46,15 +46,15 @@ export default function ResultVideoBlock({
           >
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img src={thumbUrl(v.id)} alt={`${name} 영상 썸네일`} width={112} height={199} loading="lazy" className="h-full w-full object-cover" />
-            <span className="pointer-events-none absolute left-1/2 top-1/2 flex h-11 w-11 -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-full bg-ink/80">
-              <svg width="18" height="18" viewBox="0 0 24 24" aria-hidden="true" className="text-paper"><path d="M8 5v14l11-7z" fill="currentColor" /></svg>
+            <span className="pointer-events-none absolute left-1/2 top-1/2 flex h-11 w-11 -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-full bg-paper/80">
+              <svg width="18" height="18" viewBox="0 0 24 24" aria-hidden="true" className="text-ink"><path d="M8 5v14l11-7z" fill="currentColor" /></svg>
             </span>
           </a>
           <div className="flex min-w-0 flex-col justify-between gap-2">
             <div className="flex flex-col gap-1.5">
-              <span className="text-xs font-bold text-accent">{who} 장수 이야기, 1분 영상</span>
+              <span className="text-xs font-bold text-accent-ink">{who} 장수 이야기, 1분 영상</span>
               <span className="font-serif text-[17px] font-bold leading-snug">{v.title}</span>
-              <VideoBadgeText video={v} className="text-xs text-muted" newClassName="text-xs font-bold text-accent" />
+              <VideoBadgeText video={v} className="text-xs text-muted" newClassName="text-xs font-bold text-accent-ink" />
             </div>
             <a
               href={`/samguk/videos?v=${v.id}`}
@@ -67,7 +67,7 @@ export default function ResultVideoBlock({
         </section>
       )}
       {faces.length > 0 && (
-        <section className="flex flex-col gap-2.5 rounded-[22px] border border-line bg-white p-3.5">
+        <section className="flex flex-col gap-2.5 rounded-[22px] border border-line bg-card p-3.5">
           <div className="flex items-baseline justify-between">
             <span className="font-serif text-base font-bold">{who} 장수와 엮인 장수들</span>
             {personId && PEOPLE_WITH_PAGE.has(personId) && (

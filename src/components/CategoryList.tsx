@@ -14,7 +14,7 @@ export default function CategoryList({ items, hidden }: { items: CategoryItem[];
           <li className={i > 0 ? "mt-3" : undefined}><h3 className="text-[13px] font-medium text-muted px-1">{item.group}</h3></li>
         )}
         <li hidden={hidden?.(item) || undefined} className={i < 6 ? "rise" : undefined} style={i < 6 ? ({ "--i": i } as React.CSSProperties) : undefined}>
-          <Link href={item.href} className="press flex gap-3 items-center bg-white border border-line rounded-[22px] p-2.5 hover:border-accent/50 transition">
+          <Link href={item.href} className="press flex gap-3 items-center bg-card border border-line rounded-[22px] p-2.5 hover:border-accent/50 transition">
             {item.thumb.image && item.thumb.alt ? (
               // 캐릭터 얼굴: 이미지 검색에 잡히도록 alt와 크기를 둔다
               <img src={item.thumb.image} alt={item.thumb.alt} width={64} height={64} loading="lazy" decoding="async" className="w-16 h-16 flex-none rounded-2xl object-cover" style={{ background: item.thumb.bg }} />
@@ -30,7 +30,7 @@ export default function CategoryList({ items, hidden }: { items: CategoryItem[];
             <span className="flex-1 min-w-0">
               <span className="block font-bold text-[15px] text-ink">{item.title}</span>
               <span className="block text-xs text-muted mt-0.5 mb-1.5">{item.desc}</span>
-              {item.chip && <span className="inline-block text-[11px] font-bold px-2 py-0.5 rounded-full bg-card-2 text-accent">{item.chip}</span>}
+              {item.chip && <span className="inline-block text-[11px] font-bold px-2 py-0.5 rounded-full bg-card-2 text-accent-ink">{item.chip}</span>}
             </span>
             <Icon name="chevron" size={18} className="text-muted mr-1 flex-none" />
           </Link>

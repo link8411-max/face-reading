@@ -67,7 +67,7 @@ export default function PeopleBrowser({ cards, afterMap }: { cards: HubCard[]; a
               type="button"
               aria-pressed={filter === f}
               onClick={() => choose(f)}
-              className={`h-11 px-4 rounded-full border text-sm font-medium transition ${filter === f ? "bg-ink text-paper border-ink" : "bg-white text-ink border-line hover:border-accent/50"}`}
+              className={`h-11 px-4 rounded-full border text-sm font-medium transition ${filter === f ? "bg-ink text-paper border-ink" : "bg-card text-ink border-line hover:border-accent/50"}`}
             >
               {FILTER_LABEL[f]} <span className={filter === f ? "text-paper/80" : "text-muted"}>{counts[f] ?? 0}</span>
             </button>
@@ -90,14 +90,14 @@ export default function PeopleBrowser({ cards, afterMap }: { cards: HubCard[]; a
             onChange={(e) => setQuery(e.target.value)}
             placeholder="이름이나 자로 찾기 (예: 하후, 운장)"
             autoComplete="off"
-            className="w-full h-12 rounded-full border border-line bg-white px-5 text-base outline-none focus:border-accent"
+            className="w-full h-12 rounded-full border border-line bg-card px-5 text-base outline-none focus:border-accent"
           />
         </label>
         {searching && total === 0 && <p className="mt-4 text-sm text-muted" role="status">찾는 인물이 아직 없어요</p>}
         <ul className="mt-4 grid grid-cols-2 gap-3">
           {cards.map((c) => (
             <li key={c.id} data-person={c.id} className={shown.has(c.id) ? "" : "hidden"}>
-              <Link href={`/samguk/people/${c.id}`} prefetch={false} className="block h-full overflow-hidden rounded-[22px] border border-line bg-white transition hover:border-accent/50">
+              <Link href={`/samguk/people/${c.id}`} prefetch={false} className="block h-full overflow-hidden rounded-[22px] border border-line bg-card transition hover:border-accent/50">
                 <Portrait card={c} className="w-full aspect-[4/5] h-auto" width={160} height={200} />
                 <span className="block px-3 pt-2.5 pb-3.5">
                   <span className="block font-serif font-bold break-keep">{c.name}</span>
@@ -108,7 +108,7 @@ export default function PeopleBrowser({ cards, afterMap }: { cards: HubCard[]; a
           ))}
         </ul>
         {canMore && (
-          <button type="button" onClick={() => setExpanded(true)} className="mt-4 w-full h-12 rounded-full border border-line bg-white text-sm font-medium hover:border-accent/50">
+          <button type="button" onClick={() => setExpanded(true)} className="mt-4 w-full h-12 rounded-full border border-line bg-card text-sm font-medium hover:border-accent/50">
             더 보기 ({total - FIRST_PAGE}명)
           </button>
         )}
@@ -116,8 +116,8 @@ export default function PeopleBrowser({ cards, afterMap }: { cards: HubCard[]; a
 
       {today && (
         <section aria-label="오늘의 인물" className="mt-8">
-          <div className="rounded-[22px] border border-line bg-white p-4">
-            <p className="text-xs font-bold text-accent">오늘의 인물</p>
+          <div className="rounded-[22px] border border-line bg-card p-4">
+            <p className="text-xs font-bold text-accent-ink">오늘의 인물</p>
             <div className="mt-2 flex gap-4">
               <Portrait card={today} className="w-[72px] h-[90px] rounded-xl flex-none" width={72} height={90} />
               <div className="min-w-0">

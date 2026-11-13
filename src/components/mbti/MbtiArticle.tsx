@@ -7,8 +7,8 @@ import MonthlyFortune from "@/components/mbti/MonthlyFortune";
 import { mbtiOgPath, mbtiProfiles, mbtiUrl, monthlyFor } from "@/content/mbtiTypes";
 import { MBTI_TYPES, bestMatches, compatSummary, type MbtiType } from "@/lib/mbti/compat";
 
-const card = "bg-white border border-line rounded-3xl p-5";
-const h2 = "font-bold text-lg text-accent mb-2";
+const card = "bg-card border border-line rounded-3xl p-5";
+const h2 = "font-bold text-lg text-accent-ink mb-2";
 
 export function mbtiFaqs(type: MbtiType) {
   const p = mbtiProfiles[type];
@@ -42,10 +42,10 @@ export default function MbtiArticle({ type }: { type: MbtiType }) {
       <nav className="text-sm text-muted"><Link href="/">홈</Link> › <Link href="/mbti">MBTI</Link> › {type}</nav>
       <p className="text-sm text-muted text-center"><Link href="/face2" className="underline underline-offset-2">내 얼굴은 무슨 상일까?</Link> 사진 한 장으로 확인해 보세요</p>
       <header className="text-center">
-        <p className="text-sm font-bold text-accent">{p.nickname}</p>
+        <p className="text-sm font-bold text-accent-ink">{p.nickname}</p>
         <h1 className="font-serif text-4xl font-bold mt-1">{type}</h1>
         <div className="flex flex-wrap justify-center gap-1.5 mt-3">
-          {p.strengths.map((s) => <span key={s} className="text-xs font-bold px-2.5 py-1 rounded-full bg-accent/10 text-accent">{s}</span>)}
+          {p.strengths.map((s) => <span key={s} className="text-xs font-bold px-2.5 py-1 rounded-full bg-accent/10 text-accent-ink">{s}</span>)}
         </div>
       </header>
 
@@ -56,7 +56,7 @@ export default function MbtiArticle({ type }: { type: MbtiType }) {
           <li><b>어울리는 직업</b> · {p.jobs.slice(0, 3).map((j) => j.title).join(", ")}</li>
           <li><b>잘 맞는 여행지</b> · {p.travel.domestic[0].place}, {p.travel.abroad[0].place}</li>
         </ul>
-        <Link href={`/fortune/mbti?t=${slug}`} className="mt-3 inline-block text-sm text-accent underline underline-offset-2">오늘의 {type} 운세 보기</Link>
+        <Link href={`/fortune/mbti?t=${slug}`} className="mt-3 inline-block text-sm text-accent-ink underline underline-offset-2">오늘의 {type} 운세 보기</Link>
       </section>
 
       <section className={card}><h2 className={h2}>{type}는 이런 사람</h2><p className="leading-relaxed">{p.summary}</p></section>
@@ -68,7 +68,7 @@ export default function MbtiArticle({ type }: { type: MbtiType }) {
             const s = compatSummary(type, b);
             return (
               <div key={b} className="rounded-2xl bg-paper p-3">
-                <p className="font-bold"><Link href={`/mbti/${b.toLowerCase()}`} className="text-accent">{b}</Link> · {s.label} <span className="text-accent">{s.total}점</span></p>
+                <p className="font-bold"><Link href={`/mbti/${b.toLowerCase()}`} className="text-accent-ink">{b}</Link> · {s.label} <span className="text-accent-ink">{s.total}점</span></p>
                 <p className="text-sm leading-relaxed mt-1">{s.lines.join(" ")}</p>
               </div>
             );
@@ -88,7 +88,7 @@ export default function MbtiArticle({ type }: { type: MbtiType }) {
               <tr key={b} className="border-t border-line">
                 <td className="py-1.5"><Link href={`/mbti/match?a=${type}&b=${b}`} className="font-bold">{b}</Link></td>
                 <td className="text-center">{s.love}</td><td className="text-center">{s.friend}</td><td className="text-center">{s.work}</td>
-                <td className="text-center font-bold text-accent">{s.total}</td>
+                <td className="text-center font-bold text-accent-ink">{s.total}</td>
               </tr>
             ))}
           </tbody>
@@ -134,7 +134,7 @@ export default function MbtiArticle({ type }: { type: MbtiType }) {
       <section>
         <h2 className="font-bold text-base mb-2">다른 유형 보기</h2>
         <div className="grid grid-cols-4 gap-2 text-center text-sm font-bold">
-          {MBTI_TYPES.filter((t) => t !== type).map((t) => <Link key={t} href={`/mbti/${t.toLowerCase()}`} className="bg-white border border-line rounded-xl py-2">{t}</Link>)}
+          {MBTI_TYPES.filter((t) => t !== type).map((t) => <Link key={t} href={`/mbti/${t.toLowerCase()}`} className="bg-card border border-line rounded-xl py-2">{t}</Link>)}
         </div>
       </section>
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd).replace(/</g, "\\u003c") }} />

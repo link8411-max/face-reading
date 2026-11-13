@@ -44,7 +44,7 @@ export default function WordBody({ card, sameWhen, sameKind, quiz }: { card: Car
       <dl className="mt-5 space-y-4">
         {rows.map(([label, text]) => (
           <div key={label} className="rounded-[22px] border border-line bg-card px-5 py-4">
-            <dt className="text-xs font-bold text-accent">{label}</dt>
+            <dt className="text-xs font-bold text-accent-ink">{label}</dt>
             <dd className="mt-1 text-[15px] leading-relaxed break-keep">{text}</dd>
           </div>
         ))}

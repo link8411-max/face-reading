@@ -197,14 +197,14 @@ export default function SamgukPage() {
               <SamgukGameCard captureRef={resultRef} character={result.character} similarity={result.similarity} />
 
               <p className="mt-4 text-[13px] leading-relaxed bg-card-2 rounded-[22px] px-4 py-3">
-                <span className="font-bold text-accent">닮은 점</span> {result.matchReason}
+                <span className="font-bold text-accent-ink">닮은 점</span> {result.matchReason}
               </p>
 
               <section aria-label="나를 지켜줄 장수" className="mt-3 bg-card border border-line rounded-[24px] p-4 flex gap-3.5 items-center">
                 {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img src={portraitThumb(`/images/samguk/${guardian.character.name}.jpg`)} width={64} height={76} loading="lazy" decoding="async" alt={`${guardian.character.name} 도트 초상화`} className="w-16 h-[76px] object-cover rounded-xl [image-rendering:pixelated] flex-none" />
                 <div className="flex-1">
-                  <p className="text-xs font-medium text-accent">나를 지켜줄 장수</p>
+                  <p className="text-xs font-medium text-accent-ink">나를 지켜줄 장수</p>
                   <p className="font-serif font-bold text-lg mt-1">{guardian.character.name} · 궁합 {guardian.score}점</p>
                   <p className="text-xs leading-normal text-muted mt-1">{guardian.line}</p>
                 </div>
@@ -235,7 +235,7 @@ export default function SamgukPage() {
               <NextSteps from="samguk" withPhoto={!!image} />
               <MoreTests current="/samguk" />
 
-              <details className="group mt-4 bg-white border border-line rounded-[22px] px-5 py-4">
+              <details className="group mt-4 bg-card border border-line rounded-[22px] px-5 py-4">
                 <summary className="font-bold cursor-pointer list-none flex justify-between items-center">
                   코에이 능력치 보기
                   <Icon name="chevron" size={18} className="text-muted transition group-open:rotate-90" />

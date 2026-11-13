@@ -15,7 +15,7 @@ export default function PersonHeader({ id, verdictOptions }: { id: string; verdi
   const src = portraitSrc(id)
   const years = `${p.born ?? '?'} ~ ${p.died ?? '?'}년`
   return (
-    <header className="mt-4 flex gap-4 items-center bg-white rounded-[22px] border border-line p-4">
+    <header className="mt-4 flex gap-4 items-center bg-card rounded-[22px] border border-line p-4">
       {src ? (
         // eslint-disable-next-line @next/next/no-img-element
         <img src={src} alt={`${c.name} 초상`} width={112} height={140} className="w-28 h-[140px] object-cover rounded-2xl border border-line flex-none" />

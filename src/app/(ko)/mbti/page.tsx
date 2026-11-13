@@ -13,10 +13,10 @@ export const metadata: Metadata = {
 };
 
 const GROUPS: { title: string; types: MbtiType[]; color: string }[] = [
-  { title: '분석가형 (NT)', types: ['INTJ', 'INTP', 'ENTJ', 'ENTP'], color: 'bg-[#E6EDFF]' },
-  { title: '외교관형 (NF)', types: ['INFJ', 'INFP', 'ENFJ', 'ENFP'], color: 'bg-[#E2F5EA]' },
-  { title: '관리자형 (SJ)', types: ['ISTJ', 'ISFJ', 'ESTJ', 'ESFJ'], color: 'bg-[#FFF4CC]' },
-  { title: '탐험가형 (SP)', types: ['ISTP', 'ISFP', 'ESTP', 'ESFP'], color: 'bg-[#ECE8FF]' },
+  { title: '분석가형 (NT)', types: ['INTJ', 'INTP', 'ENTJ', 'ENTP'], color: 'bg-[#1B2552]' },
+  { title: '외교관형 (NF)', types: ['INFJ', 'INFP', 'ENFJ', 'ENFP'], color: 'bg-[#143A33]' },
+  { title: '관리자형 (SJ)', types: ['ISTJ', 'ISFJ', 'ESTJ', 'ESFJ'], color: 'bg-[#3A3318]' },
+  { title: '탐험가형 (SP)', types: ['ISTP', 'ISFP', 'ESTP', 'ESFP'], color: 'bg-[#2D2352]' },
 ];
 
 export default function MbtiHub() {
@@ -33,7 +33,7 @@ export default function MbtiHub() {
         <span className="block font-bold text-lg">얼굴 궁합</span>
         <span className="block text-sm text-muted">두 얼굴로 보는 친구·연인·짝사랑 궁합</span>
       </Link>
-      <Link href="/mbti/match" className="block bg-[#E2F5EA] text-ink rounded-[22px] p-5">
+      <Link href="/mbti/match" className="block bg-[#143A33] text-ink rounded-[22px] p-5">
         <Icon name="rings" size={26} className="mb-1" />
         <span className="block font-bold text-lg mt-1">MBTI 궁합 계산기</span>
         <span className="block text-sm text-muted">두 유형의 연애·친구·직장 궁합 점수 →</span>

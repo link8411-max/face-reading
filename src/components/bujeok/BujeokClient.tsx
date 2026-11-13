@@ -180,7 +180,7 @@ export default function BujeokClient({ initial, high = null }: { initial?: Initi
         ) : (
           <>
             <BujeokForm values={values} onChange={onValues} mode={mode} onModeChange={setMode} boxCount={boxCount} previewEl={previewEl} birthError={birthError} nameError={nameError} fromError={fromError} canSubmit={canSubmit} onSubmit={start} />
-            {failText && <p role="alert" className="mt-3 text-sm text-center text-accent">{failText}</p>}
+            {failText && <p role="alert" className="mt-3 text-sm text-center text-accent-ink">{failText}</p>}
           </>
         )}
       </main>

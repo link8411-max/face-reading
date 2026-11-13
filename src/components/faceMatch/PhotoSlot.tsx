@@ -58,7 +58,7 @@ export default function PhotoSlot({ label, gender, onGender, image, onFile, erro
           <input ref={fileRef} type="file" accept="image/*" onChange={pick} disabled={disabled} className="hidden" aria-label={`${label} ${t("fm.fileAria")}`} />
         </>
       )}
-      {error && <p role="alert" id={`${label}-error`} className="text-sm text-accent animate-shake-x">{error}</p>}
+      {error && <p role="alert" id={`${label}-error`} className="text-sm text-accent-ink animate-shake-x">{error}</p>}
     </section>
   );
 }

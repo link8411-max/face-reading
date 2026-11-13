@@ -126,7 +126,7 @@ function CupGameInner({ board, title, cards, notes, top5 }: CupGameProps) {
 
   return (
     <div className="mt-5">
-      <p className="text-center text-sm font-bold text-accent">{progressLabel(cup, title)}</p>
+      <p className="text-center text-sm font-bold text-accent-ink">{progressLabel(cup, title)}</p>
       <h2 className="mt-1 text-center font-serif text-xl font-bold">둘 중 누가 더 끌리나요?</h2>
       <div key={num} className="cup-in mt-4">
         <div className="grid grid-cols-2 items-stretch gap-3">

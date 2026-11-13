@@ -25,7 +25,7 @@ function Tile({ t }: { t: SgTile }) {
         {t.portrait ? face : dashed}
         {t.hasVideo && (
           <span className="absolute bottom-[3px] right-[3px] flex h-5 w-5 items-center justify-center rounded-full bg-accent" aria-label="영상 있음">
-            <svg width="10" height="10" viewBox="0 0 24 24" aria-hidden="true" className="text-paper"><path d="M8 5v14l11-7z" fill="currentColor" /></svg>
+            <svg width="10" height="10" viewBox="0 0 24 24" aria-hidden="true" className="text-white"><path d="M8 5v14l11-7z" fill="currentColor" /></svg>
           </span>
         )}
       </span>
@@ -60,13 +60,13 @@ export default function Sanggwando({ id, name, groups, portrait }: { id: string;
             <img src={portraitThumb(portrait)} alt="" loading="lazy" decoding="async" className="h-full w-full object-cover [image-rendering:pixelated]" />
           )}
         </span>
-        <span className="flex flex-col gap-0.5 text-paper">
+        <span className="flex flex-col gap-0.5 text-ink">
           <span className="font-serif text-base font-bold">{name}{eulReul(name)} 둘러싼 {total}명</span>
           {anyVideo && <span className="text-xs text-gold-game">영상 표시가 있는 인물은 영상도 있어요</span>}
         </span>
       </div>
       {groups.map((g) => (
-        <div key={g.key} className={`rounded-[18px] border bg-white px-3 pb-3.5 pt-3 ${BORDER[g.key] ?? 'border-line'}`}>
+        <div key={g.key} className={`rounded-[18px] border bg-card px-3 pb-3.5 pt-3 ${BORDER[g.key] ?? 'border-line'}`}>
           <p className="mb-2.5 text-xs font-bold">{g.key} {g.tiles.length}명</p>
           <div className="flex flex-wrap gap-2">
             {g.tiles.map((t, i) => <Tile key={`${t.id ?? t.name}-${i}`} t={t} />)}

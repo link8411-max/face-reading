@@ -33,7 +33,7 @@ export default function RosterStartLink({ id }: { id: string }) {
     <div className="rounded-[18px] bg-card border border-line px-4 py-4 text-center">
       <p>영입하면 시작 장수로 고를 수 있어요</p>
       <span className="block text-xs text-muted mt-1">싸움에서 이긴 뒤 항복을 받아 내면 장수록에 올라요.</span>
-      <Link href="/samguk/duel" className="mt-3 inline-flex h-11 items-center justify-center rounded-full border border-line bg-white px-5 text-sm font-medium">
+      <Link href="/samguk/duel" className="mt-3 inline-flex h-11 items-center justify-center rounded-full border border-line bg-card px-5 text-sm font-medium">
         영입하러 출진
       </Link>
     </div>

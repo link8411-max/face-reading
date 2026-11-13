@@ -147,7 +147,7 @@ export default function FaceMatchClient({ invite }: { invite?: { key: AnimalKey;
           <legend className="text-[13px] text-muted mb-2.5">{t("fm.relQuestion")}</legend>
           <div role="radiogroup" aria-label={t("fm.relAria")} className="grid grid-cols-3 gap-2">
             {REL.map((r) => (
-              <button key={r} type="button" role="radio" aria-checked={rel === r} disabled={busy} onClick={() => setRel(r)} className={`h-12 rounded-full border text-[15px] font-medium transition disabled:opacity-60 ${rel === r ? "bg-ink text-paper border-ink" : "bg-white text-ink border-line"}`}>
+              <button key={r} type="button" role="radio" aria-checked={rel === r} disabled={busy} onClick={() => setRel(r)} className={`h-12 rounded-full border text-[15px] font-medium transition disabled:opacity-60 ${rel === r ? "bg-ink text-paper border-ink" : "bg-card text-ink border-line"}`}>
                 {relName[r]}
               </button>
             ))}
@@ -158,7 +158,7 @@ export default function FaceMatchClient({ invite }: { invite?: { key: AnimalKey;
       <PhotoSlot label={t("fm.me")} gender={me.gender} onGender={(g) => { setMe(withGender(me, g)); saveGender(g); }} image={me.image} onFile={(d) => { setMe(withPhoto(me, d)); track("photo_selected", { test_name: "face_match" }); }} error={me.error} disabled={busy} fixed={meFixed ? me.animal ?? undefined : undefined} />
 
       {inviteUrl && (
-        <div className="bg-white border border-line rounded-[22px] p-4 flex flex-col gap-2">
+        <div className="bg-card border border-line rounded-[22px] p-4 flex flex-col gap-2">
           <p className="text-sm">{OTHER_LABEL[rel!]}도 자기 사진으로 해 보게 할까요?</p>
           <button type="button" onClick={inviteShare.share} disabled={inviteShare.busy} className="h-12 rounded-full bg-accent text-white text-sm font-medium flex items-center justify-center gap-1.5 disabled:opacity-50">
             <Icon name="share" size={16} /> {OTHER_LABEL[rel!]}에게 초대 링크 보내기
@@ -170,8 +170,8 @@ export default function FaceMatchClient({ invite }: { invite?: { key: AnimalKey;
 
       <PhotoSlot label={otherLabel} gender={other.gender} onGender={(g) => setOther(withGender(other, g))} image={other.image} onFile={(d) => { setOther(withPhoto(other, d)); track("photo_selected", { test_name: "face_match" }); }} error={other.error} disabled={busy} fixed={invite ? invite.key : undefined} />
 
-      <div className="flex items-center gap-2.5 bg-white rounded-[18px] px-3.5 py-3">
-        <Icon name="shield" size={20} className="text-accent flex-none" />
+      <div className="flex items-center gap-2.5 bg-card rounded-[18px] px-3.5 py-3">
+        <Icon name="shield" size={20} className="text-accent-ink flex-none" />
         <span className="text-xs leading-normal text-muted">
           {rel === "crush" ? t("fm.privacyCrush") : t("fm.privacy")}
         </span>

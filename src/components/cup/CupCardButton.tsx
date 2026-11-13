@@ -21,7 +21,7 @@ export default function CupCardButton({ card, fact, state, onPick }: Props) {
       data-card-id={card.id}
       aria-pressed={state === null ? undefined : state === 'picked'}
       onClick={() => onPick(card.id)}
-      className={`flex min-h-[44px] w-full min-w-0 flex-col rounded-[22px] border bg-white p-2.5 text-left transition-opacity ${ring} ${dim}`}
+      className={`flex min-h-[44px] w-full min-w-0 flex-col rounded-[22px] border bg-card p-2.5 text-left transition-opacity ${ring} ${dim}`}
     >
       {/* eslint-disable-next-line @next/next/no-img-element */}
       <img src={portraitThumb(card.portrait)} alt="" width={160} height={200} decoding="async" className="aspect-[4/5] w-full rounded-2xl border border-line object-cover" />
@@ -29,7 +29,7 @@ export default function CupCardButton({ card, fact, state, onPick }: Props) {
       <span className="mt-1 block text-[13px] leading-snug text-muted break-keep">{card.line}</span>
       {fact && (
         <span className="mt-2 block text-[12px] leading-snug break-keep">
-          <span className="font-bold text-accent">알고 보면:</span> {fact}
+          <span className="font-bold text-accent-ink">알고 보면:</span> {fact}
         </span>
       )}
     </button>

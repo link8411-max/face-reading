@@ -139,7 +139,7 @@ export default function CoupangBanner({ subId, tone = "light" }: { subId: string
 
   const linkClass = dark
     ? "h-10 px-4 rounded-full bg-white/10 border border-stone-600 text-sm text-stone-100 grid place-items-center"
-    : "h-10 px-4 rounded-full bg-white border border-line text-sm grid place-items-center";
+    : "h-10 px-4 rounded-full bg-card border border-line text-sm grid place-items-center";
 
   return (
     <div ref={boxRef} className="mt-6 no-screenshot">

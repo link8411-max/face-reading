@@ -109,7 +109,7 @@ export default function SajuClient() {
               <h2 className="font-serif font-bold text-[27px] leading-[1.4] break-keep">생년월일시로 읽는<br />내 사주 풀이</h2>
               <p className="mt-2.5 text-sm text-muted">타고난 성향과 10년 흐름, 올해를 쉬운 말로 풀어 드려요</p>
             </div>
-            <div className="bg-white rounded-[28px] p-6 mb-6 border border-line">
+            <div className="bg-card rounded-[28px] p-6 mb-6 border border-line">
               <div className="flex justify-center gap-2 mb-4">
                 {[false, true].map((lunar) => (
                   <button
@@ -117,7 +117,7 @@ export default function SajuClient() {
                     type="button"
                     onClick={() => setIsLunar(lunar)}
                     aria-pressed={isLunar === lunar}
-                    className={`h-11 px-5 rounded-full text-sm font-medium border transition ${isLunar === lunar ? "bg-ink text-paper border-ink" : "bg-white text-ink border-line"}`}
+                    className={`h-11 px-5 rounded-full text-sm font-medium border transition ${isLunar === lunar ? "bg-ink text-paper border-ink" : "bg-card text-ink border-line"}`}
                   >
                     {lunar ? "음력" : "양력"}
                   </button>
@@ -155,7 +155,7 @@ export default function SajuClient() {
                 <GenderPills value={gender} onChange={chooseGender} />
               </div>
 
-              {error && <p role="alert" className="mb-3 text-sm text-accent text-center">{error}</p>}
+              {error && <p role="alert" className="mb-3 text-sm text-accent-ink text-center">{error}</p>}
 
               <button
                 type="button"

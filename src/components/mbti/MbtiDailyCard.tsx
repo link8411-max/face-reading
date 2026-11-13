@@ -22,7 +22,7 @@ export default function MbtiDailyCard({ type, date, daily, captureRef, withMatch
         <circle cx="90" cy="36" r="29" fill="#EEF1FA" />
         <path d="M26 26l2 5 5 2-5 2-2 5-2-5-5-2 5-2z" fill="#2D55FF" />
       </svg>
-      <p className="relative text-xs font-medium text-accent">{dateLabel(date)} · 오늘의 MBTI 운세</p>
+      <p className="relative text-xs font-medium text-accent-ink">{dateLabel(date)} · 오늘의 MBTI 운세</p>
       <h2 className="relative font-serif font-bold text-[25px] leading-[1.4] mt-2 pr-16">
         {type} <span className="text-base font-medium text-muted">{mbtiProfiles[type].nickname}</span>
       </h2>
@@ -30,7 +30,7 @@ export default function MbtiDailyCard({ type, date, daily, captureRef, withMatch
       <div className="bg-card-2 rounded-[18px] mt-4 px-4 py-3.5 flex flex-col gap-2">
         {rows.map(([label, text]) => (
           <p key={label} className="text-[13px] leading-relaxed">
-            <span className="font-bold text-accent">{label}</span> {text}
+            <span className="font-bold text-accent-ink">{label}</span> {text}
           </p>
         ))}
       </div>
@@ -42,9 +42,9 @@ export default function MbtiDailyCard({ type, date, daily, captureRef, withMatch
       <p className="text-[13px] mt-3">
         오늘 잘 맞는 유형{" "}
         {withMatchLink ? (
-          <Link href={`/mbti/match?a=${type}&b=${daily.match}`} className="font-bold text-accent underline underline-offset-2">{daily.match}</Link>
+          <Link href={`/mbti/match?a=${type}&b=${daily.match}`} className="font-bold text-accent-ink underline underline-offset-2">{daily.match}</Link>
         ) : (
-          <span className="font-bold text-accent">{daily.match}</span>
+          <span className="font-bold text-accent-ink">{daily.match}</span>
         )}
       </p>
       <p className="text-[11px] text-muted mt-4 text-center">운명을 읽다 · unse-ai.com · 재미로 보는 운세</p>

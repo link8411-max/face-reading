@@ -94,7 +94,7 @@ export default async function GeneralPage({ params }: Props) {
         </header>
 
         {getPerson(id) && (
-          <Link href={`/samguk/people/${id}`} className="mt-5 flex h-11 items-center justify-center rounded-full border border-line bg-white text-sm font-medium text-ink">
+          <Link href={`/samguk/people/${id}`} className="mt-5 flex h-11 items-center justify-center rounded-full border border-line bg-card text-sm font-medium text-ink">
             {g.name} 인물열전 보기
           </Link>
         )}
@@ -108,7 +108,7 @@ export default async function GeneralPage({ params }: Props) {
 
         <section className="mt-8">
           <h2 className="font-serif font-bold text-lg mb-3">코에이 능력치</h2>
-          <table className="w-full text-sm bg-white rounded-[22px] border border-line overflow-hidden">
+          <table className="w-full text-sm bg-card rounded-[22px] border border-line overflow-hidden">
             <tbody>
               {STAT_KEYS.map((k) => (
                 <tr key={k} className="border-b border-line last:border-0">
@@ -133,7 +133,7 @@ export default async function GeneralPage({ params }: Props) {
               const s = SKILLS[sid];
               const main = sid === intro.signature;
               return (
-                <li key={sid} className="bg-white rounded-[18px] border border-line px-4 py-3 flex items-center justify-between gap-3">
+                <li key={sid} className="bg-card rounded-[18px] border border-line px-4 py-3 flex items-center justify-between gap-3">
                   <div className="min-w-0">
                     <p className="font-medium break-keep">{s.name}{main && <span className="ml-2 text-xs text-muted">필살기</span>}</p>
                     <p className="text-xs text-muted">{s.kind}</p>
@@ -168,7 +168,7 @@ export default async function GeneralPage({ params }: Props) {
           <ul className="grid grid-cols-2 gap-2">
             {GENERALS.filter((o) => o.id !== id).map((o) => (
               <li key={o.id}>
-                <Link href={`/samguk/duel/generals/${o.id}`} className="flex items-center justify-between rounded-full border border-line bg-white px-4 py-2.5 text-sm hover:border-accent/50 transition">
+                <Link href={`/samguk/duel/generals/${o.id}`} className="flex items-center justify-between rounded-full border border-line bg-card px-4 py-2.5 text-sm hover:border-accent/50 transition">
                   <span>{o.name}</span>
                   <span className="text-xs text-muted">{o.kind}</span>
                 </Link>

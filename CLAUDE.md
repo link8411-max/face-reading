@@ -29,12 +29,12 @@ npm run test:e2e     # E2E (next build 후 3200 포트): 전 페이지 로딩·�
 
 ---
 
-## 디자인 시스템 (블루·라임, 2026-11-13)
+## 디자인 시스템 (밤, 2026-11-14 · 이전 블루·라임 2026-11-13)
 
 시안: 디자인 캔버스 `https://claude.ai/artifact/Psoi9fmSypmynmFNE2vBhR` (Main, TestStart, ResultCard, SamgukCard). 타깃 20~30대 여성, 무섭지 않고 너무 핑크하지 않은 뉴트럴.
 
 ### 토큰 (`globals.css` `@theme`)
-`bg-paper`(#F7F8FC) `bg-card`(#FFFFFF, 흰 카드는 `border border-line`) `bg-card-2`(#EEF1FA) `border-line`(#E1E6F5) `text-ink`(#1A1B25) `text-muted`(#5E6070) `text-accent`(#2D55FF, 포인트) `lime`(#C6F24E, 장식) `blush`(#E9BCA8, 얼굴 그림 볼 홍조만) · 삼국지 카드 전용 `bg-navy-game`(#23263A) `text-gold-game`(#E8B547)
+`bg-paper`(#0B1026, 짙은 남색 바탕) `bg-card`(#141A36, 카드는 `border border-line`) `bg-card-2`(#1B2246) `border-line`(#2A3360) `text-ink`(#EEF0FA) `text-muted`(#A3A9C6) `bg-accent`(#3E5BFF, 버튼 바탕·흰 글씨) `text-accent-ink`(#9DB2FF, 어두운 바탕 위 포인트 글자. `text-accent`는 쓰지 않는다, 테스트로 막음) `lime`(#C6F24E, 장식, 라임 위 글씨는 `text-paper`) `blush`(#E9BCA8, 얼굴 그림 볼 홍조만) · 삼국지 카드 전용 `bg-navy-game`(#23263A) `text-gold-game`(#E8B547). 시안 캔버스 https://claude.ai/artifact/BYPwTBiBCpzPQ2rS9rwRxL, 계획 `docs/superpowers/plans/2026-11-14-night-revamp.md`. `bg-white`·`text-black`·`#fff`를 박지 않는다(부적·일기토·삼국지·og 제외, 테스트로 막음).
 - 글꼴: 제목·본문 Pretendard 가변(400~800, `font-serif`·`font-sans` 모두), 전통 부적 글씨만 Gowun Batang(미리 받지 않음), 삼국지 카드 Silkscreen(`font-pixel`). 900 굵기 금지(테스트).
   - 자체 호스팅(`next/font/local`, 2026-11-05): woff2와 OFL 라이선스는 `src/fonts/`, `layout.tsx`에서 읽는다. Google Fonts(`next/font/google`)는 쓰지 않는다 — Vercel 빌드가 폰트 다운로드 실패로 깨진 적이 있다(테스트로 막음). 한글 글꼴은 `scripts/font-subset.mjs`로 KS X 1001 2350자 + 라틴·기호 + src 코드에 나오는 글자만 남긴다(원본·사용법은 스크립트 머리말). 2350 밖 한글을 새 문구에 쓰면 스크립트를 다시 돌린다.
 - 모양: 카드 `rounded-[22px]`~`rounded-[30px]`, 버튼 pill(`rounded-full`), 주 버튼 `h-[52px] bg-accent text-white`, 선택된 칩·토글은 `bg-ink text-paper`.
@@ -149,7 +149,7 @@ public/
 - 허브 순서: 관상·얼굴 테스트 = [관상·동물상] 내 관상 풀이 → 동물상, [삼국지로 보는 얼굴] 닮은꼴 → 우리 팀 → 월드컵 → 열전 → 영상 → 일기토. 사주·운세 = 내 사주 풀이 → 신년운세 → 띠별 → 오늘의 운세, [MBTI] 오늘의 MBTI 운세. 궁합·MBTI = 얼굴 궁합 → MBTI 궁합 계산기 → MBTI 유형별 풀이(오늘의 MBTI 운세는 사주·운세에만).
 - 푸터는 같은 데이터를 쓰되 `footer: false` 항목은 뺀다(삼국지는 닮은꼴·열전만 푸터에).
 - 결과 사이 연결: `NEXT_BY_TEST`(navigation.ts, 같은 줄기 1 + 다른 줄기 1) → `components/result/NextSteps`("이어서 보면 좋아요"). 사주·신년운세·띠별 글·오늘의 운세·관상·동물상·삼국지·MBTI 유형·MBTI 궁합 계산기에 붙어 있다. 사진 결과에서는 같은 사진 칸을 `NextTests`가 맡으므로 NextSteps는 다른 줄기만 보인다(`withPhoto`). GA `next_test_click(test_name=간 곳)`. 생년월일 넘기기는 사주·신년운세 결과의 부적 카드 하나뿐이다(`handOffBirth`, 메모리로만 전달; 나머지는 링크만). `NEXT_BY_TEST`의 saju·fortune은 이제 서로 대신 부적으로 이어진다.
-- 디자인 토큰·글꼴은 위 "디자인 시스템 (블루·라임)" 참고.
+- 디자인 토큰·글꼴은 위 "디자인 시스템 (밤)" 참고.
 - 참여자 수·인기 순위 같은 숫자는 실제 집계 전까지 넣지 않는다(테스트로 막음).
 
 ## 언어 (한국어·영어, 2026-11-13)

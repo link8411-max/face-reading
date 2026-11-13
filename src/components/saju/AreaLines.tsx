@@ -9,7 +9,7 @@ export default function AreaLines({ tenGods }: { tenGods: SajuResult["tenGods"] 
       <ul className="space-y-2.5">
         {r.lines.map((l) => (
           <li key={l.key} className="flex gap-3 text-sm leading-relaxed">
-            <span className="shrink-0 w-9 h-6 rounded-full bg-card-2 text-accent text-xs font-bold grid place-items-center">{l.label}</span>
+            <span className="shrink-0 w-9 h-6 rounded-full bg-card-2 text-accent-ink text-xs font-bold grid place-items-center">{l.label}</span>
             <span>{l.text}</span>
           </li>
         ))}

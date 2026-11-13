@@ -136,7 +136,7 @@ export default function FortuneClient() {
 
         {/* Input Section */}
         {!result && (
-          <div className="bg-white rounded-[28px] p-6 mb-6 border border-line">
+          <div className="bg-card rounded-[28px] p-6 mb-6 border border-line">
             <h3 className="font-serif font-bold text-lg mb-4 text-center">생년월일 입력</h3>
 
             {/* 음력/양력 선택 */}
@@ -144,14 +144,14 @@ export default function FortuneClient() {
               <button
                 onClick={() => setIsLunar(false)}
                 aria-pressed={!isLunar}
-                className={`h-11 px-5 rounded-full text-sm font-medium border transition ${!isLunar ? "bg-ink text-paper border-ink" : "bg-white text-ink border-line"}`}
+                className={`h-11 px-5 rounded-full text-sm font-medium border transition ${!isLunar ? "bg-ink text-paper border-ink" : "bg-card text-ink border-line"}`}
               >
                 양력
               </button>
               <button
                 onClick={() => setIsLunar(true)}
                 aria-pressed={isLunar}
-                className={`h-11 px-5 rounded-full text-sm font-medium border transition ${isLunar ? "bg-ink text-paper border-ink" : "bg-white text-ink border-line"}`}
+                className={`h-11 px-5 rounded-full text-sm font-medium border transition ${isLunar ? "bg-ink text-paper border-ink" : "bg-card text-ink border-line"}`}
               >
                 음력
               </button>
@@ -176,9 +176,9 @@ export default function FortuneClient() {
                 onChange={(e) => setBirthHour(e.target.value as HourSlotKey | "")}
                 className="w-full px-4 py-3 bg-card-2 border border-line rounded-xl text-center text-lg text-ink focus:outline-none focus:ring-2 focus:ring-accent/40 appearance-none cursor-pointer"
               >
-                <option value="" className="bg-white">모름</option>
+                <option value="" className="bg-card">모름</option>
                 {HOUR_SLOTS.map((slot) => (
-                  <option key={slot.key} value={slot.key} className="bg-white">
+                  <option key={slot.key} value={slot.key} className="bg-card">
                     {slot.label}
                   </option>
                 ))}
@@ -204,17 +204,17 @@ export default function FortuneClient() {
             {/* 캡쳐 영역 시작 */}
             <div ref={resultRef} className="space-y-3 bg-card border border-line rounded-[30px] p-4">
             {/* 기본 정보 */}
-            <div className="bg-white rounded-[22px] p-5 border border-line">
+            <div className="bg-card rounded-[22px] p-5 border border-line">
               <div className="text-center mb-4">
-                <p className="text-xs font-medium text-accent">{FORTUNE_YEAR.year} {FORTUNE_YEAR.간지}년 신년운세</p>
+                <p className="text-xs font-medium text-accent-ink">{FORTUNE_YEAR.year} {FORTUNE_YEAR.간지}년 신년운세</p>
                 <h2 className="font-serif text-[25px] font-bold mt-1">{result.사주정보.띠}띠</h2>
                 {/* 생년월일은 화면에만, 저장·공유 이미지에는 넣지 않는다 */}
                 <p className="text-muted text-sm no-screenshot">
                   {birthDate.year}년 {birthDate.month}월 {birthDate.day}일생
                   <span className={`ml-2 px-2 py-0.5 rounded-full text-xs ${
                     result.사주정보.역법.startsWith("음력")
-                      ? "bg-card-2 text-accent"
-                      : "bg-card-2 text-accent"
+                      ? "bg-card-2 text-accent-ink"
+                      : "bg-card-2 text-accent-ink"
                   }`}>
                     {result.사주정보.역법.startsWith("음력") ? result.사주정보.역법 : "양력"}
                   </span>
@@ -236,19 +236,19 @@ export default function FortuneClient() {
             </div>
 
             {/* 올해와 나 */}
-            <div className="bg-white rounded-[22px] p-5 border border-line">
+            <div className="bg-card rounded-[22px] p-5 border border-line">
               <SeunCard seun={result.사주정보.세운} dayBranch={result.사주정보.기둥.day.branch} />
             </div>
 
             {/* 총운 */}
-            <div className="bg-white rounded-[22px] p-5 border border-line">
+            <div className="bg-card rounded-[22px] p-5 border border-line">
               <div className="flex justify-between items-center mb-3">
                 <h3 className="font-serif font-bold text-lg">{FORTUNE_YEAR.year}년 총운</h3>
-                <span className="text-accent text-xl tracking-wider">
+                <span className="text-accent-ink text-xl tracking-wider">
                   {renderStars(result.운세.총운.rating)}
                 </span>
               </div>
-              <div className="inline-block px-3 py-1 bg-ink text-white rounded-full text-sm font-bold mb-3">
+              <div className="inline-block px-3 py-1 bg-ink text-paper rounded-full text-sm font-bold mb-3">
                 {result.운세.총운.keyword}
               </div>
               <p className="text-muted leading-relaxed">{result.운세.총운.summary}</p>
@@ -273,11 +273,11 @@ export default function FortuneClient() {
               {shareNotice && <p role="status" className="mt-2 text-xs text-center text-muted">{shareNotice}</p>}
               <GiftNudge from="fortune" />
               <div className="grid grid-cols-2 gap-2 mt-2">
-                <button onClick={() => { track("share_click", { test_name: "fortune", method: "save_image" }); download(getShareOptions()); }} disabled={isCapturing} className="h-12 rounded-full bg-white border border-line text-sm font-medium flex items-center justify-center gap-1.5 disabled:opacity-50">
+                <button onClick={() => { track("share_click", { test_name: "fortune", method: "save_image" }); download(getShareOptions()); }} disabled={isCapturing} className="h-12 rounded-full bg-card border border-line text-sm font-medium flex items-center justify-center gap-1.5 disabled:opacity-50">
                   <Icon name="download" size={16} />
                   이미지 저장
                 </button>
-                <button onClick={resetAll} className="h-12 rounded-full bg-white border border-line text-sm font-medium flex items-center justify-center gap-1.5">
+                <button onClick={resetAll} className="h-12 rounded-full bg-card border border-line text-sm font-medium flex items-center justify-center gap-1.5">
                   <Icon name="refresh" size={16} />
                   다시하기
                 </button>
@@ -285,15 +285,15 @@ export default function FortuneClient() {
             </div>
 
             {/* 월별 운세 */}
-            <div className="bg-white rounded-[22px] p-5 border border-line">
+            <div className="bg-card rounded-[22px] p-5 border border-line">
               <h3 className="font-serif font-bold text-lg mb-3">월별 운세</h3>
               <div className="space-y-3">
                 <div className="bg-card-2 rounded-xl p-3 border border-line">
-                  <p className="text-sm text-accent font-medium">상반기 (1-6월)</p>
+                  <p className="text-sm text-accent-ink font-medium">상반기 (1-6월)</p>
                   <p className="text-sm text-muted">{result.운세.월별운세.상반기}</p>
                 </div>
                 <div className="bg-card-2 rounded-xl p-3 border border-line">
-                  <p className="text-sm text-accent font-medium">하반기 (7-12월)</p>
+                  <p className="text-sm text-accent-ink font-medium">하반기 (7-12월)</p>
                   <p className="text-sm text-muted">{result.운세.월별운세.하반기}</p>
                 </div>
                 <div className="flex gap-3">
@@ -303,14 +303,14 @@ export default function FortuneClient() {
                   </div>
                   <div className="flex-1 bg-card-2 rounded-xl p-3 text-center border border-line">
                     <p className="text-xs text-muted">주의할 달</p>
-                    <p className="text-lg font-bold text-accent">{result.운세.월별운세.주의할달}</p>
+                    <p className="text-lg font-bold text-accent-ink">{result.운세.월별운세.주의할달}</p>
                   </div>
                 </div>
               </div>
             </div>
 
             {/* 세부 운세 */}
-            <div className="bg-white rounded-[22px] p-5 border border-line">
+            <div className="bg-card rounded-[22px] p-5 border border-line">
               <h3 className="font-serif font-bold text-lg mb-3">세부 운세</h3>
               <div className="space-y-4">
                 {Object.entries(result.운세.세부운세).map(([항목, 데이터]) => (
@@ -319,7 +319,7 @@ export default function FortuneClient() {
                       <span className="font-medium text-ink">
                         {항목}
                       </span>
-                      <span className="text-accent">{renderStars(데이터.rating)}</span>
+                      <span className="text-accent-ink">{renderStars(데이터.rating)}</span>
                     </div>
                     <p className="text-sm text-muted">{데이터.description}</p>
                   </div>
@@ -331,12 +331,12 @@ export default function FortuneClient() {
             <SeasonPicks slot="fortune" />
 
             {/* 행운 요소 */}
-            <div className="bg-white rounded-[22px] p-5 border border-line">
+            <div className="bg-card rounded-[22px] p-5 border border-line">
               <h3 className="font-serif font-bold text-lg mb-3">행운 요소</h3>
               <div className="grid grid-cols-2 gap-3">
                 <div className="bg-card-2 rounded-xl p-3 text-center border border-line">
                   <p className="text-xs text-muted">행운의 숫자</p>
-                  <p className="text-xl font-bold text-accent">
+                  <p className="text-xl font-bold text-accent-ink">
                     {result.운세.행운요소.행운의숫자.join(", ")}
                   </p>
                 </div>
@@ -356,7 +356,7 @@ export default function FortuneClient() {
             </div>
 
             {/* 조언 */}
-            <div className="bg-white rounded-[22px] p-5 border border-line">
+            <div className="bg-card rounded-[22px] p-5 border border-line">
               <h3 className="font-serif font-bold text-lg mb-3">{FORTUNE_YEAR.year}년 조언</h3>
               <div className="space-y-3">
                 <div className="flex gap-3">
@@ -364,12 +364,12 @@ export default function FortuneClient() {
                   <p className="text-sm text-muted">{result.운세.조언.해야할것}</p>
                 </div>
                 <div className="flex gap-3">
-                  <span className="text-accent">✗</span>
+                  <span className="text-accent-ink">✗</span>
                   <p className="text-sm text-muted">{result.운세.조언.피해야할것}</p>
                 </div>
                 <div className="bg-card-2 rounded-xl p-4 text-center border border-line">
                   <p className="text-xs text-muted mb-1">명심할 말</p>
-                  <p className="font-medium text-accent">"{result.운세.조언.명심할말}"</p>
+                  <p className="font-medium text-accent-ink">"{result.운세.조언.명심할말}"</p>
                 </div>
               </div>
             </div>
@@ -383,13 +383,13 @@ export default function FortuneClient() {
             {/* 버튼 */}
             <Link
               href={`/fortune/2027/${SLUG_BY_띠[result.사주정보.띠]}`}
-              className="block w-full mb-2 py-3 text-center bg-white border border-line rounded-full font-medium"
+              className="block w-full mb-2 py-3 text-center bg-card border border-line rounded-full font-medium"
             >
               {result.사주정보.띠}띠 {FORTUNE_YEAR.year} 운세 자세히 보기
             </Link>
             <Link
               href="/mbti/match"
-              className="block w-full mb-2 py-3 text-center bg-white border border-line rounded-full font-medium"
+              className="block w-full mb-2 py-3 text-center bg-card border border-line rounded-full font-medium"
             >
               MBTI 궁합도 보기
             </Link>

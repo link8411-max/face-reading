@@ -14,7 +14,7 @@ export default function LongVideoCard({ videos, slot }: { videos: Video[]; slot:
         id={v.id}
         slot={slot}
         href={`https://www.youtube.com/watch?v=${v.id}`}
-        className="mt-2.5 flex flex-col gap-2 overflow-hidden rounded-[22px] border border-line bg-white"
+        className="mt-2.5 flex flex-col gap-2 overflow-hidden rounded-[22px] border border-line bg-card"
       >
         <span className="relative block aspect-video w-full overflow-hidden bg-navy-game">
           {/* hqdefault는 4:3에 검은 띠가 있어 16:9 칸에 꽉 채워 띠를 잘라낸다 */}

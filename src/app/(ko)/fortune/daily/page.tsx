@@ -136,7 +136,7 @@ export default function DailyFortunePage() {
 
         {/* Input Section */}
         {!result && (
-          <div className="bg-white rounded-[28px] p-6 mb-6 border border-line">
+          <div className="bg-card rounded-[28px] p-6 mb-6 border border-line">
             <h3 className="font-serif font-bold text-lg mb-4 text-center">태어난 해를 알려주세요</h3>
 
             <input
@@ -152,7 +152,7 @@ export default function DailyFortunePage() {
               aria-invalid={!!yearCheck.error}
               className="w-full px-4 py-4 bg-card-2 border border-line rounded-xl text-center text-2xl text-ink focus:outline-none focus:ring-2 focus:ring-accent/40 focus:border-line mb-2 placeholder-muted/60"
             />
-            {yearCheck.error && <p role="alert" className="text-sm text-center text-accent mb-2">{yearCheck.error}</p>}
+            {yearCheck.error && <p role="alert" className="text-sm text-center text-accent-ink mb-2">{yearCheck.error}</p>}
             <div className="mb-2" />
 
             {/* 입춘 전 출생 체크박스 */}
@@ -198,11 +198,11 @@ export default function DailyFortunePage() {
               {shareNotice && <p role="status" className="mt-2 text-xs text-center text-muted">{shareNotice}</p>}
               <GiftNudge from="daily" />
               <div className="grid grid-cols-2 gap-2 mt-2">
-                <button onClick={() => { track("share_click", { test_name: "daily", method: "save_image" }); download(getShareOptions()); }} disabled={isCapturing} className="h-12 rounded-full bg-white border border-line text-sm font-medium flex items-center justify-center gap-1.5 disabled:opacity-50">
+                <button onClick={() => { track("share_click", { test_name: "daily", method: "save_image" }); download(getShareOptions()); }} disabled={isCapturing} className="h-12 rounded-full bg-card border border-line text-sm font-medium flex items-center justify-center gap-1.5 disabled:opacity-50">
                   <Icon name="download" size={16} />
                   이미지 저장
                 </button>
-                <button onClick={resetAll} className="h-12 rounded-full bg-white border border-line text-sm font-medium flex items-center justify-center gap-1.5">
+                <button onClick={resetAll} className="h-12 rounded-full bg-card border border-line text-sm font-medium flex items-center justify-center gap-1.5">
                   <Icon name="refresh" size={16} />
                   다시하기
                 </button>
@@ -215,10 +215,10 @@ export default function DailyFortunePage() {
 
             <NextSteps from="daily" className="" />
 
-            <Link href="/mbti/match" className="block w-full py-3 text-center bg-white border border-line rounded-full font-medium">
+            <Link href="/mbti/match" className="block w-full py-3 text-center bg-card border border-line rounded-full font-medium">
               MBTI 궁합도 보기
             </Link>
-            <Link href="/fortune" className="block w-full py-3 text-center bg-white border border-line rounded-full font-medium">
+            <Link href="/fortune" className="block w-full py-3 text-center bg-card border border-line rounded-full font-medium">
               {FORTUNE_YEAR.year} 신년운세 보기
             </Link>
           </div>

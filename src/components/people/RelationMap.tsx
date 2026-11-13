@@ -28,7 +28,7 @@ export default function RelationMap({ centerId }: { centerId: string }) {
           const y = CX + R * Math.sin(a)
           return (
             <g key={`${r.otherId ?? r.otherName}-${i}`}>
-              <g className={r.kin ? 'text-accent' : 'text-muted'}>
+              <g className={r.kin ? 'text-accent-ink' : 'text-muted'}>
                 <line x1={CX} y1={CX} x2={x} y2={y} stroke="currentColor" strokeWidth={r.kin ? 2 : 1.4} strokeDasharray={r.kin ? undefined : '4 4'} />
               </g>
               <rect x={x - 30} y={y - 15} width={60} height={30} rx={15} className="fill-white stroke-line" strokeWidth={1} />

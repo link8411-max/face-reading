@@ -95,15 +95,15 @@ export default function TeamClient() {
     <div className="flex flex-col gap-4 pb-7 no-screenshot">
       {slots.map((s, i) => (
         <PhotoSlot key={i} label={`${i + 1}번 팀원`} gender={s.gender} onGender={(g) => setSlots((all) => all.map((x, j) => (j === i ? withGender(x, g) : x)))} image={s.image} onFile={(d) => { setSlots((all) => all.map((x, j) => (j === i ? withPhoto(x, d) : x))); track("photo_selected", { test_name: "team_samguk" }); }} error={s.error} disabled={busy}>
-          <input value={s.nickname} onChange={(e) => set(i, { nickname: e.target.value.slice(0, 8) })} maxLength={8} placeholder="별칭 (선택, 예: 김대리)" aria-label={`${i + 1}번 팀원 별칭`} disabled={busy} className="h-11 rounded-full border border-line bg-white px-4 text-sm disabled:opacity-60" />
+          <input value={s.nickname} onChange={(e) => set(i, { nickname: e.target.value.slice(0, 8) })} maxLength={8} placeholder="별칭 (선택, 예: 김대리)" aria-label={`${i + 1}번 팀원 별칭`} disabled={busy} className="h-11 rounded-full border border-line bg-card px-4 text-sm disabled:opacity-60" />
         </PhotoSlot>
       ))}
       <div className="flex gap-2">
-        {slots.length < MAX && <button type="button" disabled={busy} onClick={() => setSlots([...slots, empty()])} className="flex-1 h-12 rounded-full bg-white border border-line text-sm font-medium">한 명 더</button>}
-        {slots.length > 2 && <button type="button" disabled={busy} onClick={() => setSlots(slots.slice(0, -1))} className="flex-1 h-12 rounded-full bg-white border border-line text-sm font-medium">마지막 칸 빼기</button>}
+        {slots.length < MAX && <button type="button" disabled={busy} onClick={() => setSlots([...slots, empty()])} className="flex-1 h-12 rounded-full bg-card border border-line text-sm font-medium">한 명 더</button>}
+        {slots.length > 2 && <button type="button" disabled={busy} onClick={() => setSlots(slots.slice(0, -1))} className="flex-1 h-12 rounded-full bg-card border border-line text-sm font-medium">마지막 칸 빼기</button>}
       </div>
-      <div className="flex items-center gap-2.5 bg-white rounded-[18px] px-3.5 py-3">
-        <Icon name="shield" size={20} className="text-accent flex-none" />
+      <div className="flex items-center gap-2.5 bg-card rounded-[18px] px-3.5 py-3">
+        <Icon name="shield" size={20} className="text-accent-ink flex-none" />
         <span className="text-xs leading-normal text-muted">팀원 사진은 내 폰 안에서만 보고 바로 지워요. 별칭은 저장 이미지에만 나오고 공유 링크에는 들어가지 않아요.</span>
       </div>
       {busy && <AnalyzingOverlay cast="tiger" steps={TEAM_STEPS} step={analyzeStep} />}

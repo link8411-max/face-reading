@@ -19,14 +19,14 @@ export default function SeasonCard() {
     return onDayMaybeChanged(update);
   }, []);
   return (
-    <section aria-label={season.chip} className="press h-16 bg-[#E6EDFF] rounded-[22px]">
+    <section aria-label={season.chip} className="press h-16 bg-card-2 rounded-[22px]">
       <Link href={season.cta.href} aria-label={season.cta.label} className="h-full flex items-center gap-3 px-4">
-        <span className="flex-none text-xs font-bold bg-lime text-ink px-2.5 py-1 rounded-full">{season.chip}</span>
+        <span className="flex-none text-xs font-bold bg-lime text-paper px-2.5 py-1 rounded-full">{season.chip}</span>
         <span className="flex-1 min-w-0">
           <h2 className="block font-serif font-bold text-[14px] leading-tight truncate">{season.title.replace("\n", " ")}</h2>
           <span className="block text-xs text-muted mt-0.5 truncate">{season.sub}</span>
         </span>
-        <Icon name="chevron" size={18} className="flex-none text-accent" />
+        <Icon name="chevron" size={18} className="flex-none text-accent-ink" />
       </Link>
     </section>
   );

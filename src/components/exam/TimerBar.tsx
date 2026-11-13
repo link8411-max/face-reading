@@ -27,7 +27,7 @@ export default function TimerBar({ limitMs, delayMs = 0, reduced, timedOut = fal
           <div className={`h-2 rounded-full ${urgent ? 'bg-accent' : 'bg-ink'}`} style={{ width: shrink || timedOut ? '0%' : '100%', transition: timedOut ? 'none' : `width ${limitMs}ms linear ${shrink ? '0ms' : '0ms'}` }} />
         </div>
       )}
-      <span key={urgent && !timedOut ? secs : 'n'} className={`w-10 text-right text-sm font-bold tabular-nums ${urgent ? 'text-accent' : ''} ${urgent && !timedOut ? 'ex-tick' : ''}`} role="timer" aria-label={`남은 시간 ${secs}초`}>{secs}초</span>
+      <span key={urgent && !timedOut ? secs : 'n'} className={`w-10 text-right text-sm font-bold tabular-nums ${urgent ? 'text-accent-ink' : ''} ${urgent && !timedOut ? 'ex-tick' : ''}`} role="timer" aria-label={`남은 시간 ${secs}초`}>{secs}초</span>
     </div>
   )
 }

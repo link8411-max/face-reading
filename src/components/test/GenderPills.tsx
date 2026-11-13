@@ -19,7 +19,7 @@ export default function GenderPills({ value, onChange, label, disabled }: { valu
             aria-checked={on}
             disabled={disabled}
             onClick={() => onChange(g)}
-            className={`h-12 rounded-full border text-[15px] font-medium transition disabled:opacity-60 ${on ? "bg-ink text-paper border-ink" : "bg-white text-ink border-line"}`}
+            className={`h-12 rounded-full border text-[15px] font-medium transition disabled:opacity-60 ${on ? "bg-ink text-paper border-ink" : "bg-card text-ink border-line"}`}
           >
             {g === "여" ? t("gender.female") : t("gender.male")}
           </button>

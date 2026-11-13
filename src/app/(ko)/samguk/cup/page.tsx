@@ -52,7 +52,7 @@ export default async function CupPickerPage() {
     <div className="min-h-screen bg-paper text-ink">
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumb) }} />
       <main className="mx-auto max-w-lg px-[22px] pt-6 pb-12">
-        <p className="text-sm font-medium text-accent">삼국지 장수 월드컵</p>
+        <p className="text-sm font-medium text-accent-ink">삼국지 장수 월드컵</p>
         <h1 className="mt-2 font-serif text-[27px] font-bold leading-[1.3] break-keep">누가 나의 최애 장수일까요?</h1>
         <p className="mt-2 leading-relaxed text-muted break-keep">두 장수 중 한 명을 고를 때마다 짧은 이야기를 읽어요</p>
 
@@ -76,7 +76,7 @@ export default async function CupPickerPage() {
                     <h2 className="font-serif text-lg font-bold break-keep">{title}</h2>
                     <p className="mt-0.5 text-sm text-ink break-keep">{blurb}</p>
                     {basis ? <p className="mt-0.5 text-xs text-muted break-keep">{basis}</p> : null}
-                    {n > 0 ? <p className="mt-1 text-xs text-accent tabular-nums">지금까지 {n}판</p> : null}
+                    {n > 0 ? <p className="mt-1 text-xs text-accent-ink tabular-nums">지금까지 {n}판</p> : null}
                   </div>
                 </Link>
               </li>

@@ -9,8 +9,8 @@ import { formatSlot, nextDeliveryWord } from "@/lib/push/slotLabel";
 import type { DailyFortune } from "@/lib/dailyEngine";
 import { getSubscription, pushUiState, readPushEnv, readStoredGanji, readStoredSendAt, subscribe, unsubscribe, type PushUiState } from "@/lib/push/client";
 
-const SELECT = "h-12 rounded-full bg-white border border-line text-sm font-medium px-4 w-full mb-2 disabled:opacity-50";
-const PILL = "h-12 rounded-full bg-white border border-line text-sm font-medium flex items-center justify-center gap-1.5 w-full disabled:opacity-50";
+const SELECT = "h-12 rounded-full bg-card border border-line text-sm font-medium px-4 w-full mb-2 disabled:opacity-50";
+const PILL = "h-12 rounded-full bg-card border border-line text-sm font-medium flex items-center justify-center gap-1.5 w-full disabled:opacity-50";
 
 export default function PushToggle({ fortune }: { fortune: DailyFortune | null }) {
   const ganji = fortune?.나.년주표기 ?? null;

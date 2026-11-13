@@ -20,11 +20,11 @@ export default function Explain({ q, correct, timedOut, rate = null, isLast, onN
       <p className="mt-1 text-[15px] break-keep">정답은 <b>{q.options[q.answer]}</b></p>
       <p className="mt-1 text-sm text-muted">{q.term}</p>
       {/* 실제 집계가 표본 기준(MIN_SOLVERS)을 넘은 문제만. 답을 고른 뒤에만 보인다 */}
-      {rate && <p className="mt-2 inline-block rounded-full bg-card-2 px-3 py-1 text-xs font-medium text-accent">{rate}</p>}
+      {rate && <p className="mt-2 inline-block rounded-full bg-card-2 px-3 py-1 text-xs font-medium text-accent-ink">{rate}</p>}
       <dl className="mt-4 space-y-3">
         {rows.map(([label, text], i) => (
           <div key={label} className="ex-rise" style={{ '--d': `${120 + i * 80}ms` } as React.CSSProperties}>
-            <dt className="text-xs font-bold text-accent">{label}</dt>
+            <dt className="text-xs font-bold text-accent-ink">{label}</dt>
             <dd className="mt-0.5 text-[15px] leading-relaxed break-keep">{text}</dd>
           </div>
         ))}

@@ -42,27 +42,27 @@ function KoFooter() {
         <div className="grid grid-cols-2 gap-6 mb-8">
           {CATEGORIES.filter((c) => c.items.length > 0).map((c) => (
             <div key={c.key} className="space-y-3">
-              <p className="text-accent font-bold text-sm"><Link href={c.href}>{c.title}</Link></p>
+              <p className="text-accent-ink font-bold text-sm"><Link href={c.href}>{c.title}</Link></p>
               <ul className="text-sm space-y-2 text-muted">
                 {c.items.filter((i) => i.footer !== false).map((i) => (
-                  <li key={i.href}><Link href={i.href} className="hover:text-accent">{i.title}</Link></li>
+                  <li key={i.href}><Link href={i.href} className="hover:text-accent-ink">{i.title}</Link></li>
                 ))}
               </ul>
             </div>
           ))}
           <div className="space-y-3">
-            <p className="text-accent font-bold text-sm">함께 해봐요</p>
+            <p className="text-accent-ink font-bold text-sm">함께 해봐요</p>
             <ul className="text-sm space-y-2 text-muted">
               {FOOTER_EXTRA.map((i) => (
-                <li key={i.href}><Link href={i.href} className="hover:text-accent">{i.title}</Link></li>
+                <li key={i.href}><Link href={i.href} className="hover:text-accent-ink">{i.title}</Link></li>
               ))}
             </ul>
           </div>
           <div className="space-y-3 col-span-2 border-t pt-6">
             <p className="text-muted font-bold text-sm">정보</p>
             <ul className="text-sm space-y-2 text-muted">
-              <li><Link href="/about" className="hover:text-accent">서비스 소개</Link></li>
-              <li><Link href="/privacy" className="hover:text-accent">개인정보처리방침</Link></li>
+              <li><Link href="/about" className="hover:text-accent-ink">서비스 소개</Link></li>
+              <li><Link href="/privacy" className="hover:text-accent-ink">개인정보처리방침</Link></li>
             </ul>
           </div>
         </div>
@@ -85,7 +85,7 @@ function EnFooter({ locale }: { locale: Locale }) {
       <div className="max-w-lg mx-auto">
         <ul className="text-sm space-y-2 text-muted mb-8">
           {links.map((l) => (
-            <li key={l.href}><Link href={l.href} className="hover:text-accent">{t(locale, l.key)}</Link></li>
+            <li key={l.href}><Link href={l.href} className="hover:text-accent-ink">{t(locale, l.key)}</Link></li>
           ))}
         </ul>
         <div className="text-center pt-6 border-t border-line">

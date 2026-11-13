@@ -179,7 +179,7 @@ export default function AnimalTypePage() {
             {!en && <NextSteps from="animal" withPhoto={!!image} />}
             <MoreTests current={en ? "/en/animal" : "/animal"} locale={locale} />
 
-            <details className="group mt-4 bg-white border border-line rounded-[22px] px-5 py-4">
+            <details className="group mt-4 bg-card border border-line rounded-[22px] px-5 py-4">
               <summary className="font-bold cursor-pointer list-none flex justify-between items-center">
                 {t("animal.seeMore")}
                 <Icon name="chevron" size={18} className="text-muted transition group-open:rotate-90" />
@@ -213,7 +213,7 @@ export default function AnimalTypePage() {
                   <p className="text-xs text-muted mt-3 mb-1.5">{t("animal.otherSides")}</p>
                   <div className="flex flex-wrap gap-1.5">
                     {d!.personality.negative.map((p) => (
-                      <span key={p} className="px-3 py-1.5 bg-white border border-line rounded-full text-[13px]">{p}</span>
+                      <span key={p} className="px-3 py-1.5 bg-card border border-line rounded-full text-[13px]">{p}</span>
                     ))}
                   </div>
                 </section>

@@ -41,7 +41,7 @@ export default async function CupSharePage({ params }: Props) {
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img src={s.image} alt={`${s.name} 도트 초상화`} className="h-28 w-24 flex-none rounded-2xl border-4 border-gold-game object-cover [image-rendering:pixelated]" />
           <div>
-            <p className="font-medium text-accent">{cupName(BOARDS[s.board].title)}</p>
+            <p className="font-medium text-accent-ink">{cupName(BOARDS[s.board].title)}</p>
             <h1 className="mt-1 font-serif text-[27px] font-bold leading-[1.3] break-keep">{s.name}</h1>
           </div>
         </div>

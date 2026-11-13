@@ -10,7 +10,7 @@ export default function ArticleShare({ testName, title, text, url, imageUrl, gif
   const { busy, notice, share } = useResultShare({ testName, title, text, url, imageUrl });
   return (
     <div className="no-screenshot flex flex-col">
-      <button type="button" onClick={share} disabled={busy} className="h-[48px] rounded-full border border-line bg-white text-ink font-medium text-[15px] flex items-center justify-center gap-2 disabled:opacity-50">
+      <button type="button" onClick={share} disabled={busy} className="h-[48px] rounded-full border border-line bg-card text-ink font-medium text-[15px] flex items-center justify-center gap-2 disabled:opacity-50">
         <Icon name="share" size={18} />
         공유하기
       </button>
