@@ -45,9 +45,9 @@
     "size": 0.36
   },
   "mbti-enfj": {
-    "cx": 0.47,
-    "cy": 0.245,
-    "size": 0.562
+    "cx": 0.5,
+    "cy": 0.24,
+    "size": 0.36
   },
   "mbti-enfp": {
     "cx": 0.43,
@@ -75,9 +75,9 @@
     "size": 0.5
   },
   "mbti-estj": {
-    "cx": 0.49,
-    "cy": 0.235,
-    "size": 0.5
+    "cx": 0.47,
+    "cy": 0.26,
+    "size": 0.36
   },
   "mbti-estp": {
     "cx": 0.52,
@@ -90,9 +90,9 @@
     "size": 0.5
   },
   "mbti-infp": {
-    "cx": 0.45,
-    "cy": 0.255,
-    "size": 0.5
+    "cx": 0.52,
+    "cy": 0.36,
+    "size": 0.36
   },
   "mbti-intj": {
     "cx": 0.45,
@@ -110,9 +110,9 @@
     "size": 0.5
   },
   "mbti-isfp": {
-    "cx": 0.47,
-    "cy": 0.245,
-    "size": 0.5
+    "cx": 0.57,
+    "cy": 0.23,
+    "size": 0.36
   },
   "mbti-istj": {
     "cx": 0.47,
@@ -140,123 +140,123 @@
     "size": 0.5
   },
   "zodiac-rat-f": {
-    "cx": 0.41,
-    "cy": 0.245,
-    "size": 0.5
+    "cx": 0.44,
+    "cy": 0.27,
+    "size": 0.36
   },
   "zodiac-rat-m": {
-    "cx": 0.45,
-    "cy": 0.265,
-    "size": 0.5
+    "cx": 0.46,
+    "cy": 0.28,
+    "size": 0.36
   },
   "zodiac-ox-f": {
     "cx": 0.5,
-    "cy": 0.245,
-    "size": 0.5
+    "cy": 0.14,
+    "size": 0.36
   },
   "zodiac-ox-m": {
-    "cx": 0.47,
-    "cy": 0.265,
-    "size": 0.5
+    "cx": 0.51,
+    "cy": 0.25,
+    "size": 0.36
   },
   "zodiac-tiger-f": {
-    "cx": 0.45,
-    "cy": 0.265,
-    "size": 0.475
+    "cx": 0.48,
+    "cy": 0.21,
+    "size": 0.36
   },
   "zodiac-tiger-m": {
-    "cx": 0.52,
-    "cy": 0.245,
-    "size": 0.5
+    "cx": 0.47,
+    "cy": 0.19,
+    "size": 0.36
   },
   "zodiac-rabbit-f": {
-    "cx": 0.48,
-    "cy": 0.265,
-    "size": 0.525
+    "cx": 0.47,
+    "cy": 0.28,
+    "size": 0.36
   },
   "zodiac-rabbit-m": {
-    "cx": 0.49,
-    "cy": 0.245,
-    "size": 0.5
+    "cx": 0.53,
+    "cy": 0.24,
+    "size": 0.36
   },
   "zodiac-dragon-f": {
-    "cx": 0.47,
-    "cy": 0.245,
-    "size": 0.5
+    "cx": 0.4,
+    "cy": 0.27,
+    "size": 0.36
   },
   "zodiac-dragon-m": {
-    "cx": 0.46,
-    "cy": 0.255,
-    "size": 0.5
+    "cx": 0.47,
+    "cy": 0.15,
+    "size": 0.36
   },
   "zodiac-snake-f": {
-    "cx": 0.47,
-    "cy": 0.255,
-    "size": 0.5
+    "cx": 0.56,
+    "cy": 0.24,
+    "size": 0.36
   },
   "zodiac-snake-m": {
-    "cx": 0.5,
-    "cy": 0.245,
-    "size": 0.5
+    "cx": 0.45,
+    "cy": 0.26,
+    "size": 0.36
   },
   "zodiac-horse-f": {
-    "cx": 0.5,
-    "cy": 0.275,
-    "size": 0.525
+    "cx": 0.49,
+    "cy": 0.18,
+    "size": 0.36
   },
   "zodiac-horse-m": {
-    "cx": 0.5,
-    "cy": 0.265,
-    "size": 0.5
+    "cx": 0.49,
+    "cy": 0.24,
+    "size": 0.36
   },
   "zodiac-sheep-f": {
-    "cx": 0.42,
-    "cy": 0.275,
-    "size": 0.5
+    "cx": 0.47,
+    "cy": 0.35,
+    "size": 0.36
   },
   "zodiac-sheep-m": {
-    "cx": 0.47,
-    "cy": 0.265,
-    "size": 0.5
+    "cx": 0.49,
+    "cy": 0.2,
+    "size": 0.36
   },
   "zodiac-monkey-f": {
-    "cx": 0.42,
-    "cy": 0.295,
-    "size": 0.5
+    "cx": 0.43,
+    "cy": 0.22,
+    "size": 0.36
   },
   "zodiac-monkey-m": {
-    "cx": 0.46,
-    "cy": 0.285,
-    "size": 0.5
+    "cx": 0.47,
+    "cy": 0.24,
+    "size": 0.36
   },
   "zodiac-rooster-f": {
     "cx": 0.47,
-    "cy": 0.255,
-    "size": 0.525
+    "cy": 0.3,
+    "size": 0.36
   },
   "zodiac-rooster-m": {
-    "cx": 0.47,
-    "cy": 0.285,
-    "size": 0.525
+    "cx": 0.55,
+    "cy": 0.19,
+    "size": 0.36
   },
   "zodiac-dog-f": {
-    "cx": 0.46,
-    "cy": 0.305,
-    "size": 0.5
+    "cx": 0.48,
+    "cy": 0.32,
+    "size": 0.36
   },
   "zodiac-dog-m": {
-    "cx": 0.47,
-    "cy": 0.285,
-    "size": 0.5
+    "cx": 0.41,
+    "cy": 0.21,
+    "size": 0.36
   },
   "zodiac-pig-f": {
-    "cx": 0.47,
-    "cy": 0.295,
-    "size": 0.5
+    "cx": 0.56,
+    "cy": 0.35,
+    "size": 0.36
   },
   "zodiac-pig-m": {
     "cx": 0.47,
-    "cy": 0.275,
-    "size": 0.5
+    "cy": 0.23,
+    "size": 0.36
   }
 }
