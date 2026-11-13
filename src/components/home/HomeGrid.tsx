@@ -6,6 +6,7 @@ import type { CategoryItem, Tag } from "@/content/navigation";
 import { portraitThumb } from "@/lib/portraitThumb";
 import { Icon } from "@/components/icons";
 import { CAST, type CastKey } from "@/content/cast";
+import { HOME_ART } from "@/content/homeArt";
 import { t } from "@/lib/i18n/dict";
 import type { Locale } from "@/lib/i18n/locales";
 
@@ -64,23 +65,29 @@ export default function HomeGrid({ items, children, locale = "ko" }: { items: Ca
           const shown = en || visibleFor(chip, item);
           const portrait = item.thumb.image && !item.thumb.alt;
           const castKey = castOf(item);
+          const homeArt = HOME_ART[item.href];
+          const art = homeArt
+            ? { src: homeArt.src, bg: "#151A38", name: homeArt.type }
+            : castKey
+              ? { src: CAST[castKey].img, bg: CAST[castKey].bg, name: en ? CAST[castKey].en : CAST[castKey].name }
+              : null;
           return (
             <li key={item.href} hidden={!shown} data-home-card={item.href} className={n < 6 ? "rise" : undefined} style={{ "--i": n + 3 } as React.CSSProperties}>
-              {castKey ? (
+              {art ? (
                 <Link href={item.href} className="press relative block h-full min-h-[236px] overflow-hidden rounded-[18px] bg-card border border-line">
                   <img
-                    src={CAST[castKey].img}
+                    src={art.src}
                     alt={item.thumb.alt ?? ""}
                     width={720}
                     height={960}
                     loading="lazy"
                     decoding="async"
                     className="absolute inset-0 w-full h-full object-cover object-[center_15%]"
-                    style={{ background: CAST[castKey].bg }}
+                    style={{ background: art.bg }}
                   />
                   <span aria-hidden className="absolute inset-x-0 bottom-0 h-[130px] bg-gradient-to-b from-transparent to-paper" />
                   <span className="absolute left-3 right-3 bottom-3 flex flex-col gap-[3px]">
-                    <span className="text-xs text-accent-ink">{en ? CAST[castKey].en : CAST[castKey].name} · {kindLabel(item, locale)}</span>
+                    <span className="text-xs text-accent-ink">{art.name} · {kindLabel(item, locale)}</span>
                     <span className="text-[15px] font-bold leading-[1.35] break-keep">{item.title}</span>
                     <span className="sr-only">{item.desc}</span>
                   </span>
