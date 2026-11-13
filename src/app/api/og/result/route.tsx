@@ -93,13 +93,13 @@ export async function GET(request: NextRequest) {
 
   return new ImageResponse(
     (
-      <div style={{ width: '100%', height: '100%', display: 'flex', backgroundColor: '#FBF6F1', padding: '48px' }}>
-        <div style={{ position: 'relative', flex: 1, display: 'flex', alignItems: 'center', backgroundColor: '#ECE5D9', borderRadius: '48px', padding: '56px 72px', overflow: 'hidden' }}>
+      <div style={{ width: '100%', height: '100%', display: 'flex', backgroundColor: '#F7F8FC', padding: '48px' }}>
+        <div style={{ position: 'relative', flex: 1, display: 'flex', alignItems: 'center', backgroundColor: '#FFFFFF', border: '3px solid #E1E6F5', borderRadius: '48px', padding: '56px 72px', overflow: 'hidden' }}>
           <div style={{ display: 'flex', flexDirection: 'column', flex: 1 }}>
-            <div style={{ display: 'flex', fontSize: '30px', color: '#9A4F35', fontWeight: 700 }}>운명을 읽다 · {label}</div>
-            <div style={{ display: 'flex', fontSize: '96px', fontWeight: 700, color: '#2E2A27', marginTop: '20px', lineHeight: 1.1 }}>{big}</div>
-            {score ? <div style={{ display: 'flex', fontSize: '52px', fontWeight: 700, color: '#9A4F35', marginTop: '16px' }}>{score}</div> : null}
-            <div style={{ display: 'flex', fontSize: '34px', color: '#6B6259', marginTop: '28px', maxWidth: image ? '640px' : '900px', wordBreak: 'keep-all' }}>{phrase}</div>
+            <div style={{ display: 'flex', fontSize: '30px', color: '#2D55FF', fontWeight: 700 }}>운명을 읽다 · {label}</div>
+            <div style={{ display: 'flex', fontSize: '96px', fontWeight: 700, color: '#1A1B25', marginTop: '20px', lineHeight: 1.1 }}>{big}</div>
+            {score ? <div style={{ display: 'flex', fontSize: '52px', fontWeight: 700, color: '#2D55FF', marginTop: '16px' }}>{score}</div> : null}
+            <div style={{ display: 'flex', fontSize: '34px', color: '#5E6070', marginTop: '28px', maxWidth: image ? '640px' : '900px', wordBreak: 'keep-all' }}>{phrase}</div>
           </div>
           {image ? (
             // eslint-disable-next-line @next/next/no-img-element
@@ -107,8 +107,8 @@ export async function GET(request: NextRequest) {
             <img src={image as unknown as string} width={300} height={360} style={{ objectFit: 'cover', borderRadius: '24px', border: '8px solid #23263A' }} alt="" />
           ) : (
             <div style={{ display: 'flex', position: 'absolute', right: '40px', top: '40px', width: '220px', height: '220px' }}>
-              <div style={{ position: 'absolute', right: '40px', top: '30px', width: '180px', height: '180px', borderRadius: '50%', backgroundColor: '#FBF6F1', display: 'flex' }} />
-              <div style={{ position: 'absolute', right: '0px', top: '0px', width: '170px', height: '170px', borderRadius: '50%', backgroundColor: '#ECE5D9', display: 'flex' }} />
+              <div style={{ position: 'absolute', right: '40px', top: '30px', width: '180px', height: '180px', borderRadius: '50%', backgroundColor: '#EEF1FA', display: 'flex' }} />
+              <div style={{ position: 'absolute', right: '0px', top: '0px', width: '170px', height: '170px', borderRadius: '50%', backgroundColor: '#C6F24E', display: 'flex' }} />
             </div>
           )}
         </div>

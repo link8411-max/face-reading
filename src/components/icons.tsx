@@ -99,9 +99,9 @@ export function Icon({ name, size = 22, className }: { name: IconName; size?: nu
 export function SmileFace({ size = 120 }: { size?: number }) {
   return (
     <svg width={size} height={size} viewBox="0 0 120 120" fill="none" strokeLinecap="round" aria-hidden="true">
-      <circle cx="60" cy="60" r="50" fill="#FBF6F1" />
-      <path d="M44 54c2-3 6-3 8 0M68 54c2-3 6-3 8 0" stroke="#2E2A27" strokeWidth="2.4" />
-      <path d="M48 74c7 7 17 7 24 0" stroke="#2E2A27" strokeWidth="2.4" />
+      <circle cx="60" cy="60" r="50" fill="#F7F8FC" />
+      <path d="M44 54c2-3 6-3 8 0M68 54c2-3 6-3 8 0" stroke="#1A1B25" strokeWidth="2.4" />
+      <path d="M48 74c7 7 17 7 24 0" stroke="#1A1B25" strokeWidth="2.4" />
       <circle cx="40" cy="68" r="6" fill="#E9BCA8" />
       <circle cx="80" cy="68" r="6" fill="#E9BCA8" />
     </svg>
@@ -109,14 +109,14 @@ export function SmileFace({ size = 120 }: { size?: number }) {
 }
 
 // 초승달·별 장식 (히어로·결과 카드 오른쪽 위). 바탕색 위에 겹쳐 그린다.
-export function MoonDeco({ bg = "#ECE5D9", size = 150 }: { bg?: string; size?: number }) {
+export function MoonDeco({ bg = "#EEF1FA", size = 150 }: { bg?: string; size?: number }) {
   return (
     <svg width={size} height={size} viewBox="0 0 150 150" fill="none" aria-hidden="true">
-      <circle cx="88" cy="62" r="44" fill="#FBF6F1" />
+      <circle cx="88" cy="62" r="44" fill="#F7F8FC" />
       <circle cx="108" cy="50" r="40" fill={bg} />
-      <path d="M30 30l3 7 7 3-7 3-3 7-3-7-7-3 7-3z" fill="#9A4F35" />
-      <circle cx="132" cy="118" r="3" fill="#9A4F35" />
-      <circle cx="52" cy="112" r="2" fill="#2E2A27" />
+      <path d="M30 30l3 7 7 3-7 3-3 7-3-7-7-3 7-3z" fill="#2D55FF" />
+      <circle cx="132" cy="118" r="3" fill="#2D55FF" />
+      <circle cx="52" cy="112" r="2" fill="#1A1B25" />
     </svg>
   );
 }

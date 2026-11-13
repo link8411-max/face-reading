@@ -7,8 +7,8 @@ export default function manifest(): MetadataRoute.Manifest {
     description: '무료 AI 관상 분석과 사주팔자 기반 신년운세',
     start_url: '/',
     display: 'standalone',
-    background_color: '#FBF6F1',
-    theme_color: '#FBF6F1',
+    background_color: '#F7F8FC',
+    theme_color: '#F7F8FC',
     orientation: 'portrait',
     icons: [
       { src: '/icons/icon-192.png', sizes: '192x192', type: 'image/png' },

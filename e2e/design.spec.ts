@@ -1,11 +1,11 @@
 import { test, expect } from '@playwright/test'
 
-test('본문에 한글 글꼴(Noto Sans KR)과 뉴트럴 바탕·글자색이 실제로 적용된다', async ({ page }) => {
+test('본문에 한글 글꼴(Pretendard)과 새 색 바탕·글자색이 실제로 적용된다', async ({ page }) => {
   await page.goto('/')
   const s = await page.evaluate(() => { const c = getComputedStyle(document.body); return { font: c.fontFamily, bg: c.backgroundColor, color: c.color } })
   expect(s.font).toMatch(/pretendard/i)
-  expect(s.bg).toBe('rgb(251, 246, 241)')
-  expect(s.color).toBe('rgb(46, 42, 39)')
+  expect(s.bg).toBe('rgb(247, 248, 252)')
+  expect(s.color).toBe('rgb(26, 27, 37)')
 })
 
 test('홈 대표 제목(h1)은 사이트 이름과 핵심 키워드, 시즌 문구는 h2', async ({ page }) => {

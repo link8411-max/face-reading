@@ -1,14 +1,15 @@
 @import "tailwindcss";
 
-/* 뉴트럴 디자인 토큰 (4b, 디자인 캔버스 시안): bg-paper, bg-card, text-ink, text-accent 등으로 쓴다 */
+/* 디자인 토큰: 시안 B(블루·라임, 2026-11-13): bg-paper, bg-card, text-ink, text-accent 등으로 쓴다 */
 @theme {
-  --color-paper: #FBF6F1;
-  --color-card: #ECE5D9;
-  --color-card-2: #F1EBE2;
-  --color-line: #E6DED2;
-  --color-ink: #2E2A27;
-  --color-muted: #6B6259;
-  --color-accent: #9A4F35;
+  --color-paper: #F7F8FC;
+  --color-card: #FFFFFF;
+  --color-card-2: #EEF1FA;
+  --color-line: #E1E6F5;
+  --color-ink: #1A1B25;
+  --color-muted: #5E6070;
+  --color-accent: #2D55FF;
+  --color-lime: #C6F24E;
   --color-blush: #E9BCA8;
   --color-navy-game: #23263A;
   --color-gold-game: #E8B547;

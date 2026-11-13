@@ -3,7 +3,7 @@ import { NextRequest } from 'next/server';
 
 export const runtime = 'edge';
 
-// 공유 미리보기(OG) 이미지 — 사이트 뉴트럴 톤(바탕 #FBF6F1, 오트밀 카드, 테라코타 포인트)
+// 공유 미리보기(OG) 이미지 — 사이트 뉴트럴 톤(바탕 #F7F8FC, 흰 카드, 블루·라임 포인트)
 export async function GET(request: NextRequest) {
   try {
     const { searchParams } = new URL(request.url);
@@ -13,7 +13,7 @@ export async function GET(request: NextRequest) {
 
     return new ImageResponse(
       (
-        <div style={{ height: '100%', width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', backgroundColor: '#FBF6F1', padding: '56px' }}>
+        <div style={{ height: '100%', width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', backgroundColor: '#F7F8FC', padding: '56px' }}>
           <div
             style={{
               position: 'relative',
@@ -22,24 +22,25 @@ export async function GET(request: NextRequest) {
               display: 'flex',
               flexDirection: 'column',
               justifyContent: 'center',
-              backgroundColor: '#ECE5D9',
+              backgroundColor: '#FFFFFF',
+              border: '3px solid #E1E6F5',
               borderRadius: '48px',
               padding: '64px 80px',
               overflow: 'hidden',
             }}
           >
             {/* 초승달·별 장식 */}
-            <div style={{ position: 'absolute', right: '60px', top: '40px', width: '220px', height: '220px', borderRadius: '50%', backgroundColor: '#FBF6F1', display: 'flex' }} />
-            <div style={{ position: 'absolute', right: '20px', top: '10px', width: '200px', height: '200px', borderRadius: '50%', backgroundColor: '#ECE5D9', display: 'flex' }} />
-            <div style={{ position: 'absolute', right: '330px', top: '70px', width: '22px', height: '22px', borderRadius: '50%', backgroundColor: '#9A4F35', display: 'flex' }} />
+            <div style={{ position: 'absolute', right: '60px', top: '40px', width: '220px', height: '220px', borderRadius: '50%', backgroundColor: '#EEF1FA', display: 'flex' }} />
+            <div style={{ position: 'absolute', right: '20px', top: '10px', width: '200px', height: '200px', borderRadius: '50%', backgroundColor: '#C6F24E', display: 'flex' }} />
+            <div style={{ position: 'absolute', right: '330px', top: '70px', width: '22px', height: '22px', borderRadius: '50%', backgroundColor: '#2D55FF', display: 'flex' }} />
 
-            <div style={{ display: 'flex', fontSize: '30px', color: '#9A4F35', fontWeight: 700 }}>운명을 읽다</div>
+            <div style={{ display: 'flex', fontSize: '30px', color: '#2D55FF', fontWeight: 700 }}>운명을 읽다</div>
             <div style={{ display: 'flex', alignItems: 'center', gap: '24px', marginTop: '24px' }}>
               {icon ? <span style={{ fontSize: '84px' }}>{icon}</span> : null}
-              <span style={{ fontSize: '84px', fontWeight: 700, color: '#2E2A27', lineHeight: 1.2 }}>{title}</span>
+              <span style={{ fontSize: '84px', fontWeight: 700, color: '#1A1B25', lineHeight: 1.2 }}>{title}</span>
             </div>
-            <div style={{ display: 'flex', fontSize: '38px', color: '#6B6259', marginTop: '24px' }}>{subtitle}</div>
-            <div style={{ display: 'flex', fontSize: '28px', color: '#6B6259', marginTop: '48px' }}>unse-ai.com</div>
+            <div style={{ display: 'flex', fontSize: '38px', color: '#5E6070', marginTop: '24px' }}>{subtitle}</div>
+            <div style={{ display: 'flex', fontSize: '28px', color: '#5E6070', marginTop: '48px' }}>unse-ai.com</div>
           </div>
         </div>
       ),

@@ -17,9 +17,9 @@ export default function ResultCard({ eyebrow, title, summary, art, bars, chips, 
   return (
     <article ref={captureRef} className="relative overflow-hidden bg-card rounded-[30px] px-[22px] pt-6 pb-5 flex flex-col text-ink">
       <svg width="120" height="120" viewBox="0 0 120 120" fill="none" aria-hidden="true" className="absolute -right-2.5 -top-1.5">
-        <circle cx="74" cy="46" r="32" fill="#FBF6F1" />
-        <circle cx="90" cy="36" r="29" fill="#ECE5D9" />
-        <path d="M26 26l2 5 5 2-5 2-2 5-2-5-5-2 5-2z" fill="#9A4F35" />
+        <circle cx="74" cy="46" r="32" fill="#F7F8FC" />
+        <circle cx="90" cy="36" r="29" fill="#EEF1FA" />
+        <path d="M26 26l2 5 5 2-5 2-2 5-2-5-5-2 5-2z" fill="#2D55FF" />
       </svg>
       <p className="relative text-xs font-medium text-accent">{eyebrow}</p>
       <h2 className="relative font-serif font-bold text-[25px] leading-[1.4] mt-2 pr-16 break-keep">{title}</h2>

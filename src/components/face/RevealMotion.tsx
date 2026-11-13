@@ -9,7 +9,7 @@ import { revealPlan, STEP_MS, type RevealStep } from "@/lib/face/revealTimeline"
 
 const W = 390;
 const H = 488; // 4:5
-const ACCENT = "#A4553A";
+const ACCENT = "#2D55FF";
 const PALACE_GAP_MS = 400;
 
 interface Props {

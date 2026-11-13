@@ -40,7 +40,7 @@ export default function ThreeKingdomsMap({ count, selected, onSelect }: { count:
       <svg viewBox="0 0 360 300" role="group" aria-label="삼국 개략도" className="block w-full h-auto rounded-[22px] border border-line bg-card-2">
         <defs>
           <pattern id="tk-dots" width="6" height="6" patternUnits="userSpaceOnUse">
-            <rect width="2" height="2" fill="#2E2A27" opacity="0.1" />
+            <rect width="2" height="2" fill="#1A1B25" opacity="0.1" />
           </pattern>
         </defs>
         {REGIONS.map((r) => {
@@ -57,15 +57,15 @@ export default function ThreeKingdomsMap({ count, selected, onSelect }: { count:
               className="group cursor-pointer outline-none"
               opacity={dim(r.key)}
             >
-              <polygon points={r.points} fill={on ? r.fillOn : r.fill} stroke={on ? '#9A4F35' : '#B8AE9F'} strokeWidth={on ? 3 : 1.5} strokeLinejoin="miter" shapeRendering="crispEdges" className="transition-colors group-hover:brightness-95 group-focus-visible:stroke-accent group-focus-visible:[stroke-width:3px]" />
+              <polygon points={r.points} fill={on ? r.fillOn : r.fill} stroke={on ? '#2D55FF' : '#B8AE9F'} strokeWidth={on ? 3 : 1.5} strokeLinejoin="miter" shapeRendering="crispEdges" className="transition-colors group-hover:brightness-95 group-focus-visible:stroke-accent group-focus-visible:[stroke-width:3px]" />
               <polygon points={r.points} fill="url(#tk-dots)" pointerEvents="none" shapeRendering="crispEdges" />
-              <text x={r.label[0]} y={r.label[1]} fontSize="26" fontWeight="700" className="font-serif" fill="#2E2A27" pointerEvents="none">{r.key}</text>
-              <text x={r.label[0] + 2} y={r.label[1] + 20} fontSize="13" fill="#6B6259" pointerEvents="none">{count[r.key] ?? 0}명</text>
+              <text x={r.label[0]} y={r.label[1]} fontSize="26" fontWeight="700" className="font-serif" fill="#1A1B25" pointerEvents="none">{r.key}</text>
+              <text x={r.label[0] + 2} y={r.label[1] + 20} fontSize="13" fill="#5E6070" pointerEvents="none">{count[r.key] ?? 0}명</text>
               {r.capitals.map((c) => (
                 <g key={c.name} pointerEvents="none">
-                  <circle cx={c.at[0]} cy={c.at[1]} r="4" fill="#2E2A27" />
-                  <circle cx={c.at[0]} cy={c.at[1]} r="7" fill="none" stroke="#2E2A27" strokeWidth="1" opacity="0.5" />
-                  <text x={c.side === 'left' ? c.at[0] - 12 : c.at[0] + 12} y={c.at[1] + 4.5} textAnchor={c.side === 'left' ? 'end' : 'start'} fontSize="13" fontWeight="700" fill="#2E2A27">{c.name}</text>
+                  <circle cx={c.at[0]} cy={c.at[1]} r="4" fill="#1A1B25" />
+                  <circle cx={c.at[0]} cy={c.at[1]} r="7" fill="none" stroke="#1A1B25" strokeWidth="1" opacity="0.5" />
+                  <text x={c.side === 'left' ? c.at[0] - 12 : c.at[0] + 12} y={c.at[1] + 4.5} textAnchor={c.side === 'left' ? 'end' : 'start'} fontSize="13" fontWeight="700" fill="#1A1B25">{c.name}</text>
                 </g>
               ))}
             </g>
@@ -83,8 +83,8 @@ export default function ThreeKingdomsMap({ count, selected, onSelect }: { count:
         >
           {/* 눈에 보이는 칩은 작게, 누르는 영역은 위아래·좌우로 넓힌다(화면에서 44px 이상) */}
           <rect x="256" y="0" width="104" height="50" fill="#000" fillOpacity="0" />
-          <rect x="268" y="8" width="80" height="28" rx="14" fill={selected === '기타' ? '#2E2A27' : '#FBF6F1'} stroke={selected === '기타' ? '#2E2A27' : '#B8AE9F'} strokeWidth="1.5" className="group-focus-visible:stroke-accent group-focus-visible:[stroke-width:3px]" />
-          <text x="308" y="27" textAnchor="middle" fontSize="14" fontWeight="700" fill={selected === '기타' ? '#FBF6F1' : '#2E2A27'} pointerEvents="none">군웅</text>
+          <rect x="268" y="8" width="80" height="28" rx="14" fill={selected === '기타' ? '#1A1B25' : '#F7F8FC'} stroke={selected === '기타' ? '#1A1B25' : '#B8AE9F'} strokeWidth="1.5" className="group-focus-visible:stroke-accent group-focus-visible:[stroke-width:3px]" />
+          <text x="308" y="27" textAnchor="middle" fontSize="14" fontWeight="700" fill={selected === '기타' ? '#F7F8FC' : '#1A1B25'} pointerEvents="none">군웅</text>
         </g>
       </svg>
       <figcaption className="mt-2 text-[11px] text-muted">개략도예요. 실제 국경과 다를 수 있어요</figcaption>

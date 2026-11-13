@@ -3,11 +3,11 @@ import { Icon, type IconName } from "@/components/icons";
 
 // "친구랑 같이 해봐요" 2열 카드. 관상(/face2)은 바로 위 히어로가 맡으므로 넣지 않는다
 export const PLAY_TOGETHER: { title: string; desc: string; href: string; icon: IconName; bg: string }[] = [
-  { title: "동물상 테스트", desc: "고양이상? 여우상?", href: "/animal", icon: "cat", bg: "#F3EBDD" },
-  { title: "얼굴 궁합", desc: "친구·연인·짝사랑 궁합", href: "/face-match", icon: "heart", bg: "#E6E8DF" },
-  { title: "MBTI 궁합 계산기", desc: "연애·친구·직장 궁합 점수", href: "/mbti/match", icon: "rings", bg: "#ECE6F0" },
-  { title: "나는 삼국지 속 누구?", desc: "닮은 장수와 회사생활 스탯", href: "/samguk", icon: "fan", bg: "#E8EEE6" },
-  { title: "밈 능력고사", desc: "매일 5문제, 내 등급은?", href: "/exam/meme", icon: "spark", bg: "#F1EBE2" },
+  { title: "동물상 테스트", desc: "고양이상? 여우상?", href: "/animal", icon: "cat", bg: "#E6EDFF" },
+  { title: "얼굴 궁합", desc: "친구·연인·짝사랑 궁합", href: "/face-match", icon: "heart", bg: "#E2F5EA" },
+  { title: "MBTI 궁합 계산기", desc: "연애·친구·직장 궁합 점수", href: "/mbti/match", icon: "rings", bg: "#E2F5EA" },
+  { title: "나는 삼국지 속 누구?", desc: "닮은 장수와 회사생활 스탯", href: "/samguk", icon: "fan", bg: "#ECE8FF" },
+  { title: "밈 능력고사", desc: "매일 5문제, 내 등급은?", href: "/exam/meme", icon: "spark", bg: "#ECE8FF" },
 ];
 
 export default function PlayTogether() {

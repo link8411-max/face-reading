@@ -18,7 +18,7 @@ export default function SeasonCard() {
     return onDayMaybeChanged(update);
   }, []);
   return (
-    <section aria-label={season.chip} className="bg-[#E6E8DF] rounded-[22px] p-5 flex items-center gap-3.5">
+    <section aria-label={season.chip} className="bg-[#E6EDFF] rounded-[22px] p-5 flex items-center gap-3.5">
       <div className="flex-1">
         <p className="text-xs font-medium text-[#4F5A43]">{season.chip}</p>
         <h2 className="font-serif font-bold text-[17px] leading-[1.4] mt-1.5 whitespace-pre-line">{season.title}</h2>
@@ -28,9 +28,9 @@ export default function SeasonCard() {
         </Link>
       </div>
       <svg width="64" height="64" viewBox="0 0 64 64" fill="none" aria-hidden="true">
-        <circle cx="24" cy="32" r="16" fill="#FBF6F1" />
+        <circle cx="24" cy="32" r="16" fill="#F7F8FC" />
         <circle cx="40" cy="32" r="16" fill="#CFD6C4" />
-        <path d="M32 22l2 5 5 2-5 2-2 5-2-5-5-2 5-2z" fill="#9A4F35" />
+        <path d="M32 22l2 5 5 2-5 2-2 5-2-5-5-2 5-2z" fill="#2D55FF" />
       </svg>
     </section>
   );

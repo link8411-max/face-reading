@@ -45,7 +45,7 @@ function showSaveModal(blob: Blob, ua: string) {
   modal.setAttribute('aria-label', '이미지 저장')
   modal.style.cssText = 'position:fixed;inset:0;z-index:9999;background:rgba(46,42,39,0.95);display:flex;flex-direction:column;justify-content:center;align-items:center;padding:20px;gap:14px;'
   const msg = document.createElement('p')
-  msg.style.cssText = 'color:#FBF6F1;font-size:16px;text-align:center;margin:0;'
+  msg.style.cssText = 'color:#F7F8FC;font-size:16px;text-align:center;margin:0;'
   msg.textContent = '이미지를 길게 눌러 저장하세요'
   const img = document.createElement('img')
   img.alt = '결과 이미지'
@@ -59,7 +59,7 @@ function showSaveModal(blob: Blob, ua: string) {
     const b = document.createElement('button')
     b.type = 'button'
     b.textContent = label
-    b.style.cssText = `padding:12px 22px;border-radius:999px;font-size:15px;font-weight:bold;border:1px solid #FBF6F1;${primary ? 'background:#FBF6F1;color:#2E2A27;' : 'background:transparent;color:#FBF6F1;'}`
+    b.style.cssText = `padding:12px 22px;border-radius:999px;font-size:15px;font-weight:bold;border:1px solid #F7F8FC;${primary ? 'background:#F7F8FC;color:#1A1B25;' : 'background:transparent;color:#F7F8FC;'}`
     return b
   }
   const external = externalOpenUrl(ua, location.href)

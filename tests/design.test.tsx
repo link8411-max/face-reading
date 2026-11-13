@@ -29,8 +29,8 @@ test('본문·제목 글꼴 변수는 둘 다 Pretendard', () => {
 })
 
 const TOKENS: [string, string][] = [
-  ['paper', '#FBF6F1'], ['card', '#ECE5D9'], ['card-2', '#F1EBE2'], ['line', '#E6DED2'],
-  ['ink', '#2E2A27'], ['muted', '#6B6259'], ['accent', '#9A4F35'], ['blush', '#E9BCA8'],
+  ['paper', '#F7F8FC'], ['card', '#FFFFFF'], ['card-2', '#EEF1FA'], ['line', '#E1E6F5'],
+  ['ink', '#1A1B25'], ['muted', '#5E6070'], ['accent', '#2D55FF'], ['lime', '#C6F24E'], ['blush', '#E9BCA8'],
   ['navy-game', '#23263A'], ['gold-game', '#E8B547'],
   ['bujeok-paper', '#E6C35C'], ['bujeok-jusa', '#B3261E'], ['bujeok-cute-paper', '#FFFAF2'], ['bujeok-cute-ink', '#5B4037'],
 ]
@@ -47,8 +47,19 @@ const lum = (hex: string) => {
 const contrast = (a: string, b: string) => { const [x, y] = [lum(a), lum(b)].sort((m, n) => n - m); return (x + 0.05) / (y + 0.05) }
 const hex = (n: string) => TOKENS.find(([k]) => k === n)![1]
 
-test.each([['muted', 'card'], ['ink', 'card'], ['paper', 'ink'], ['accent', 'paper'], ['muted', 'paper']])('%s on %s 대비 4.5 이상', (fg, bg) => {
+test.each([['muted', 'card'], ['ink', 'card'], ['paper', 'ink'], ['accent', 'paper'], ['muted', 'paper'], ['accent', 'card-2'], ['muted', 'card-2']])('%s on %s 대비 4.5 이상', (fg, bg) => {
   expect(contrast(hex(fg), hex(bg))).toBeGreaterThanOrEqual(4.5)
+})
+
+test('주 버튼 흰 글씨가 포인트색 위에서 대비 4.5 이상', () => {
+  expect(contrast('#FFFFFF', hex('accent'))).toBeGreaterThanOrEqual(4.5)
+})
+
+test('옛 베이지·테라코타 색이 src에 남아 있지 않다(부적·게임 전용 색 제외)', () => {
+  const { execSync } = require('node:child_process')
+  // 일기토 게임 팔레트(src/game)는 화면 개편 범위 밖이라 뺀다(palette.ts·config.ts가 #6B6259를 쓴다)
+  const hits = execSync("grep -rniE '#(FBF6F1|ECE5D9|F1EBE2|E6DED2|2E2A27|6B6259|9A4F35|A4553A)' src --exclude-dir=game || true", { encoding: 'utf8' }).trim()
+  expect(hits).toBe('')
 })
 
 test.each(ICON_NAMES)('아이콘 %s는 장식용(aria-hidden)이고 선 굵기 1.6', (name) => {
