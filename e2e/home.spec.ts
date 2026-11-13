@@ -4,8 +4,8 @@ import { trackErrors } from './helpers'
 test('관상 히어로 → 관상, 시즌 카드(수능 뒤) → 내 사주 풀이', async ({ page }) => {
   await page.clock.setFixedTime(new Date('2026-11-25T10:00:00+09:00'))
   await page.goto('/')
-  await expect(page.getByRole('heading', { name: /내 얼굴에는/ })).toBeVisible()
-  await page.getByRole('link', { name: '내 관상 보러 가기' }).click()
+  await expect(page.getByRole('heading', { name: '저승사자의 명부 사주' })).toBeVisible()
+  await page.getByRole('link', { name: /내 관상 보러 가기/ }).click()
   await expect(page).toHaveURL(/\/face2$/)
   await page.goto('/')
   await page.getByRole('link', { name: /내 사주 보기/ }).click()
@@ -57,7 +57,7 @@ test('홈 순서: 칩 → 대표 카드 → 시즌 띠 → 카드 2열 → 오�
   await page.goto('/')
   const y = async (loc: import('@playwright/test').Locator) => (await loc.boundingBox())!.y
   const chips = await y(page.getByRole('button', { name: '전체', exact: true }))
-  const hero = await y(page.getByRole('region', { name: /내 얼굴에는/ }))
+  const hero = await y(page.getByRole('region', { name: '오늘의 추천' }))
   const season = await y(page.locator('section[aria-label^="수능"], section[aria-label="내 사주 풀이"]'))
   const grid = await y(page.getByRole('list', { name: '테스트 카드' }))
   const today = await y(page.getByRole('region', { name: '오늘 새로 바뀐 것' }))
@@ -65,6 +65,17 @@ test('홈 순서: 칩 → 대표 카드 → 시즌 띠 → 카드 2열 → 오�
   const faq = await y(page.getByRole('region', { name: '자주 묻는 질문' }))
   const order = [chips, hero, season, grid, today, banner, faq]
   expect(order).toEqual([...order].sort((a, b) => a - b))
+})
+
+test('캐러셀: 여섯 장, 옆으로 넘기면 표시가 2 / 6, 320px에서도 넘치지 않는다', async ({ page }) => {
+  for (const width of [320, 390]) {
+    await page.setViewportSize({ width, height: 800 }); await page.goto('/')
+    await expect(page.locator('[data-hero-slide]')).toHaveCount(6)
+    await expect(page.locator('[data-hero-count]')).toHaveText('1 / 6')
+    await page.locator('[data-hero-scroller]').evaluate((e) => { e.scrollTo({ left: e.clientWidth, behavior: 'instant' as ScrollBehavior }) })
+    await expect(page.locator('[data-hero-count]')).toHaveText('2 / 6')
+    expect(await page.evaluate(() => document.documentElement.scrollWidth > window.innerWidth), `${width}px`).toBe(false)
+  }
 })
 
 test('띠 바로 고르기는 오늘 탭으로 옮겨졌다', async ({ page }) => {
@@ -79,11 +90,11 @@ test('띠 바로 고르기는 오늘 탭으로 옮겨졌다', async ({ page }) =
   await expect(page.getByRole('region', { name: '띠 바로 고르기' })).toHaveCount(0)
 })
 
-test('390px 홈 본문 높이 2600px 이하(푸터 제외)', async ({ page }) => {
+test('390px 홈 본문 높이 3000px 이하(푸터 제외, 큰 캐릭터 카드 때문에 2600에서 올림)', async ({ page }) => {
   await page.setViewportSize({ width: 390, height: 844 }); await page.goto('/')
   const h = await page.evaluate(() => document.querySelector('main')!.getBoundingClientRect().height)
   console.log('HOME_MAIN_HEIGHT', h)
-  expect(h).toBeLessThanOrEqual(2600)
+  expect(h).toBeLessThanOrEqual(3000)
 })
 
 test('검색으로 테스트 시작 화면에 들어와도 다른 테스트로 가는 줄이 있다', async ({ page }) => {

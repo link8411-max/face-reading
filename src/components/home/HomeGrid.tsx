@@ -5,6 +5,7 @@ import { useState, type ReactNode } from "react";
 import type { CategoryItem, Tag } from "@/content/navigation";
 import { portraitThumb } from "@/lib/portraitThumb";
 import { Icon } from "@/components/icons";
+import { CAST, type CastKey } from "@/content/cast";
 import { t } from "@/lib/i18n/dict";
 import type { Locale } from "@/lib/i18n/locales";
 
@@ -19,6 +20,17 @@ const CHIPS: { key: "all" | Tag; label: string }[] = [
 // 처음에 보이는 8개(서버 HTML에는 나머지도 모두 있고 hidden으로만 가린다)
 export const HOME_DEFAULT = ["/face2", "/animal", "/face-match", "/fortune/daily", "/bujeok", "/exam/meme", "/samguk", "/saju"];
 
+// 캐릭터 얼굴 썸네일(/images/cast/<키>-face.webp)이 있는 항목은 큰 캐릭터 카드로 그린다
+function castOf(item: CategoryItem): CastKey | null {
+  const m = item.thumb.alt && item.thumb.image?.match(/\/images\/cast\/([a-z]+)-face\.webp$/);
+  return m && m[1] in CAST ? (m[1] as CastKey) : null;
+}
+
+const KIND_KEY = { face: "chip.face", fortune: "chip.fortune", match: "chip.match", play: "chip.play" } as const;
+function kindLabel(item: CategoryItem, locale: Locale): string {
+  return t(locale, KIND_KEY[item.tags[0]]);
+}
+
 /** 칩 하나에서 보일 항목: 전체는 기본 8개, 나머지는 그 태그 항목 전부 */
 export function visibleFor(chip: "all" | Tag, item: CategoryItem): boolean {
   return chip === "all" ? HOME_DEFAULT.includes(item.href) : item.tags.includes(chip);
@@ -32,27 +44,49 @@ export default function HomeGrid({ items, children, locale = "ko" }: { items: Ca
   const ordered = en ? items : [...HOME_DEFAULT.map((h) => items.find((i) => i.href === h)!), ...items.filter((i) => !HOME_DEFAULT.includes(i.href))];
   return (
     <div className="space-y-3">
-      {!en && <div role="group" aria-label="테스트 종류" className="flex gap-2 overflow-x-auto [scrollbar-width:none] -mx-4 px-4">
+      {!en && <div role="group" aria-label="테스트 종류" className="flex gap-[22px] overflow-x-auto [scrollbar-width:none] -mx-4 px-4 border-b border-line">
         {CHIPS.map((c) => (
           <button
             key={c.key}
             type="button"
             aria-pressed={chip === c.key}
             onClick={() => setChip(c.key)}
-            className={`press flex-none h-10 px-4 rounded-full text-sm font-semibold border transition-colors ${chip === c.key ? "bg-ink text-paper border-ink" : "bg-card text-ink border-line"}`}
+            className={`flex-none h-11 text-[15px] border-b-2 -mb-px transition-colors ${chip === c.key ? "text-ink border-ink font-bold" : "text-muted border-transparent"}`}
           >
             {c.label}
           </button>
         ))}
       </div>}
       {children}
-      <ul aria-label={t(locale, "home.cardsAria")} className="grid grid-cols-2 gap-2.5">
+      <h2 className="font-serif font-extrabold text-[19px] tracking-tight px-1 pt-3">{t(locale, "home.askWho")}</h2>
+      <ul aria-label={t(locale, "home.cardsAria")} className="grid grid-cols-2 gap-3">
         {ordered.map((item, n) => {
           const shown = en || visibleFor(chip, item);
           const portrait = item.thumb.image && !item.thumb.alt;
+          const castKey = castOf(item);
           return (
             <li key={item.href} hidden={!shown} data-home-card={item.href} className={n < 6 ? "rise" : undefined} style={{ "--i": n + 3 } as React.CSSProperties}>
-              <Link href={item.href} className="press relative block h-full min-h-[176px] overflow-hidden rounded-[24px] bg-card border border-line p-4">
+              {castKey ? (
+                <Link href={item.href} className="press relative block h-full min-h-[236px] overflow-hidden rounded-[18px] bg-card border border-line">
+                  <img
+                    src={CAST[castKey].img}
+                    alt={item.thumb.alt ?? ""}
+                    width={720}
+                    height={960}
+                    loading="lazy"
+                    decoding="async"
+                    className="absolute inset-0 w-full h-full object-cover object-[center_15%]"
+                    style={{ background: CAST[castKey].bg }}
+                  />
+                  <span aria-hidden className="absolute inset-x-0 bottom-0 h-[130px] bg-gradient-to-b from-transparent to-paper" />
+                  <span className="absolute left-3 right-3 bottom-3 flex flex-col gap-[3px]">
+                    <span className="text-xs text-accent-ink">{en ? CAST[castKey].en : CAST[castKey].name} · {kindLabel(item, locale)}</span>
+                    <span className="text-[15px] font-bold leading-[1.35] break-keep">{item.title}</span>
+                    <span className="sr-only">{item.desc}</span>
+                  </span>
+                </Link>
+              ) : (
+              <Link href={item.href} className="press relative block h-full min-h-[236px] overflow-hidden rounded-[18px] bg-card border border-line p-4">
                 {item.thumb.bg && (
                   <span aria-hidden className="absolute inset-x-0 bottom-0 h-[46%]" style={{ background: `${item.thumb.bg}2E` }} />
                 )}
@@ -75,6 +109,7 @@ export default function HomeGrid({ items, children, locale = "ko" }: { items: Ca
                   </span>
                 )}
               </Link>
+              )}
             </li>
           );
         })}

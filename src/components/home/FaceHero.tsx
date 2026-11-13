@@ -1,41 +1,47 @@
-import { Fragment } from "react";
 import Link from "next/link";
 import { CAST } from "@/content/cast";
-import TodayLabel from "@/components/home/TodayLabel";
+import { HOME_HERO, EN_HERO_ROUTES } from "@/content/homeHero";
+import HeroScroller from "@/components/home/HeroScroller";
 import { t } from "@/lib/i18n/dict";
 import { localePath, type Locale } from "@/lib/i18n/locales";
 
-// 메인 대표 카드: 관상(/face2)으로 바로 이어진다. 오른쪽은 관상을 맡은 해태.
+// 홈 대표 캐러셀: 캐릭터 큰 카드. 첫 장만 먼저 받고(LCP) 나머지는 늦게 받는다. 모든 장이 서버 HTML에 있다.
 export default function FaceHero({ locale = "ko" }: { locale?: Locale }) {
-  const c = CAST.haetae;
-  const lines = t(locale, "home.heroHeading").split("\n");
+  const slides = locale === "en" ? HOME_HERO.filter((s) => EN_HERO_ROUTES.includes(s.href)) : HOME_HERO;
   return (
-    <section aria-labelledby="face-hero-title" className="press relative overflow-hidden bg-card border border-line rounded-[28px] p-[22px] min-h-[210px]">
-      <div className="relative z-10 max-w-[56%]">
-        <span className="inline-block text-xs font-bold bg-lime text-paper px-2.5 py-1 rounded-full">{t(locale, "home.badge")}</span>
-        <h2 id="face-hero-title" className="font-serif font-extrabold text-[23px] leading-[1.3] tracking-tight mt-3 break-keep">
-          {lines.map((l, i) => (
-            <Fragment key={l}>
-              {i > 0 && <br />}
-              {l}
-            </Fragment>
-          ))}
-        </h2>
-        {locale === "ko" && <p className="text-xs text-muted mt-2"><TodayLabel suffix="오늘의 얼굴 운" /></p>}
-        <Link href={localePath(locale, "/face2")} className="mt-3.5 h-11 px-5 rounded-full inline-flex items-center justify-center bg-accent text-white text-[15px] font-bold">
-          {t(locale, "home.heroStart")}<span className="sr-only">{t(locale, "home.heroSr")}</span>
-        </Link>
-        <p className="text-[11px] text-muted mt-2">{t(locale, "home.heroPrivacy")}</p>
-      </div>
-      <img
-        src={c.img}
-        alt={`${locale === "en" ? c.en : c.name} ${t(locale, "cast.alt")}`}
-        width={142}
-        height={142}
-        fetchPriority="high"
-        className="absolute right-3.5 bottom-3.5 w-[142px] h-[142px] rounded-[34px] object-cover"
-        style={{ background: c.bg }}
-      />
+    <section aria-label={t(locale, "home.heroAria")}>
+      <HeroScroller total={slides.length}>
+        {slides.map((s, i) => {
+          const c = CAST[s.cast];
+          const name = locale === "en" ? c.en : c.name;
+          return (
+            <Link
+              key={s.cast}
+              href={localePath(locale, s.href)}
+              data-hero-slide
+              data-index={i}
+              className="relative flex-none w-full h-[500px] snap-center block overflow-hidden"
+              style={{ background: c.bg }}
+            >
+              <img
+                src={c.img}
+                alt={`${name} ${t(locale, "cast.alt")}`}
+                width={720}
+                height={960}
+                {...(i === 0 ? { fetchPriority: "high" as const } : { loading: "lazy" as const, decoding: "async" as const })}
+                className="absolute inset-0 w-full h-full object-cover object-[center_20%]"
+              />
+              <span aria-hidden className="absolute inset-x-0 bottom-0 h-[270px] bg-gradient-to-b from-transparent via-paper/85 to-paper" />
+              <span className="absolute left-5 right-5 bottom-[22px] flex flex-col gap-2.5">
+                <span className="self-start px-2.5 py-1 rounded-full bg-lime text-paper text-xs font-bold">{t(locale, s.kindKey)}</span>
+                <h2 className="font-serif text-[28px] leading-[1.25] font-extrabold tracking-tight break-keep text-ink">{t(locale, s.titleKey)}</h2>
+                <p className="text-sm leading-[1.55] text-ink/80 break-keep">&ldquo;{t(locale, s.sayKey)}&rdquo;</p>
+                <span className="mt-1.5 h-[52px] rounded-full bg-accent text-white text-base font-bold flex items-center justify-center">{t(locale, s.ctaKey)}</span>
+              </span>
+            </Link>
+          );
+        })}
+      </HeroScroller>
     </section>
   );
 }
