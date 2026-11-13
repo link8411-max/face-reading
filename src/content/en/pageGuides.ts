@@ -53,7 +53,7 @@ export const pageGuides: Record<EnGuideRoute, EnGuideData> = {
     summary: 'Measure your eyes, nose, mouth and face shape from one photo, then read personality, early-middle-later life flow and life-area fortunes through traditional gwansang.',
     intro: [
       'Gwansang, the Korean art of face reading, is a traditional East Asian way of reading personality and the flow of fortune from the features of a face. The forehead has long been linked to early life, the nose and cheekbones to midlife, and the mouth and chin to later life, while the eyes are treated as the window of the heart and weighed most heavily.',
-      'This AI face reading finds 68 reference points on a face in one photo, then measures eye size and eye-corner direction, nose length and nostril width, mouth size and mouth corners, forehead and chin proportions, and overall face shape. The measurements are matched to traditional gwansang readings for early, middle and later life, and for wealth, love, career, health and people.',
+      'This AI face reading finds 478 reference points on a face in one photo, then measures eye size and eye-corner direction, nose length and nostril width, mouth size and mouth corners, forehead and chin proportions, and overall face shape. The measurements are matched to traditional gwansang readings for early, middle and later life, and for wealth, love, career, health and people.',
       'It is free with no limit on tries, so feel free to compare the photos of family or friends for fun.',
     ],
     highlights: [
