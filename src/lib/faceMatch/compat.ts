@@ -2,7 +2,8 @@
 // 한 폰에서 두 장을 올리든 초대 링크로 하든 같은 동물상·관계면 같은 점수가 나온다(링크에는 유형만 담기므로).
 // 기준: animalTypeDB의 잘 맞는 동물상(best)·맞춰 가면 좋은 동물상(worst). 관계마다 55~100으로 넓혀 최고 쌍이 100점이 되게 한다.
 import { ANIMAL_KEYS, type AnimalKey } from '@/lib/animal/matcher'
-import { animalTypeDB } from '@/lib/animalTypeDB'
+import { animalTypeDB, type AnimalType } from '@/lib/animalTypeDB'
+import * as EN from '@/content/en/faceMatch'
 
 export const REL = ['friend', 'lover', 'crush'] as const
 export type Rel = (typeof REL)[number]
@@ -67,8 +68,28 @@ const CLOSING: Record<Rel, [string, string, string]> = {
 
 export interface FaceMatchResult { score: number; label: string; headline: string; lines: [string, string]; others: { rel: Rel; score: number }[] }
 
-export function faceMatch(a: AnimalKey, b: AnimalKey, rel: Rel): FaceMatchResult {
+/** 영어 문구를 쓸 때 영어 동물상 데이터를 넘긴다. 점수 계산은 같고 글만 src/content/en/faceMatch.ts에서 온다. */
+export interface EnFaceMatchText { animals: Record<string, AnimalType> }
+
+function faceMatchEn(a: AnimalKey, b: AnimalKey, rel: Rel, s: number, animals: Record<string, AnimalType>): FaceMatchResult {
+  const A = animals[a], B = animals[b]
+  const first = a === b
+    ? EN.FIRST_LINE.same(A.name, A.personality.positive[0])
+    : EN.FIRST_LINE.different(A.name, A.personality.positive[0], B.name, B.personality.positive[0])
+  const tier = s >= 85 ? 0 : s >= 70 ? 1 : 2
+  const labelIdx = s >= 95 ? 0 : s >= 85 ? 1 : s >= 75 ? 2 : s >= 65 ? 3 : 4
+  return {
+    score: s,
+    label: EN.LABELS[rel][labelIdx],
+    headline: rel === 'crush' ? EN.HEADLINE.crush(s) : EN.HEADLINE.other(rel, s),
+    lines: [first, EN.CLOSING[rel][tier]],
+    others: REL.filter((r) => r !== rel).map((r) => ({ rel: r, score: score(a, b, r) })),
+  }
+}
+
+export function faceMatch(a: AnimalKey, b: AnimalKey, rel: Rel, en?: EnFaceMatchText): FaceMatchResult {
   const s = score(a, b, rel)
+  if (en) return faceMatchEn(a, b, rel, s, en.animals)
   const A = animalTypeDB[a], B = animalTypeDB[b]
   const first = a === b
     ? `둘 다 ${josa(A.name, '이라', '라')} ${A.personality.positive[0]}에서 금방 통해요.`

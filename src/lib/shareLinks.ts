@@ -9,6 +9,7 @@ import { faceMatch, REL, REL_NAME, type Rel } from '@/lib/faceMatch/compat'
 import type { AnimalKey } from '@/lib/animal/matcher'
 import { josa } from '@/lib/josa'
 import { SITE, UTM } from '@/lib/shareBase'
+import { localePath, type Locale } from '@/lib/i18n/locales'
 import { GUANSANG_TYPES, LEGACY_FACE_KEYS } from '@/content/guansang'
 import { isGuansangTypeKey } from '@/lib/face/guansangKeys'
 import { STEM_BY_KEY } from '@/lib/saju/keys'
@@ -70,9 +71,9 @@ export function parseShared(kind: ShareKind, key: string, s?: unknown): SharedRe
   return { ...base, score, name: c.name, image: `/images/samguk/${c.name}.jpg`, phrase: `나는 ${josa(c.name, '이랑', '랑')} ${score}% 닮았대. 너는 삼국지 속 누구야?` }
 }
 
-export function shareUrl(kind: ShareKind, key: string, score?: number): string {
+export function shareUrl(kind: ShareKind, key: string, score?: number, locale: Locale = 'ko'): string {
   const s = kind === 'face' || kind === 'saju' || score === undefined ? null : clampScore(score)
-  return `${SITE}${TEST_PATH[kind]}/r/${encodeURIComponent(key)}?${s !== null ? `s=${s}&` : ''}${UTM(kind)}`
+  return `${SITE}${localePath(locale, TEST_PATH[kind])}/r/${encodeURIComponent(key)}?${s !== null ? `s=${s}&` : ''}${UTM(kind)}`
 }
 
 // MBTI 궁합 공유 링크는 계산기(/mbti/match, 검색 노출·정적)와 다른 주소 /mbti/r/infp-entj (검색 제외)
@@ -85,9 +86,9 @@ export function mbtiShared(aIn: string, bIn: string): { a: string; b: string; sc
 }
 
 // 결과 미리보기 이미지 주소 (카톡·인스타 미리보기, 카카오톡 공유 카드)
-export function ogImageUrl(kind: ShareKind | 'mbti', key: string, score?: number | null, b?: string): string {
+export function ogImageUrl(kind: ShareKind | 'mbti', key: string, score?: number | null, b?: string, locale: Locale = 'ko'): string {
   if (kind === 'mbti') return `${SITE}/api/og/result?kind=mbti&a=${key}&b=${b}`
-  return `${SITE}/api/og/result?kind=${kind}&key=${encodeURIComponent(key)}${score !== undefined && score !== null ? `&s=${score}` : ''}`
+  return `${SITE}/api/og/result?kind=${kind}&key=${encodeURIComponent(key)}${score !== undefined && score !== null ? `&s=${score}` : ''}${locale === 'ko' ? '' : `&lang=${locale}`}`
 }
 
 // ===== 얼굴 궁합 (8단계) =====
@@ -95,8 +96,8 @@ export function ogImageUrl(kind: ShareKind | 'mbti', key: string, score?: number
 const isAnimal = (k: string): k is AnimalKey => (ANIMAL_KEYS as readonly string[]).includes(k)
 export const isRel = (r: string): r is Rel => (REL as readonly string[]).includes(r)
 
-export function faceMatchUrl(a: AnimalKey, b: AnimalKey, rel: Rel): string {
-  return `${SITE}/face-match/r/${a}-${b}?rel=${rel}&${UTM('face_match')}`
+export function faceMatchUrl(a: AnimalKey, b: AnimalKey, rel: Rel, locale: Locale = 'ko'): string {
+  return `${SITE}${localePath(locale, '/face-match')}/r/${a}-${b}?rel=${rel}&${UTM('face_match')}`
 }
 
 // 짝사랑은 초대 링크를 만들지 않는다 (상대에게 보내는 순간 짝사랑이 아니다)

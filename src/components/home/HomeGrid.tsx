@@ -5,6 +5,8 @@ import { useState, type ReactNode } from "react";
 import type { CategoryItem, Tag } from "@/content/navigation";
 import { portraitThumb } from "@/lib/portraitThumb";
 import { Icon } from "@/components/icons";
+import { t } from "@/lib/i18n/dict";
+import type { Locale } from "@/lib/i18n/locales";
 
 const CHIPS: { key: "all" | Tag; label: string }[] = [
   { key: "all", label: "전체" },
@@ -23,12 +25,14 @@ export function visibleFor(chip: "all" | Tag, item: CategoryItem): boolean {
 }
 
 // 칩 줄 + (대표 카드·시즌 띠: children) + 카드 2열. 칩은 이동이 아니라 카드만 거른다.
-export default function HomeGrid({ items, children }: { items: CategoryItem[]; children: ReactNode }) {
+export default function HomeGrid({ items, children, locale = "ko" }: { items: CategoryItem[]; children: ReactNode; locale?: Locale }) {
   const [chip, setChip] = useState<"all" | Tag>("all");
-  const ordered = [...HOME_DEFAULT.map((h) => items.find((i) => i.href === h)!), ...items.filter((i) => !HOME_DEFAULT.includes(i.href))];
+  const en = locale === "en";
+  // 영어판은 테스트가 적어 칩 없이 전부 보인다
+  const ordered = en ? items : [...HOME_DEFAULT.map((h) => items.find((i) => i.href === h)!), ...items.filter((i) => !HOME_DEFAULT.includes(i.href))];
   return (
     <div className="space-y-3">
-      <div role="group" aria-label="테스트 종류" className="flex gap-2 overflow-x-auto [scrollbar-width:none] -mx-4 px-4">
+      {!en && <div role="group" aria-label="테스트 종류" className="flex gap-2 overflow-x-auto [scrollbar-width:none] -mx-4 px-4">
         {CHIPS.map((c) => (
           <button
             key={c.key}
@@ -40,11 +44,11 @@ export default function HomeGrid({ items, children }: { items: CategoryItem[]; c
             {c.label}
           </button>
         ))}
-      </div>
+      </div>}
       {children}
-      <ul aria-label="테스트 카드" className="grid grid-cols-2 gap-2.5">
+      <ul aria-label={t(locale, "home.cardsAria")} className="grid grid-cols-2 gap-2.5">
         {ordered.map((item, n) => {
-          const shown = visibleFor(chip, item);
+          const shown = en || visibleFor(chip, item);
           const portrait = item.thumb.image && !item.thumb.alt;
           return (
             <li key={item.href} hidden={!shown} data-home-card={item.href} className={n < 6 ? "rise" : undefined} style={{ "--i": n + 3 } as React.CSSProperties}>

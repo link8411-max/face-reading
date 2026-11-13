@@ -4,6 +4,8 @@ import { checkFrontal, extractFeatures, FRONTAL_YAW_LIMIT, type Landmark } from 
 import { toZ, type Gender, type ZVector } from './featureStats'
 import { extractGuansangFeatures } from './guansangFeatures'
 import { toZGuansang, type GuansangZ } from './guansangStats'
+import { t } from '@/lib/i18n/dict'
+import type { Locale } from '@/lib/i18n/locales'
 
 export type PhotoFail = 'tool' | 'noface' | 'frontal' | 'read'
 /** 실패: reason은 GA photo_fail로도 나간다. frontal은 yaw(고개 돌린 정도, 0=정면)와 방향을 함께 준다 */
@@ -21,13 +23,18 @@ export const REASON_TEXT: Record<PhotoFail, string> = {
 }
 
 /** 왜 실패했는지 그 사진 기준으로 구체적으로. 고개 돌림은 방향과 정도(기준 대비)를 숫자로 보여 준다 */
-export function failText(f: PhotoFailure): string {
+export function failText(f: PhotoFailure, locale: Locale = 'ko'): string {
   if (f.reason === 'frontal' && f.yaw !== undefined) {
     const got = Math.round(f.yaw * 100), limit = Math.round(FRONTAL_YAW_LIMIT * 100)
-    const dir = f.turnedTo ? `${f.turnedTo}으로 ` : ''
-    return `고개가 ${dir}돌아가 있어요(돌아간 정도 ${got}, ${limit} 이하여야 해요). 카메라를 똑바로 보고 찍은 사진으로 다시 해 주세요.`
+    const dir = f.turnedTo ? (locale === 'en' ? `${f.turnedTo === '왼쪽' ? 'left' : 'right'} ` : `${f.turnedTo}으로 `) : ''
+    return t(locale, 'err.turned').replace('{dir}', dir).replace('{got}', String(got)).replace('{limit}', String(limit))
   }
-  return REASON_TEXT[f.reason]
+  return reasonText(f.reason, locale)
+}
+
+/** 실패 이유별 안내(언어별) */
+export function reasonText(reason: PhotoFail, locale: Locale = 'ko'): string {
+  return t(locale, `err.${reason}`)
 }
 
 /**

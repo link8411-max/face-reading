@@ -18,7 +18,10 @@ import GuansangResultView from "@/components/face/GuansangResultView";
 import RevealMotion from "@/components/face/RevealMotion";
 import { useHandedPhoto } from "@/hooks/useHandedPhoto";
 import { useResultShare } from "@/hooks/useResultShare";
-import { analyzePhotoDetailed, failText, holdAtLeast, REASON_TEXT } from "@/lib/face/analyzePhoto";
+import { analyzePhotoDetailed, failText, holdAtLeast, reasonText } from "@/lib/face/analyzePhoto";
+import { useLocale, useT } from "@/lib/i18n/LocaleProvider";
+import { useEnCopy } from "@/lib/i18n/copy";
+import { SHARE_PHRASE } from "@/content/en/share";
 import { classifyGuansang, type GuansangResult } from "@/lib/face/guansang";
 import type { Landmark } from "@/lib/face/landmarkFeatures";
 import { GUANSANG_TYPES } from "@/content/guansang";
@@ -29,6 +32,10 @@ interface FaceState { guansang: GuansangResult; landmarks: Landmark[]; image: st
 
 export default function Face2Page() {
   const goBack = useBackOrHome();
+  const t = useT();
+  const locale = useLocale();
+  const en = locale === "en";
+  const enG = useEnCopy()?.guansang;
   const [image, setImage] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const [result, setResult] = useState<FaceState | null>(null);
@@ -44,7 +51,7 @@ export default function Face2Page() {
   const type = result?.guansang.type;
   const { ref: resultRef, isCapturing, download } = useScreenshot<HTMLElement>();
   const { busy, notice, share: shareCard } = useResultShare(
-    type ? { testName: "face", title: "운명을 읽다 · AI 관상 테스트", text: parseShared("face", type)!.phrase, url: shareUrl("face", type), imageUrl: ogImageUrl("face", type) } : null,
+    type ? { testName: "face", title: t("face.shareTitle"), text: en && enG ? SHARE_PHRASE.face(enG.types[type].nickname) : parseShared("face", type)!.phrase, url: shareUrl("face", type, undefined, locale), imageUrl: ogImageUrl("face", type, undefined, undefined, locale) } : null,
   );
 
   const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -73,7 +80,7 @@ export default function Face2Page() {
       if (!r.ok) {
         track("photo_fail", { test_name: "face", result_id: r.reason });
         await holdAtLeast(t0);
-        setError(failText(r));
+        setError(failText(r, locale));
         return;
       }
       const guansang = classifyGuansang({ z: r.z, g: r.g, zones: r.zones });
@@ -83,7 +90,7 @@ export default function Face2Page() {
     } catch (err) {
       console.error("Analysis error:", err);
       track("photo_fail", { test_name: "face", result_id: "read" });
-      setError(REASON_TEXT.read);
+      setError(reasonText("read", locale));
     } finally {
       setLoading(false);
     }
@@ -103,14 +110,14 @@ export default function Face2Page() {
   return (
     <div className="min-h-screen bg-paper text-ink">
       <main className="mx-auto px-[22px] max-w-lg">
-        <TestHeader title="AI 관상 테스트" onBack={() => (result ? resetAll() : goBack())} backLabel={result ? "다시하기" : "돌아가기"} />
+        <TestHeader title={t("face.title")} onBack={() => (result ? resetAll() : goBack())} backLabel={result ? t("btn.tryAgain") : t("btn.back")} />
 
         {!result && (
           <TestStart
-            heading={"웃는 사진 한 장이면\n충분해요"}
-            desc="사진 한 장으로 보는 무료 관상이에요. 얼굴형 5가지와 힘이 실린 자리 3곳으로 15가지 상을 나누고, 돈·일·사랑·사람·버팀 다섯 자리를 풀어드려요."
-            tips={["앞머리는 살짝 넘겨주세요", "밝은 곳에서"]}
-            analyzeLabel="관상 보기"
+            heading={t("face.heading")}
+            desc={t("face.desc")}
+            tips={[t("face.tip1"), t("face.tip2")]}
+            analyzeLabel={t("face.analyze")}
             image={image}
             gender={gender}
             onGender={setGender}
@@ -145,8 +152,8 @@ export default function Face2Page() {
                   onShare={shareCard}
                   onSave={() => {
                     track("share_click", { test_name: "face", method: "save_image" });
-                    const t = GUANSANG_TYPES[result.guansang.type];
-                    download({ fileName: `관상_${t.nickname}`, shareTitle: `나의 관상: ${t.nickname}`, shareText: t.oneLiner });
+                    const ty = (enG?.types ?? GUANSANG_TYPES)[result.guansang.type];
+                    download({ fileName: `${t("face.file")}_${ty.nickname}`, shareTitle: `${t("face.saveTitle")}: ${ty.nickname}`, shareText: ty.oneLiner });
                   }}
                   onRetry={resetAll}
                   busy={busy || isCapturing}
@@ -155,17 +162,17 @@ export default function Face2Page() {
               }
               after={
                 <>
-                  <div className="mt-2"><CoupangBanner subId="face" /></div>
+                  {!en && <div className="mt-2"><CoupangBanner subId="face" /></div>}
                   <NextTests current="face" image={result.image} />
-                  <NextSteps from="face" withPhoto />
-                  <MoreTests current="/face2" />
+                  {!en && <NextSteps from="face" withPhoto />}
+                  <MoreTests current={en ? "/en/face2" : "/face2"} locale={locale} />
                 </>
               }
             />
           </>
         )}
 
-        <p className="text-center text-muted text-xs mt-6 pb-4">재미로만 봐 주세요. 과학적 근거는 없어요.</p>
+        <p className="text-center text-muted text-xs mt-6 pb-4">{t("result.disclaimer")}</p>
       </main>
     </div>
   );

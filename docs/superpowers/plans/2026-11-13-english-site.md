@@ -116,9 +116,9 @@
 - 영어판에서는 `CoupangBanner`·`GiftNudge`·카카오톡 공유를 그리지 않는다.
 - 영어판 하단 탭: Home(`/en`)·All(`/en/all`)·Today는 영어판이 없으므로 탭 둘(Home·All)만.
 
-- [ ] **Step 1: 테스트** — `tests/i18n/pages.test.tsx`: 영어 페이지 파일들이 있고 metadata canonical이 `/en/...`, 한국어 `/face2` layout의 `alternates.languages.en`이 `https://unse-ai.com/en/face2`. 한국어 공용 컴포넌트를 locale 없이 렌더한 HTML이 이 작업 전과 같다(`TestStart`, `ResultActions`, `MoreTests`의 렌더 결과를 Task 시작 때 스냅숏으로 떠 두고 비교). `e2e/i18n.spec.ts`: `/en/face2` 열림·영어 제목·`html[lang=en]`·한글 없음(`/[가-힣]/`가 본문 글자에 없어야 함, 단 캐릭터 그림 alt 제외); `/face2`에서 언어 메뉴로 English → `/en/face2`; `/saju`에서 English → `/en?only=ko`와 안내 문구; 쿠키 없는 요청으로 `/face2`를 열면 307이 없다.
-- [ ] **Step 2: 실패 확인 → Step 3: 구현 → Step 4: `npm test && npm run test:e2e` 통과**
-- [ ] **Step 5: 커밋** — `"영어판: 홈·전체·관상·동물상·얼굴 궁합 영어 페이지와 화면마다 언어 메뉴"`
+- [x] **Step 1: 테스트** — `tests/i18n/pages.test.tsx`: 영어 페이지 파일들이 있고 metadata canonical이 `/en/...`, 한국어 `/face2` layout의 `alternates.languages.en`이 `https://unse-ai.com/en/face2`. 한국어 공용 컴포넌트를 locale 없이 렌더한 HTML이 이 작업 전과 같다(`TestStart`, `ResultActions`, `MoreTests`의 렌더 결과를 Task 시작 때 스냅숏으로 떠 두고 비교). `e2e/i18n.spec.ts`: `/en/face2` 열림·영어 제목·`html[lang=en]`·한글 없음(`/[가-힣]/`가 본문 글자에 없어야 함, 단 캐릭터 그림 alt 제외); `/face2`에서 언어 메뉴로 English → `/en/face2`; `/saju`에서 English → `/en?only=ko`와 안내 문구; 쿠키 없는 요청으로 `/face2`를 열면 307이 없다.
+- [x] **Step 2: 실패 확인 → Step 3: 구현 → Step 4: `npm test && npm run test:e2e` 통과**
+- [x] **Step 5: 커밋** — `"영어판: 홈·전체·관상·동물상·얼굴 궁합 영어 페이지와 화면마다 언어 메뉴"`
 
 ---
 

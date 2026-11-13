@@ -6,6 +6,9 @@ import type { ZoneKey, PalaceKey } from "@/lib/face/guansangKeys";
 import type { PalaceResult } from "@/lib/face/palaces";
 import { LABEL_COPY, PALACE_COPY } from "@/content/guansang";
 import { revealPlan, STEP_MS, type RevealStep } from "@/lib/face/revealTimeline";
+import { useT } from "@/lib/i18n/LocaleProvider";
+import { useEnCopy } from "@/lib/i18n/copy";
+import type { UiKey } from "@/lib/i18n/dict";
 
 const W = 390;
 const H = 488; // 4:5
@@ -52,16 +55,15 @@ function palaceAnchor(key: PalaceKey, lm: Landmark[]): { x: number; y: number; a
   }
 }
 
-const STEP_TEXT: Record<RevealStep, string> = {
-  dots: "얼굴 기준점 478개를 재고 있어요",
-  zones: "이마·코·턱 세 구간의 비율을 봐요",
-  palaces: "다섯 자리의 힘을 읽어요",
-  card: "결과를 준비했어요",
-};
+const STEP_KEY: Record<RevealStep, UiKey> = { dots: "reveal.dots", zones: "reveal.zones", palaces: "reveal.palaces", card: "reveal.card" };
 
-const ZONE_LABEL: Record<ZoneKey, string> = { up: "상", mid: "중", down: "하" };
+const ZONE_KEY: Record<ZoneKey, UiKey> = { up: "reveal.up", mid: "reveal.mid", down: "reveal.down" };
 
 export default function RevealMotion({ imageUrl, landmarks, zones, dominant, palaces, onDone }: Props) {
+  const tr = useT();
+  const enG = useEnCopy()?.guansang;
+  const LABELS = enG?.label ?? LABEL_COPY;
+  const PALACES = enG?.palace ?? PALACE_COPY;
   const canvasRef = useRef<HTMLCanvasElement>(null);
   // 라벨 위치도 캔버스의 cover 변환을 거쳐 점·선과 같은 좌표계를 쓴다
   const [imgSize, setImgSize] = useState<{ w: number; h: number } | null>(null);
@@ -196,16 +198,16 @@ export default function RevealMotion({ imageUrl, landmarks, zones, dominant, pal
         onClick={finish}
         className="absolute right-4 top-4 z-10 rounded-full border border-line bg-white px-3.5 py-1.5 text-[13px] font-medium text-ink"
       >
-        건너뛰기
+        {tr("reveal.skip")}
       </button>
       <p className="absolute left-4 top-4 z-10 font-serif text-[16px] text-ink">
-        {STEP_TEXT[step ?? "dots"]}
+        {tr(STEP_KEY[step ?? "dots"])}
       </p>
     {showBars && landmarks && (
       <div className="absolute right-4 top-14 z-10 w-[84px] space-y-1.5 rounded-[22px] bg-paper/80 p-2.5">
         {order.map((z) => (
           <div key={z} className="flex items-center gap-1.5 text-[11px] text-ink">
-            <span className="w-3 shrink-0">{ZONE_LABEL[z]}</span>
+            <span className="w-3 shrink-0">{tr(ZONE_KEY[z])}</span>
             <div className="h-2 flex-1 overflow-hidden rounded-full bg-card-2">
               <div
                 data-testid={`bar-${z}`}
@@ -252,7 +254,7 @@ export default function RevealMotion({ imageUrl, landmarks, zones, dominant, pal
                   transform: `translate(${tx}, -50%)`,
                 }}
               >
-                {LABEL_COPY[p.label]} · {PALACE_COPY[p.key].easy}
+                {LABELS[p.label]} · {PALACES[p.key].easy}
               </div>
             );
           })}

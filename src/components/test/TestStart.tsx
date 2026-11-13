@@ -6,12 +6,15 @@ import { usePathname } from "next/navigation";
 import MoreTests from "@/components/MoreTests";
 import { Icon, SmileFace } from "@/components/icons";
 import GenderPills, { type Gender } from "@/components/test/GenderPills";
+import { useLocale, useT } from "@/lib/i18n/LocaleProvider";
+import { t as tr } from "@/lib/i18n/dict";
+import type { Locale } from "@/lib/i18n/locales";
 
-export function analyzeButtonLabel(s: { hasImage: boolean; gender: Gender | null; needsGender?: boolean; loading: boolean; preparing: boolean; label: string }) {
-  if (!s.hasImage) return "사진을 먼저 골라 주세요";
-  if (s.needsGender !== false && !s.gender) return "성별을 먼저 골라 주세요";
-  if (s.preparing) return "분석 준비 중…";
-  if (s.loading) return "분석 중…";
+export function analyzeButtonLabel(s: { hasImage: boolean; gender: Gender | null; needsGender?: boolean; loading: boolean; preparing: boolean; label: string }, locale: Locale = "ko") {
+  if (!s.hasImage) return tr(locale, "start.needPhoto");
+  if (s.needsGender !== false && !s.gender) return tr(locale, "start.needGender");
+  if (s.preparing) return tr(locale, "start.preparing");
+  if (s.loading) return tr(locale, "start.analyzing");
   return s.label;
 }
 
@@ -51,7 +54,9 @@ export default function TestStart({
 }) {
   const fileRef = useRef<HTMLInputElement>(null);
   const path = usePathname() ?? "/";
-  const label = analyzeButtonLabel({ hasImage: !!image, gender: gender ?? null, needsGender, loading, preparing, label: analyzeLabel });
+  const t = useT();
+  const locale = useLocale();
+  const label = analyzeButtonLabel({ hasImage: !!image, gender: gender ?? null, needsGender, loading, preparing, label: analyzeLabel }, locale);
   const ready = label === analyzeLabel;
 
   return (
@@ -61,7 +66,7 @@ export default function TestStart({
 
       {needsGender && (
         <fieldset className="mt-6">
-          <legend className="text-[13px] text-muted mb-2.5">나는</legend>
+          <legend className="text-[13px] text-muted mb-2.5">{t("gender.label")}</legend>
           <GenderPills value={gender ?? null} onChange={(g) => onGender?.(g)} />
         </fieldset>
       )}
@@ -73,12 +78,12 @@ export default function TestStart({
       >
         {image ? (
           // eslint-disable-next-line @next/next/no-img-element
-          <img ref={imageRef} src={image} alt="고른 사진" crossOrigin="anonymous" className="max-h-64 rounded-[22px] object-contain" />
+          <img ref={imageRef} src={image} alt={t("start.chosenAlt")} crossOrigin="anonymous" className="max-h-64 rounded-[22px] object-contain" />
         ) : (
           <>
             <SmileFace />
-            <span className="text-[15px] font-bold">사진 고르기</span>
-            <span className="text-xs text-muted">셀카도 좋아요 · 정면이면 더 정확해요</span>
+            <span className="text-[15px] font-bold">{t("btn.choosePhoto")}</span>
+            <span className="text-xs text-muted">{t("start.photoHint")}</span>
           </>
         )}
       </button>
@@ -90,7 +95,7 @@ export default function TestStart({
         ))}
         {image && (
           <button type="button" onClick={() => { if (fileRef.current) fileRef.current.value = ""; onReset(); }} className="text-xs text-ink bg-white border border-line rounded-full px-3 py-[7px]">
-            다른 사진 고르기
+            {t("start.anotherPhoto")}
           </button>
         )}
       </div>
@@ -99,7 +104,7 @@ export default function TestStart({
 
       <div className="mt-7 flex items-center gap-2.5 bg-white rounded-[18px] px-3.5 py-3">
         <Icon name="shield" size={20} className="text-accent flex-none" />
-        <span className="text-xs leading-normal text-muted">사진은 내 폰 안에서만 보고 바로 지워요. 어디에도 올라가지 않아요.</span>
+        <span className="text-xs leading-normal text-muted">{t("privacy.line")}</span>
       </div>
       <button
         type="button"
@@ -109,7 +114,7 @@ export default function TestStart({
       >
         {label}
       </button>
-      <MoreTests current={path} className="mt-8" />
+      <MoreTests current={path} className="mt-8" locale={locale} />
     </div>
   );
 }

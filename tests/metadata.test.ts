@@ -8,7 +8,9 @@ test('/face2 title에 주력 키워드가 있다', () => {
 })
 
 test('/face2 H1이 AI 관상 테스트다 (TestHeader가 title을 h1로 렌더)', () => {
-  expect(readFileSync('src/app/(ko)/face2/page.tsx', 'utf8')).toContain('<TestHeader title="AI 관상 테스트"')
+  // 화면 문구는 언어 사전에서 온다(ko 값이 "AI 관상 테스트"여야 한다)
+  expect(readFileSync('src/app/(ko)/face2/page.tsx', 'utf8')).toContain('<TestHeader title={t("face.title")}')
+  expect(readFileSync('src/content/ko/ui.ts', 'utf8')).toContain("'face.title': 'AI 관상 테스트'")
   expect(readFileSync('src/components/test/TestHeader.tsx', 'utf8')).toMatch(/<h1[^>]*>\{title\}<\/h1>/)
 })
 

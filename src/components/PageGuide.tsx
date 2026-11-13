@@ -1,10 +1,27 @@
 import Link from "next/link";
 import { pageGuides, faqJsonLd, TEST_LINKS, type GuideRoute } from "@/content/pageGuides";
+import { pageGuides as enGuides, TEST_LINKS_EN, type EnGuideData, type EnGuideRoute } from "@/content/en/pageGuides";
+import { counterpart } from "@/lib/i18n/alternates";
+import { t } from "@/lib/i18n/dict";
+import { localePath, type Locale } from "@/lib/i18n/locales";
+
+function enFaqJsonLd(guide: EnGuideData): string {
+  const data = {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    mainEntity: guide.faqs.map(({ q, a }) => ({ "@type": "Question", name: q, acceptedAnswer: { "@type": "Answer", text: a } })),
+  };
+  return JSON.stringify(data).replace(/</g, "\\u003c");
+}
 
 // 테스트 위젯 아래에 붙는 서버 렌더 설명 섹션 (결과 이미지 캡처에서 제외: no-screenshot)
-export default function PageGuide({ route }: { route: GuideRoute }) {
-  const guide = pageGuides[route];
+export default function PageGuide({ route, locale = "ko" }: { route: GuideRoute | EnGuideRoute; locale?: Locale }) {
+  const en = locale === "en";
+  const guide = en ? enGuides[route as EnGuideRoute] : pageGuides[route as GuideRoute];
   if (!guide) return null;
+  // 영어판에는 영어 페이지가 있는 테스트만 잇는다
+  const related = en ? guide.related.filter((r) => counterpart(r, "en")) : guide.related;
+  const labelOf = (r: string) => (en ? TEST_LINKS_EN[r].label : (TEST_LINKS as Record<string, { label: string }>)[r].label);
 
   return (
     <section className="no-screenshot bg-paper text-ink border-t border-line">
@@ -36,7 +53,7 @@ export default function PageGuide({ route }: { route: GuideRoute }) {
         {/* 본문은 접어 두되 HTML에는 남겨 검색엔진이 읽게 한다 */}
         <details className="group bg-white rounded-[22px] border border-line px-5 py-4">
           <summary className="font-bold cursor-pointer list-none flex justify-between items-center">
-            자세히 보기
+            {t(locale, "guide.more")}
             <span className="transition group-open:rotate-180" aria-hidden>▾</span>
           </summary>
           <div className="mt-4 space-y-3 leading-relaxed">
@@ -53,7 +70,7 @@ export default function PageGuide({ route }: { route: GuideRoute }) {
         </details>
 
         <div>
-          <h3 className="font-serif font-bold text-lg mb-3">자주 묻는 질문</h3>
+          <h3 className="font-serif font-bold text-lg mb-3">{t(locale, "guide.faq")}</h3>
           <div className="space-y-2">
             {guide.faqs.map((f) => (
               <details key={f.q} className="bg-white rounded-[18px] border border-line px-4 py-3">
@@ -65,22 +82,22 @@ export default function PageGuide({ route }: { route: GuideRoute }) {
         </div>
 
         <div>
-          <h3 className="font-serif font-bold text-lg mb-3">다른 테스트도 해보세요</h3>
+          <h3 className="font-serif font-bold text-lg mb-3">{t(locale, "guide.related")}</h3>
           <div className="grid grid-cols-1 gap-2">
-            {guide.related.map((r) => (
+            {related.map((r) => (
               <Link
                 key={r}
-                href={r}
+                href={localePath(locale, r)}
                 className="bg-white rounded-full border border-line px-5 py-3 font-medium hover:border-accent/50 transition"
               >
-                {TEST_LINKS[r].label}
+                {labelOf(r)}
               </Link>
             ))}
           </div>
         </div>
       </div>
 
-      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: faqJsonLd(route) }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: en ? enFaqJsonLd(guide as EnGuideData) : faqJsonLd(route as GuideRoute) }} />
     </section>
   );
 }

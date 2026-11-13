@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import PageGuide from "@/components/PageGuide";
+import { languageAlternates } from "@/lib/i18n/alternates";
 
 // 검색 결과 제목·설명 (클릭률 위주, 길이 상한은 tests/seo-snippets.test.tsx). og·트위터도 같은 문구
 const TITLE = "동물상 테스트 | 고양이상? 여우상? 남녀 따로 분석 – 운명을 읽다";
@@ -11,6 +12,7 @@ export const metadata: Metadata = {
   keywords: "동물상 테스트, 동물상, 강아지상, 고양이상, 여우상, 곰상, 토끼상, 사슴상, 호랑이상, 독수리상, 무료 테스트, 얼굴 분석",
   alternates: {
     canonical: "https://unse-ai.com/animal",
+    languages: languageAlternates("/animal"),
   },
   openGraph: {
     title: TITLE,

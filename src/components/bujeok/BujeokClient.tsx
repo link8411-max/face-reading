@@ -163,7 +163,7 @@ export default function BujeokClient({ initial, high = null }: { initial?: Initi
   return (
     <div className="text-ink">
       <main className="mx-auto px-[22px] max-w-lg pb-6">
-        <TestHeader title="나만의 부적" onBack={() => (phase !== 'form' ? setPhase('form') : goBack())} backLabel={phase !== 'form' ? '다시하기' : '돌아가기'} />
+        <TestHeader title="나만의 부적" onBack={() => (phase !== 'form' ? setPhase('form') : goBack())} backLabel={phase !== 'form' ? '다시하기' : '돌아가기'} language={false} />
 
         {phase === 'rite' && spec ? (
           <div ref={panel} className="mx-auto max-w-[420px]">

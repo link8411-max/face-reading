@@ -21,7 +21,7 @@ export default function DuelMount() {
   return (
     <section className="duel-cloth min-h-[100dvh] pb-8">
       <div className="mx-auto px-4 max-w-lg">
-        <TestHeader title="삼국지 일기토" onBack={goBack} backLabel="돌아가기" tone="dark" />
+        <TestHeader title="삼국지 일기토" onBack={goBack} backLabel="돌아가기" tone="dark" language={false} />
       </div>
       <DuelClient />
     </section>

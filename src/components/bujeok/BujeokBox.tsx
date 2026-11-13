@@ -39,7 +39,7 @@ export default function BujeokBox() {
   return (
     <div className="min-h-screen bg-paper text-ink">
       <main className="mx-auto px-[22px] max-w-lg pb-10">
-        <TestHeader title="내 부적함" onBack={goBack} backLabel="돌아가기" />
+        <TestHeader title="내 부적함" onBack={goBack} backLabel="돌아가기" language={false} />
 
         {items === undefined ? null : items === null ? (
           <p className="mt-10 text-center text-sm text-muted break-keep">이 브라우저에서는 부적함을 쓸 수 없어요</p>

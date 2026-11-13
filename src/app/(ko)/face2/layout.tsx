@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import PageGuide from "@/components/PageGuide";
+import { languageAlternates } from "@/lib/i18n/alternates";
 
 // 검색 결과 제목·설명 (클릭률 위주, 길이 상한은 tests/seo-snippets.test.tsx). og·트위터도 같은 문구
 const TITLE = "무료 AI 관상 테스트 | 사진 한 장으로 보는 관상 – 운명을 읽다";
@@ -11,6 +12,7 @@ export const metadata: Metadata = {
   keywords: "AI 관상 테스트, 무료 관상 테스트, 무료 관상, AI 관상, 관상 분석, 얼굴 관상, 관상 보기, 관상 테스트, 얼굴 분석, 운세",
   alternates: {
     canonical: "https://unse-ai.com/face2",
+    languages: languageAlternates("/face2"),
   },
   openGraph: {
     title: TITLE,
