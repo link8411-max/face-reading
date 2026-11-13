@@ -24,9 +24,9 @@ for (const path of PAGES) {
 test('홈 → 각 테스트 → 돌아가기 → 홈', async ({ page }) => {
   for (const path of TEST_PAGES) {
     await page.goto('/')
-    // 4a 새 메인: 운세 항목은 '사주·운세' 묶음 탭 안에 있다
+    // 새 메인: 처음에 안 보이는 항목은 칩('운세')을 누르면 나온다
     const direct = page.locator(`main a[href="${path}"]:visible`).first()
-    if (!(await direct.count())) await page.getByRole('region', { name: '테스트 묶음' }).getByRole('tab', { name: '사주·운세' }).click()
+    if (!(await direct.count())) await page.getByRole('button', { name: '운세', exact: true }).click()
     await page.locator(`main a[href="${path}"]:visible`).first().click()
     await expect(page).toHaveURL(new RegExp(`${path}$`))
     await page.getByRole('button', { name: /돌아가기/ }).click()

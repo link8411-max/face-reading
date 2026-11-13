@@ -108,7 +108,7 @@ export const CATEGORIES: Category[] = RAW_CATEGORIES.map((c) => ({ ...c, items: 
 // 푸터에만 놓는 링크// 푸터에만 놓는 링크: 묶음(홈 탭·허브)과 하단 탭 순서는 건드리지 않는다. 홈에서는 '친구랑 같이 해봐요' 카드가 맡는다.
 export const FOOTER_EXTRA: { title: string; href: string }[] = [{ title: '밈 능력고사', href: '/exam/meme' }]
 
-const EXTRA_DESC: Record<string, string> = { '/exam/meme': '매일 자정에 열리는 5문제, 내 등급은?' }
+const EXTRA_DESC: Record<string, string> = { '/exam/meme': '매일 5문제, 내 등급은?' }
 
 /** 모든 테스트(묶음 순서 + 푸터에만 있던 항목). 전체 탭·홈 카드·오늘 탭의 원본. */
 export const ALL_ITEMS: CategoryItem[] = [

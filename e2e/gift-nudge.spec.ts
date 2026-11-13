@@ -24,7 +24,7 @@ test('오늘의 운세 결과: 공유 버튼 아래 부적 선물 줄, 누르면
   const nudge = await expectBelowShare(page, /오늘 운세 공유하기/)
   await nudge.click()
   await expect(page).toHaveURL(/\/bujeok\?mode=gift$/)
-  await expect(page.getByRole('radio', { name: '선물 보내기' })).toHaveAttribute('aria-checked', 'true')
+  await expect(page.getByRole('radio', { name: '선물하기' })).toHaveAttribute('aria-checked', 'true')
   expect((await events(page)).filter(([e]) => e === 'next_test_click')).toEqual([['next_test_click', { test_name: 'bujeok', result_id: 'gift_daily' }]])
 })
 

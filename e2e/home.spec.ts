@@ -12,25 +12,25 @@ test('관상 히어로 → 관상, 시즌 카드(수능 뒤) → 내 사주 풀�
   await expect(page).toHaveURL(/\/saju$/)
 })
 
-test('띠 바로 고르기: 양띠를 누르면 오늘의 운세가 메인에 나오고 두 링크로 이어진다', async ({ page }) => {
-  const errors = trackErrors(page)
+test('칩 "운세"를 누르면 운세 카드만 보이고 다른 카드는 숨는다', async ({ page }) => {
   await page.goto('/')
-  const picker = page.getByRole('region', { name: '띠 바로 고르기' })
-  await picker.getByRole('button', { name: /양/ }).click()
-  await expect(picker.getByText(/양띠 오늘의 한마디/)).toBeVisible()
-  await expect(picker.getByRole('link', { name: /오늘의 운세 자세히/ })).toHaveAttribute('href', '/fortune/daily')
-  await expect(picker.getByRole('link', { name: /2027 양띠 운세/ })).toHaveAttribute('href', '/fortune/2027/sheep')
-  expect(errors).toEqual([])
+  const card = (href: string) => page.locator(`[data-home-card="${href}"]`)
+  await expect(card('/samguk')).toBeVisible()
+  await expect(card('/fortune/2027')).toBeHidden()
+  const chip = page.getByRole('button', { name: '운세', exact: true })
+  await chip.click()
+  await expect(chip).toHaveAttribute('aria-pressed', 'true')
+  await expect(card('/fortune/2027')).toBeVisible()
+  await expect(card('/fortune/daily')).toBeVisible()
+  await expect(card('/samguk')).toBeHidden()
+  await expect(card('/face-match')).toBeHidden()
+  await page.getByRole('button', { name: '전체', exact: true }).click()
+  await expect(card('/samguk')).toBeVisible()
 })
 
-test('묶음 탭 전환: 사주·운세를 누르면 운세 항목이 보인다', async ({ page }) => {
-  await page.goto('/')
-  const tabs = page.getByRole('region', { name: '테스트 묶음' })
-  await expect(tabs.locator('a[href="/samguk"]')).toBeVisible()
-  await tabs.getByRole('tab', { name: '사주·운세' }).click()
-  await expect(tabs.locator('a[href="/fortune/daily"]')).toBeVisible()
-  await tabs.getByRole('tab', { name: '궁합' }).click()
-  await expect(tabs.locator('a[href="/mbti/match"]')).toBeVisible()
+test('서버 HTML에는 숨겨진 카드까지 모든 링크가 있다', async ({ request }) => {
+  const html = await (await request.get('/')).text()
+  for (const href of ['/fortune/2027', '/samguk/cup', '/mbti', '/samguk/duel', '/exam/meme']) expect(html, href).toContain(`href="${href}"`)
 })
 
 test('홈에서 6개 테스트에 두 번 탭 이내로 도달', async ({ page }) => {
@@ -38,7 +38,7 @@ test('홈에서 6개 테스트에 두 번 탭 이내로 도달', async ({ page }
     await page.goto('/')
     const direct = page.locator(`main a[href="${href}"]:visible`).first()
     if (await direct.count()) { await direct.click() } else {
-      await page.getByRole('region', { name: '테스트 묶음' }).getByRole('tab', { name: '사주·운세' }).click()
+      await page.getByRole('button', { name: '운세', exact: true }).click()
       await page.locator(`main a[href="${href}"]:visible`).first().click()
     }
     await expect(page).toHaveURL(new RegExp(`${href.replace(/\//g, '\\/')}$`))
@@ -53,25 +53,55 @@ test('홈: hydration 오류 없음', async ({ page }) => {
   expect(errors.filter((e) => /hydrat/i.test(e))).toEqual([])
 })
 
-test('홈 순서: 히어로 → 시즌 카드 → 띠 고르기 → 친구랑 같이 → 쿠팡 배너 → 묶음 탭 (배너가 첫 흐름을 막지 않는다)', async ({ page }) => {
+test('홈 순서: 칩 → 대표 카드 → 시즌 띠 → 카드 2열 → 오늘 줄 → 쿠팡 배너 → FAQ', async ({ page }) => {
   await page.goto('/')
   const y = async (loc: import('@playwright/test').Locator) => (await loc.boundingBox())!.y
+  const chips = await y(page.getByRole('button', { name: '전체', exact: true }))
   const hero = await y(page.getByRole('region', { name: /내 얼굴에는/ }))
   const season = await y(page.locator('section[aria-label^="수능"], section[aria-label="내 사주 풀이"]'))
-  const picker = await y(page.getByRole('region', { name: '띠 바로 고르기' }))
-  const together = await y(page.getByRole('region', { name: '친구랑 같이 해봐요' }))
+  const grid = await y(page.getByRole('list', { name: '테스트 카드' }))
+  const today = await y(page.getByRole('region', { name: '오늘 새로 바뀐 것' }))
   const banner = await y(page.locator('iframe[title="쿠팡 추천 상품"]'))
-  const tabs = await y(page.getByRole('region', { name: '테스트 묶음' }))
-  expect(hero).toBeLessThan(season)
-  expect(season).toBeLessThan(picker)
-  expect(picker).toBeLessThan(together)
-  expect(together).toBeLessThan(banner)
-  expect(banner).toBeLessThan(tabs)
+  const faq = await y(page.getByRole('region', { name: '자주 묻는 질문' }))
+  const order = [chips, hero, season, grid, today, banner, faq]
+  expect(order).toEqual([...order].sort((a, b) => a - b))
 })
+
+test('띠 바로 고르기는 오늘 탭으로 옮겨졌다', async ({ page }) => {
+  const errors = trackErrors(page)
+  await page.goto('/today')
+  const picker = page.getByRole('region', { name: '띠 바로 고르기' })
+  await picker.getByRole('button', { name: /양/ }).click()
+  await expect(picker.getByText(/양띠 오늘의 한마디/)).toBeVisible()
+  await expect(picker.getByRole('link', { name: /2027 양띠 운세/ })).toHaveAttribute('href', '/fortune/2027/sheep')
+  expect(errors).toEqual([])
+  await page.goto('/')
+  await expect(page.getByRole('region', { name: '띠 바로 고르기' })).toHaveCount(0)
+})
+
+test('390px 홈 본문 높이 2600px 이하(푸터 제외)', async ({ page }) => {
+  await page.setViewportSize({ width: 390, height: 844 }); await page.goto('/')
+  const h = await page.evaluate(() => document.querySelector('main')!.getBoundingClientRect().height)
+  console.log('HOME_MAIN_HEIGHT', h)
+  expect(h).toBeLessThanOrEqual(2600)
+})
+
+test('검색으로 테스트 시작 화면에 들어와도 다른 테스트로 가는 줄이 있다', async ({ page }) => {
+  await page.goto('/animal')
+  await expect(page.getByRole('heading', { name: '다른 테스트 둘러보기' })).toBeVisible()
+  await expect(page.getByRole('link', { name: '전체 보기' })).toHaveAttribute('href', '/all')
+})
+
+for (const width of [320, 390]) {
+  test(`${width}px: 홈이 가로로 넘치지 않는다`, async ({ page }) => {
+    await page.setViewportSize({ width, height: 800 }); await page.goto('/')
+    expect(await page.evaluate(() => document.documentElement.scrollWidth > window.innerWidth)).toBe(false)
+  })
+}
 
 test('밈 능력고사: 홈 카드와 푸터에서 /exam/meme으로 간다', async ({ page }) => {
   await page.goto('/')
-  const card = page.getByRole('region', { name: '친구랑 같이 해봐요' }).locator('a[href="/exam/meme"]')
+  const card = page.locator('[data-home-card="/exam/meme"] a')
   await expect(card).toHaveCount(1)
   await expect(card).toContainText('밈 능력고사')
   await expect(card).toContainText('매일 5문제, 내 등급은?')
@@ -88,8 +118,8 @@ test('시즌 카드(11/12): 수능 D-7 합격 부적 카드 → /bujeok?mode=gif
   await expect(card).toContainText('이름 도장 찍힌 부적 카드, 카톡으로 선물')
   await card.getByRole('link', { name: '합격 부적 보내기' }).click()
   await expect(page).toHaveURL(/\/bujeok\?mode=gift&wish=pass$/)
-  await expect(page.getByRole('radio', { name: '선물 보내기' })).toHaveAttribute('aria-checked', 'true')
-  await expect(page.getByRole('radio', { name: '합격' })).toHaveAttribute('aria-checked', 'true')
+  await expect(page.getByRole('radio', { name: '선물하기' })).toHaveAttribute('aria-checked', 'true')
+  await expect(page.getByRole('button', { name: '합격' })).toHaveAttribute('aria-pressed', 'true') // 소원은 aria-pressed 버튼
 })
 
 test('시즌 카드: 수능 당일 D-DAY, 11/20 수고했어요, 11/21은 사주 카드', async ({ page }) => {

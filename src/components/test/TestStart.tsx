@@ -2,6 +2,8 @@
 
 import type { ChangeEvent, RefObject } from "react";
 import { useEffect, useRef } from "react";
+import { usePathname } from "next/navigation";
+import MoreTests from "@/components/MoreTests";
 import { Icon, SmileFace } from "@/components/icons";
 import GenderPills, { type Gender } from "@/components/test/GenderPills";
 
@@ -48,6 +50,7 @@ export default function TestStart({
   imageRef?: RefObject<HTMLImageElement | null>; // 분석이 이 이미지 요소를 직접 읽는다 (관상: face-api, 동물상: MediaPipe)
 }) {
   const fileRef = useRef<HTMLInputElement>(null);
+  const path = usePathname() ?? "/";
   const label = analyzeButtonLabel({ hasImage: !!image, gender: gender ?? null, needsGender, loading, preparing, label: analyzeLabel });
   const ready = label === analyzeLabel;
 
@@ -106,6 +109,7 @@ export default function TestStart({
       >
         {label}
       </button>
+      <MoreTests current={path} className="mt-8" />
     </div>
   );
 }

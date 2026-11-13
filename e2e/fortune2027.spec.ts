@@ -25,7 +25,8 @@ test('없는 띠 주소는 404', async ({ page }) => {
 
 test('홈 → 띠별 운세 → 양띠 → 사주로 자세히 보기', async ({ page }) => {
   await page.goto('/')
-  await page.locator('main a[href="/fortune/2027"]').first().click()
+  await page.getByRole('button', { name: '운세', exact: true }).click() // 홈 칩: 운세 카드 보이기
+  await page.locator('main a[href="/fortune/2027"]:visible').first().click()
   await expect(page).toHaveURL(/\/fortune\/2027$/)
   await page.locator('a[href="/fortune/2027/sheep"]').first().click() // 허브에 격자·비교표·삼재 링크가 있어 여러 개
   await expect(page.locator('h1')).toHaveText('2027년 양띠 운세')

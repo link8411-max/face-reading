@@ -8,27 +8,31 @@ test('시즌 카드: 평소는 내 사주 풀이, 12~1월 신년운세 값은 �
   expect(src).toMatch(/\/\/\s+cta: \{ label: '지금 확인하기', href: '\/fortune' \}/)
 })
 
-test('홈 순서: 관상 히어로 → 시즌 카드 → 띠 → 친구랑 → 쿠팡 → 묶음 탭 → FAQ, 하단 띠 칩 목록 없음', () => {
+test('홈 순서: 머리 → 칩·대표 카드·카드 2열(HomeGrid) → 오늘 줄 → 쿠팡 → FAQ', () => {
   const src = readFileSync('src/app/page.tsx', 'utf8')
-  const order = ['<FaceHero', '<SeasonCard', '<ZodiacPicker', '<PlayTogether', '<CoupangBanner', '<SeasonPicks', '<CategoryTabs', 'HOME_FAQS.map((f)'].map((k) => src.indexOf(k))
-  expect(order.every((v) => v > 0)).toBe(true)
+  const order = ['<h1', '<HomeGrid', '<TodayRow', '<CoupangBanner', 'HOME_FAQS.map((f)'].map((s) => src.indexOf(s))
+  expect(order.every((i) => i > 0)).toBe(true)
   expect([...order].sort((a, b) => a - b)).toEqual(order)
+  for (const gone of ['ZodiacPicker', 'PlayTogether', 'CategoryTabs', 'SeasonPicks']) expect(src).not.toContain(gone)
   expect(src).not.toContain('ZODIAC_SLUGS')
 })
 
 test('홈은 서버 페이지이고 시즌 설정·FAQ 데이터를 쓴다', () => {
   const src = readFileSync('src/app/page.tsx', 'utf8')
   expect(src).not.toMatch(/^"use client"/)
-  expect(src).toContain('FaceHero')
-  expect(src).toContain('PlayTogether')
-  expect(src).toContain('SeasonCard')
-  expect(src).toContain('ZodiacPicker')
-  expect(src).toContain('CategoryTabs')
-  expect(src).toContain('HOME_FAQS')
+  for (const k of ['FaceHero', 'SeasonCard', 'HomeGrid', 'TodayRow', 'HOME_FAQS']) expect(src).toContain(k)
+})
+
+test('칩: 전체는 기본 8개, 태그 칩은 그 태그 항목 전부', async () => {
+  const { visibleFor, HOME_DEFAULT } = await import('@/components/home/HomeGrid')
+  const { ALL_ITEMS } = await import('@/content/navigation')
+  expect(HOME_DEFAULT).toHaveLength(8)
+  expect(ALL_ITEMS.filter((i) => visibleFor('all', i)).map((i) => i.href).sort()).toEqual([...HOME_DEFAULT].sort())
+  expect(ALL_ITEMS.filter((i) => visibleFor('fortune', i)).every((i) => i.tags.includes('fortune'))).toBe(true)
 })
 
 test('홈에 근거 없는 참여자 수·순위 숫자가 없다', () => {
-  const all = ['src/app/page.tsx', 'src/components/home/FaceHero.tsx', 'src/components/home/PlayTogether.tsx', 'src/components/home/SeasonCard.tsx', 'src/components/home/ZodiacPicker.tsx', 'src/components/home/CategoryTabs.tsx', 'src/content/season.ts'].map((f) => readFileSync(f, 'utf8')).join('\n')
+  const all = ['src/app/page.tsx', 'src/components/home/FaceHero.tsx', 'src/components/home/SeasonCard.tsx', 'src/components/home/ZodiacPicker.tsx', 'src/components/home/HomeGrid.tsx', 'src/components/home/TodayRow.tsx', 'src/components/MoreTests.tsx', 'src/content/season.ts'].map((f) => readFileSync(f, 'utf8')).join('\n')
   expect(all).not.toMatch(/\d[\d,]*명\s*(확인|참여|이용)|인기\s*순위|HOT/)
 })
 
@@ -45,7 +49,7 @@ test('띠 고르기는 날짜를 마운트 뒤에 계산한다(서버·브라우
   expect(src).not.toMatch(/^const .*new Date\(\)/m)
 })
 
-const HOME_FILES = ['src/app/page.tsx', 'src/components/home/FaceHero.tsx', 'src/components/home/PlayTogether.tsx', 'src/components/home/SeasonCard.tsx', 'src/components/home/ZodiacPicker.tsx', 'src/components/home/CategoryTabs.tsx', 'src/content/season.ts']
+const HOME_FILES = ['src/app/page.tsx', 'src/components/home/FaceHero.tsx', 'src/components/home/SeasonCard.tsx', 'src/components/home/ZodiacPicker.tsx', 'src/components/home/HomeGrid.tsx', 'src/components/home/TodayRow.tsx', 'src/components/MoreTests.tsx', 'src/content/season.ts']
 
 test('홈 화면 파일에 이모지가 없다 (선 아이콘·텍스트 칩)', () => {
   for (const f of HOME_FILES) expect(readFileSync(f, 'utf8'), f).not.toMatch(/\p{Extended_Pictographic}/u)
@@ -53,12 +57,4 @@ test('홈 화면 파일에 이모지가 없다 (선 아이콘·텍스트 칩)', 
 
 test('홈에 "곧 열려요" 같은 열리지 않은 기능 안내가 없다', () => {
   for (const f of HOME_FILES) expect(readFileSync(f, 'utf8'), f).not.toContain('곧 열려요')
-})
-
-test('친구랑 같이 해봐요: 동물상·얼굴 궁합·MBTI 궁합·삼국지·밈 능력고사 (관상은 히어로가 맡음)', async () => {
-  const { PLAY_TOGETHER } = await import('@/components/home/PlayTogether')
-  expect(PLAY_TOGETHER.map((c) => c.href)).toEqual(['/animal', '/face-match', '/mbti/match', '/samguk', '/exam/meme'])
-  const exam = PLAY_TOGETHER.find((c) => c.href === '/exam/meme')!
-  expect(exam.title).toBe('밈 능력고사')
-  expect(exam.desc).toBe('매일 5문제, 내 등급은?')
 })

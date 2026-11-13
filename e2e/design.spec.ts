@@ -24,6 +24,6 @@ test('홈 시즌 문구(수능 기간)도 h2', async ({ page }) => {
 })
 
 test('띠를 고르면 결과가 스크린리더에 읽힌다(aria-live)', async ({ page }) => {
-  await page.goto('/')
+  await page.goto('/today')
   await expect(page.getByRole('region', { name: '띠 바로 고르기' }).locator('[aria-live="polite"]')).toHaveCount(1)
 })

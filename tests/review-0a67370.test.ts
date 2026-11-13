@@ -6,7 +6,7 @@ import { ogQueryOk, OG_CACHE_CONTROL } from '@/lib/ogQuery'
 import { captureFilter } from '@/lib/capture'
 
 test('시즌 카드 slot은 GA 값 필터를 통과한다 (띠별: zodiac_rat 형식)', () => {
-  const files = ['src/app/page.tsx', 'src/app/fortune/daily/page.tsx', 'src/components/Zodiac2027Article.tsx', 'src/app/fortune/FortuneClient.tsx']
+  const files = ['src/app/today/page.tsx', 'src/app/fortune/daily/page.tsx', 'src/components/Zodiac2027Article.tsx', 'src/app/fortune/FortuneClient.tsx']
   const slots: string[] = []
   for (const f of files) {
     for (const m of readFileSync(f, 'utf8').matchAll(/<SeasonPicks slot=(?:"([^"]+)"|\{`([^`]+)`\})/g)) {

@@ -16,6 +16,7 @@ import { animalTypeDB } from "@/lib/animalTypeDB";
 import ResultCard, { type ResultCardProps } from "@/components/result/ResultCard";
 import ResultActions from "@/components/result/ResultActions";
 import NextTests from "@/components/result/NextTests";
+import MoreTests from "@/components/MoreTests";
 import NextSteps from "@/components/result/NextSteps";
 import { useHandedPhoto } from "@/hooks/useHandedPhoto";
 import { useResultShare } from "@/hooks/useResultShare";
@@ -156,6 +157,7 @@ export default function AnimalTypePage() {
             </div>
             {image && <NextTests current="animal" image={image} />}
             <NextSteps from="animal" withPhoto={!!image} />
+            <MoreTests current="/animal" />
 
             <details className="group mt-4 bg-white border border-line rounded-[22px] px-5 py-4">
               <summary className="font-bold cursor-pointer list-none flex justify-between items-center">

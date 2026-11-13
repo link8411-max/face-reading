@@ -150,7 +150,7 @@ test('매일 바뀌는 항목은 셋', () => { expect(ALL_ITEMS.filter((i) => i.
 
 "다른 테스트 둘러보기": `TestStart` 아래(시작 화면 맨 아래)와 결과 화면 공유 버튼 묶음 아래(`NextSteps` 자리. `NextSteps`·`NextTests`가 이미 있으면 그 아래에 하나만)에 `<MoreTests current={경로} />`.
 
-- [ ] **Step 1: 테스트를 새 홈에 맞춘다**
+- [x] **Step 1: 테스트를 새 홈에 맞춘다**
 
 `tests/home.test.ts`의 "홈 순서", "친구랑 같이 해봐요" 테스트를 바꾼다:
 ```ts
@@ -177,10 +177,10 @@ test('검색으로 테스트 시작 화면에 들어와도 다른 테스트로 �
 ```
 83행의 라디오 이름은 화면 문구 "선물하기"로 고친다(`e2e/gift-nudge.spec.ts:27`도 같이).
 
-- [ ] **Step 2: 실패 확인** — `npx vitest run tests/home.test.ts` → FAIL
-- [ ] **Step 3: 구현** (위 순서. 카드·칩 모양은 시안을 따른다. 서버 HTML에 8개 카드 + 거를 때 쓸 나머지 카드가 모두 들어가고 처음엔 `hidden`)
-- [ ] **Step 4: 통과 확인** — `npm test && npm run test:e2e` → 새 테스트 포함 PASS(기존 무관 실패는 `buttons.spec.ts` 하나만 남아야 한다)
-- [ ] **Step 5: 커밋** — `"홈을 짧게: 칩·대표 카드·캐릭터 카드 2열·오늘 줄, 시작·결과 화면에 다른 테스트 둘러보기"`
+- [x] **Step 2: 실패 확인** — `npx vitest run tests/home.test.ts` → FAIL
+- [x] **Step 3: 구현** (위 순서. 카드·칩 모양은 시안을 따른다. 서버 HTML에 8개 카드 + 거를 때 쓸 나머지 카드가 모두 들어가고 처음엔 `hidden`)
+- [x] **Step 4: 통과 확인** — `npm test && npm run test:e2e` → 새 테스트 포함 PASS(기존 무관 실패는 `buttons.spec.ts` 하나만 남아야 한다)
+- [x] **Step 5: 커밋** — `"홈을 짧게: 칩·대표 카드·캐릭터 카드 2열·오늘 줄, 시작·결과 화면에 다른 테스트 둘러보기"`
 
 ---
 
