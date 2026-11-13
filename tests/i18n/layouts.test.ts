@@ -19,3 +19,18 @@ describe('루트 레이아웃 둘', () => {
     expect(readFileSync('src/app/en/layout.tsx', 'utf8')).toContain('LOCALE_HTML_LANG.en');
   });
 });
+
+test('없는 주소 404: 전역(한국어 틀)과 두 언어 트리 모두 있다', () => {
+  const { existsSync, readFileSync: read } = require('node:fs')
+  expect(existsSync('src/app/global-not-found.tsx')).toBe(true)
+  expect(existsSync('src/app/(ko)/not-found.tsx')).toBe(true)
+  expect(existsSync('src/app/en/not-found.tsx')).toBe(true)
+  expect(read('src/app/global-not-found.tsx', 'utf8')).toMatch(/<html lang="ko">[\s\S]*SiteShell/)
+  expect(read('next.config.ts', 'utf8')).toMatch(/globalNotFound: true/)
+})
+
+test('안내 띠 닫기는 언어를 고르지 않는다(영어 공유 링크가 한국어로 넘어가지 않게)', () => {
+  const src = require('node:fs').readFileSync('src/components/i18n/LanguageBanner.tsx', 'utf8')
+  expect(src).not.toMatch(/writeLangCookie\("ko"\)/)
+  expect(src).toMatch(/dismissed/)
+})

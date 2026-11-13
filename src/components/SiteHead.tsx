@@ -1,7 +1,7 @@
 import type { ReactNode } from "react";
 
 // <head> 안쪽 공통 요소(PWA 메타, 애드센스, 구조화 데이터, 서비스 워커 등록). 한국어·영어 루트 레이아웃이 함께 쓴다.
-export default function SiteHead({ appName, jsonLd }: { appName: string; jsonLd: Record<string, unknown> }): ReactNode {
+export default function SiteHead({ appName, jsonLd }: { appName: string; jsonLd?: Record<string, unknown> }): ReactNode {
   return (
     <>
         {/* PWA 메타 태그 */}
@@ -18,11 +18,13 @@ export default function SiteHead({ appName, jsonLd }: { appName: string; jsonLd:
         <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-9670928093323234"
           crossOrigin="anonymous" suppressHydrationWarning></script>
 
-        <script
-          type="application/ld+json"
-          suppressHydrationWarning
-          dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
-        />
+        {jsonLd && (
+          <script
+            type="application/ld+json"
+            suppressHydrationWarning
+            dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+          />
+        )}
 
         {/* 서비스 워커 등록 */}
         <script

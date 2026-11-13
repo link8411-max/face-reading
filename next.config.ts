@@ -1,6 +1,7 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
+  experimental: { globalNotFound: true }, // 루트 레이아웃이 (ko)·en 둘이라 없는 주소 404를 src/app/global-not-found.tsx가 그린다
   // AI 관상(/face, Gemini)은 무료 관상(/face2)으로 통합됨
   async redirects() {
     return [

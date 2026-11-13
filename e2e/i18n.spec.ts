@@ -109,12 +109,19 @@ test('해외 방문자(안내 쿠키)에게는 "View this page in English" 띠�
   expect((await context.cookies()).find((c) => c.name === 'lang')?.value).toBe('en')
 })
 
-test('안내 띠를 닫으면 한국어를 기억해 다시 안 뜬다', async ({ page, context, baseURL }) => {
+test('안내 띠를 닫으면 다시 안 뜨지만 언어를 고른 것은 아니다(영어 공유 링크는 영어로 열린다)', async ({ page, context, baseURL }) => {
   await context.addCookies([{ name: 'lang_suggest', value: 'en', url: baseURL! }])
   await page.goto('/face2')
   await page.getByRole('button', { name: 'Close' }).click()
   await expect(page.getByRole('button', { name: 'View this page in English' })).toHaveCount(0)
-  expect((await context.cookies()).find((c) => c.name === 'lang')?.value).toBe('ko')
+  const cookies = await context.cookies()
+  expect(cookies.find((c) => c.name === 'lang')).toBeUndefined()
+  expect(cookies.find((c) => c.name === 'lang_suggest')?.value).toBe('dismissed')
+  await page.reload()
+  await page.waitForTimeout(500)
+  await expect(page.getByRole('button', { name: 'View this page in English' })).toHaveCount(0)
+  await page.goto('/en/animal/r/cat?s=88')
+  await expect(page).toHaveURL(/\/en\/animal\/r\/cat/)
 })
 
 test('영어판이 없는 한국어 페이지에는 안내 띠가 뜨지 않는다', async ({ page, context, baseURL }) => {
