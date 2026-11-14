@@ -2,8 +2,8 @@ import type { Metadata } from "next";
 import SajuClient from "./SajuClient";
 import PageGuide from "@/components/PageGuide";
 
-const TITLE = "무료 사주 풀이 | 내 사주를 쉬운 말로, 10년 대운까지 – 운명을 읽다";
-const DESCRIPTION = "무료 만세력으로 네 기둥을 뽑고 오행, 십신, 10년 대운과 올해 흐름까지 쉬운 말로 풀어요. 한국천문연구원 절기 시각 기준이고 가입 없이 무료예요.";
+const TITLE = "무료 사주 풀이 | 쉬운 말로 보는 내 사주·10년 대운 – 운명을 읽다";
+const DESCRIPTION = "무료 만세력으로 네 기둥을 뽑고 오행, 십신, 10년 대운과 올해 흐름까지 쉬운 말로 풀어요. 한국천문연구원 절기 기준, 가입 없이 무료예요.";
 
 export const metadata: Metadata = {
   title: TITLE,

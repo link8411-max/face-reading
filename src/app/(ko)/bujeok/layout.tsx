@@ -1,7 +1,7 @@
 import type { Metadata } from 'next'
 
 const SITE = 'https://unse-ai.com'
-const TITLE = '무료 부적 만들기 | 손으로 돌려 보는 부적 카드, 잠금화면 저장 – 운명을 읽다'
+const TITLE = '무료 부적 만들기 | 손으로 돌려 보는 부적 카드 – 운명을 읽다'
 const DESCRIPTION = '합격·재물·건강 등 소원 11가지 중 하나를 고르고 마지막 한 획을 직접 그어 완성하는 부적 카드예요. 잠금화면 저장과 선물까지 무료예요.'
 const IMAGE = '/bujeok/og-bujeok.png' // 1200×630, scripts/bujeok-examples.ts가 만든 정지 그림
 
