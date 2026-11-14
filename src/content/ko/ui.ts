@@ -51,6 +51,12 @@ export const UI: Record<UiKey, string> = {
   'btn.sharePreparing': '공유 준비 중…',
 
   // start screen
+  'start.tabFace': '관상 보기',
+  'start.tabAnimal': '동물상 보기',
+  'fm.tabTest': '궁합 보기',
+  'start.tabGuide': '설명',
+  'start.guideHint': '아래에 자세한 설명과 자주 묻는 질문이 있어요.',
+  'start.tabPreview': '미리보기',
   'start.photoHint': '셀카도 좋아요 · 정면이면 더 정확해요',
   'start.anotherPhoto': '다른 사진 고르기',
   'start.chosenAlt': '고른 사진',

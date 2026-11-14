@@ -27,14 +27,14 @@ export default function FaceMatchPage() {
             top={<CastHero cast="gumiho" lineKey="say.faceMatch.start" locale="en" />}
             head={
               <>
-                <h2 className="mt-4 font-serif font-bold text-[27px] leading-[1.4] break-keep">
+                <h2 className="mt-1 mb-3.5 font-serif font-bold text-[24px] leading-[1.35] break-keep">
                   {lines[0]}
                   <br />
                   {lines[1]}
                 </h2>
-                <p className="mt-2.5 mb-5 text-sm text-muted leading-relaxed">{t("en", "fm.desc")}</p>
               </>
             }
+            intro={<p className="mt-5 text-sm text-muted leading-relaxed">{t("en", "fm.desc")}</p>}
           />
         </EnCopyProvider>
       </main>

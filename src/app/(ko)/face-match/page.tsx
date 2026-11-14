@@ -23,10 +23,10 @@ export default function FaceMatchPage() {
         top={<CastHero cast="gumiho" lineKey="say.faceMatch.start" />}
         head={
           <>
-            <h2 className="mt-4 font-serif font-bold text-[27px] leading-[1.4] break-keep">우리 둘,<br />얼굴 궁합은 몇 점?</h2>
-            <p className="mt-2.5 mb-5 text-sm text-muted leading-relaxed">두 사람의 얼굴로 동물상을 찾아 친구·연인·짝사랑 궁합을 알려 드려요.</p>
+            <h2 className="mt-1 mb-3.5 font-serif font-bold text-[24px] leading-[1.35] break-keep">우리 둘,<br />얼굴 궁합은 몇 점?</h2>
           </>
         }
+        intro={<p className="mt-5 text-sm text-muted leading-relaxed">두 사람의 얼굴로 동물상을 찾아 친구·연인·짝사랑 궁합을 알려 드려요.</p>}
       />
     </main>
   );

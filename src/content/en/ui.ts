@@ -58,6 +58,12 @@ export const UI = {
   'btn.sharePreparing': 'Preparing to share…',
 
   // start screen
+  'start.tabFace': 'Read my face',
+  'start.tabAnimal': 'Find my animal',
+  'fm.tabTest': 'Check match',
+  'start.tabGuide': 'About',
+  'start.guideHint': 'Details and FAQ are below.',
+  'start.tabPreview': 'Preview',
   'start.photoHint': 'Selfies are fine · facing front is more accurate',
   'start.anotherPhoto': 'Choose another photo',
   'start.chosenAlt': 'Chosen photo',

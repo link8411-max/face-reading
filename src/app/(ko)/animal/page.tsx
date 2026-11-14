@@ -148,6 +148,7 @@ export default function AnimalTypePage() {
         {!result && (
           <TestStart
             heading={t("animal.heading")}
+            testTab={t("start.tabAnimal")}
             desc={t("animal.desc")}
             tips={[t("animal.tip1"), t("animal.tip2")]}
             analyzeLabel={t("animal.analyze")}

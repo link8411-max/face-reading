@@ -459,7 +459,7 @@ test('점안: 짧게 그으면 안내가 뜨고 다시 긋게 한다. 제대로 
   await wishTile(page, '합격').click()
   await pickFinish(page, '종이')
   await makeBtn(page).click()
-  await expect(page.getByText('마지막 한 획을 그어 부적을 완성해요')).toBeVisible()
+  await expect(page.getByText('마지막 한 획을 그어 부적을 완성해요')).toBeVisible({ timeout: 15000 }) // 무당 장면(5초) 뒤에 나온다
   await expect(page.getByRole('button', { name: '그냥 완성하기' })).toBeVisible()
   await drawStroke(page, [[120, 254], [121, 280], [121, 300]])
   await expect(page.getByText('점선을 따라 아래까지 쭉 그어 주세요')).toBeVisible()

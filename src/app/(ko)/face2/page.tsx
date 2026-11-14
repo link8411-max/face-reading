@@ -121,6 +121,7 @@ export default function Face2Page() {
         {!result && (
           <TestStart
             heading={t("face.heading")}
+            testTab={t("start.tabFace")}
             desc={t("face.desc")}
             tips={[t("face.tip1"), t("face.tip2")]}
             analyzeLabel={t("face.analyze")}

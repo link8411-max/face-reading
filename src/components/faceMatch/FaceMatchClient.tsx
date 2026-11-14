@@ -8,6 +8,7 @@ import { Icon } from "@/components/icons";
 import type { Gender } from "@/components/test/GenderPills";
 import ResultActions from "@/components/result/ResultActions";
 import FaceMatchCard from "@/components/faceMatch/FaceMatchCard";
+import StartTabs, { GUIDE_TAB } from "@/components/test/StartTabs";
 import PhotoSlot from "@/components/faceMatch/PhotoSlot";
 import { loadGender, saveGender } from "@/lib/genderMemory";
 import { useScreenshot } from "@/hooks/useScreenshot";
@@ -40,7 +41,8 @@ const OTHER_LABEL: Record<Rel, string> = { friend: "친구", lover: "내 사람"
 const cap = (s: string) => s.charAt(0).toUpperCase() + s.slice(1);
 
 // top: 시작 화면에서만 보이는 캐릭터 그림(결과가 나오면 사라진다), head: 그 아래 제목·설명(결과 화면에도 남는다). 둘 다 서버에서 그려 HTML에 들어간다.
-export default function FaceMatchClient({ invite, top, head }: { invite?: { key: AnimalKey; rel: "friend" | "lover" }; top?: ReactNode; head?: ReactNode }) {
+// intro: 시작 화면 "설명" 탭에 들어가는 소개 문장(11/14 스크롤 줄이기로 제목 아래에서 옮김)
+export default function FaceMatchClient({ invite, top, head, intro }: { invite?: { key: AnimalKey; rel: "friend" | "lover" }; top?: ReactNode; head?: ReactNode; intro?: ReactNode }) {
   const t = useT();
   const locale = useLocale();
   const en = locale === "en";
@@ -146,14 +148,16 @@ export default function FaceMatchClient({ invite, top, head }: { invite?: { key:
     <>
     {top}
     {head}
-    <div className="flex flex-col gap-4 pb-7 no-screenshot">
+    <div className="pb-7 no-screenshot">
+    <StartTabs tabs={[{ key: "test", label: t("fm.tabTest"), content: (
+    <div className="flex flex-col gap-2.5 mt-3">
       {invite ? (
         <p className="bg-card border border-line rounded-[22px] p-4 text-sm leading-relaxed">
           <b>{invite.rel === "lover" ? "내 사람이 연인 궁합을 보자고 해요." : "친구가 궁합을 보자고 해요."}</b> {josa(OTHER_LABEL[invite.rel], "은", "는")} {animalTypeDB[invite.key].name}이에요. 내 사진을 올리면 바로 궁합이 나와요.
         </p>
       ) : (
         <fieldset>
-          <legend className="text-[13px] text-muted mb-2.5">{t("fm.relQuestion")}</legend>
+          <legend className="sr-only">{t("fm.relQuestion")}</legend>
           <div role="radiogroup" aria-label={t("fm.relAria")} className="grid grid-cols-3 gap-2">
             {REL.map((r) => (
               <button key={r} type="button" role="radio" aria-checked={rel === r} disabled={busy} onClick={() => setRel(r)} className={`h-12 rounded-full border text-[15px] font-medium transition disabled:opacity-60 ${rel === r ? "bg-ink text-paper border-ink" : "bg-card text-ink border-line"}`}>
@@ -164,7 +168,10 @@ export default function FaceMatchClient({ invite, top, head }: { invite?: { key:
         </fieldset>
       )}
 
-      <PhotoSlot label={t("fm.me")} gender={me.gender} onGender={(g) => { setMe(withGender(me, g)); saveGender(g); }} image={me.image} onFile={(d) => { setMe(withPhoto(me, d)); track("photo_selected", { test_name: "face_match" }); }} error={me.error} disabled={busy} fixed={meFixed ? me.animal ?? undefined : undefined} />
+      <div className="grid grid-cols-2 gap-2.5">
+        <PhotoSlot compact label={t("fm.me")} gender={me.gender} onGender={(g) => { setMe(withGender(me, g)); saveGender(g); }} image={me.image} onFile={(d) => { setMe(withPhoto(me, d)); track("photo_selected", { test_name: "face_match" }); }} error={me.error} disabled={busy} fixed={meFixed ? me.animal ?? undefined : undefined} />
+        <PhotoSlot compact label={otherLabel} gender={other.gender} onGender={(g) => setOther(withGender(other, g))} image={other.image} onFile={(d) => { setOther(withPhoto(other, d)); track("photo_selected", { test_name: "face_match" }); }} error={other.error} disabled={busy} fixed={invite ? invite.key : undefined} />
+      </div>
 
       {inviteUrl && (
         <div className="bg-card border border-line rounded-[22px] p-4 flex flex-col gap-2">
@@ -173,22 +180,22 @@ export default function FaceMatchClient({ invite, top, head }: { invite?: { key:
             <Icon name="share" size={16} /> {OTHER_LABEL[rel!]}에게 초대 링크 보내기
           </button>
           {inviteShare.notice && <p role="status" className="text-xs text-muted text-center">{inviteShare.notice}</p>}
-          <p className="text-xs text-muted text-center">또는 아래에 {OTHER_LABEL[rel!]} 사진을 올려도 돼요</p>
+          <p className="text-xs text-muted text-center">또는 위 칸에 {OTHER_LABEL[rel!]} 사진을 올려도 돼요</p>
         </div>
       )}
 
-      <PhotoSlot label={otherLabel} gender={other.gender} onGender={(g) => setOther(withGender(other, g))} image={other.image} onFile={(d) => { setOther(withPhoto(other, d)); track("photo_selected", { test_name: "face_match" }); }} error={other.error} disabled={busy} fixed={invite ? invite.key : undefined} />
-
-      <div className="flex items-center gap-2.5 bg-card rounded-[18px] px-3.5 py-3">
-        <Icon name="shield" size={20} className="text-accent-ink flex-none" />
-        <span className="text-xs leading-normal text-muted">
-          {rel === "crush" ? t("fm.privacyCrush") : t("fm.privacy")}
-        </span>
-      </div>
       {busy && <AnalyzingOverlay cast="gumiho" steps={FACE_MATCH_STEPS} step={analyzeStep} />}
       <button type="button" onClick={analyze} disabled={!ready || busy} className="h-[52px] rounded-full bg-accent text-white text-[15px] font-medium disabled:opacity-45">
         {busy ? t("fm.going") : !rel ? t("fm.needRel") : t("fm.go")}
       </button>
+      <div className="-mt-1 flex items-center gap-2 px-1">
+        <Icon name="shield" size={16} className="text-accent-ink flex-none" />
+        <span className="text-xs leading-normal text-muted">
+          {rel === "crush" ? t("fm.privacyCrush") : t("fm.privacy")}
+        </span>
+      </div>
+    </div>
+    ) }, { key: GUIDE_TAB, label: t("start.tabGuide"), content: intro }]} />
     </div>
     </>
   );

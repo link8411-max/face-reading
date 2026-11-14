@@ -3,7 +3,7 @@ import GenderPills from '@/components/test/GenderPills'
 import TestStart, { analyzeButtonLabel } from '@/components/test/TestStart'
 
 const base = {
-  heading: '웃는 사진 한 장이면 충분해요', desc: '설명', tips: ['밝은 곳에서'], analyzeLabel: '관상 보기',
+  heading: '웃는 사진 한 장이면 충분해요', desc: '사진 한 장으로 보는 관상', testTab: '관상 테스트', tips: ['밝은 곳에서'], analyzeLabel: '관상 보기',
   image: null, gender: null, onGender: () => {}, onFile: () => {}, onAnalyze: () => {}, onReset: () => {}, loading: false, error: null,
 } as const
 
@@ -23,12 +23,12 @@ test('분석 버튼 문구: 사진 → 성별 → 준비 중 → 분석 중 순�
   expect(analyzeButtonLabel({ hasImage: true, gender: '남', loading: false, preparing: false, label: '관상 보기' })).toBe('관상 보기')
 })
 
-test('시작 화면: 성별 미선택이면 분석 버튼이 비활성, 사진 안내 문구가 버튼 위에 있다', () => {
+test('시작 화면: 성별 미선택이면 분석 버튼이 비활성, 사진 안심 문구는 버튼 바로 아래(첫 화면에 버튼이 들어오게, 11/14)', () => {
   const html = renderToStaticMarkup(<TestStart {...base} image="data:image/png;base64,AA" />)
   expect(html).toMatch(/<button[^>]*disabled=""[^>]*>성별을 먼저 골라 주세요/)
   const note = html.indexOf('사진은 내 폰 안에서만 보고 바로 지워요')
   expect(note).toBeGreaterThan(0)
-  expect(note).toBeLessThan(html.indexOf('성별을 먼저 골라 주세요'))
+  expect(note).toBeGreaterThan(html.indexOf('성별을 먼저 골라 주세요'))
   expect(html).not.toMatch(/\p{Extended_Pictographic}/u)
 })
 
@@ -51,4 +51,15 @@ test('관상 2판 페이지는 성별을 묻고(기억값·추정으로 미리 �
   expect(src).not.toContain('needsGender={false}')
   expect(src).toContain('useRememberedGender')
   expect(src).toContain('useGenderGuess')
+})
+
+test('시작 화면 탭: 테스트·미리보기·설명. 미리보기·설명 패널도 서버 HTML에 있고 처음엔 숨김', () => {
+  const html = renderToStaticMarkup(<TestStart {...base} preview={<p>미리보기 내용</p>} />)
+  const tabs = [...html.matchAll(/role="tab"[^>]*>([^<]+)</g)].map((m) => m[1])
+  expect(tabs).toEqual(['관상 테스트', '미리보기', '설명'])
+  expect(html).toContain('미리보기 내용')
+  expect(html).toContain(base.desc) // 설명 문장은 설명 탭 안에(서버 HTML에 그대로)
+  expect(html).toMatch(/data-start-panel="preview" class="hidden"/)
+  expect(html).toMatch(/data-start-panel="guide" class="hidden"/)
+  expect(html).toMatch(/data-start-panel="test" class=""/)
 })

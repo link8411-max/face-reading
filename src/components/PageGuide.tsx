@@ -24,7 +24,7 @@ export default function PageGuide({ route, locale = "ko" }: { route: GuideRoute 
   const labelOf = (r: string) => (en ? TEST_LINKS_EN[r].label : (TEST_LINKS as Record<string, { label: string }>)[r].label);
 
   return (
-    <section className="no-screenshot bg-paper text-ink border-t border-line">
+    <section data-page-guide className="no-screenshot bg-paper text-ink border-t border-line">
       <div className="max-w-lg mx-auto px-4 py-10 space-y-6">
         <div className="text-center">
           <h2 className="font-serif text-[22px] font-bold break-keep">{guide.heading}</h2>
