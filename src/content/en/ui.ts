@@ -272,6 +272,7 @@ export const UI = {
   'say.exam.reveal': 'Ta-da! Your report card is here.',
   'say.bujeok.start': 'What would you like me to put in it?',
   'say.bujeok.ask': 'I\'ll tuck your wish into the sound of the bell.',
+  'say.bujeok.rite': 'Let me paint it for you, with care.',
   'say.bujeok.reveal': 'Made with care. Keep it close today.',
 } as const;
 

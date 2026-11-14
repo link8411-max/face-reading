@@ -45,6 +45,7 @@ export const CAST_LINES = {
   // 부적 (무당)
   'say.bujeok.start': 'mudang',
   'say.bujeok.ask': 'mudang',
+  'say.bujeok.rite': 'mudang',
   'say.bujeok.reveal': 'mudang',
 } as const satisfies Record<string, CastKey>
 

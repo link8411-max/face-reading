@@ -1,5 +1,5 @@
 'use client'
-// /bujeok 화면: form → rite(마지막 한 획·도장) → done. 완성 화면에서 카드가 돌며 나타난다(손으로 돌려 볼 수 있다). 서버 호출 없이 브라우저에서 만들고 저장한다.
+// /bujeok 화면: form → scene(무당이 그려 주는 5초 영상, 움직임 줄이기면 건너뜀) → rite(마지막 한 획·도장) → done. 완성 화면에서 카드가 돌며 나타난다(손으로 돌려 볼 수 있다). 서버 호출 없이 브라우저에서 만들고 저장한다.
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { useBackOrHome } from '@/hooks/useBackOrHome'
 import TestHeader from '@/components/test/TestHeader'
@@ -8,6 +8,7 @@ import BujeokCard from './BujeokCard'
 import BujeokDone from './BujeokDone'
 import BujeokRite, { type RiteSteps } from './BujeokRite'
 import BujeokAd from './BujeokAd'
+import MudangScene, { RiteFlashOut, shouldPlayScene } from './MudangScene'
 import { useBox } from './useBox'
 import type { WeeklyHigh } from '@/lib/zipsise/banner'
 import { track } from '@/lib/analytics'
@@ -26,7 +27,7 @@ export interface Initial { mode?: Mode; wish?: Wish; style?: BujeokStyle; finish
 const BIRTH_FAIL = '날짜를 다시 확인해 주세요. 음력 윤달은 그 해에 있는 달만 고를 수 있어요.'
 const NAME_FAIL = '이름은 한글·영문·숫자로 8자까지 적어 주세요.'
 
-type Phase = 'form' | 'rite' | 'done'
+type Phase = 'form' | 'scene' | 'rite' | 'done'
 
 function initialValues(initial?: Initial): FormValues {
   const b = takeHandedBirth()
@@ -46,7 +47,10 @@ export default function BujeokClient({ initial, high = null }: { initial?: Initi
   const goBack = useBackOrHome()
   const [values, setValues] = useState<FormValues>(() => initialValues(initial))
   const [phase, setPhase] = useState<Phase>('form')
-  useScrollTopWhen(phase === 'done')
+  useScrollTopWhen(phase === 'scene' || phase === 'done')
+  // 장면이 끝나면 갈 단계(점안 또는 바로 완성)
+  const afterScene = useRef<'rite' | 'done'>('rite')
+  const [flashOut, setFlashOut] = useState(false)
   const [spec, setSpec] = useState<BujeokSpec | null>(null)
   const [mode, setMode] = useState<Mode>(initial?.mode === 'gift' ? 'gift' : 'mine')
   const [madeName, setMadeName] = useState<string | null>(null)
@@ -109,7 +113,9 @@ export default function BujeokClient({ initial, high = null }: { initial?: Initi
     setSpec({ style, wish, el, variant: randomVariant(), finish })
     setPlayKey((k) => k + 1)
     // 점안: 내 전통 부적은 긋고 도장, 귀여운은 도장만. 선물은 보내는 사람이 긋기만(귀여운 선물은 바로 완성)
-    setPhase(gift && style === 'cute' ? 'done' : 'rite')
+    const next = gift && style === 'cute' ? 'done' : 'rite'
+    afterScene.current = next
+    setPhase(shouldPlayScene() ? 'scene' : next)
     track('test_start', { test_name: 'bujeok' })
     track('result_view', { test_name: 'bujeok', result_id: `${style}_${wish}` })
   }
@@ -166,7 +172,15 @@ export default function BujeokClient({ initial, high = null }: { initial?: Initi
       <main className="mx-auto px-[22px] max-w-lg pb-6">
         <TestHeader title="나만의 부적" onBack={() => (phase !== 'form' ? setPhase('form') : goBack())} backLabel={phase !== 'form' ? '다시하기' : '돌아가기'} language={false} />
 
-        {phase === 'rite' && spec ? (
+        {phase === 'scene' && spec ? (
+          <MudangScene
+            key={playKey}
+            onDone={(flashed) => {
+              setFlashOut(flashed)
+              setPhase(afterScene.current)
+            }}
+          />
+        ) : phase === 'rite' && spec ? (
           <div ref={panel} className="mx-auto max-w-[420px]">
             <BujeokRite key={playKey} spec={spec} name={madeName} steps={riteSteps} onDone={finishRite} />
           </div>
@@ -185,6 +199,7 @@ export default function BujeokClient({ initial, high = null }: { initial?: Initi
           </>
         )}
       </main>
+      {flashOut && <RiteFlashOut onGone={() => setFlashOut(false)} />}
     </div>
   )
 }

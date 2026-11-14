@@ -477,3 +477,10 @@ body:has(.bj-dark) nav[aria-label='하단 메뉴'] { background-color: #1C1712; 
   .reveal-card, .reveal-pop, .rise, .scan-beam, .peek-cast, .tab-pop { animation: none !important; }
   .press, .tab-indicator { transition: none !important; }
 }
+
+/* 부적 무당 장면 끝의 금빛 번쩍임(MudangScene): 차오르고(.45초) 다음 화면에서 걷힌다(.7초). 한 번만. 움직임 줄이기면 장면 자체가 없다. */
+.rite-flash { background: radial-gradient(circle at 50% 55%, #FFFBEA 0%, #FFEFB8 40%, #F2C45A 100%); }
+.rite-flash-in { animation: rite-flash-in .45s ease-in both; }
+.rite-flash-out { animation: rite-flash-out .7s ease-out both; }
+@keyframes rite-flash-in { from { opacity: 0; } to { opacity: 1; } }
+@keyframes rite-flash-out { from { opacity: 1; } to { opacity: 0; } }

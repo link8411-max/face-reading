@@ -265,5 +265,6 @@ export const UI: Record<UiKey, string> = {
   'say.exam.reveal': '뚝딱! 성적표 나왔다.',
   'say.bujeok.start': '어떤 마음을 담아 드릴까요?',
   'say.bujeok.ask': '고른 소원을 방울 소리에 실어 둘게요.',
+  'say.bujeok.rite': '정성껏 담아 그려 드릴게요.',
   'say.bujeok.reveal': '정성껏 담았어요. 오늘 하루 든든하게 지니세요.',
 };
