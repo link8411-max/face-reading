@@ -6,7 +6,7 @@ import { PEOPLE, PEOPLE_IDS } from '@/content/samgukPeople'
 import { relationsOf } from '@/lib/people/relations'
 
 async function render(id: string): Promise<string> {
-  return renderToStaticMarkup(await Page({ params: Promise.resolve({ id }) }))
+  return renderToStaticMarkup(await Page({ params: Promise.resolve({ id }) })).replace(/<nav aria-label="단락 바로 가기"[\s\S]*?<\/nav>/, '') // 단락 탭 글자는 순서 검사에서 뺀다
 }
 
 test('portraitSrc: 한글 이름 jpg, 초상화 대기 인물은 null', () => {

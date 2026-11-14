@@ -14,7 +14,8 @@ vi.mock('@/lib/videos/fetch', () => ({ getChannelVideos: async () => current }))
 import Page from '@/app/(ko)/samguk/people/[id]/page'
 
 async function render(id: string): Promise<string> {
-  return renderToStaticMarkup(await Page({ params: Promise.resolve({ id }) }))
+  // 따라다니는 단락 탭(이야기·영상·상관도…)의 글자는 순서 검사에서 뺀다
+  return renderToStaticMarkup(await Page({ params: Promise.resolve({ id }) })).replace(/<nav aria-label="단락 바로 가기"[\s\S]*?<\/nav>/, '')
 }
 const idx = (html: string, s: string) => {
   const i = html.indexOf(s)

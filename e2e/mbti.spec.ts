@@ -55,7 +55,7 @@ test('16유형 페이지: 남녀 두 캐릭터가 실제로 불러와지고 가�
   for (const s of SLUGS) {
     await page.goto(`/mbti/${s}`)
     for (const g of ['f', 'm']) {
-      const img = page.locator(`img[src="/images/mbti/${s}-${g}.webp"]`)
+      const img = page.locator(`header img[src="/images/mbti/${s}-${g}.webp"]`)
       await expect(img, `${s}-${g}`).toBeVisible()
       await expect.poll(() => img.evaluate((i: HTMLImageElement) => i.complete && i.naturalWidth), `${s}-${g}`).toBe(720)
     }

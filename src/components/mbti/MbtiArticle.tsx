@@ -6,9 +6,22 @@ import ArticleShare from "@/components/share/ArticleShare";
 import MonthlyFortune from "@/components/mbti/MonthlyFortune";
 import { mbtiOgPath, mbtiProfiles, mbtiUrl, monthlyFor } from "@/content/mbtiTypes";
 import { mbtiArt } from "@/lib/art";
+import SectionNav from "@/components/SectionNav";
+import MbtiMatchMap from "@/components/mbti/MbtiMatchMap";
 import { MBTI_TYPES, bestMatches, compatSummary, type MbtiType } from "@/lib/mbti/compat";
 
 const card = "bg-card border border-line rounded-3xl p-5";
+
+// 따라다니는 단락 탭(SectionNav) 항목. 단락 id와 같아야 한다(tests/sectionNav.test.tsx)
+export const MBTI_SECTIONS = [
+  { id: "sec-summary", label: "요약" },
+  { id: "sec-who", label: "성격" },
+  { id: "sec-match", label: "궁합" },
+  { id: "sec-love", label: "연애" },
+  { id: "sec-travel", label: "여행지" },
+  { id: "sec-jobs", label: "직업" },
+  { id: "sec-faq", label: "FAQ" },
+];
 const h2 = "font-bold text-lg text-accent-ink mb-2";
 
 export function mbtiFaqs(type: MbtiType) {
@@ -66,7 +79,9 @@ export default function MbtiArticle({ type }: { type: MbtiType }) {
         </div>
       </header>
 
-      <section className={card}>
+      <SectionNav items={MBTI_SECTIONS} />
+
+      <section id="sec-summary" className={`${card} scroll-mt-16`}>
         <h2 className={h2}>{type} 한눈에 보기</h2>
         <p className="leading-relaxed">{p.nickname} {type}의 연애 궁합 1위는 {bestMatches(type, "love", 1)[0]}, 친구 궁합 1위는 {bestMatches(type, "friend", 1)[0]}, 직장 궁합 1위는 {bestMatches(type, "work", 1)[0]}예요.</p>
         <ul className="mt-2 space-y-1 text-sm">
@@ -76,11 +91,12 @@ export default function MbtiArticle({ type }: { type: MbtiType }) {
         <Link href={`/fortune/mbti?t=${slug}`} className="mt-3 inline-block text-sm text-accent-ink underline underline-offset-2">오늘의 {type} 운세 보기</Link>
       </section>
 
-      <section className={card}><h2 className={h2}>{type}는 이런 사람</h2><p className="leading-relaxed">{p.summary}</p></section>
+      <section id="sec-who" className={`${card} scroll-mt-16`}><h2 className={h2}>{type}는 이런 사람</h2><p className="leading-relaxed">{p.summary}</p></section>
 
-      <section className={card}>
+      <section id="sec-match" className={`${card} scroll-mt-16`}>
         <h2 className={h2}>{type}와 잘 맞는 유형</h2>
-        <div className="space-y-3">
+        <MbtiMatchMap type={type} />
+        <div className="space-y-3 mt-5">
           {bestMatches(type, "love").map((b) => {
             const s = compatSummary(type, b);
             return (
@@ -113,11 +129,11 @@ export default function MbtiArticle({ type }: { type: MbtiType }) {
         <p className="text-xs text-muted mt-2">※ 재미로 보는 궁합이에요. 성격의 네 가지 축이 같은지 다른지로 계산했어요.</p>
       </section>
 
-      <section className={card}><h2 className={h2}>{type}의 연애 스타일</h2><p className="leading-relaxed">{p.love}</p></section>
+      <section id="sec-love" className={`${card} scroll-mt-16`}><h2 className={h2}>{type}의 연애 스타일</h2><p className="leading-relaxed">{p.love}</p></section>
 
       <ContentCta href="/face2" title={`${type}인 내 얼굴은 무슨 상일까?`} desc="사진 한 장이면 관상 풀이가 1분 안에 나와요. 사진은 저장하지 않아요." label="내 관상 보기" />
 
-      <section className={card}>
+      <section id="sec-travel" className={`${card} scroll-mt-16`}>
         <h2 className={h2}>{type}와 잘 맞는 여행지</h2>
         <h3 className="font-bold text-sm mt-1">국내</h3>
         <ul className="space-y-1.5 mt-1 text-sm">{p.travel.domestic.map((t) => <li key={t.place}><b>{t.place}</b> — {t.why}</li>)}</ul>
@@ -125,7 +141,7 @@ export default function MbtiArticle({ type }: { type: MbtiType }) {
         <ul className="space-y-1.5 mt-1 text-sm">{p.travel.abroad.map((t) => <li key={t.place}><b>{t.place}</b> — {t.why}</li>)}</ul>
       </section>
 
-      <section className={card}>
+      <section id="sec-jobs" className={`${card} scroll-mt-16`}>
         <h2 className={h2}>{type}에게 어울리는 직업</h2>
         <ul className="space-y-1.5 text-sm">{p.jobs.map((j) => <li key={j.title}><b>{j.title}</b> — {j.why}</li>)}</ul>
         <p className="leading-relaxed text-sm mt-3">{p.workStyle}</p>
@@ -139,7 +155,7 @@ export default function MbtiArticle({ type }: { type: MbtiType }) {
 
       <NextSteps from="mbti" className="" />
 
-      <section className={card}>
+      <section id="sec-faq" className={`${card} scroll-mt-16`}>
         <h2 className={h2}>자주 묻는 질문</h2>
         <div className="space-y-2">
           {faqs.map((f) => (

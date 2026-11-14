@@ -7,9 +7,24 @@ import CoupangBanner from "@/components/CoupangBanner";
 import ContentCta from "@/components/ContentCta";
 import CastSay from "@/components/cast/CastSay";
 import { zodiacArt } from "@/lib/art";
+import { zodiacMatches } from "@/lib/zodiacMatch";
+import SectionNav from "@/components/SectionNav";
 import ArticleShare from "@/components/share/ArticleShare";
 
 const card = "bg-card rounded-[22px] border border-line p-5";
+
+// 따라다니는 단락 탭 항목(단락 id와 같아야 한다)
+export const ZODIAC_SECTIONS = [
+  { id: "sec-총운", label: "총운" },
+  { id: "sec-재물운", label: "재물" },
+  { id: "sec-연애·인간관계", label: "연애" },
+  { id: "sec-직장·학업운", label: "직장" },
+  { id: "sec-건강운", label: "건강" },
+  { id: "sec-quarter", label: "분기" },
+  { id: "sec-match", label: "궁합" },
+  { id: "sec-lucky", label: "행운" },
+  { id: "sec-faq", label: "FAQ" },
+];
 const h2 = "font-serif font-bold text-lg mb-2";
 
 export function zodiacFaqs(slug: ZodiacSlug) {
@@ -78,6 +93,8 @@ export default function Zodiac2027Article({ slug }: { slug: ZodiacSlug }) {
 
         <CastSay cast="baksu" lineKey="say.zodiac.intro" />
 
+        <SectionNav items={ZODIAC_SECTIONS} />
+
         <section className={card}>
           <h2 className={h2}>{z.띠}띠 출생연도</h2>
           <p className="leading-relaxed">{years.map((y) => `${y}년`).join(", ")}생</p>
@@ -98,13 +115,13 @@ export default function Zodiac2027Article({ slug }: { slug: ZodiacSlug }) {
         )}
 
         {([["총운", z.총운], ["재물운", z.재물], ["연애·인간관계", z.연애관계], ["직장·학업운", z.직장학업], ["건강운", z.건강]] as const).map(([title, body]) => (
-          <section key={title} className={card}>
+          <section key={title} id={`sec-${title}`} className={`${card} scroll-mt-16`}>
             <h2 className={h2}>{title}</h2>
             <p className="leading-relaxed">{body}</p>
           </section>
         ))}
 
-        <section className={card}>
+        <section id="sec-quarter" className={`${card} scroll-mt-16`}>
           <h2 className={h2}>분기별 흐름</h2>
           <ol className="space-y-3">
             {z.분기.map((q, i) => (
@@ -115,8 +132,20 @@ export default function Zodiac2027Article({ slug }: { slug: ZodiacSlug }) {
 
         <ContentCta href="/face2" title={`${z.띠}띠인 내 얼굴은 무슨 상일까?`} desc="사진 한 장이면 관상 풀이가 1분 안에 나와요. 사진은 저장하지 않아요." label="내 관상 보기" />
 
-        <section className={card}>
+        <section id="sec-match" className={`${card} scroll-mt-16`}>
           <h2 className={h2}>{FORTUNE_YEAR.year}년 잘 맞는 띠</h2>
+          {/* 11/14 사용자 "상세 내에 궁합이 제일 잘 맞는 거 보여 주고, 삼국지 상세처럼": 잘 맞는 띠 셋을 캐릭터 카드로 */}
+          <ul className="grid grid-cols-3 gap-2.5 mb-4">
+            {zodiacMatches(slug).map((m, i) => (
+              <li key={m.slug}>
+                <Link href={`/fortune/2027/${m.slug}`} className="block text-center">
+                  <img src={zodiacArt(m.slug, i % 2 === 0 ? "f" : "m").src} alt={`${zodiac2027[m.slug].띠}띠 ${i % 2 === 0 ? "여성" : "남성"} 캐릭터`} width={720} height={960} loading="lazy" className="block w-full h-auto aspect-[3/4] object-cover rounded-[16px] border border-line bg-card-2" />
+                  <p className="mt-1.5 font-bold text-sm">{zodiac2027[m.slug].띠}띠</p>
+                  <p className="text-[11px] text-accent-ink">{m.kind === "육합" ? `짝꿍 · ${m.pair}` : m.pair}</p>
+                </Link>
+              </li>
+            ))}
+          </ul>
           <p className="leading-relaxed">{z.궁합}</p>
         </section>
 
@@ -125,7 +154,7 @@ export default function Zodiac2027Article({ slug }: { slug: ZodiacSlug }) {
           <p className="leading-relaxed">{z.추천}</p>
         </section>
 
-        <section className={card}>
+        <section id="sec-lucky" className={`${card} scroll-mt-16`}>
           <h2 className={h2}>행운을 부르는 것</h2>
           <dl className="grid grid-cols-2 gap-2 text-sm">
             <dt className="text-muted">행운의 색</dt><dd>{z.행운.색}</dd>
@@ -154,7 +183,7 @@ export default function Zodiac2027Article({ slug }: { slug: ZodiacSlug }) {
           MBTI 궁합도 보기
         </Link>
 
-        <section className={card}>
+        <section id="sec-faq" className={`${card} scroll-mt-16`}>
           <h2 className={h2}>자주 묻는 질문</h2>
           <div className="space-y-2">
             {faqs.map((f) => (

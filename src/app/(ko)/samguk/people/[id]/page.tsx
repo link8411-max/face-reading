@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import SectionNav, { type SectionItem } from "@/components/SectionNav";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import CoupangBanner from "@/components/CoupangBanner";
@@ -77,6 +78,18 @@ export default async function PersonPage({ params }: Props) {
   const { own, related: relatedVideos } = videosForPerson(channelVideos, id);
   const ownVideos = own.filter((v) => isVideoId(v.id));
   const groups = sanggwando(id, channelVideos);
+  const ownVideo = own.some((v) => isVideoId(v.id));
+  const hasMap = groups.some((g) => g.tiles.length > 0);
+  // 따라다니는 단락 탭(11/14). 없는 단락(영상·상관도·함께 보는 인물)은 빼고 넘긴다
+  const sections: SectionItem[] = [
+    { id: "sec-story", label: "이야기" },
+    ...(ownVideo ? [{ id: "sec-video", label: "영상" }] : []),
+    ...(hasMap ? [{ id: "sec-map", label: "상관도" }] : []),
+    { id: "sec-info", label: "정보" },
+    { id: "cheer", label: "응원" },
+    { id: "duel-vote", label: "투표" },
+    ...(related.length > 0 ? [{ id: "sec-people", label: "함께 보는 인물" }] : []),
+  ];
 
   // 투표 위젯에 넘길 값 (서버에서 계산해 평범한 데이터로 보낸다)
   const rival = allSamgukCharacters.find((x) => x.id === p.rivalId);
@@ -122,9 +135,10 @@ export default async function PersonPage({ params }: Props) {
 
         {/* 2. 머리 카드 */}
         <PersonHeader id={id} verdictOptions={verdictLabels} />
+        <SectionNav items={sections} edge="-mx-[22px] px-[22px]" className="mt-4" />
 
         {/* 3. 요약·태그 */}
-        <section className="mt-5">
+        <section id="sec-story" className="mt-5 scroll-mt-16">
           <p className="leading-relaxed">{p.summary}</p>
           <ul className="mt-3 flex flex-wrap gap-2">
             {p.tags.map((t) => (
@@ -142,13 +156,13 @@ export default async function PersonPage({ params }: Props) {
         </section>
 
         {/* 3-1. 이 인물 영상 */}
-        <PersonVideos id={id} name={c.name} videos={own} />
+        <div id="sec-video" className="scroll-mt-16"><PersonVideos id={id} name={c.name} videos={own} /></div>
 
         {/* 4. 쿠팡 배너 */}
         <CoupangBanner subId={`people-${id}`} />
 
         {/* 4-1. 상관도 · 관계 인물 영상 */}
-        <Sanggwando id={id} name={c.name} groups={groups} portrait={portraitSrc(id)} />
+        <div id="sec-map" className="scroll-mt-16"><Sanggwando id={id} name={c.name} groups={groups} portrait={portraitSrc(id)} /></div>
         <RelatedVideosRow items={relatedVideos} />
 
         {/* 5. 닮은꼴 배너 */}
@@ -167,7 +181,7 @@ export default async function PersonPage({ params }: Props) {
         </section>
 
         {/* 6. 한눈에 보기 */}
-        <section className="mt-6">
+        <section id="sec-info" className="mt-6 scroll-mt-16">
           <h2 className="font-serif font-bold text-lg mb-3">{c.name} 한눈에 보기</h2>
           <dl className="bg-card rounded-[22px] border border-line px-5 py-4 space-y-3 text-sm leading-relaxed">
             <div>
@@ -194,7 +208,7 @@ export default async function PersonPage({ params }: Props) {
         </section>
 
         {/* 7. 응원 */}
-        <section id="cheer" className="mt-6 scroll-mt-4">
+        <section id="cheer" className="mt-6 scroll-mt-16">
           <CheerButton id={id} name={c.name} />
         </section>
 
@@ -244,7 +258,7 @@ export default async function PersonPage({ params }: Props) {
         </div>
 
         {/* 9~11. 투표 */}
-        <section id="duel-vote" className="mt-8">
+        <section id="duel-vote" className="mt-8 scroll-mt-16">
           <VotePoll
             kind="duel"
             id={id}
@@ -280,7 +294,7 @@ export default async function PersonPage({ params }: Props) {
 
         {/* 12. 함께 보는 인물 */}
         {related.length > 0 && (
-          <section className="mt-10">
+          <section id="sec-people" className="mt-10 scroll-mt-16">
             <h2 className="font-serif font-bold text-lg mb-3">함께 보는 인물</h2>
             <ul className="grid grid-cols-2 gap-2">
               {related.map((r, i) => (
