@@ -116,11 +116,10 @@ export default function Face2Page() {
   return (
     <div className="min-h-screen bg-paper text-ink">
       <main className="mx-auto px-[22px] max-w-lg">
-        <TestHeader title={t("face.title")} onBack={() => (result ? resetAll() : goBack())} backLabel={result ? t("btn.tryAgain") : t("btn.back")} cast={result ? undefined : { cast: "haetae", line: "say.face2.start" }} />
+        <TestHeader title={t("face.title")} onBack={() => (result ? resetAll() : goBack())} backLabel={result ? t("btn.tryAgain") : t("btn.back")} cast={result ? undefined : { cast: "haetae", line: "say.face2.start", heading: t("face.heading") }} />
 
         {!result && (
           <TestStart
-            heading={t("face.heading")}
             testTab={t("start.tabFace")}
             desc={t("face.desc")}
             tips={[t("face.tip1"), t("face.tip2")]}

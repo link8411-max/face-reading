@@ -24,7 +24,7 @@ export default function FaceMatchPage() {
         </header>
         <EnCopyProvider copy={{ animals: EN_ANIMALS }}>
           <FaceMatchClient
-            top={<CastHero cast="gumiho" lineKey="say.faceMatch.start" locale="en" />}
+            top={<CastHero cast="gumiho" lineKey="say.faceMatch.start" locale="en" heading={`${lines[0]}\n${lines[1]}`} />}
             head={
               <>
                 <h2 className="mt-1 mb-3.5 font-serif font-bold text-[24px] leading-[1.35] break-keep">

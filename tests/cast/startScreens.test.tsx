@@ -1,7 +1,7 @@
 import { renderToStaticMarkup } from 'react-dom/server'
 import { readFileSync } from 'node:fs'
 import TestHeader from '@/components/test/TestHeader'
-import CastHero, { heroTop } from '@/components/cast/CastHero'
+import CastHero from '@/components/cast/CastHero'
 import ResultPreview from '@/components/test/ResultPreview'
 import Face2Page from '@/app/(ko)/face2/page'
 import AnimalTypePage from '@/app/(ko)/animal/page'
@@ -23,20 +23,18 @@ vi.mock('next/navigation', () => ({ useRouter: () => ({ push: () => {}, replace:
 const imgs = (html: string) => html.match(/<img [^>]*>/g) ?? []
 const noop = () => {}
 
-test('CastHero: 캐릭터 3:4 그림(alt·크기·eager·높은 우선순위)과 말풍선, 2:1 낮은 띠(11/14 스크롤 줄이기, 얼굴이 띠 40% 자리)', () => {
-  const html = renderToStaticMarkup(<CastHero cast="haetae" lineKey="say.face2.start" />)
+test('CastHero: 왼쪽 캐릭터 3:4 카드(alt·크기·eager·높은 우선순위) + 오른쪽 제목(h2)·말풍선(11/14 첫 화면에 버튼이 들어오게)', () => {
+  const html = renderToStaticMarkup(<CastHero cast="haetae" lineKey="say.face2.start" heading={'얼굴로 보는\n내 관상'} />)
   const big = imgs(html).find((i) => i.includes('/images/cast/haetae.webp')) ?? ''
   expect(big).toContain('alt="해태 캐릭터"')
   expect(big).toContain('width="720"')
   expect(big).toContain('height="960"')
   expect(big).toContain('fetchPriority="high"')
   expect(big).not.toContain('loading="lazy"')
-  expect(html).toContain('aspect-[2/1]')
-  expect(html).toContain(UI['say.face2.start'])
-  // 얼굴 중심 cy=0.2 → top = (0.2 − 4/3·0.2)·200% = −13.3%
-  expect(big).toContain('top:-13.3%')
-  expect(heroTop(0.315)).toBe('-44.0%')
-  expect(heroTop(0)).toBe('0.0%') // 그림이 띠 위로 내려오지 않는다
+  expect(html).toContain('w-[112px] aspect-[3/4]')
+  expect(html).toMatch(/<h2[^>]*>얼굴로 보는\n내 관상<\/h2>/)
+  expect(html.indexOf('<h2')).toBeLessThan(html.indexOf(UI['say.face2.start']))
+  expect(renderToStaticMarkup(<CastHero cast="haetae" lineKey="say.face2.start" />)).not.toContain('<h2')
 })
 
 test('TestHeader: cast가 있으면 h1과 캐릭터 그림·대사, 없으면 그림이 없다', () => {

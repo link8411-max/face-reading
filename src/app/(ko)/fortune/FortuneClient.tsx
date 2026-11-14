@@ -128,32 +128,29 @@ export default function FortuneClient() {
   return (
     <div className="min-h-screen bg-paper text-ink">
       <main className="mx-auto px-[22px] max-w-lg pb-6">
-        <TestHeader title={`${FORTUNE_YEAR.year} 신년 운세`} onBack={() => (result ? resetAll() : goBack())} backLabel={result ? "다시하기" : "돌아가기"} cast={result ? undefined : { cast: "sajaElder", line: "say.fortuneYear.start" }} />
+        <TestHeader title={`${FORTUNE_YEAR.year} 신년 운세`} onBack={() => (result ? resetAll() : goBack())} backLabel={result ? "다시하기" : "돌아가기"} cast={result ? undefined : { cast: "sajaElder", line: "say.fortuneYear.start", heading: `생년월일로 보는\n${FORTUNE_YEAR.year} 내 운세` }} />
         {!result && (
-          <div className="mt-2.5 mb-6">
-            <h2 className="font-serif font-bold text-[27px] leading-[1.4] break-keep">생년월일로 보는<br />{FORTUNE_YEAR.year} 내 운세</h2>
-            <p className="mt-2.5 text-sm text-muted">{FORTUNE_YEAR.간지}년 · 사주와 오행으로 풀어 보는 새해 운세</p>
-          </div>
+          <p className="mt-2.5 mb-3 text-sm text-muted">{FORTUNE_YEAR.간지}년 · 사주와 오행으로 풀어 보는 새해 운세</p>
         )}
 
         {/* Input Section */}
         {!result && (
-          <div className="bg-card rounded-[28px] p-6 mb-6 border border-line">
-            <h3 className="font-serif font-bold text-lg mb-4 text-center">생년월일 입력</h3>
+          <div className="bg-card rounded-[28px] p-4 mb-6 border border-line">
+            <h3 className="sr-only">생년월일 입력</h3>
 
             {/* 음력/양력 선택 */}
-            <div className="flex justify-center gap-2 mb-4">
+            <div className="flex justify-center gap-2 mb-3">
               <button
                 onClick={() => setIsLunar(false)}
                 aria-pressed={!isLunar}
-                className={`h-11 px-5 rounded-full text-sm font-medium border transition ${!isLunar ? "bg-ink text-paper border-ink" : "bg-card text-ink border-line"}`}
+                className={`h-10 px-5 rounded-full text-sm font-medium border transition ${!isLunar ? "bg-ink text-paper border-ink" : "bg-card text-ink border-line"}`}
               >
                 양력
               </button>
               <button
                 onClick={() => setIsLunar(true)}
                 aria-pressed={isLunar}
-                className={`h-11 px-5 rounded-full text-sm font-medium border transition ${isLunar ? "bg-ink text-paper border-ink" : "bg-card text-ink border-line"}`}
+                className={`h-10 px-5 rounded-full text-sm font-medium border transition ${isLunar ? "bg-ink text-paper border-ink" : "bg-card text-ink border-line"}`}
               >
                 음력
               </button>
@@ -171,12 +168,12 @@ export default function FortuneClient() {
             <BirthDateFields value={birthDate} onChange={setBirthDate} error={dateCheck.error} />
 
             {/* 태어난 시간 */}
-            <div className="mb-6">
+            <div className="mb-4">
               <label className="block text-sm text-muted mb-1">태어난 시간 (시주)</label>
               <select
                 value={birthHour}
                 onChange={(e) => setBirthHour(e.target.value as HourSlotKey | "")}
-                className="w-full px-4 py-3 bg-card-2 border border-line rounded-xl text-center text-lg text-ink focus:outline-none focus:ring-2 focus:ring-accent/40 appearance-none cursor-pointer"
+                className="w-full px-4 py-2.5 bg-card-2 border border-line rounded-xl text-center text-lg text-ink focus:outline-none focus:ring-2 focus:ring-accent/40 appearance-none cursor-pointer"
               >
                 <option value="" className="bg-card">모름</option>
                 {HOUR_SLOTS.map((slot) => (
@@ -186,7 +183,7 @@ export default function FortuneClient() {
                 ))}
               </select>
               <p className="text-xs text-muted mt-1 text-center">
-                모르면 &apos;모름&apos;을 고르세요. 시간을 알면 네 번째 기둥까지 계산해요
+                모르면 &apos;모름&apos;, 알면 네 번째 기둥까지 계산해요
               </p>
             </div>
 

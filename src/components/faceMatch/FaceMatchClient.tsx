@@ -40,7 +40,7 @@ const OTHER_LABEL: Record<Rel, string> = { friend: "친구", lover: "내 사람"
 // - invite: 초대 링크로 들어온 사람. 상대(초대한 친구) 칸은 결과로 채워져 있고, 내 사진만 올린다
 const cap = (s: string) => s.charAt(0).toUpperCase() + s.slice(1);
 
-// top: 시작 화면에서만 보이는 캐릭터 그림(결과가 나오면 사라진다), head: 그 아래 제목·설명(결과 화면에도 남는다). 둘 다 서버에서 그려 HTML에 들어간다.
+// top: 시작 화면의 캐릭터 머리(제목 포함, 결과가 나오면 사라진다), head: 결과 화면의 제목. 둘 다 서버에서 그려 HTML에 들어간다.
 // intro: 시작 화면 "설명" 탭에 들어가는 소개 문장(11/14 스크롤 줄이기로 제목 아래에서 옮김)
 export default function FaceMatchClient({ invite, top, head, intro }: { invite?: { key: AnimalKey; rel: "friend" | "lover" }; top?: ReactNode; head?: ReactNode; intro?: ReactNode }) {
   const t = useT();
@@ -147,9 +147,8 @@ export default function FaceMatchClient({ invite, top, head, intro }: { invite?:
   return (
     <>
     {top}
-    {head}
     <div className="pb-7 no-screenshot">
-    <StartTabs tabs={[{ key: "test", label: t("fm.tabTest"), content: (
+    <StartTabs className="mt-3.5" tabs={[{ key: "test", label: t("fm.tabTest"), content: (
     <div className="flex flex-col gap-2.5 mt-3">
       {invite ? (
         <p className="bg-card border border-line rounded-[22px] p-4 text-sm leading-relaxed">

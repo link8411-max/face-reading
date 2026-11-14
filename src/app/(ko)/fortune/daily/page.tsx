@@ -128,12 +128,9 @@ export default function DailyFortunePage() {
   return (
     <div className="min-h-screen bg-paper text-ink">
       <main className="mx-auto px-[22px] max-w-lg pb-6">
-        <TestHeader title="오늘의 운세" onBack={() => (result ? resetAll() : goBack())} backLabel={result ? "다시하기" : "돌아가기"} cast={result ? undefined : { cast: "sajaF", line: "say.today.start" }} />
+        <TestHeader title="오늘의 운세" onBack={() => (result ? resetAll() : goBack())} backLabel={result ? "다시하기" : "돌아가기"} cast={result ? undefined : { cast: "sajaF", line: "say.today.start", heading: "오늘, 내 띠의\n하루는?" }} />
         {!result && (
-          <div className="mt-2.5 mb-6">
-            <h2 className="font-serif font-bold text-[27px] leading-[1.4] break-keep">오늘, 내 띠의<br />하루는?</h2>
-            <p className="mt-2.5 text-sm text-muted">{today ? dayLabel(today) : "\u00A0"}</p>
-          </div>
+          <p className="mt-3 mb-4 text-sm text-muted">{today ? dayLabel(today) : "\u00A0"}</p>
         )}
 
         {/* Input Section */}

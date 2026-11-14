@@ -143,11 +143,10 @@ export default function AnimalTypePage() {
     <div className="min-h-screen bg-paper text-ink">
 
       <main className="mx-auto px-[22px] max-w-lg">
-        <TestHeader title={t("animal.title")} onBack={() => (result ? resetAll() : goBack())} backLabel={result ? t("btn.tryAgain") : t("btn.back")} cast={result ? undefined : { cast: "tiger", line: "say.animal.start" }} />
+        <TestHeader title={t("animal.title")} onBack={() => (result ? resetAll() : goBack())} backLabel={result ? t("btn.tryAgain") : t("btn.back")} cast={result ? undefined : { cast: "tiger", line: "say.animal.start", heading: t("animal.heading") }} />
 
         {!result && (
           <TestStart
-            heading={t("animal.heading")}
             testTab={t("start.tabAnimal")}
             desc={t("animal.desc")}
             tips={[t("animal.tip1"), t("animal.tip2")]}

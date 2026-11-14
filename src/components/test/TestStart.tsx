@@ -39,7 +39,7 @@ function ErrorNote({ text }: { text: string }) {
 export default function TestStart({
   heading, desc, tips, analyzeLabel, image, gender, onGender, onFile, onAnalyze, onReset, loading, error, preparing = false, imageRef, needsGender = true, preview, testTab,
 }: {
-  heading: string;
+  heading?: string; // 캐릭터가 없는 화면(삼국지)만. 캐릭터가 있으면 제목은 TestHeader cast.heading으로 캐릭터 옆에
   testTab: string; // 첫 탭 이름(예: "동물상 보기")
   desc: string;
   tips: string[];
@@ -126,7 +126,7 @@ export default function TestStart({
 
   return (
     <div className="flex flex-col pb-7 no-screenshot">
-      <h2 className="mt-1 font-serif font-bold text-[24px] leading-[1.35] whitespace-pre-line break-keep">{heading}</h2>
+      {heading && <h2 className="mt-1 font-serif font-bold text-[24px] leading-[1.35] whitespace-pre-line break-keep">{heading}</h2>}
       <StartTabs tabs={tabs} className="mt-3.5" />
       <MoreTests current={path} className="mt-8" locale={locale} />
     </div>

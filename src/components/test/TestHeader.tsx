@@ -1,5 +1,7 @@
 "use client";
 
+import type React from "react";
+
 import { Icon } from "@/components/icons";
 import LanguageSwitch from "@/components/i18n/LanguageSwitch";
 import CastHero from "@/components/cast/CastHero";
@@ -9,8 +11,8 @@ import { useLocale } from "@/lib/i18n/LocaleProvider";
 
 // 테스트 페이지 머리: 뒤로(입력 화면) 또는 다시하기(결과 화면) + 페이지 이름(h1)
 // tone="dark": 어두운 바탕(일기토 천) 위에서 밝은 글씨
-// cast: 시작 화면에서만 준다. 머리 아래에 캐릭터 큰 그림(16:10)과 말풍선이 깔린다. 결과 화면에서는 주지 않는다.
-export default function TestHeader({ title, onBack, backLabel, tone = "light", language = true, cast }: { title: string; onBack: () => void; backLabel: string; tone?: "light" | "dark"; language?: boolean; cast?: { cast: CastKey; line: LineKey } }) {
+// cast: 시작 화면에서만 준다. 머리 아래에 캐릭터 옆 카드와 제목(heading)·말풍선(CastHero). 결과 화면에서는 주지 않는다.
+export default function TestHeader({ title, onBack, backLabel, tone = "light", language = true, cast }: { title: string; onBack: () => void; backLabel: string; tone?: "light" | "dark"; language?: boolean; cast?: { cast: CastKey; line: LineKey; heading?: React.ReactNode } }) {
   const fg = tone === "dark" ? "text-ink" : "text-ink";
   const locale = useLocale();
   return (
@@ -26,7 +28,7 @@ export default function TestHeader({ title, onBack, backLabel, tone = "light", l
         {language && <LanguageSwitch />}
       </div>
     </header>
-    {cast && <CastHero cast={cast.cast} lineKey={cast.line} locale={locale} />}
+    {cast && <CastHero cast={cast.cast} lineKey={cast.line} locale={locale} heading={cast.heading} />}
     </>
   );
 }

@@ -111,14 +111,11 @@ export default function SajuClient() {
   return (
     <div className="min-h-screen bg-paper text-ink">
       <main className="mx-auto px-[22px] max-w-lg pb-6">
-        <TestHeader title="내 사주 풀이" onBack={onBack} backLabel={backLabel} cast={result ? undefined : { cast: "saja", line: STEP_LINE[step - 1] }} />
+        <TestHeader title="내 사주 풀이" onBack={onBack} backLabel={backLabel} cast={result ? undefined : { cast: "saja", line: STEP_LINE[step - 1], heading: "생년월일시로 읽는\n내 사주 풀이" }} />
 
         {!result && (
           <>
-            <div className="mt-4 mb-4">
-              <h2 className="font-serif font-bold text-[27px] leading-[1.4] break-keep">생년월일시로 읽는<br />내 사주 풀이</h2>
-              <p className="mt-2.5 text-sm text-muted">타고난 성향과 10년 흐름, 올해를 쉬운 말로 풀어 드려요</p>
-            </div>
+            <p className="mt-3 mb-3 text-sm text-muted">타고난 성향과 10년 흐름, 올해를 쉬운 말로 풀어 드려요</p>
             <div role="progressbar" aria-label={`질문 ${step} / 3`} aria-valuemin={1} aria-valuemax={3} aria-valuenow={step} className="flex gap-1.5 mb-3">
               {[1, 2, 3].map((n) => (
                 <span key={n} className={`h-1 flex-1 rounded-full ${n <= step ? "bg-accent" : "bg-line"}`} />

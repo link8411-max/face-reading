@@ -20,7 +20,7 @@ export default function FaceMatchPage() {
         <div className="absolute right-[-8px] top-1"><LanguageSwitch /></div>
       </header>
       <FaceMatchClient
-        top={<CastHero cast="gumiho" lineKey="say.faceMatch.start" />}
+        top={<CastHero cast="gumiho" lineKey="say.faceMatch.start" heading={"우리 둘,\n얼굴 궁합은 몇 점?"} />}
         head={
           <>
             <h2 className="mt-1 mb-3.5 font-serif font-bold text-[24px] leading-[1.35] break-keep">우리 둘,<br />얼굴 궁합은 몇 점?</h2>
