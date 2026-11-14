@@ -3,7 +3,7 @@ import type { Metadata } from 'next'
 const SITE = 'https://unse-ai.com'
 const TITLE = '밈 능력고사 | 신조어·밈·레트로 유행어 테스트, 매일 5문제 – 운명을 읽다'
 const DESCRIPTION = '매일 5문제, 신조어와 밈과 레트로 유행어를 얼마나 아는지 풀어 보는 능력고사예요. 문제마다 뜻과 쓰임, 유래를 알려 주고 성적통지표를 친구와 겨뤄 볼 수 있어요.'
-const IMAGE = `/api/og?title=${encodeURIComponent('밈 능력고사')}&subtitle=${encodeURIComponent('매일 5문제, 내 등급은?')}`
+const IMAGE = `/api/og?title=${encodeURIComponent('밈 능력고사')}&subtitle=${encodeURIComponent('매일 5문제, 내 등급은?')}&cast=dokkaebi`
 
 export const metadata: Metadata = {
   title: TITLE,

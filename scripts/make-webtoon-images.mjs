@@ -55,8 +55,8 @@ const JOBS = [
   ...Object.entries(FILES).map(([key, name]) => ({ out: OUT, key, name, og: true })),
   ...ANIMALS.flatMap((a) => ['f', 'm'].map((g) => ({ out: OUT_ANIMAL, key: `${a}-${g}`, name: `${a}-${g}`, og: false }))),
   ...MBTIS.map((m) => ({ out: OUT_MBTI, key: m, name: `mbti-${m}`, og: false })),
-  ...MBTIS.flatMap((m) => ['f', 'm'].map((g) => ({ out: OUT_MBTI, key: `${m}-${g}`, name: mbtiSrc(m, g), og: false }))),
-  ...ZODIACS.flatMap((z) => ['f', 'm'].map((g) => ({ out: OUT_ZODIAC, key: `${z}-${g}`, name: `zodiac-${z}-${g}`, og: false }))),
+  ...MBTIS.flatMap((m) => ['f', 'm'].map((g) => ({ out: OUT_MBTI, key: `${m}-${g}`, name: mbtiSrc(m, g), og: false, ogJpg: true }))),
+  ...ZODIACS.flatMap((z) => ['f', 'm'].map((g) => ({ out: OUT_ZODIAC, key: `${z}-${g}`, name: `zodiac-${z}-${g}`, og: false, ogJpg: true }))),
   ...FACES.flatMap((k) => ['f', 'm'].map((g) => ({ out: OUT_FACE, key: `${k}-${g}`, name: `face-${k}-${g}`, og: false }))),
 ];
 
@@ -65,7 +65,7 @@ mkdirSync(OUT_MBTI, { recursive: true });
 mkdirSync(OUT_ZODIAC, { recursive: true });
 mkdirSync(OUT_ANIMAL, { recursive: true });
 mkdirSync(OUT_FACE, { recursive: true });
-for (const { out, key, name, og } of JOBS) {
+for (const { out, key, name, og, ogJpg } of JOBS) {
   const file = find(name);
   const meta = await sharp(file).metadata();
   const { width: w, height: h } = meta;
@@ -74,6 +74,8 @@ for (const { out, key, name, og } of JOBS) {
   if (ch > h) { ch = h; cw = Math.round((h * 3) / 4); left = w - cw; }
   const big = sharp(file).extract({ left, top, width: cw, height: ch }).resize(720, 960);
   await big.clone().webp({ quality: 74 }).toFile(join(out, `${key}.webp`));
+  // 검색·공유 미리보기(/api/og ?img=)용: @vercel/og는 webp를 못 읽어 jpg로 따로(360×480)
+  if (ogJpg) await big.clone().resize(360, 480).jpeg({ quality: 78, mozjpeg: true }).toFile(join(out, `${key}-og.jpg`));
 
   const c = { ...DEFAULT_CROP, ...(crops[name] ?? {}) };
   const side = Math.round(w * c.size);

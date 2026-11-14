@@ -23,7 +23,7 @@ export const metadata: Metadata = {
     url: "https://unse-ai.com/face2",
     images: [
       {
-        url: "/api/og?title=무료%20관상%20분석&subtitle=얼굴로%20보는%20운세",
+        url: "/api/og?title=무료%20관상%20분석&subtitle=얼굴로%20보는%20운세&cast=haetae",
         width: 1200,
         height: 630,
         alt: "무료 관상 분석",
@@ -34,7 +34,7 @@ export const metadata: Metadata = {
     card: "summary_large_image",
     title: TITLE,
     description: DESCRIPTION,
-    images: ["/api/og?title=무료%20관상%20분석&subtitle=얼굴로%20보는%20운세"],
+    images: ["/api/og?title=무료%20관상%20분석&subtitle=얼굴로%20보는%20운세&cast=haetae"],
   },
 };
 

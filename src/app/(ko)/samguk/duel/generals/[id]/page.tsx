@@ -1,4 +1,6 @@
 import type { Metadata } from "next";
+import { portraitSrc } from "@/lib/people/portrait";
+import { ogUrl } from "@/lib/ogArt";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { DUEL_GENERAL_INTRO } from "@/content/duelGuide";
@@ -46,7 +48,8 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const sig = SKILLS[DUEL_GENERAL_INTRO[id].signature].name;
   const description = `삼국지 일기토 ${g.name}(${g.kind})의 코에이 능력치와 필살기 ${sig}, 기술 4가지, 보스별 상성을 정리했어요.`;
   const url = `${SITE}/samguk/duel/generals/${id}`;
-  const image = `/api/og?title=${encodeURIComponent(`${g.name} 일기토`)}&subtitle=${encodeURIComponent(sig)}`;
+  const portrait = portraitSrc(id);
+  const image = ogUrl(`${g.name} 일기토`, `필살기 ${sig} · 능력치`, { img: portrait ? [portrait] : [] });
   return {
     title,
     description,

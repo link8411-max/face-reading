@@ -1,4 +1,5 @@
 // MBTI 16유형 본문 — /mbti/[type] 정적 페이지용 (재미로 보는 유형 풀이)
+import { ogUrl } from "@/lib/ogArt";
 import { MBTI_TYPES, bestMatches, compatSummary, type MbtiType } from '@/lib/mbti/compat'
 
 export interface MbtiProfile {
@@ -479,5 +480,8 @@ export const MBTI_SLUGS = MBTI_TYPES.map((t) => t.toLowerCase())
 
 // MBTI 글의 정식 주소와 공유 미리보기 이미지 경로 (page.tsx의 메타데이터와 글 안 공유하기가 함께 쓴다)
 export const mbtiUrl = (type: MbtiType) => `https://unse-ai.com/mbti/${type.toLowerCase()}`
-export const mbtiOgPath = (type: MbtiType) =>
-  `/api/og?title=${encodeURIComponent(`${type} ${mbtiProfiles[type].nickname}`)}&subtitle=${encodeURIComponent("MBTI 궁합·연애·직업")}`
+// 미리보기 그림: 그 유형 남녀 캐릭터 둘(네이버 썸네일은 가운데를 잘라 쓰므로 그림이 가운데에 온다)
+export const mbtiOgPath = (type: MbtiType) => {
+  const k = type.toLowerCase()
+  return ogUrl(`${type} ${mbtiProfiles[type].nickname}`, "MBTI 특징·궁합·연애·직업", { img: [`/images/mbti/${k}-f-og.jpg`, `/images/mbti/${k}-m-og.jpg`] })
+}

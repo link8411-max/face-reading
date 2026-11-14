@@ -20,13 +20,13 @@ export const metadata: Metadata = {
     type: "website",
     locale: "ko_KR",
     siteName: "운명을 읽다",
-    images: [{ url: "/api/og?title=동물상%20테스트&subtitle=나는%20어떤%20동물을%20닮았을까?", width: 1200, height: 630 }],
+    images: [{ url: "/api/og?title=동물상%20테스트&subtitle=나는%20어떤%20동물을%20닮았을까?&cast=tiger", width: 1200, height: 630 }],
   },
   twitter: {
     card: "summary_large_image",
     title: TITLE,
     description: DESCRIPTION,
-    images: ["/api/og?title=동물상%20테스트&subtitle=나는%20어떤%20동물을%20닮았을까?"],
+    images: ["/api/og?title=동물상%20테스트&subtitle=나는%20어떤%20동물을%20닮았을까?&cast=tiger"],
   },
 };
 

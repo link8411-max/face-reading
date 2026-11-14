@@ -20,7 +20,7 @@ const SITE = "https://unse-ai.com";
 const URL = `${SITE}/samguk/people`;
 const TITLE = "삼국지 인물 관계도 | 위·촉·오 인물 소개 – 운명을 읽다";
 const DESCRIPTION = "위·촉·오 삼국지 인물의 관계도와 열전을 세력별로 모았어요. 의형제·혈연·라이벌 관계를 한눈에 보고 인물 이야기를 읽어 보세요.";
-const OG = `/api/og?title=${encodeURIComponent("삼국지 인물 관계도")}&subtitle=${encodeURIComponent("위·촉·오 인물 열전")}`;
+const OG = `/api/og?title=${encodeURIComponent("삼국지 인물 관계도")}&subtitle=${encodeURIComponent("위·촉·오 인물 열전")}&img=${encodeURIComponent("/images/samguk/관우.jpg,/images/samguk/조조.jpg")}`;
 
 // 허브는 정적이지만 쇼츠 띠가 1시간마다 새 영상을 받도록 ISR
 export const revalidate = 3600;

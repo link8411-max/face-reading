@@ -17,13 +17,13 @@ export const metadata: Metadata = {
     locale: "ko_KR",
     siteName: "운명을 읽다",
     url: "https://unse-ai.com/saju",
-    images: [{ url: "/api/og?title=내%20사주%20풀이&subtitle=네%20기둥·십신·대운을%20쉬운%20말로", width: 1200, height: 630 }],
+    images: [{ url: "/api/og?title=내%20사주%20풀이&subtitle=네%20기둥·십신·대운을%20쉬운%20말로&cast=saja", width: 1200, height: 630 }],
   },
   twitter: {
     card: "summary_large_image",
     title: TITLE,
     description: DESCRIPTION,
-    images: ["/api/og?title=내%20사주%20풀이&subtitle=네%20기둥·십신·대운을%20쉬운%20말로"],
+    images: ["/api/og?title=내%20사주%20풀이&subtitle=네%20기둥·십신·대운을%20쉬운%20말로&cast=saja"],
   },
 };
 

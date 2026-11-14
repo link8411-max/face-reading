@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { ogUrl } from "@/lib/ogArt";
 import SectionNav, { type SectionItem } from "@/components/SectionNav";
 import Link from "next/link";
 import { notFound } from "next/navigation";
@@ -35,8 +36,9 @@ export function generateStaticParams() {
   return PEOPLE_IDS.map((id) => ({ id }));
 }
 
-function ogImagePath(name: string, subtitle: string) {
-  return `/api/og?title=${encodeURIComponent(`${name} 열전`)}&subtitle=${encodeURIComponent(subtitle)}`;
+// 미리보기 그림: 그 인물 초상화(없으면 그림 없이)
+function ogImagePath(name: string, subtitle: string, portrait: string | null = null) {
+  return ogUrl(`${name} 열전`, subtitle, { img: portrait ? [portrait] : [] });
 }
 
 function lookup(id: string) {
@@ -53,7 +55,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const title = personTitle(id);
   const description = personDescription(id);
   const url = `${SITE}/samguk/people/${id}`;
-  const image = ogImagePath(c.name, p.style ? `자 ${p.style}` : c.role);
+  const image = ogImagePath(c.name, p.style ? `자 ${p.style}` : c.role, portraitSrc(id));
   return {
     title,
     description,
@@ -95,7 +97,7 @@ export default async function PersonPage({ params }: Props) {
   const rival = allSamgukCharacters.find((x) => x.id === p.rivalId);
   const rivalName = rival?.name ?? p.rivalId;
   const shareUrl = `${url}?utm_source=share&utm_medium=friend_link&utm_campaign=people`;
-  const shareImage = `${SITE}${ogImagePath(c.name, p.style ? `자 ${p.style}` : c.role)}`;
+  const shareImage = `${SITE}${ogImagePath(c.name, p.style ? `자 ${p.style}` : c.role, portraitSrc(id))}`;
   const verdictLabels = p.verdictOptions.map((key) => ({ key, label: VERDICTS.find((v) => v.key === key)?.label ?? key }));
 
   const person: Record<string, unknown> = {

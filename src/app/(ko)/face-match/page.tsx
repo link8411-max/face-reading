@@ -9,7 +9,7 @@ export const metadata: Metadata = {
   description: "두 사람 얼굴 사진으로 보는 친구·연인·짝사랑 궁합. 동물상으로 궁합 점수와 잘 맞는 이유를 알려 드려요. 사진은 저장되지 않아요.",
   keywords: "얼굴 궁합, 관상 궁합, 짝사랑 궁합, 커플 궁합, 친구 궁합, 동물상 궁합",
   alternates: { canonical: "https://unse-ai.com/face-match", languages: languageAlternates("/face-match") },
-  openGraph: { title: "얼굴 궁합 테스트 | 운명을 읽다", description: "친구·연인·짝사랑, 두 얼굴의 궁합은 몇 점일까?", url: "https://unse-ai.com/face-match", type: "website", locale: "ko_KR", siteName: "운명을 읽다", images: [{ url: "/api/og?title=얼굴%20궁합&subtitle=친구·연인·짝사랑%20궁합은%20몇%20점?", width: 1200, height: 630 }] },
+  openGraph: { title: "얼굴 궁합 테스트 | 운명을 읽다", description: "친구·연인·짝사랑, 두 얼굴의 궁합은 몇 점일까?", url: "https://unse-ai.com/face-match", type: "website", locale: "ko_KR", siteName: "운명을 읽다", images: [{ url: "/api/og?title=얼굴%20궁합&subtitle=친구·연인·짝사랑%20궁합은%20몇%20점?&cast=gumiho", width: 1200, height: 630 }] },
 };
 
 export default function FaceMatchPage() {

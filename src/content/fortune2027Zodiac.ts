@@ -1,6 +1,7 @@
 // 2027 정미년(丁未年) 띠별 운세 본문 — /fortune/2027/[zodiac] 정적 페이지용
 // 정미년의 정화(丁火)·미토(未土)와 각 띠 지지의 합·충·형 관계를 바탕으로 썼다. 재미로 읽는 운세다.
 
+import { ogUrl } from '@/lib/ogArt'
 import { FORTUNE_YEAR } from '@/lib/fortuneYear'
 export const ZODIAC_SLUGS = ['rat', 'ox', 'tiger', 'rabbit', 'dragon', 'snake', 'horse', 'sheep', 'monkey', 'rooster', 'dog', 'pig'] as const
 export type ZodiacSlug = (typeof ZODIAC_SLUGS)[number]
@@ -300,5 +301,6 @@ export const zodiac2027: Record<ZodiacSlug, Zodiac2027> = {
 
 // 띠 글의 정식 주소와 공유 미리보기 이미지 경로 (page.tsx의 메타데이터와 글 안 공유하기가 함께 쓴다)
 export const zodiacUrl = (slug: ZodiacSlug) => `https://unse-ai.com/fortune/2027/${slug}`
+// 미리보기 그림: 그 띠 남녀 캐릭터 둘
 export const zodiacOgPath = (slug: ZodiacSlug) =>
-  `/api/og?title=${encodeURIComponent(`${FORTUNE_YEAR.year}년 ${zodiac2027[slug].띠}띠 운세`)}&subtitle=${encodeURIComponent(`${FORTUNE_YEAR.간지}년 띠별 신년운세`)}`
+  ogUrl(`${FORTUNE_YEAR.year}년 ${zodiac2027[slug].띠}띠 운세`, `${FORTUNE_YEAR.간지}년 총운·재물·연애·띠 궁합`, { img: [`/images/zodiac/${slug}-f-og.jpg`, `/images/zodiac/${slug}-m-og.jpg`] })
