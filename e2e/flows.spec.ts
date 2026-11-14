@@ -217,7 +217,7 @@ test('한 번 고른 성별은 다음 사진 테스트에서 미리 골라져 �
 
 // ===== 시작 화면의 캐릭터와 "나올 수 있는 결과" 미리 보기 (밤 개편 4차) =====
 for (const [path, dir, n] of [['/animal', 'animal', 13], ['/face2', 'face', 15]] as const) {
-  test(`${path} 시작 화면: 성별을 바꾸면 미리 보기 그림이 그 성별 그림으로, 사진을 고르면 숨는다`, async ({ page }) => {
+  test(`${path} 시작 화면: 미리보기 탭에 결과 그림, 성별을 바꾸면 그 성별 그림으로`, async ({ page }) => {
     await page.goto(path)
     const imgs = page.locator('[data-result-preview] img')
     await expect(imgs).toHaveCount(n)
@@ -227,8 +227,10 @@ for (const [path, dir, n] of [['/animal', 'animal', 13], ['/face2', 'face', 15]]
     expect(await imgs.first().getAttribute('src')).toContain(`/images/${dir}/`)
     await page.getByRole('radio', { name: '여자', exact: true }).click()
     await expect.poll(() => imgs.evaluateAll((l) => l.every((i) => (i as HTMLImageElement).src.includes('-f.webp')))).toBe(true)
-    await page.locator('input[type=file]').setInputFiles({ name: 'blank.png', mimeType: 'image/png', buffer: await blankPng(page) })
-    await expect(page.locator('[data-result-preview]')).toHaveCount(0)
+    // 미리보기는 둘째 탭(11/14 스크롤 줄이기): 처음엔 숨어 있고 탭을 누르면 보인다
+    await expect(page.locator('[data-result-preview]')).toBeHidden()
+    await page.getByRole('tab', { name: '미리보기' }).click()
+    await expect(page.locator('[data-result-preview]')).toBeVisible()
   })
 }
 
