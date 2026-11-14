@@ -9,7 +9,7 @@ export interface SectionItem { id: string; label: string }
 const BAR = 52; // 탭 줄 높이(px). 이 아래부터 단락이 보이게 이동한다
 
 // edge: 바깥 여백을 뚫는 클래스(페이지 좌우 여백과 같게)
-export default function SectionNav({ items, className = "", edge = "-mx-4 px-4" }: { items: SectionItem[]; className?: string; edge?: string }) {
+export default function SectionNav({ items, className = "", edge = "-mx-4 px-4", label = "단락 바로 가기" }: { items: SectionItem[]; className?: string; edge?: string; label?: string }) {
   const [active, setActive] = useState(items[0]?.id);
   const strip = useRef<HTMLDivElement>(null);
   const lock = useRef(0); // 탭을 눌러 이동하는 동안은 스크롤로 켜진 탭을 바꾸지 않는다
@@ -59,7 +59,7 @@ export default function SectionNav({ items, className = "", edge = "-mx-4 px-4" 
   };
 
   return (
-    <nav aria-label="단락 바로 가기" className={`no-screenshot sticky top-0 z-30 ${edge} bg-paper/95 backdrop-blur border-b border-line ${className}`} data-section-nav>
+    <nav aria-label={label} className={`no-screenshot sticky top-0 z-30 ${edge} bg-paper/95 backdrop-blur border-b border-line ${className}`} data-section-nav>
       <div ref={strip} className="flex gap-1.5 overflow-x-auto py-2 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
         {items.map((it) => {
           const on = it.id === active;

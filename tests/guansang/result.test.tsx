@@ -27,7 +27,7 @@ test('별명·칩 2개·자리 5줄·안내문', () => {
 
 test('조심할 점 블록은 no-screenshot', () => {
   const html = render(base)
-  expect(html).toMatch(/<section class="no-screenshot[^"]*"[^>]*><h3[^>]*>조심할 점/)
+  expect(html).toMatch(/<section[^>]*class="no-screenshot[^"]*"[^>]*><h3[^>]*>조심할 점/)
 })
 
 test('이마가 불확실하면 안내, balanced면 칩 3개', () => {

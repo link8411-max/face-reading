@@ -1,5 +1,6 @@
 "use client";
 
+import SectionNav from "@/components/SectionNav";
 import type { Ref } from "react";
 import { useLocale, useT } from "@/lib/i18n/LocaleProvider";
 import CastSay from "@/components/cast/CastSay";
@@ -40,12 +41,19 @@ export default function GuansangResultView({ result, captureRef, actions, after,
   return (
     <div className="pb-6 animate-fade-in">
       <div className="mb-3"><CastSay cast="haetae" lineKey="say.face2.reveal" size="sm" locale={locale} /></div>
+      <SectionNav label={tr("nav.sections")} edge="-mx-[22px] px-[22px]" className="mb-3" items={[
+        { id: "gs-result", label: tr("face.navResult") },
+        { id: "gs-why", label: tr("face.navWhy") },
+        { id: "gs-caution", label: tr("face.navCaution") },
+        { id: "gs-partner", label: tr("face.navPartner") },
+      ]} />
+      <div id="gs-result" className="scroll-mt-16" />
       <ResultCard captureRef={captureRef} hero={{ src: faceArt(result.type, g).src, alt: en ? `${t.nickname} result illustration` : `${t.nickname} 결과 그림` }} eyebrow={tr("face.eyebrow")} title={t.nickname} summary={t.oneLiner} chips={chips} reasons={reasons} />
       <p className="mt-3 text-center text-[11px] text-muted leading-relaxed">
         {SHAPES[result.shape].traditional} · {ZONES[result.zone].traditional} · {en?.schoolNote ?? SCHOOL_NOTE}
       </p>
 
-      <section className="mt-4 bg-card border border-line rounded-[22px] px-5 py-4 no-screenshot">
+      <section id="gs-why" className="scroll-mt-16 mt-4 bg-card border border-line rounded-[22px] px-5 py-4 no-screenshot">
         <h3 className="font-serif font-bold text-base">{tr("face.why")}</h3>
         <p className="mt-2 text-sm leading-relaxed">{en ? `${SHAPES[result.shape].evidence} ${ZONES[result.zone].evidence}` : evidenceText(result.shape, result.zone)}</p>
         {result.foreheadUncertain && <p className="mt-2 text-xs text-muted leading-relaxed">{en?.foreheadNote ?? FOREHEAD_NOTE}</p>}
@@ -53,13 +61,13 @@ export default function GuansangResultView({ result, captureRef, actions, after,
 
       {actions}
 
-      <section className="no-screenshot mt-4 bg-card-2 rounded-[22px] px-5 py-4">
+      <section id="gs-caution" className="no-screenshot scroll-mt-16 mt-4 bg-card-2 rounded-[22px] px-5 py-4">
         <h3 className="font-serif font-bold text-base">{tr("face.caution")}</h3>
         <p className="mt-2 text-sm leading-relaxed">{t.caution.situation}</p>
         <p className="mt-1.5 text-sm leading-relaxed text-accent-ink">{t.caution.action}</p>
       </section>
 
-      <section className="no-screenshot mt-3 bg-card-2 rounded-[22px] px-5 py-4">
+      <section id="gs-partner" className="no-screenshot scroll-mt-16 mt-3 bg-card-2 rounded-[22px] px-5 py-4">
         <h3 className="font-serif font-bold text-base">{tr("face.partner")}</h3>
         <p className="mt-2 text-sm font-bold">{partner.nickname}</p>
         <p className="mt-1 text-sm leading-relaxed">{t.partnerLine}</p>

@@ -1,5 +1,6 @@
 "use client";
 
+import SectionNav from "@/components/SectionNav";
 import GiftNudge from "@/components/bujeok/GiftNudge";
 import SeasonPicks from "@/components/SeasonPicks";
 import { track } from "@/lib/analytics";
@@ -200,10 +201,19 @@ export default function FortuneClient() {
         {/* Result Section */}
         {result && (
           <div className="space-y-4 animate-fade-in">
+            <SectionNav items={[
+              { id: "fy-base", label: "내 사주" },
+              { id: "fy-seun", label: "올해와 나" },
+              { id: "fy-total", label: "총운" },
+              { id: "fy-month", label: "월별" },
+              { id: "fy-detail", label: "세부 운세" },
+              { id: "fy-lucky", label: "행운" },
+              { id: "fy-advice", label: "조언" },
+            ]} edge="-mx-[22px] px-[22px]" />
             {/* 캡쳐 영역 시작 */}
             <div ref={resultRef} className="space-y-3 bg-card border border-line rounded-[30px] p-4">
             {/* 기본 정보 */}
-            <div className="bg-card rounded-[22px] p-5 border border-line">
+            <div id="fy-base" className="scroll-mt-16 bg-card rounded-[22px] p-5 border border-line">
               <div className="text-center mb-4">
                 <p className="text-xs font-medium text-accent-ink">{FORTUNE_YEAR.year} {FORTUNE_YEAR.간지}년 신년운세</p>
                 <h2 className="font-serif text-[25px] font-bold mt-1">{result.사주정보.띠}띠</h2>
@@ -235,12 +245,12 @@ export default function FortuneClient() {
             </div>
 
             {/* 올해와 나 */}
-            <div className="bg-card rounded-[22px] p-5 border border-line">
+            <div id="fy-seun" className="scroll-mt-16 bg-card rounded-[22px] p-5 border border-line">
               <SeunCard seun={result.사주정보.세운} dayBranch={result.사주정보.기둥.day.branch} />
             </div>
 
             {/* 총운 */}
-            <div className="bg-card rounded-[22px] p-5 border border-line">
+            <div id="fy-total" className="scroll-mt-16 bg-card rounded-[22px] p-5 border border-line">
               <div className="flex justify-between items-center mb-3">
                 <h3 className="font-serif font-bold text-lg">{FORTUNE_YEAR.year}년 총운</h3>
                 <span className="text-accent-ink text-xl tracking-wider">
@@ -284,7 +294,7 @@ export default function FortuneClient() {
             </div>
 
             {/* 월별 운세 */}
-            <div className="bg-card rounded-[22px] p-5 border border-line">
+            <div id="fy-month" className="scroll-mt-16 bg-card rounded-[22px] p-5 border border-line">
               <h3 className="font-serif font-bold text-lg mb-3">월별 운세</h3>
               <div className="space-y-3">
                 <div className="bg-card-2 rounded-xl p-3 border border-line">
@@ -309,7 +319,7 @@ export default function FortuneClient() {
             </div>
 
             {/* 세부 운세 */}
-            <div className="bg-card rounded-[22px] p-5 border border-line">
+            <div id="fy-detail" className="scroll-mt-16 bg-card rounded-[22px] p-5 border border-line">
               <h3 className="font-serif font-bold text-lg mb-3">세부 운세</h3>
               <div className="space-y-4">
                 {Object.entries(result.운세.세부운세).map(([항목, 데이터]) => (
@@ -330,7 +340,7 @@ export default function FortuneClient() {
             <SeasonPicks slot="fortune" />
 
             {/* 행운 요소 */}
-            <div className="bg-card rounded-[22px] p-5 border border-line">
+            <div id="fy-lucky" className="scroll-mt-16 bg-card rounded-[22px] p-5 border border-line">
               <h3 className="font-serif font-bold text-lg mb-3">행운 요소</h3>
               <div className="grid grid-cols-2 gap-3">
                 <div className="bg-card-2 rounded-xl p-3 text-center border border-line">
@@ -355,7 +365,7 @@ export default function FortuneClient() {
             </div>
 
             {/* 조언 */}
-            <div className="bg-card rounded-[22px] p-5 border border-line">
+            <div id="fy-advice" className="scroll-mt-16 bg-card rounded-[22px] p-5 border border-line">
               <h3 className="font-serif font-bold text-lg mb-3">{FORTUNE_YEAR.year}년 조언</h3>
               <div className="space-y-3">
                 <div className="flex gap-3">
