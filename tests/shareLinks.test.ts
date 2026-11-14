@@ -1,6 +1,6 @@
 import { GUANSANG_TYPES, LEGACY_FACE_KEYS } from '@/content/guansang'
 import { GUANSANG_TYPE_KEYS } from '@/lib/face/guansangKeys'
-import { parseShared, shareUrl, clampScore, faceSlug, mbtiShared } from '@/lib/shareLinks'
+import { parseShared, shareUrl, clampScore, faceSlug, mbtiShared, parseMbtiGenders } from '@/lib/shareLinks'
 
 test('점수는 정수 50~99로 제한, 숫자가 아니면 null', () => {
   expect(clampScore('87')).toBe(87)
@@ -103,4 +103,12 @@ test('사주: 일간 10키 전부 통과, 모르는 키는 null, 링크에 점�
   expect(parseShared('saju', 'bogus')).toBeNull()
   expect(parseShared('saju', 'constructor')).toBeNull()
   expect(shareUrl('saju', 'gyeong', 80)).toBe('https://unse-ai.com/saju/r/gyeong?utm_source=share&utm_medium=friend_link&utm_campaign=saju')
+})
+
+test('MBTI 궁합 공유 링크는 두 캐릭터 성별(g=fm)을 싣고, 틀린 값은 버린다', () => {
+  const u = new URL(mbtiShared('INFP', 'ENTJ', ['f', 'm'])!.url)
+  expect(u.searchParams.get('g')).toBe('fm')
+  expect(new URL(mbtiShared('INFP', 'ENTJ')!.url).searchParams.get('g')).toBeNull()
+  expect(parseMbtiGenders('mf')).toEqual(['m', 'f'])
+  for (const bad of ['', 'f', 'fx', 'fmf', null, undefined]) expect(parseMbtiGenders(bad)).toBeNull()
 })

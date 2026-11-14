@@ -42,18 +42,22 @@ export default function MbtiArticle({ type }: { type: MbtiType }) {
     <div className="max-w-lg mx-auto px-4 py-6 space-y-5">
       <nav className="text-sm text-muted"><Link href="/">홈</Link> › <Link href="/mbti">MBTI</Link> › {type}</nav>
       <p className="text-sm text-muted text-center"><Link href="/face2" className="underline underline-offset-2">내 얼굴은 무슨 상일까?</Link> 사진 한 장으로 확인해 보세요</p>
-      <header className="relative overflow-hidden rounded-[30px] border border-line bg-card">
-        <img
-          src={mbtiArt(type).src}
-          alt={`${type} ${p.nickname} 캐릭터`}
-          width={720}
-          height={960}
-          fetchPriority="high"
-          decoding="async"
-          className="block w-full h-auto aspect-[3/4] object-cover"
-        />
-        <div aria-hidden className="absolute inset-x-0 bottom-0 h-[58%]" style={{ background: "linear-gradient(180deg, rgba(11,16,38,0), rgba(11,16,38,0.88) 60%, var(--color-paper))" }} />
-        <div className="absolute inset-x-5 bottom-4">
+      <header>
+        {/* 남녀 두 캐릭터를 나란히(11/14 사용자 "MBTI도 성별이 둘 다 나와야지") */}
+        <div className="grid grid-cols-2 gap-2.5">
+          {(["f", "m"] as const).map((g) => (
+            <img
+              key={g}
+              src={mbtiArt(type, g).src}
+              alt={`${type} ${p.nickname} ${g === "f" ? "여자" : "남자"} 캐릭터`}
+              width={720}
+              height={960}
+              fetchPriority="high"
+              className="block w-full h-auto aspect-[3/4] object-cover rounded-[22px] border border-line bg-card-2"
+            />
+          ))}
+        </div>
+        <div className="mt-4 px-1">
           <p className="text-sm font-bold text-accent-ink">{p.nickname}</p>
           <h1 className="font-serif text-4xl font-bold mt-1">{type}</h1>
           <div className="flex flex-wrap gap-1.5 mt-3">

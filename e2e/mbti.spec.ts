@@ -50,14 +50,33 @@ test('유형 페이지 → 궁합 계산기 → 결과에서 유형 페이지로
   await expect(page).toHaveURL(/\/mbti\/match/)
 })
 
-test('16유형 페이지: 유형 그림이 실제로 불러와지고 가로로 넘치지 않는다', async ({ page }) => {
+test('16유형 페이지: 남녀 두 캐릭터가 실제로 불러와지고 가로로 넘치지 않는다', async ({ page }) => {
   const errors = trackErrors(page)
   for (const s of SLUGS) {
     await page.goto(`/mbti/${s}`)
-    const img = page.locator(`img[src="/images/mbti/${s}.webp"]`)
-    await expect(img, s).toBeVisible()
-    await expect.poll(() => img.evaluate((i: HTMLImageElement) => i.complete && i.naturalWidth), s).toBe(720)
+    for (const g of ['f', 'm']) {
+      const img = page.locator(`img[src="/images/mbti/${s}-${g}.webp"]`)
+      await expect(img, `${s}-${g}`).toBeVisible()
+      await expect.poll(() => img.evaluate((i: HTMLImageElement) => i.complete && i.naturalWidth), `${s}-${g}`).toBe(720)
+    }
     expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth), s).toBe(true)
   }
   expect(errors).toEqual([])
+})
+
+test('MBTI 궁합: 나·상대 성별을 고르면 결과에 두 캐릭터가 그 성별로 나오고, 공유 링크에 g가 실린다', async ({ page }) => {
+  await page.goto('/mbti/match')
+  await page.getByRole('group', { name: '나의 MBTI' }).getByRole('button', { name: 'INFP', exact: true }).click()
+  await page.getByRole('group', { name: '상대의 MBTI' }).getByRole('button', { name: 'ENTJ', exact: true }).click()
+  await page.getByRole('radiogroup', { name: '나의 MBTI 성별' }).getByRole('radio', { name: '남' }).click()
+  await page.getByRole('radiogroup', { name: '상대의 MBTI 성별' }).getByRole('radio', { name: '여' }).click()
+  await page.getByRole('button', { name: /INFP × ENTJ 궁합 보기/ }).click()
+  const result = page.getByRole('region', { name: '궁합 결과' })
+  for (const src of ['/images/mbti/infp-m.webp', '/images/mbti/entj-f.webp']) {
+    const img = result.locator(`img[src="${src}"]`)
+    await expect(img).toBeVisible()
+    await expect.poll(() => img.evaluate((i: HTMLImageElement) => i.complete && i.naturalWidth)).toBe(720)
+  }
+  await page.goto('/mbti/r/infp-entj?g=mf')
+  await expect(page.getByRole('region', { name: '궁합 결과' }).locator('img[src="/images/mbti/infp-m.webp"]')).toBeVisible()
 })

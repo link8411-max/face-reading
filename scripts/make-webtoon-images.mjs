@@ -43,6 +43,9 @@ function find(name) {
 // 동물상 13종 × 여(f)·남(m): public/images/animal/<키>-<f|m>.webp(큰 그림)·-face.webp(얼굴 240)
 const ANIMALS = ['dog', 'cat', 'fox', 'bear', 'rabbit', 'deer', 'tiger', 'eagle', 'desertfox', 'dino', 'wolf', 'squirrel', 'hamster'];
 // MBTI 16유형: public/images/mbti/<유형>.webp·-face.webp (원본 mbti-<유형>)
+// + 남녀 둘(11/14): <유형>-<f|m>.webp. 처음 뽑은 성별은 원본 mbti-<유형>, 반대 성별은 mbti-<유형>-<f|m>(크롭도 그 이름). src/lib/art.ts MBTI_BASE_GENDER와 같다.
+const MBTI_BASE_M = ['intj', 'entp', 'enfj', 'istj', 'estj', 'istp', 'isfp', 'estp'];
+const mbtiSrc = (m, g) => ((g === 'm') === MBTI_BASE_M.includes(m) ? `mbti-${m}` : `mbti-${m}-${g}`);
 const MBTIS = ['enfj', 'enfp', 'entj', 'entp', 'esfj', 'esfp', 'estj', 'estp', 'infj', 'infp', 'intj', 'intp', 'isfj', 'isfp', 'istj', 'istp'];
 // 띠 12 × 여·남: public/images/zodiac/<slug>-<f|m>.webp·-face.webp (원본 zodiac-<slug>-<f|m>)
 const ZODIACS = ['rat', 'ox', 'tiger', 'rabbit', 'dragon', 'snake', 'horse', 'sheep', 'monkey', 'rooster', 'dog', 'pig'];
@@ -52,6 +55,7 @@ const JOBS = [
   ...Object.entries(FILES).map(([key, name]) => ({ out: OUT, key, name, og: true })),
   ...ANIMALS.flatMap((a) => ['f', 'm'].map((g) => ({ out: OUT_ANIMAL, key: `${a}-${g}`, name: `${a}-${g}`, og: false }))),
   ...MBTIS.map((m) => ({ out: OUT_MBTI, key: m, name: `mbti-${m}`, og: false })),
+  ...MBTIS.flatMap((m) => ['f', 'm'].map((g) => ({ out: OUT_MBTI, key: `${m}-${g}`, name: mbtiSrc(m, g), og: false }))),
   ...ZODIACS.flatMap((z) => ['f', 'm'].map((g) => ({ out: OUT_ZODIAC, key: `${z}-${g}`, name: `zodiac-${z}-${g}`, og: false }))),
   ...FACES.flatMap((k) => ['f', 'm'].map((g) => ({ out: OUT_FACE, key: `${k}-${g}`, name: `face-${k}-${g}`, og: false }))),
 ];

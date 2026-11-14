@@ -9,6 +9,7 @@ import { faceMatch, REL, REL_NAME, type Rel } from '@/lib/faceMatch/compat'
 import type { AnimalKey } from '@/lib/animal/matcher'
 import { josa } from '@/lib/josa'
 import { SITE, UTM } from '@/lib/shareBase'
+import type { ArtGender } from '@/lib/animal/art'
 import { localePath, type Locale } from '@/lib/i18n/locales'
 import { GUANSANG_TYPES, LEGACY_FACE_KEYS } from '@/content/guansang'
 import { isGuansangTypeKey } from '@/lib/face/guansangKeys'
@@ -83,12 +84,16 @@ export function shareUrl(kind: ShareKind, key: string, score?: number, locale: L
 }
 
 // MBTI 궁합 공유 링크는 계산기(/mbti/match, 검색 노출·정적)와 다른 주소 /mbti/r/infp-entj (검색 제외)
-export function mbtiShared(aIn: string, bIn: string): { a: string; b: string; score: number; phrase: string; url: string; path: string } | null {
+// g: 두 캐릭터의 성별 두 글자(나·상대, 예 "fm"). 공유 링크에 실어 받는 사람도 같은 두 캐릭터를 본다(11/14). 틀린 값은 버린다.
+export const parseMbtiGenders = (g: string | null | undefined): [ArtGender, ArtGender] | null =>
+  g && /^[fm]{2}$/.test(g) ? [g[0] as ArtGender, g[1] as ArtGender] : null
+
+export function mbtiShared(aIn: string, bIn: string, g?: [ArtGender, ArtGender] | null): { a: string; b: string; score: number; phrase: string; url: string; path: string } | null {
   const a = aIn.toUpperCase(), b = bIn.toUpperCase()
   if (!isMbti(a) || !isMbti(b)) return null
   const score = compatSummary(a, b).total
   const path = `/mbti/r/${a.toLowerCase()}-${b.toLowerCase()}`
-  return { a, b, score, phrase: `${a}랑 ${b} 궁합 ${score}점이래. 우리도 해볼까?`, path, url: `${SITE}${path}?${UTM('mbti_match')}` }
+  return { a, b, score, phrase: `${a}랑 ${b} 궁합 ${score}점이래. 우리도 해볼까?`, path, url: `${SITE}${path}?${g ? `g=${g.join('')}&` : ''}${UTM('mbti_match')}` }
 }
 
 // 결과 미리보기 이미지 주소 (카톡·인스타 미리보기, 카카오톡 공유 카드)

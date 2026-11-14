@@ -2,10 +2,10 @@ import type { Metadata } from "next";
 import { redirect } from "next/navigation";
 import MatchCalculator from "@/components/mbti/MatchCalculator";
 import CoupangBanner from "@/components/CoupangBanner";
-import { mbtiShared, ogImageUrl, SITE } from "@/lib/shareLinks";
+import { mbtiShared, ogImageUrl, parseMbtiGenders, SITE } from "@/lib/shareLinks";
 import type { MbtiType } from "@/lib/mbti/compat";
 
-type Props = { params: Promise<{ pair: string }> };
+type Props = { params: Promise<{ pair: string }>; searchParams: Promise<{ g?: string }> };
 
 const parse = (pair: string) => {
   const [a = "", b = ""] = pair.split("-");
@@ -28,15 +28,16 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   };
 }
 
-export default async function MbtiSharePage({ params }: Props) {
+export default async function MbtiSharePage({ params, searchParams }: Props) {
   const m = parse((await params).pair);
+  const g = parseMbtiGenders((await searchParams).g);
   if (!m) redirect("/mbti/match");
   return (
     <div className="max-w-lg mx-auto px-4 py-6 space-y-5">
       <header>
         <h1 className="font-serif text-3xl font-bold">MBTI 궁합</h1>
       </header>
-      <MatchCalculator initial={{ a: m.a as MbtiType, b: m.b as MbtiType, fromShare: true }} />
+      <MatchCalculator initial={{ a: m.a as MbtiType, b: m.b as MbtiType, fromShare: true, g }} />
       <CoupangBanner subId="share-mbti" />
     </div>
   );

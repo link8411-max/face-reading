@@ -59,6 +59,11 @@ test.each(MBTI_TYPES)('MBTI %s: 큰 그림 720×960, 얼굴 240×240', async (t)
   await checkArt(mbtiArt(t))
 })
 
+const MBTI_ART = MBTI_TYPES.flatMap((t) => (['f', 'm'] as const).map((g) => [t, g] as const))
+test.each(MBTI_ART)('MBTI %s 남녀 %s: 큰 그림 720×960, 얼굴 240×240', async (t, g) => {
+  await checkArt(mbtiArt(t, g))
+})
+
 const ZODIAC_ART = ZODIAC_SLUGS.flatMap((z) => (['f', 'm'] as const).map((g) => [z, g] as const))
 test.each(ZODIAC_ART)('띠 %s-%s: 큰 그림 720×960, 얼굴 240×240', async (z, g) => {
   await checkArt(zodiacArt(z, g))

@@ -10,12 +10,14 @@ import { UI } from '@/content/ko/ui'
 
 const imgs = (html: string) => html.match(/<img [^>]*>/g) ?? []
 
-test.each(MBTI_TYPES)('/mbti/%s: 서버 HTML에 유형 그림(alt·크기)과 h1이 있다', (t) => {
+test.each(MBTI_TYPES)('/mbti/%s: 서버 HTML에 남녀 두 캐릭터(alt·크기)와 h1이 있다', (t) => {
   const html = renderToStaticMarkup(<MbtiArticle type={t} />)
-  const big = imgs(html).find((i) => i.includes(`/images/mbti/${t.toLowerCase()}.webp`)) ?? ''
-  expect(big).toMatch(new RegExp(`alt="${t} [^"]+ 캐릭터"`))
-  expect(big).toContain('width="720"')
-  expect(big).toContain('height="960"')
+  for (const [g, word] of [['f', '여자'], ['m', '남자']] as const) {
+    const im = imgs(html).find((i) => i.includes(`/images/mbti/${t.toLowerCase()}-${g}.webp`)) ?? ''
+    expect(im, `${t}-${g}`).toMatch(new RegExp(`alt="${t} [^"]+ ${word} 캐릭터"`))
+    expect(im).toContain('width="720"')
+    expect(im).toContain('height="960"')
+  }
   expect(html).toMatch(new RegExp(`<h1[^>]*>${t}</h1>`))
 })
 
